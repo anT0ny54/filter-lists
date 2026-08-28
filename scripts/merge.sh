@@ -7,7 +7,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
 SOURCES="$REPO_DIR/sources.txt"
-CUSTOM="$REPO_DIR/custom-rules.txt"
 OUTPUT="$REPO_DIR/filters.txt"
 TEMP_DIR=$(mktemp -d)
 INCLUDE_DIR="$TEMP_DIR/includes"
@@ -38,33 +37,26 @@ validate_filter_list() {
     lines=$(wc -l < "$file" | tr -d ' ')
     size=$(wc -c < "$file" | tr -d ' ')
 
-    # 1. Reject tiny files — real filter lists are at minimum several KB.
-    #    Anything under 500 bytes is an error page, rate-limit response, or redirect stub.
     if [ "$size" -lt 500 ]; then
         echo "   [SKIP] Too small (${size} bytes) — $url"
         return 1
     fi
 
-    # 2. Reject suspiciously short files (< 5 lines)
     if [ "$lines" -lt 5 ]; then
         echo "   [SKIP] Too few lines (${lines}) — $url"
         return 1
     fi
 
-    # 3. Reject HTML error pages: proxy blocks, 404s, captchas, Tomcat errors,
-    #    CloudFlare challenges, rate-limit pages.
     if head -20 "$file" | grep -qi '<!doctype\|<html\|HTTP Status [0-9]\|<title>'; then
         echo "   [SKIP] HTML/error page — $url"
         return 1
     fi
 
-    # 4. Reject JSON error responses (API auth errors, rate limits returning JSON)
     if head -3 "$file" | grep -qE '^[[:space:]]*\{'; then
         echo "   [SKIP] JSON response (not a filter list) — $url"
         return 1
     fi
 
-    # 5. Reject binary/executable files
     if file -b --mime "$file" 2>/dev/null | grep -q 'binary\|octet-stream\|executable'; then
         echo "   [SKIP] Binary content — $url"
         return 1
@@ -73,21 +65,15 @@ validate_filter_list() {
     return 0
 }
 
-# ──────────────────────────────────────────────
-# Resolve !#include directives recursively
-# Downloads included files relative to the parent URL
-# ──────────────────────────────────────────────
 resolve_includes() {
     local file="$1"
     local base_url="$2"
     local depth="$3"
 
-    # Safety: max recursion depth of 3 to prevent infinite loops
     if [ "$depth" -gt 3 ]; then
         return
     fi
 
-    # Check total timeout
     local now
     now=$(date +%s)
     if [ $((now - start_time)) -gt "$TOTAL_TIMEOUT" ]; then
@@ -95,22 +81,16 @@ resolve_includes() {
         return
     fi
 
-    # Get the directory part of the URL (strip filename)
     local dir_url
     dir_url=$(echo "$base_url" | sed 's|/[^/]*$|/|')
 
-    # Use unique temp file per call to avoid collisions across recursion
     local inc_list="$TEMP_DIR/.inc_paths_${depth}_$RANDOM.txt"
 
-    # Extract all !#include paths to a temp file (avoids subshell issues)
     grep '^!#include ' "$file" 2>/dev/null | sed 's/^!#include //' | tr -d '\r' > "$inc_list" || true
 
-    # Process each include path
     while IFS= read -r include_path; do
-        # Skip empty paths
         [ -z "$include_path" ] && continue
 
-        # Build full URL
         local include_url
         if echo "$include_path" | grep -q '^https\?://'; then
             include_url="$include_path"
@@ -118,24 +98,20 @@ resolve_includes() {
             include_url="${dir_url}${include_path}"
         fi
 
-        # Unique filename via counter file
         local fc
         fc=$(cat "$TEMP_DIR/.counter")
         fc=$((fc + 1))
         echo "$fc" > "$TEMP_DIR/.counter"
         local include_file="$INCLUDE_DIR/inc_${fc}.txt"
 
-        # Download with timeout (--compressed: accept gzip/deflate, auto-decoded by curl)
         if curl -s -L --compressed --max-time "$INCLUDE_TIMEOUT" --retry 1 \
                -o "$include_file" "$include_url" 2>/dev/null; then
             local inc_lines inc_size
             inc_lines=$(wc -l < "$include_file" | tr -d ' ')
             inc_size=$(wc -c < "$include_file" | tr -d ' ')
-            # Apply same quality gates as main validation: size + line count + HTML check
             if [ "$inc_lines" -gt 1 ] && [ "$inc_size" -gt 200 ]; then
                 if ! head -10 "$include_file" | grep -qi '<!doctype\|<html\|HTTP Status\|<title>'; then
                     echo "      [+] $inc_lines lines — ${include_path:0:60}"
-                    # Recursively resolve includes in this file too
                     resolve_includes "$include_file" "$include_url" $((depth + 1))
                 else
                     echo "      [-] HTML/error response — ${include_path:0:60}"
@@ -152,9 +128,6 @@ resolve_includes() {
     rm -f "$inc_list"
 }
 
-# ──────────────────────────────────────────────
-# Pre-flight checks
-# ──────────────────────────────────────────────
 if [ ! -f "$SOURCES" ]; then
     echo "[ERROR] sources.txt not found at $SOURCES"
     exit 1
@@ -172,10 +145,8 @@ skipped=0
 includes_found=0
 
 while IFS= read -r url; do
-    # Skip comments and blank lines
     [[ -z "$url" || "$url" =~ ^# ]] && continue
 
-    # Check total timeout before each download
     now=$(date +%s)
     if [ $((now - start_time)) -gt "$TOTAL_TIMEOUT" ]; then
         echo "   [!] Total timeout (${TOTAL_TIMEOUT}s) reached, stopping downloads"
@@ -191,7 +162,6 @@ while IFS= read -r url; do
             echo "   [OK] $lines lines — ${url:0:80}"
             success=$((success + 1))
 
-            # Check for !#include directives and resolve them
             inc_count=$(grep -c '^!#include ' "$filename" 2>/dev/null || true)
             inc_count=${inc_count:-0}
             if [ "$inc_count" -gt 0 ]; then
@@ -210,7 +180,6 @@ while IFS= read -r url; do
     fi
 done < "$SOURCES"
 
-# Count how many include files were downloaded
 inc_downloaded=$(find "$INCLUDE_DIR" -name 'inc_*.txt' 2>/dev/null | wc -l | tr -d ' ')
 
 echo ""
@@ -218,19 +187,10 @@ echo ">> Downloaded $success/$total lists ($failed failed, $skipped skipped)"
 echo ">> Resolved $inc_downloaded included sub-files"
 echo ">> Processing rules..."
 
-# ──────────────────────────────────────────────
-# Merge, strip comments, deduplicate
-# ──────────────────────────────────────────────
-
-# Safely combine files — ensure each file ends with a newline to prevent
-# last-line-of-file-N merging with first-line-of-file-N+1 (e.g. a rule
-# getting "[Adblock Plus 2.0]" or "! Title:" appended to it).
 {
-    # Main downloaded lists (always exist if any download succeeded)
     for f in "$TEMP_DIR"/list_*.txt; do
         [ -f "$f" ] && { cat "$f"; printf '\n'; }
     done
-    # Included sub-files (may not exist)
     for f in "$INCLUDE_DIR"/inc_*.txt; do
         [ -f "$f" ] && { cat "$f"; printf '\n'; }
     done
@@ -247,7 +207,6 @@ echo ">> Processing rules..."
   | grep -vE '\-abp-properties\(' \
   > "$TEMP_DIR/all_rules_raw.txt" || true
 
-# Bail out if no rules were collected
 if [ ! -s "$TEMP_DIR/all_rules_raw.txt" ]; then
     echo "   [ERROR] No rules collected — check network and source URLs"
     exit 1
@@ -255,58 +214,27 @@ fi
 
 echo "   Raw rules: $(wc -l < "$TEMP_DIR/all_rules_raw.txt" | tr -d ' ')"
 
-# ──────────────────────────────────────────────────────────────────────────────
-# YouTube conflict prevention
-# Strip youtube.com cosmetic + scriptlet rules from non-uBlock sources.
-# These rules trigger YouTube's DOM mutation detector even while uBlock's
-# trusted-replace-fetch-response bypass scriptlet is active.
-#
-# Pattern note: ## matches both element hiding (domain##.sel) AND scriptlet
-# rules (domain##+js(...)) because ##+js contains ##.
-# Exception rules (#@#) are NOT matched, so they pass through unaffected.
-#
-# We preserve any youtube.com trusted-* scriptlets (the actual bypass rules)
-# by extracting them first, stripping all ##-based youtube rules, then
-# re-adding only the trusted ones.
-# ──────────────────────────────────────────────────────────────────────────────
-
-# Step 1: Save trusted-* scriptlet rules for youtube.com (bypass — always keep)
 grep -E 'youtube\.com.*##[+]js[(]trusted-' "$TEMP_DIR/all_rules_raw.txt" \
     > "$TEMP_DIR/youtube_trusted.txt" 2>/dev/null || true
 yt_trusted=$(wc -l < "$TEMP_DIR/youtube_trusted.txt" | tr -d ' ')
 echo "   YouTube bypass scriptlets preserved: $yt_trusted"
 
-# Step 2: Strip ALL youtube.com cosmetic + non-trusted-scriptlet rules
 grep -vE 'youtube\.com.*##' "$TEMP_DIR/all_rules_raw.txt" \
     > "$TEMP_DIR/all_rules_no_yt_cosmetic.txt" 2>/dev/null || true
 stripped=$(( $(wc -l < "$TEMP_DIR/all_rules_raw.txt" | tr -d ' ') - $(wc -l < "$TEMP_DIR/all_rules_no_yt_cosmetic.txt" | tr -d ' ') ))
 echo "   YouTube cosmetic/scriptlet rules stripped: $stripped"
 
-# Step 3: Re-add only the trusted bypass scriptlets
 cat "$TEMP_DIR/all_rules_no_yt_cosmetic.txt" "$TEMP_DIR/youtube_trusted.txt" \
     > "$TEMP_DIR/all_rules_clean.txt"
 
-# Deduplicate (sort -u)
 sort -u "$TEMP_DIR/all_rules_clean.txt" > "$TEMP_DIR/all_rules_dedup.txt"
 echo "   After dedup: $(wc -l < "$TEMP_DIR/all_rules_dedup.txt" | tr -d ' ')"
 
-# Extract custom rules (keep comments for section readability)
-if [ -f "$CUSTOM" ]; then
-    grep -v '^\s*$' "$CUSTOM" > "$TEMP_DIR/custom_rules.txt" 2>/dev/null || true
-else
-    touch "$TEMP_DIR/custom_rules.txt"
-fi
-
-# Count totals
 subscription_count=$(wc -l < "$TEMP_DIR/all_rules_dedup.txt" | tr -d ' ')
-custom_count=$(grep -cv '^!' "$TEMP_DIR/custom_rules.txt" 2>/dev/null || echo "0")
-custom_count=$(echo "$custom_count" | tr -d ' ')
-total_rules=$((subscription_count + custom_count))
+total_rules=$subscription_count
 
-# Generate timestamp
 timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
-# Build the final file
 cat > "$OUTPUT" << HEADER
 ! Title: Adblock Filter List
 ! Description: Comprehensive ads, privacy & annoyance protection
@@ -314,10 +242,10 @@ cat > "$OUTPUT" << HEADER
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/SamirPaulb/filter-lists/blob/main/LICENSE
-! Total rules: ${total_rules} (${subscription_count} from ${success} sources + ${custom_count} custom)
+! Total rules: ${total_rules} (${subscription_count} from ${success} sources)
 !
 ! Auto-generated by GitHub Actions. Do not edit directly.
-! To modify: edit sources.txt or custom-rules.txt and push.
+! To modify: edit sources.txt and push.
 !
 ! SETUP: Subscribe to this single URL in your browser:
 !   https://raw.githubusercontent.com/anT0ny54/filter-lists/refs/heads/main/filters.txt
@@ -330,21 +258,11 @@ HEADER
 
 cat "$TEMP_DIR/all_rules_dedup.txt" >> "$OUTPUT"
 
-cat >> "$OUTPUT" << SEPARATOR
-
-! ==============================
-! CUSTOM RULES
-! ==============================
-SEPARATOR
-
-cat "$TEMP_DIR/custom_rules.txt" >> "$OUTPUT"
-
-# Final timing
 end_time=$(date +%s)
 elapsed=$((end_time - start_time))
 
 echo ""
 echo ">> Output: $OUTPUT"
-echo ">> Total rules: $total_rules ($subscription_count subscription + $custom_count custom)"
+echo ">> Total rules: $total_rules ($subscription_count subscription)"
 echo ">> Completed in ${elapsed}s"
 echo ">> Done!"
