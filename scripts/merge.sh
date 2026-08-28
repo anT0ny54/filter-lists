@@ -255,7 +255,7 @@ fi
 
 echo "   Raw rules: $(wc -l < "$TEMP_DIR/all_rules_raw.txt" | tr -d ' ')"
 
-# ──────────────────────────────────────────────────────────────────────────────
+# ────────────────────────────────────────────────────────────────────────────────
 # YouTube conflict prevention
 # Strip youtube.com cosmetic + scriptlet rules from non-uBlock sources.
 # These rules trigger YouTube's DOM mutation detector even while uBlock's
@@ -268,7 +268,7 @@ echo "   Raw rules: $(wc -l < "$TEMP_DIR/all_rules_raw.txt" | tr -d ' ')"
 # We preserve any youtube.com trusted-* scriptlets (the actual bypass rules)
 # by extracting them first, stripping all ##-based youtube rules, then
 # re-adding only the trusted ones.
-# ──────────────────────────────────────────────────────────────────────────────
+# ────────────────────────────────────────────────────────────────────────────────
 
 # Step 1: Save trusted-* scriptlet rules for youtube.com (bypass — always keep)
 grep -E 'youtube\.com.*##[+]js[(]trusted-' "$TEMP_DIR/all_rules_raw.txt" \
@@ -300,7 +300,8 @@ fi
 # Count totals
 subscription_count=$(wc -l < "$TEMP_DIR/all_rules_dedup.txt" | tr -d ' ')
 custom_count=$(grep -cv '^!' "$TEMP_DIR/custom_rules.txt" 2>/dev/null || echo "0")
-custom_count=$(echo "$custom_count" | tr -d ' ')
+custom_count=$(echo "$custom_count" | xargs)  # Clean all whitespace (spaces, tabs, newlines)
+custom_count=${custom_count:-0}  # Default to 0 if empty
 total_rules=$((subscription_count + custom_count))
 
 # Generate timestamp
