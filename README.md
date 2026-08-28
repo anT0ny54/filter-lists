@@ -1,6 +1,6 @@
 # Filter Lists
 
-Comprehensive ad, tracker, malware, phishing & annoyance filter list — auto-compiled from 70+ trusted sources into a single file.
+Comprehensive ads, privacy & annoyance filter list — auto-compiled from trusted sources into a single file.
 
 ## Subscribe
 
