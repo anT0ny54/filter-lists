@@ -308,11 +308,11 @@ timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
 # Build the final file
 cat > "$OUTPUT" << HEADER
-! Title: Samir's Ultimate Filter List
-! Description: Comprehensive ad, tracker, malware, phishing & annoyance protection
+! Title: Adblock Filter List
+! Description: Comprehensive ads, privacy & annoyance protection
 ! Last updated: ${timestamp}
 ! Expires: 1 day
-! Homepage: https://github.com/SamirPaulb/filter-lists
+! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/SamirPaulb/filter-lists/blob/main/LICENSE
 ! Total rules: ${total_rules} (${subscription_count} from ${success} sources + ${custom_count} custom)
 !
@@ -320,25 +320,8 @@ cat > "$OUTPUT" << HEADER
 ! To modify: edit sources.txt or custom-rules.txt and push.
 !
 ! SETUP: Subscribe to this single URL in your browser:
-!   https://raw.githubusercontent.com/SamirPaulb/filter-lists/refs/heads/main/filters.txt
+!   https://raw.githubusercontent.com/anT0ny54/filter-lists/refs/heads/main/filters.txt
 !
-! ──────────────────────────────────────────────────────
-! uBlock Origin — one-time setup to fix YouTube ad detection:
-!
-!   This list includes uBlock's YouTube bypass rules (trusted-replace-fetch-response,
-!   trusted-prevent-dom-bypass, trusted-rpnt, etc.). uBlock Origin silently disables
-!   these "trusted-*" scriptlets from external subscriptions by default, which lets
-!   YouTube detect your adblocker. Fix it once:
-!
-!   1. Open uBlock Origin dashboard → Settings tab
-!   2. Check "I am an advanced user" → click the ⚙ gear icon
-!   3. Find: trustedListPrefixes
-!   4. Change: ublock-
-!      To:     ublock- https://raw.githubusercontent.com/SamirPaulb/
-!   5. Save — YouTube anti-adblock popup will never appear again.
-!
-!   Brave Shields / AdGuard: no extra steps needed.
-! ──────────────────────────────────────────────────────
 !
 ! ==============================
 ! SUBSCRIPTION RULES (merged from ${success} sources)
