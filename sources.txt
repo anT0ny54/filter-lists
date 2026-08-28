@@ -2,103 +2,36 @@
 # Each line is a URL to a filter list that will be downloaded and merged.
 # Lines starting with # are comments.
 
-# --- Ad Blocking ---
-https://easylist.to/easylist/easylist.txt
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-general.txt
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-2024.txt
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-2025.txt
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-2026.txt
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-mobile.txt
-https://filters.adtidy.org/extension/ublock/filters/2_without_easylist.txt
-https://filters.adtidy.org/extension/ublock/filters/11.txt
-https://pgl.yoyo.org/adservers/serverlist.php?hostformat=adblockplus&showintro=0&mimetype=plaintext
+# Basic Adblock
+https://filters.adtidy.org/extension/ublock/filters/101_optimized.txt
+https://easylist-downloads.adblockplus.org/easylist-minified.txt
+https://filters.adtidy.org/extension/ublock/filters/118_optimized.txt
+https://easylist-downloads.adblockplus.org/easyprivacy-minified.txt
+https://filters.adtidy.org/extension/ublock/filters/122_optimized.txt
+https://filters.adtidy.org/extension/ublock/filters/123_optimized.txt
+https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt
 
-# --- Privacy & Tracking ---
-https://easylist.to/easylist/easyprivacy.txt
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy.txt
-https://filters.adtidy.org/extension/ublock/filters/3.txt
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy-removeparam.txt
-https://raw.githubusercontent.com/yokoffing/filterlists/main/privacy_essentials.txt
-https://filters.adtidy.org/extension/ublock/filters/17.txt
-https://filters.adtidy.org/extension/ublock/filters/4.txt
+# EasyList China
+https://filters.adtidy.org/extension/ublock/filters/104_optimized.txt
+https://easylist-downloads.adblockplus.org/easylistchina-minified.txt
 
-# --- Malware, Phishing & Security ---
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/badware.txt
-https://malware-filter.gitlab.io/malware-filter/urlhaus-filter.txt
-https://malware-filter.gitlab.io/malware-filter/phishing-filter.txt
-https://raw.githubusercontent.com/Spam404/lists/master/adblock-list.txt
-https://raw.githubusercontent.com/DandelionSprout/adfilt/master/Dandelion%20Sprout's%20Anti-Malware%20List.txt
-https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.txt
-https://raw.githubusercontent.com/iam-py-test/my_filters_001/main/antimalware.txt
-https://raw.githubusercontent.com/yokoffing/filterlists/main/enhanced_site_protection.txt
-https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/hoster.txt
-https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/dyndns.txt
+# Liste FR
+https://filters.adtidy.org/extension/ublock/filters/113_optimized.txt
+https://easylist-downloads.adblockplus.org/liste_fr-minified.txt
 
-# --- Annoyances ---
-https://easylist.to/easylist/fanboy-annoyance.txt
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/annoyances-cookies.txt
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/annoyances-others.txt
-https://filters.adtidy.org/extension/ublock/filters/14.txt
-https://filters.adtidy.org/extension/ublock/filters/19.txt
-https://raw.githubusercontent.com/DandelionSprout/adfilt/master/AnnoyancesList
-https://secure.fanboy.co.nz/fanboy-newsletter.txt
-https://secure.fanboy.co.nz/fanboy-mobile-notifications.txt
-https://easylist-downloads.adblockplus.org/fanboy-social.txt
-https://raw.githubusercontent.com/yokoffing/filterlists/main/annoyance_list.txt
-https://raw.githubusercontent.com/yokoffing/filterlists/main/click2load.txt
-
-# --- Resource Abuse & Crypto Mining ---
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/resource-abuse.txt
-https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/nocoin.txt
-
-# --- AdGuard Master DNS Filter ---
-https://filters.adtidy.org/extension/ublock/filters/15.txt
-
-# --- Comprehensive Domain Blocking ---
-https://big.oisd.nl
-https://someonewhocares.org/hosts/hosts
-
-# --- Regional ---
-https://filters.adtidy.org/extension/ublock/filters/224.txt
-https://filters.adtidy.org/extension/ublock/filters/1.txt
-https://filters.adtidy.org/extension/ublock/filters/7.txt
-https://easylist-downloads.adblockplus.org/easylistchina.txt
-https://raw.githubusercontent.com/easylist/ruadlist/master/RuAdList-uBO.txt
-https://easylist-downloads.adblockplus.org/easylistgermany.txt
-https://fanboy.co.nz/fanboy-korean.txt
-https://raw.githubusercontent.com/realodix/AdBlockID/main/dist/adblockid.adfl.txt
-https://easylist-downloads.adblockplus.org/indianlist.txt
-https://easylist-downloads.adblockplus.org/Liste_AR.txt
-
-# --- Dark Web, Scams & Proxy Bypass ---
-https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/doh-vpn-proxy-bypass.txt
-https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/fake.txt
-
-# --- Redirectors, Link Shorteners & LAN Protection ---
-https://raw.githubusercontent.com/iam-py-test/my_filters_001/main/anti-redirectors.txt
-https://raw.githubusercontent.com/piperun/iploggerfilter/master/filterlist
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/ubo-link-shorteners.txt
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/lan-block.txt
-
-# --- Social, AI & Chat Widgets ---
-https://raw.githubusercontent.com/easylist/easylist/refs/heads/master/fanboy-addon/fanboy_ai_suggestions.txt
-https://raw.githubusercontent.com/easylist/easylist/master/fanboy-addon/fanboy_chatapps_third-party.txt
-
-# --- Brave-Specific ---
-https://raw.githubusercontent.com/brave/adblock-lists/master/brave-unbreak.txt
-https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-firstparty.txt
-https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-specific.txt
-https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-social.txt
-https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/brave-cookie-specific.txt
-https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/yt-shorts.txt
-# DISABLED: hides YouTube recommendations below video (ytm-item-section-renderer.single-column-watch-next-modern-panels)
-# https://raw.githubusercontent.com/brave/adblock-lists/master/brave-lists/yt-distracting.txt
-
-# --- Paywall Bypass ---
-https://raw.githubusercontent.com/liamengland1/miscfilters/master/antipaywall.txt
-https://gitflic.ru/project/magnolia1234/bypass-paywalls-clean-filters/blob/raw?file=bpc-paywall-filter.txt
-
-# --- Unbreak / Fix ---
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/unbreak.txt
-https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/quick-fixes.txt
+# Other EasyList
+https://easylist-downloads.adblockplus.org/abpindo-minified.txt
+https://easylist-downloads.adblockplus.org/abpvn-minified.txt
+https://easylist-downloads.adblockplus.org/bulgarian_list-minified.txt
+https://easylist-downloads.adblockplus.org/easylistdutch-minified.txt
+https://easylist-downloads.adblockplus.org/easylistgermany-minified.txt
+https://easylist-downloads.adblockplus.org/israellist-minified.txt
+https://easylist-downloads.adblockplus.org/easylistitaly-minified.txt
+https://easylist-downloads.adblockplus.org/easylistlithuania-minified.txt
+https://easylist-downloads.adblockplus.org/easylistpolish-minified.txt
+https://easylist-downloads.adblockplus.org/easylistportuguese-minified.txt
+https://easylist-downloads.adblockplus.org/easylistspanish-minified.txt
+https://easylist-downloads.adblockplus.org/indianlist-minified.txt
+https://easylist-downloads.adblockplus.org/latvianlist-minified.txt
+https://easylist-downloads.adblockplus.org/rolist-minified.txt
+https://easylist-downloads.adblockplus.org/ruadlist-minified.txt
