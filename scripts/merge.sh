@@ -153,7 +153,8 @@ MERGED_RULES="$TEMP_DIR/merged_rules.txt"
 } > "$MERGED_RULES"
 
 # Process with Python - read from file instead of stdin
-python3 << 'PY' "$MERGED_RULES"
+{
+  python3 << 'PY' "$MERGED_RULES"
 import sys, re
 from collections import OrderedDict
 
@@ -170,7 +171,7 @@ def normalize_cosmetic(rule):
     # Normalize domain list before ## / #@#
     m = re.match(r'^\s*([^#]+?)(##|#@#)(.*)$', rule)
     if not m:
-        return rule.strip()
+         return rule.strip()
 
     domains, sep, sel = m.group(1).strip(), m.group(2), m.group(3).strip()
     domains = canon_domain_list(domains)
@@ -185,7 +186,7 @@ def rule_key(rule):
 
     # Cosmetic rules
     if "##" in r or "#@#" in r:
-        r = normalize_cosmetic(r)
+         r = normalize_cosmetic(r)
 
         # Lowercase domain hostnames in domain list only
         m = re.match(r'^([^#]+?)(##|#@#)(.*)$', r)
@@ -232,7 +233,8 @@ for r in rules:
 # Sort alphabetically by canonical key
 for k in sorted(seen.keys(), key=lambda x: x.lower()):
     print(seen[k])
-PY > "$TEMP_DIR/final_rules.txt"
+PY
+} > "$TEMP_DIR/final_rules.txt"
 
 if [[ ! -s "$TEMP_DIR/final_rules.txt" ]]; then
   echo "[ERROR] No rules collected."
