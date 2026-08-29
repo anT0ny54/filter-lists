@@ -208,6 +208,9 @@ with open(merged_file, 'r') as f:
         # Skip comment lines (starting with !, [, or #)
         if line.startswith("!") or line.startswith("[") or line.startswith("#"):
             continue
+        # Skip metadata lines with Diff-Path
+        if "Diff-Path:" in line:
+            continue
         if "<" in line and ">" in line and not ("##" in line or "#@#" in line):
             continue
         if "youtube.com" in line and "##+js(trusted-" in line:
