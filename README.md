@@ -20,7 +20,8 @@ https://raw.githubusercontent.com/anT0ny54/filter-lists/refs/heads/main/filters.
 On [KoyebDNS](https://koyeb.com) you can use HaGeZi Blocklists MultiPro+TIF.
 
 | HaGeZi Blocklists | DNS-over-HTTPS |
-| MultiPro + TIF | `flaky-liza-ant0ny54-00dc5eb8.koyeb.app/dns-query` ||
+| --- | --- |
+| MultiPro + TIF | `flaky-liza-ant0ny54-00dc5eb8.koyeb.app/dns-query` |
 
 
 ## How It Works
@@ -44,11 +45,11 @@ A GitHub Action runs daily (fully automatic, zero manual work):
 
 - **Personal use only** — maintained exclusively for the repository owner's personal browsing on personal devices. Not a product, not a service, not offered to the public.
 - **No affiliation** — does not represent any employer, organization, or professional entity (past, present, or future).
-- **Third-party content** — all filter rules originate from independent, publicly available open-source projects. All IP rights remain with their respective authors. No claim of authorship or ownership is made.
+- **Third-party content** — all filter rules originate from independent, publicly available open-source projects. All IP rights remain with their respective authors. No claim of authorship or owners[...]
 - **No distribution or recommendation** — the owner does not encourage, recommend, or endorse use by any third party.
 - **No commercial use** — generates no revenue, accepts no payments, serves no business purpose.
 - **No intent to cause harm** — sole purpose is personal privacy and security. No intent to cause economic loss to any advertiser, publisher, or ad network.
-- **Right to privacy** — personal content filtering is a recognized lawful exercise of individual privacy rights under GDPR (EU), DPDPA (India), CCPA (USA), PIPEDA (Canada), UK GDPR, nDSG (Switzerland), PIPL (China), and other applicable legislation.
+- **Right to privacy** — personal content filtering is a recognized lawful exercise of individual privacy rights under GDPR (EU), DPDPA (India), CCPA (USA), PIPEDA (Canada), UK GDPR, nDSG (Switzerla[...]
 - **No warranty** — provided "as-is" without warranties of any kind. Use at your own risk.
 - **Compliance** — users are solely responsible for compliance with their local laws.
 
