@@ -141,6 +141,8 @@ echo
 echo ">> Downloaded $success/$total lists ($failed failed, $skipped skipped)"
 echo ">> Processing rules..."
 
+# Create intermediate file to avoid broken pipe issues
+MERGED_RULES="$TEMP_DIR/merged_rules.txt"
 {
   for f in "$TEMP_DIR"/list_*.txt; do
     [[ -f "$f" ]] && { cat "$f"; printf '\n'; }
@@ -148,8 +150,10 @@ echo ">> Processing rules..."
   for f in "$INCLUDE_DIR"/inc_*.txt; do
     [[ -f "$f" ]] && { cat "$f"; printf '\n'; }
   done
-} \
-| python3 - "$TEMP_DIR" <<'PY' > "$TEMP_DIR/final_rules.txt"
+} > "$MERGED_RULES"
+
+# Process with Python
+python3 - "$TEMP_DIR" < "$MERGED_RULES" > "$TEMP_DIR/final_rules.txt" <<'PY'
 import sys, re
 from collections import OrderedDict
 
