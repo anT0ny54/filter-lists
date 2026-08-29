@@ -205,6 +205,7 @@ with open(merged_file, 'r') as f:
         line = raw.rstrip("\n").strip()
         if not line:
             continue
+        # Skip comment lines (starting with !, [, or #)
         if line.startswith("!") or line.startswith("[") or line.startswith("#"):
             continue
         if "<" in line and ">" in line and not ("##" in line or "#@#" in line):
