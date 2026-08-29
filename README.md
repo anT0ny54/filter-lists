@@ -14,6 +14,15 @@ https://raw.githubusercontent.com/anT0ny54/filter-lists/refs/heads/main/filters.
 1. Dashboard → Filter lists → Import → paste the URL above
 2. Click "Apply changes"
 
+
+#### :department_store: **MyKoyebDNSServer, free** <a name="dns server"></a>
+
+On [KoyebDNS](https://koyeb.com) you can use HaGeZi Blocklists MultiPro+TIF.
+
+| HaGeZi Blocklists | DNS-over-HTTPS |
+| MultiPro + TIF | `flaky-liza-ant0ny54-00dc5eb8.koyeb.app/dns-query` |
+
+
 ## How It Works
 
 A GitHub Action runs daily (fully automatic, zero manual work):
