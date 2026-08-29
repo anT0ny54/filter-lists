@@ -160,9 +160,9 @@ from collections import OrderedDict
 def canon_domain_list(s):
     parts = []
     for p in s.split(","):
-      p = p.strip()
-      if p and p not in parts:
-        parts.append(p)
+        p = p.strip()
+        if p and p not in parts:
+            parts.append(p)
     parts.sort()
     return ",".join(parts)
 
@@ -170,7 +170,7 @@ def normalize_cosmetic(rule):
     # Normalize domain list before ## / #@#
     m = re.match(r"^\s*([^#]+?)(##|#@#)(.*)$", rule)
     if not m:
-         return rule.strip()
+        return rule.strip()
 
     domains, sep, sel = m.group(1).strip(), m.group(2), m.group(3).strip()
     domains = canon_domain_list(domains)
@@ -185,13 +185,13 @@ def rule_key(rule):
 
     # Cosmetic rules
     if "##" in r or "#@#" in r:
-         r = normalize_cosmetic(r)
+        r = normalize_cosmetic(r)
 
         # Lowercase domain hostnames in domain list only
         m = re.match(r"^([^#]+?)(##|#@#)(.*)$", r)
         if m:
-          doms = ",".join(sorted(set(d.strip().lower() for d in m.group(1).split(",") if d.strip())))
-          return f"{doms}{m.group(2)}{m.group(3).strip()}"
+            doms = ",".join(sorted(set(d.strip().lower() for d in m.group(1).split(",") if d.strip())))
+            return f"{doms}{m.group(2)}{m.group(3).strip()}"
 
     # Network rules: normalize whitespace only
     r = re.sub(r"\s+", "", r)
@@ -201,31 +201,31 @@ rules = []
 merged_file = sys.argv[1]
 with open(merged_file, "r") as f:
     for raw in f:
-         line = raw.rstrip("\n").strip()
-         if not line:
-             continue
-         # Skip comment lines (starting with !, [, or #)
-         if line.startswith("!") or line.startswith("[") or line.startswith("#"):
-             continue
-         # Skip metadata lines with Diff-Path or other markers
-         if "Diff-Path:" in line or line.startswith("---"):
-             continue
-         if "<" in line and ">" in line and not ("##" in line or "#@#" in line):
-             continue
-         if "youtube.com" in line and "##+js(trusted-" in line:
-             # keep trusted youtube scriptlets
-             pass
-         elif "youtube.com" in line and "##" in line:
-             # drop youtube cosmetic rules as in original
-             continue
+        line = raw.rstrip("\n").strip()
+        if not line:
+            continue
+        # Skip comment lines (starting with !, [, or #)
+        if line.startswith("!") or line.startswith("[") or line.startswith("#"):
+            continue
+        # Skip metadata lines with Diff-Path or other markers
+        if "Diff-Path:" in line or line.startswith("---"):
+            continue
+        if "<" in line and ">" in line and not ("##" in line or "#@#" in line):
+            continue
+        if "youtube.com" in line and "##+js(trusted-" in line:
+            # keep trusted youtube scriptlets
+            pass
+        elif "youtube.com" in line and "##" in line:
+            # drop youtube cosmetic rules as in original
+            continue
 
-         # remove unsupported / noisy patterns from original script
-         if re.search(r"(?:^|[,$])(?:app|denyallow)=", line):
-             continue
-         if "-abp-properties(" in line:
-             continue
+        # remove unsupported / noisy patterns from original script
+        if re.search(r"(?:^|[,$])(?:app|denyallow)=", line):
+            continue
+        if "-abp-properties(" in line:
+            continue
 
-         rules.append(line)
+        rules.append(line)
 
 # Preserve last wins for duplicates after canonicalization
 seen = OrderedDict()
