@@ -202,31 +202,31 @@ rules = []
 merged_file = sys.argv[1]
 with open(merged_file, 'r') as f:
     for raw in f:
-        line = raw.rstrip("\n").strip()
-        if not line:
-            continue
-        # Skip comment lines (starting with !, [, or #)
-        if line.startswith("!") or line.startswith("[") or line.startswith("#"):
-            continue
-        # Skip metadata lines with Diff-Path
-        if "Diff-Path:" in line:
-            continue
-        if "<" in line and ">" in line and not ("##" in line or "#@#" in line):
-            continue
-        if "youtube.com" in line and "##+js(trusted-" in line:
-            # keep trusted youtube scriptlets
-            pass
-        elif "youtube.com" in line and "##" in line:
-            # drop youtube cosmetic rules as in original
-            continue
+         line = raw.rstrip("\n").strip()
+         if not line:
+             continue
+         # Skip comment lines (starting with !, [, or #)
+         if line.startswith("!") or line.startswith("[") or line.startswith("#"):
+             continue
+         # Skip metadata lines with Diff-Path or other markers
+         if "Diff-Path:" in line or line.startswith("---"):
+             continue
+         if "<" in line and ">" in line and not ("##" in line or "#@#" in line):
+             continue
+         if "youtube.com" in line and "##+js(trusted-" in line:
+             # keep trusted youtube scriptlets
+             pass
+         elif "youtube.com" in line and "##" in line:
+             # drop youtube cosmetic rules as in original
+             continue
 
-        # remove unsupported / noisy patterns from original script
-        if re.search(r'(?:^|[,$])(?:app|denyallow)=', line):
-            continue
-        if "-abp-properties(" in line:
-            continue
+         # remove unsupported / noisy patterns from original script
+         if re.search(r'(?:^|[,$])(?:app|denyallow)=', line):
+             continue
+         if "-abp-properties(" in line:
+             continue
 
-        rules.append(line)
+         rules.append(line)
 
 # Preserve last wins for duplicates after canonicalization
 seen = OrderedDict()
