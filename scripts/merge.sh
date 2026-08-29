@@ -152,8 +152,8 @@ MERGED_RULES="$TEMP_DIR/merged_rules.txt"
   done
 } > "$MERGED_RULES"
 
-# Process with Python
-python3 - "$TEMP_DIR" < "$MERGED_RULES" > "$TEMP_DIR/final_rules.txt" <<'PY'
+# Process with Python - read from file instead of stdin
+python3 << 'PY' "$MERGED_RULES"
 import sys, re
 from collections import OrderedDict
 
@@ -198,28 +198,30 @@ def rule_key(rule):
     return r
 
 rules = []
-for raw in sys.stdin:
-    line = raw.rstrip("\n").strip()
-    if not line:
-        continue
-    if line.startswith("!") or line.startswith("[") or line.startswith("#"):
-        continue
-    if "<" in line and ">" in line and not ("##" in line or "#@#" in line):
-        continue
-    if "youtube.com" in line and "##+js(trusted-" in line:
-        # keep trusted youtube scriptlets
-        pass
-    elif "youtube.com" in line and "##" in line:
-        # drop youtube cosmetic rules as in original
-        continue
+merged_file = sys.argv[1]
+with open(merged_file, 'r') as f:
+    for raw in f:
+        line = raw.rstrip("\n").strip()
+        if not line:
+            continue
+        if line.startswith("!") or line.startswith("[") or line.startswith("#"):
+            continue
+        if "<" in line and ">" in line and not ("##" in line or "#@#" in line):
+            continue
+        if "youtube.com" in line and "##+js(trusted-" in line:
+            # keep trusted youtube scriptlets
+            pass
+        elif "youtube.com" in line and "##" in line:
+            # drop youtube cosmetic rules as in original
+            continue
 
-    # remove unsupported / noisy patterns from original script
-    if re.search(r'(?:^|[,$])(?:app|denyallow)=', line):
-        continue
-    if "-abp-properties(" in line:
-        continue
+        # remove unsupported / noisy patterns from original script
+        if re.search(r'(?:^|[,$])(?:app|denyallow)=', line):
+            continue
+        if "-abp-properties(" in line:
+            continue
 
-    rules.append(line)
+        rules.append(line)
 
 # Preserve last wins for duplicates after canonicalization
 seen = OrderedDict()
@@ -230,7 +232,7 @@ for r in rules:
 # Sort alphabetically by canonical key
 for k in sorted(seen.keys(), key=lambda x: x.lower()):
     print(seen[k])
-PY
+PY > "$TEMP_DIR/final_rules.txt"
 
 if [[ ! -s "$TEMP_DIR/final_rules.txt" ]]; then
   echo "[ERROR] No rules collected."
