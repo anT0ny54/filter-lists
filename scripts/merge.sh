@@ -153,8 +153,7 @@ MERGED_RULES="$TEMP_DIR/merged_rules.txt"
 } > "$MERGED_RULES"
 
 # Process with Python - read from file instead of stdin
-{
-  python3 << 'PY' "$MERGED_RULES"
+python3 -c '
 import sys, re
 from collections import OrderedDict
 
@@ -169,7 +168,7 @@ def canon_domain_list(s):
 
 def normalize_cosmetic(rule):
     # Normalize domain list before ## / #@#
-    m = re.match(r'^\s*([^#]+?)(##|#@#)(.*)$', rule)
+    m = re.match(r"^\s*([^#]+?)(##|#@#)(.*)$", rule)
     if not m:
          return rule.strip()
 
@@ -177,7 +176,7 @@ def normalize_cosmetic(rule):
     domains = canon_domain_list(domains)
 
     # Normalize whitespace in selector only a little; keep ABP-compatible syntax
-    sel = re.sub(r'\s+', ' ', sel)
+    sel = re.sub(r"\s+", " ", sel)
     sel = sel.replace(" ,", ",").replace(", ", ",")
     return f"{domains}{sep}{sel}" if domains else f"{sep}{sel}"
 
@@ -189,18 +188,18 @@ def rule_key(rule):
          r = normalize_cosmetic(r)
 
         # Lowercase domain hostnames in domain list only
-        m = re.match(r'^([^#]+?)(##|#@#)(.*)$', r)
+        m = re.match(r"^([^#]+?)(##|#@#)(.*)$", r)
         if m:
           doms = ",".join(sorted(set(d.strip().lower() for d in m.group(1).split(",") if d.strip())))
           return f"{doms}{m.group(2)}{m.group(3).strip()}"
 
     # Network rules: normalize whitespace only
-    r = re.sub(r'\s+', '', r)
+    r = re.sub(r"\s+", "", r)
     return r
 
 rules = []
 merged_file = sys.argv[1]
-with open(merged_file, 'r') as f:
+with open(merged_file, "r") as f:
     for raw in f:
          line = raw.rstrip("\n").strip()
          if not line:
@@ -221,7 +220,7 @@ with open(merged_file, 'r') as f:
              continue
 
          # remove unsupported / noisy patterns from original script
-         if re.search(r'(?:^|[,$])(?:app|denyallow)=', line):
+         if re.search(r"(?:^|[,$])(?:app|denyallow)=", line):
              continue
          if "-abp-properties(" in line:
              continue
@@ -237,8 +236,7 @@ for r in rules:
 # Sort alphabetically by canonical key
 for k in sorted(seen.keys(), key=lambda x: x.lower()):
     print(seen[k])
-PY
-} > "$TEMP_DIR/final_rules.txt"
+' "$MERGED_RULES" > "$TEMP_DIR/final_rules.txt"
 
 if [[ ! -s "$TEMP_DIR/final_rules.txt" ]]; then
   echo "[ERROR] No rules collected."
