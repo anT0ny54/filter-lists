@@ -20,7 +20,7 @@ https://raw.githubusercontent.com/anT0ny54/filter-lists/refs/heads/main/filters.
 On [KoyebDNS](https://koyeb.com) you can use HaGeZi Blocklists MultiPro+TIF.
 
 | HaGeZi Blocklists | DNS-over-HTTPS |
-| MultiPro + TIF | `flaky-liza-ant0ny54-00dc5eb8.koyeb.app/dns-query` |
+| MultiPro + TIF | `flaky-liza-ant0ny54-00dc5eb8.koyeb.app/dns-query` ||
 
 
 ## How It Works
