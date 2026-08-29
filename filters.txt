@@ -1,10 +1,10 @@
 ! Title: Combined Adblock Filter List
-! Version: v2026.08.29.0949
-! Last updated: 2026-08-29 09:49:28 UTC
+! Version: v2026.08.29.1018
+! Last updated: 2026-08-29 10:18:23 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/SamirPaulb/filter-lists/blob/main/LICENSE
-! Total rules: 180661
+! Total rules: 180663
 !
 ! Auto-generated. Do not edit directly.
 ! Edit sources.txt and rebuild.
@@ -41773,7 +41773,7 @@ clinicaltrialsarena.com,just-food.com,railway-technology.com,retail-insight-netw
 clintonherald.com,ottumwacourier.com,thetimestribune.com###floorboard_block
 clipchamp.com,fletcher.nl,fletcherzakelijk.nl,gdemoideti.ru,intermatic.com,mayflex.com,trouwenbijfletcher.nl##+js(set-cookie,acceptCookies,true)
 cliphot69.info###custom_html-42
-cliphot69.info,cliphotvn69.com,dynadot.rsocdomains.com,phimsexhayvne.com,sayhentai.cx,www.gvnvh18z.com,xamvn.garden##.float-ck-center-lt
+cliphot69.info,cliphotvn69.com,dynadot.rsocdomains.com,phimsexhayvne.com,sayhentai.cx,www.gvnvh18z.com,xamvn.courses##.float-ck-center-lt
 clipphot.co,fullcliphot.org,fulllivehot.us##.cashfish
 clipphot.co,fullcliphot.org,fulllivehot.us##.mini-player
 clipsexsub3x.net##.catfish-bottom
@@ -60127,9 +60127,9 @@ x3cn.com###portal_block_12045
 x6d.com##li:has(>.myad)
 x6d.com,xiaodao0.com##a[href^="/ad."]
 x6g.com##.addd
-xamvn.garden##.float-contact
-xamvn.garden##.float-contact2
-xamvn.garden##.js-notices
+xamvn.courses##.float-contact
+xamvn.courses##.float-contact2
+xamvn.courses##.js-notices
 xasiat.com##.top:has(> [data-zoneid])
 xbabe.com##.bnnrs-aside
 xbdeals.net#@#a[href^="https://click.linksynergy.com/"]
@@ -75325,6 +75325,7 @@ zznews.cn#@#.ad-wrapper
 ||archivescane.com^
 ||archletsnobol.cyou^
 ||archonsomital.shop^
+||archontsmacked.qpon^
 ||archseerepugns.cfd^
 ||archspyandi.cfd^
 ||archswimming.com^
@@ -76550,6 +76551,7 @@ zznews.cn#@#.ad-wrapper
 ||avzmhurdchosj.space^
 ||avzwkkmaqlvbb.top^
 ||aw.perlesandco.com^
+||awaaalxhkqivc.site^
 ||awaiterovey.com^
 ||awaitingcoordinatelassitude.com^
 ||awaitsrereel.qpon^
@@ -109735,7 +109737,7 @@ zznews.cn#@#.ad-wrapper
 ||i.imgur.com^$domain=hentaitube.icu
 ||i.imgur.com^$domain=nintendo-master.com
 ||i.imgur.com^$image,domain=nhacdj.vn|banbuondalat.com|new.tructiepnba.me|phimbet.top
-||i.imgur.com^$image,domain=phim18hd.site|xamvn.garden
+||i.imgur.com^$image,domain=phim18hd.site|xamvn.courses
 ||i.imgur.com^*.gif$image,domain=ghienphimz.show|mv.dailyphimz.com|mv.phimmoiaz.cc|tv.manhvl.com|rophim.moe|soicau247s.org|phim24k.top|jophim.top|rophimz.top
 ||i.imgur.com^*.gif$image,domain=z1.chinav.sex|quatvn.bio
 ||i.lf360.co^
