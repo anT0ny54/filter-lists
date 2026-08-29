@@ -3,6 +3,7 @@
 # Lines starting with # are comments.
 
 # Basic Adblock
+https://filters.adtidy.org/extension/ublock/filters/101_optimized.txt
 https://easylist-downloads.adblockplus.org/easylist-minified.txt
 https://filters.adtidy.org/extension/ublock/filters/118_optimized.txt
 https://easylist-downloads.adblockplus.org/easyprivacy-minified.txt
