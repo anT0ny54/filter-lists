@@ -1,272 +1,388 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
+shopt -s nullglob
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_DIR="$(dirname "$SCRIPT_DIR")"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
+
 SOURCES="$REPO_DIR/sources.txt"
 OUTPUT="$REPO_DIR/filters.txt"
-
-TEMP_DIR="$(mktemp -d)"
-INCLUDE_DIR="$TEMP_DIR/includes"
-mkdir -p "$INCLUDE_DIR"
-trap 'rm -rf "$TEMP_DIR"' EXIT
 
 DOWNLOAD_TIMEOUT=90
 INCLUDE_TIMEOUT=60
 TOTAL_TIMEOUT=3300
 MAX_INCLUDE_DEPTH=3
+CURL_RETRIES=2
 
-start_time=$(date +%s)
-echo "0" > "$TEMP_DIR/.counter"
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+START_TIME=$(date +%s)
+DOWNLOADED="$TMP_DIR/downloaded.urls"
+: > "$DOWNLOADED"
+
+log() {
+    printf '%s\n' "$*"
+}
+
+timed_out() {
+    (( "$(date +%s)" - START_TIME >= TOTAL_TIMEOUT ))
+}
+
+already_downloaded() {
+    grep -Fqx -- "$1" "$DOWNLOADED"
+}
+
+mark_downloaded() {
+    printf '%s\n' "$1" >> "$DOWNLOADED"
+}
+
+valid_url() {
+    [[ "$1" =~ ^https?://[^[:space:]]+$ ]]
+}
 
 validate_filter_list() {
-  local file="$1" url="$2" lines size
-  lines=$(wc -l < "$file" | tr -d ' ')
-  size=$(wc -c < "$file" | tr -d ' ')
+    local file="$1"
+    local url="$2"
+    local bytes lines mime
 
-  [[ "$size" -lt 500 ]] && { echo "   [SKIP] Too small (${size} bytes) — $url"; return 1; }
-  [[ "$lines" -lt 5 ]] && { echo "   [SKIP] Too few lines (${lines}) — $url"; return 1; }
+    bytes=$(wc -c < "$file")
+    lines=$(wc -l < "$file")
 
-  if head -20 "$file" | grep -qiE '<!doctype|<html|HTTP Status [0-9]|<title>'; then
-    echo "   [SKIP] HTML/error page — $url"
-    return 1
-  fi
+    if (( bytes < 500 )); then
+        log "   [SKIP] Too small (${bytes} bytes) — $url"
+        return 1
+    fi
 
-  if head -3 "$file" | grep -qE '^[[:space:]]*\{'; then
-    echo "   [SKIP] JSON response — $url"
-    return 1
-  fi
+    if (( lines < 5 )); then
+        log "   [SKIP] Too few lines (${lines}) — $url"
+        return 1
+    fi
 
-  if file -b --mime "$file" 2>/dev/null | grep -qiE 'binary|octet-stream|executable'; then
-    echo "   [SKIP] Binary content — $url"
-    return 1
-  fi
+    if head -30 "$file" | grep -qiE \
+        '^[[:space:]]*(<!doctype|<html|<head|<title|HTTP/[0-9.] [45][0-9][0-9])'; then
+        log "   [SKIP] HTML/error response — $url"
+        return 1
+    fi
 
-  return 0
+    if head -5 "$file" | grep -qE '^[[:space:]]*\{'; then
+        log "   [SKIP] JSON response — $url"
+        return 1
+    fi
+
+    mime=$(file -b --mime-type "$file" 2>/dev/null || true)
+
+    case "$mime" in
+        application/octet-stream|application/zip|application/gzip|\
+        application/x-executable|application/x-dosexec)
+            log "   [SKIP] Binary content — $url"
+            return 1
+            ;;
+    esac
+
+    return 0
+}
+
+download_list() {
+    local url="$1"
+    local output="$2"
+    local timeout="$3"
+
+    valid_url "$url" || return 1
+    already_downloaded "$url" && return 2
+
+    mark_downloaded "$url"
+
+    curl \
+        --fail \
+        --silent \
+        --show-error \
+        --location \
+        --compressed \
+        --retry "$CURL_RETRIES" \
+        --retry-delay 2 \
+        --connect-timeout 20 \
+        --max-time "$timeout" \
+        --output "$output" \
+        "$url"
+}
+
+resolve_url() {
+    local base="$1"
+    local include="$2"
+
+    if [[ "$include" =~ ^https?:// ]]; then
+        printf '%s\n' "$include"
+    else
+        printf '%s\n' "${base%/*}/$include"
+    fi
 }
 
 resolve_includes() {
-  local file="$1" base_url="$2" depth="$3"
-  (( depth > MAX_INCLUDE_DEPTH )) && return 0
+    local file="$1"
+    local base_url="$2"
+    local depth="$3"
 
-  local now
-  now=$(date +%s)
-  (( now - start_time > TOTAL_TIMEOUT )) && return 0
+    (( depth >= MAX_INCLUDE_DEPTH )) && return 0
+    timed_out && return 0
 
-  local dir_url inc_list
-  dir_url="$(printf '%s' "$base_url" | sed 's|/[^/]*$|/|')"
-  inc_list="$TEMP_DIR/.inc_paths_${depth}_$RANDOM.txt"
+    local include_path include_url include_file
+    local include_index=0
 
-  grep '^!#include ' "$file" 2>/dev/null | sed 's/^!#include //' | tr -d '\r' > "$inc_list" || true
+    while IFS= read -r include_path; do
+        include_path="${include_path//$'\r'/}"
+        [[ -z "$include_path" ]] && continue
 
-  while IFS= read -r include_path; do
-    [[ -z "$include_path" ]] && continue
+        include_url=$(resolve_url "$base_url" "$include_path")
+        include_file="$TMP_DIR/include_${depth}_${include_index}.txt"
+        include_index=$((include_index + 1))
 
-    local include_url
-    if [[ "$include_path" =~ ^https?:// ]]; then
-      include_url="$include_path"
-    else
-      include_url="${dir_url}${include_path}"
-    fi
-
-    local fc include_file
-    fc=$(<"$TEMP_DIR/.counter")
-    fc=$((fc + 1))
-    echo "$fc" > "$TEMP_DIR/.counter"
-    include_file="$INCLUDE_DIR/inc_${fc}.txt"
-
-    if curl -fsSL --compressed --max-time "$INCLUDE_TIMEOUT" --retry 1 \
-      -o "$include_file" "$include_url" 2>/dev/null; then
-
-      if validate_filter_list "$include_file" "$include_url"; then
-        resolve_includes "$include_file" "$include_url" $((depth + 1))
-      fi
-    fi
-  done < "$inc_list"
-
-  rm -f "$inc_list"
+        if download_list "$include_url" "$include_file" "$INCLUDE_TIMEOUT"; then
+            if validate_filter_list "$include_file" "$include_url"; then
+                printf '%s\n' "$include_file" >> "$TMP_DIR/files"
+                resolve_includes \
+                    "$include_file" \
+                    "$include_url" \
+                    $((depth + 1))
+            fi
+        fi
+    done < <(
+        sed -n 's/^[[:space:]]*!#include[[:space:]]\+//p' "$file"
+    )
 }
 
-if [[ ! -f "$SOURCES" ]]; then
-  echo "[ERROR] sources.txt not found at $SOURCES"
-  exit 1
-fi
+[[ -f "$SOURCES" ]] || {
+    log "[ERROR] Missing sources file: $SOURCES"
+    exit 1
+}
 
-source_count=$(grep -cvE '^\s*$|^#' "$SOURCES" 2>/dev/null || echo 0)
-echo ">> Found $source_count source URLs in sources.txt"
-echo ">> Downloading filter lists..."
-echo
+SOURCE_COUNT=$(
+    grep -cEv '^[[:space:]]*(#|$)' "$SOURCES" || true
+)
+
+log ">> Found $SOURCE_COUNT source URLs"
+log ">> Downloading filter lists..."
+log
+
+: > "$TMP_DIR/files"
 
 total=0
 success=0
 failed=0
 skipped=0
+index=0
 
-while IFS= read -r url; do
-  [[ -z "$url" || "$url" =~ ^# ]] && continue
+while IFS= read -r url || [[ -n "$url" ]]; do
+    url="${url//$'\r'/}"
 
-  now=$(date +%s)
-  if (( now - start_time > TOTAL_TIMEOUT )); then
-    echo "   [!] Total timeout reached, stopping downloads"
-    break
-  fi
+    [[ -z "$url" ]] && continue
+    [[ "$url" =~ ^[[:space:]]*# ]] && continue
 
-  total=$((total + 1))
-  filename="$TEMP_DIR/list_${total}.txt"
-
-  if curl -fsSL --compressed --max-time "$DOWNLOAD_TIMEOUT" --retry 1 --retry-delay 3 \
-    -o "$filename" "$url" 2>/dev/null; then
-
-    if validate_filter_list "$filename" "$url"; then
-      lines=$(wc -l < "$filename" | tr -d ' ')
-      echo "   [OK] $lines lines — ${url:0:90}"
-      success=$((success + 1))
-
-      if grep -q '^!#include ' "$filename" 2>/dev/null; then
-        echo "      Resolving includes..."
-        resolve_includes "$filename" "$url" 0
-      fi
-    else
-      rm -f "$filename"
-      skipped=$((skipped + 1))
+    if timed_out; then
+        log "   [!] Total timeout reached"
+        break
     fi
-  else
-    echo "   [FAIL] ${url:0:90}"
-    rm -f "$filename"
-    failed=$((failed + 1))
-  fi
+
+    total=$((total + 1))
+    file="$TMP_DIR/source_${index}.txt"
+    index=$((index + 1))
+
+    case "$(download_list "$url" "$file" "$DOWNLOAD_TIMEOUT"; echo "$?")" in
+        0)
+            if validate_filter_list "$file" "$url"; then
+                lines=$(wc -l < "$file")
+                log "   [OK] $lines lines — ${url:0:100}"
+                printf '%s\n' "$file" >> "$TMP_DIR/files"
+                success=$((success + 1))
+
+                if grep -qE '^[[:space:]]*!#include[[:space:]]+' "$file"; then
+                    log "      Resolving includes..."
+                    resolve_includes "$file" "$url" 0
+                fi
+            else
+                rm -f "$file"
+                skipped=$((skipped + 1))
+            fi
+            ;;
+        2)
+            log "   [SKIP] Duplicate source — $url"
+            skipped=$((skipped + 1))
+            ;;
+        *)
+            log "   [FAIL] ${url:0:100}"
+            rm -f "$file"
+            failed=$((failed + 1))
+            ;;
+    esac
 done < "$SOURCES"
 
-echo
-echo ">> Downloaded $success/$total lists ($failed failed, $skipped skipped)"
-echo ">> Processing rules..."
+log
+log ">> Downloaded $success/$total lists"
+log ">> $failed failed, $skipped skipped"
+log ">> Processing rules..."
 
-# Create intermediate file to avoid broken pipe issues
-MERGED_RULES="$TEMP_DIR/merged_rules.txt"
-{
-  for f in "$TEMP_DIR"/list_*.txt; do
-    [[ -f "$f" ]] && { cat "$f"; printf '\n'; }
-  done
-  for f in "$INCLUDE_DIR"/inc_*.txt; do
-    [[ -f "$f" ]] && { cat "$f"; printf '\n'; }
-  done
-} > "$MERGED_RULES"
+python3 - "$TMP_DIR/files" "$OUTPUT" <<'PY'
+from __future__ import annotations
 
-# Process with Python - read from file instead of stdin
-python3 -c '
-import sys, re
+import re
+import sys
 from collections import OrderedDict
+from datetime import datetime, timezone
 
-def canon_domain_list(s):
-    parts = []
-    for p in s.split(","):
-        p = p.strip()
-        if p and p not in parts:
-            parts.append(p)
-    parts.sort()
-    return ",".join(parts)
+files_file, output_file = sys.argv[1:3]
 
-def normalize_cosmetic(rule):
-    # Normalize domain list before ## / #@#
-    m = re.match(r"^\s*([^#]+?)(##|#@#)(.*)$", rule)
-    if not m:
+# Rules that are not suitable for combined ABP/uBO syntax.
+UNSUPPORTED_OPTIONS = re.compile(
+    r"(?:^|[,|])(?:app|denyallow|method|header)=",
+    re.IGNORECASE,
+)
+
+INCLUDE_DIRECTIVE = re.compile(r"^\s*!#include\b", re.IGNORECASE)
+COMMENT_LINE = re.compile(r"^\s*(?:!|\[Adblock)")
+COSMETIC_RULE = re.compile(r"^\s*([^#]*?)(##|#@#)(.*)$")
+
+# These are usually subscription metadata or update-control directives.
+SKIP_DIRECTIVES = (
+    "! checksum",
+    "! expires",
+    "! homepage",
+    "! license",
+    "! title",
+    "! version",
+    "! last updated",
+    "! redirect",
+    "! redirect-rule",
+    "! moveto",
+    "! diff-path",
+)
+
+def normalize_domains(value: str) -> str:
+    domains = {
+        item.strip().lower()
+        for item in value.split(",")
+        if item.strip()
+    }
+    return ",".join(sorted(domains))
+
+def normalize_cosmetic(rule: str) -> str:
+    match = COSMETIC_RULE.match(rule)
+    if not match:
         return rule.strip()
 
-    domains, sep, sel = m.group(1).strip(), m.group(2), m.group(3).strip()
-    domains = canon_domain_list(domains)
+    domains, separator, selector = match.groups()
 
-    # Normalize whitespace in selector only a little; keep ABP-compatible syntax
-    sel = re.sub(r"\s+", " ", sel)
-    sel = sel.replace(" ,", ",").replace(", ", ",")
-    return f"{domains}{sep}{sel}" if domains else f"{sep}{sel}"
+    domains = normalize_domains(domains)
+    selector = re.sub(r"\s+", " ", selector.strip())
+    selector = re.sub(r"\s*,\s*", ",", selector)
 
-def rule_key(rule):
-    r = rule.strip()
+    return f"{domains}{separator}{selector}" if domains else \
+           f"{separator}{selector}"
 
-    # Cosmetic rules
-    if "##" in r or "#@#" in r:
-        r = normalize_cosmetic(r)
+def normalize_network(rule: str) -> str:
+    rule = rule.strip()
 
-        # Lowercase domain hostnames in domain list only
-        m = re.match(r"^([^#]+?)(##|#@#)(.*)$", r)
-        if m:
-            doms = ",".join(sorted(set(d.strip().lower() for d in m.group(1).split(",") if d.strip())))
-            return f"{doms}{m.group(2)}{m.group(3).strip()}"
+    # Remove unnecessary leading/trailing whitespace only.
+    # Do not remove spaces inside ABP regular expressions.
+    return rule
 
-    # Network rules: normalize whitespace only
-    r = re.sub(r"\s+", "", r)
-    return r
+def canonical(rule: str) -> str:
+    if "##" in rule or "#@#" in rule:
+        return normalize_cosmetic(rule)
 
-rules = []
-merged_file = sys.argv[1]
-with open(merged_file, "r") as f:
-    for raw in f:
-        line = raw.rstrip("\n").strip()
-        if not line:
-            continue
-        # Skip comment lines (starting with !, [, or #)
-        if line.startswith("!") or line.startswith("[") or line.startswith("#"):
-            continue
-        # Skip metadata lines with Diff-Path or other markers
-        if "Diff-Path:" in line or line.startswith("---"):
-            continue
-        if "<" in line and ">" in line and not ("##" in line or "#@#" in line):
-            continue
-        if "youtube.com" in line and "##+js(trusted-" in line:
-            # keep trusted youtube scriptlets
-            pass
-        elif "youtube.com" in line and "##" in line:
-            # drop youtube cosmetic rules as in original
-            continue
+    return normalize_network(rule)
 
-        # remove unsupported / noisy patterns from original script
-        if re.search(r"(?:^|[,$])(?:app|denyallow)=", line):
-            continue
-        if "-abp-properties(" in line:
-            continue
+def is_valid_rule(line: str) -> bool:
+    if not line:
+        return False
 
-        rules.append(line)
+    lower = line.lower()
 
-# Preserve last wins for duplicates after canonicalization
-seen = OrderedDict()
-for r in rules:
-    k = rule_key(r)
-    seen[k] = normalize_cosmetic(r) if ("##" in r or "#@#" in r) else r.strip()
+    if INCLUDE_DIRECTIVE.match(line):
+        return False
 
-# Sort alphabetically by canonical key
-for k in sorted(seen.keys(), key=lambda x: x.lower()):
-    print(seen[k])
-' "$MERGED_RULES" > "$TEMP_DIR/final_rules.txt"
+    if lower.startswith(SKIP_DIRECTIVES):
+        return False
 
-if [[ ! -s "$TEMP_DIR/final_rules.txt" ]]; then
-  echo "[ERROR] No rules collected."
-  exit 1
-fi
+    if COMMENT_LINE.match(line):
+        return False
 
-total_rules=$(wc -l < "$TEMP_DIR/final_rules.txt" | tr -d ' ')
-timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
-version="v$(date -u '+%Y.%m.%d.%H%M')"
+    if line.startswith(("[", "{", "<")):
+        return False
 
-cat > "$OUTPUT" <<HEADER
-! Title: Adblock Filter List
-! Version: ${version}
-! Last updated: ${timestamp}
-! Expires: 1 day
-! Homepage: https://github.com/anT0ny54/filter-lists
-! License: https://github.com/SamirPaulb/filter-lists/blob/main/LICENSE
-! Total rules: ${total_rules} from ${success} sources
-!
-! Auto-generated. Do not edit directly.
-! To modify: edit sources.txt and rebuild.
-!
-! SUBSCRIPTION
-HEADER
+    if "<html" in lower or "<!doctype" in lower:
+        return False
 
-cat "$TEMP_DIR/final_rules.txt" >> "$OUTPUT"
+    if UNSUPPORTED_OPTIONS.search(line):
+        return False
 
-elapsed=$(( $(date +%s) - start_time ))
-echo
-echo ">> Output: $OUTPUT"
-echo ">> Total rules: $total_rules"
-echo ">> Completed in ${elapsed}s"
-echo ">> Done!"
+    # Remove known uBO-only JavaScript cosmetic rules.
+    if "-abp-properties(" in lower:
+        return False
+
+    # Keep only trusted YouTube cosmetic rules if desired.
+    if "youtube.com" in lower and "##" in line:
+        if "##+js(trusted-" not in lower:
+            return False
+
+    return True
+
+files = []
+with open(files_file, encoding="utf-8", errors="ignore") as source:
+    files = [line.strip() for line in source if line.strip()]
+
+rules: OrderedDict[str, str] = OrderedDict()
+
+for filename in files:
+    try:
+        with open(filename, encoding="utf-8", errors="ignore") as source:
+            for raw in source:
+                line = raw.strip()
+
+                if not is_valid_rule(line):
+                    continue
+
+                normalized = canonical(line)
+                rules.setdefault(normalized, normalized)
+
+    except OSError:
+        continue
+
+final_rules = sorted(rules.values(), key=str.casefold)
+
+if not final_rules:
+    print("[ERROR] No valid rules collected.", file=sys.stderr)
+    raise SystemExit(1)
+
+now = datetime.now(timezone.utc)
+version = now.strftime("v%Y.%m.%d.%H%M")
+timestamp = now.strftime("%Y-%m-%d %H:%M:%S UTC")
+
+header = [
+    "! Title: Combined Adblock Filter List",
+    f"! Version: {version}",
+    f"! Last updated: {timestamp}",
+    "! Expires: 1 day",
+    "! Homepage: https://github.com/anT0ny54/filter-lists",
+    "! License: https://github.com/SamirPaulb/filter-lists/blob/main/LICENSE",
+    f"! Total rules: {len(final_rules)}",
+    "!",
+    "! Auto-generated. Do not edit directly.",
+    "! Edit sources.txt and rebuild.",
+    "!",
+]
+
+with open(output_file, "w", encoding="utf-8", newline="\n") as output:
+    output.write("\n".join(header))
+    output.write("\n")
+    output.write("\n".join(final_rules))
+    output.write("\n")
+
+print(f">> Wrote {len(final_rules)} rules")
+PY
+
+elapsed=$(( $(date +%s) - START_TIME ))
+
+log
+log ">> Output: $OUTPUT"
+log ">> Completed in ${elapsed}s"
+log ">> Done!"
