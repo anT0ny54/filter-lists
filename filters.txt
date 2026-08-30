@@ -1,10 +1,10 @@
 ! Title: Combined Adblock Filter List
-! Version: v2026.08.30.0651
-! Last updated: 2026-08-30 06:51:51 UTC
+! Version: v2026.08.30.0923
+! Last updated: 2026-08-30 09:23:55 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/SamirPaulb/filter-lists/blob/main/LICENSE
-! Total rules: 180805
+! Total rules: 180831
 !
 ! Auto-generated. Do not edit directly.
 ! Edit sources.txt and rebuild.
@@ -37407,6 +37407,7 @@ adammendrek.cz,airsoft.ch,iuav.it,racius.com##.cb
 adamtheautomator.com,laurelberninteriors.com,mediaite.com,packhacker.com,packinsider.com#@#.adthrive
 adblock-tester.com##embed[width="240"]
 adblock-tester.com##object[width="240"]
+adblockbench.com##div[class*="ad-"][id][style*="height:"]
 adblockplus.org###cookiebar
 adblockplus.org###social-list
 adbug.cn#@#.google_ads
@@ -52954,6 +52955,7 @@ ozon.ru##.h7
 p-nintendo.com###network > ul > .jm
 p-nintendo.com##.megabanner
 p2peye.com###article_content a[ref="nofollow"]
+p2plive7.top##.wrap-overlay
 p9.com.tw##.contentRightAd
 pacenewsonline.com##.widget_webads_displayads_widget
 pacificcitizen.org###fws_6848546968120
@@ -67986,6 +67988,7 @@ zznews.cn#@#.ad-wrapper
 ||aaponlzrawuzk.site^
 ||aaqnpa.sizeofficial.se^
 ||aaqrvt.thefryecompany.com^
+||aaqryhueblhms.site^
 ||aaqzvhtajrveg.online^
 ||aarjgqhgwrsxti.com^
 ||aarpannuity.newyorklife.com^
@@ -69209,6 +69212,7 @@ zznews.cn#@#.ad-wrapper
 ||adblock-zen.com^
 ||adblock-zen.com^$popup
 ||adblockanalytics.com^
+||adblockbench.com^$csp=connect-src 'self'; img-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'
 ||adblocker-sentinel.net^$popup
 ||adblockermax.com^$document
 ||adblockeromega.com^
@@ -75949,6 +75953,7 @@ zznews.cn#@#.ad-wrapper
 ||atmalinks.com^
 ||atmnews.com.np/wp-content/uploads/2025/08/FB_IMG_1754313351155.jpg
 ||atmtd.com^
+||atmtnnvxgjtqn.website^
 ||atncfddwenjgt.website^
 ||ato.tooopen.com^
 ||atom-data.io/session/latest/track.html?$3p
@@ -76307,6 +76312,7 @@ zznews.cn#@#.ad-wrapper
 ||aux-log.bidmatic.io^
 ||aux.lansator.ro^
 ||auxdciugyclyi.space^
+||auxesesinjures.com^
 ||auxgkjsoqgzko.space^
 ||auxinsdhal.shop^
 ||auxml.com^
@@ -77734,6 +77740,7 @@ zznews.cn#@#.ad-wrapper
 ||bb.lv/js/gam.js
 ||bb.onjoyri.de^
 ||bb2c68869a.com^
+||bb2k0pq1vf.com^
 ||bb2r.com^
 ||bb3d97785c.com^
 ||bb4ytxk9.xyz^
@@ -82738,6 +82745,7 @@ zznews.cn#@#.ad-wrapper
 ||cathapiingcypre.cfd^
 ||cathaytrash.com^
 ||cathedralintheirbri.com^
+||cathodenoose.com^
 ||catiuribripent.com^
 ||catkinawshar.qpon^
 ||catlanguage.net^
@@ -90059,6 +90067,7 @@ zznews.cn#@#.ad-wrapper
 ||danv01ao0kdr2.cloudfront.net^
 ||danzhallfes.com^
 ||daobaalzioctx.online^
+||daogbrqhkhydl.online^
 ||daoinelupulic.qpon^
 ||daoxwweomcsvt.site^
 ||dap.digitalgov.gov/Universal-Federated-Analytics-Min.js
@@ -102299,6 +102308,7 @@ zznews.cn#@#.ad-wrapper
 ||ftz.io^$3p
 ||ftzblwbirevog.website^
 ||ftzets.silkfred.com^
+||ftzieovgqlfln.space^
 ||fu-nu-ra.com^
 ||fubuki-umami.space/api/script.js
 ||fuck-ads.vercel.app^
@@ -106954,6 +106964,7 @@ zznews.cn#@#.ad-wrapper
 ||hajurkonews.com/uploads/advertise/ADBL-1100revised_CRN2022-02-05-04-02-58.gif
 ||hakbgofalvjbs.space^
 ||hakdaruromere.shop^
+||hakkadogly.cfd^
 ||hakkaoekist.com^
 ||hakvzygpdpnbx.online^
 ||hal.courrierinternational.com^
@@ -107136,6 +107147,7 @@ zznews.cn#@#.ad-wrapper
 ||hardfinbanana.com^
 ||hardinet.actonservice.com^
 ||hardlynetman.com^
+||hardsummer.pro^
 ||hardtofind-home.pro^
 ||hardware-mag.de/images/ads/
 ||hardware-mag.de/js/ads.min.js
@@ -110446,6 +110458,7 @@ zznews.cn#@#.ad-wrapper
 ||iknurow.pl/wp-content/uploads/2025/01/czerwony-kapturek_plakat-v01-scaled-1-300x450.jpg
 ||iknurow.pl/wp-content/uploads/2025/01/nowy-termin-koncertu-urszuli-dudziak-i-walk-away-08-02-2025-300x450.jpg
 ||iknurow.pl/wp-content/uploads/2025/02/Aras-Lyko-2025-02-04-12_31_16.jpeg
+||ikonsencoopelb.cfd^
 ||ikonsripcordslice.qpon^
 ||ikquaycaaygib.space^
 ||ikqyazeadzqvo.space^
@@ -113906,6 +113919,7 @@ zznews.cn#@#.ad-wrapper
 ||iumewrfhlgnlu.site^
 ||iunmrmdyetjbe.website^
 ||iupian.com/mstyle/js/topinfo.js
+||iupuwugpfsygy.site^
 ||iuqkrdnldzsth.online^
 ||iuqtmoblgqkgq.site^
 ||iurezbksbjvte.com^
@@ -116733,6 +116747,7 @@ zznews.cn#@#.ad-wrapper
 ||kinesis.us-east-1.analytics.edmentum.com^
 ||kinetiksoft.com^
 ||kinetiksoft.com^$document
+||kinfolkstodge.cyou^
 ||king3rsc7ol9e3ge.com^
 ||king3rsc7ol9e3ge.com^$popup
 ||kingbole.com^
@@ -121554,6 +121569,7 @@ zznews.cn#@#.ad-wrapper
 ||lrlqiohtorwwl.website^
 ||lrnetherlands.wolterskluwer.com^
 ||lrnszmhetq.com^
+||lrnumdzqvryvw.online^
 ||lrorwzpayomsy.space^
 ||lrozkvzdidybu.online^
 ||lrp7.carrefour-banque.fr^
@@ -128407,6 +128423,7 @@ zznews.cn#@#.ad-wrapper
 ||morestamping.com^
 ||moreto.net/i/branding/*
 ||morganfranklin.actonservice.com^
+||morgnondeep.com^
 ||morgueevaluation.com^
 ||morguetribute.com^
 ||moricecojurorapneic.cfd^
@@ -128432,6 +128449,7 @@ zznews.cn#@#.ad-wrapper
 ||mortonlogymethyls.qpon^
 ||mortypush.com^
 ||morularkubera.com^
+||morwongreliverserran.qpon^
 ||mosaic-static.lol^
 ||moschusrale.com^
 ||moscmzvpxnjjq.website^
@@ -144127,6 +144145,7 @@ zznews.cn#@#.ad-wrapper
 ||rfpunvguhctkq.online^
 ||rfpvfauptyqvx.space^
 ||rfpx1.com^
+||rfqnbfdmqosyy.online^
 ||rfr-69.com^$3p
 ||rfsllmogxqc.com^
 ||rfstemin.qpon^
@@ -150662,6 +150681,7 @@ zznews.cn#@#.ad-wrapper
 ||slview.psne.jp^
 ||slvijdtvksmjv.store^
 ||slvumxhzmtope.website^
+||slwsttqncmipa.site^
 ||slxktxaokcvon.site^
 ||slybheguvihki.online^
 ||slyestairmass.qpon^
@@ -162154,6 +162174,7 @@ zznews.cn#@#.ad-wrapper
 ||tidedaybreakdiverge.com^
 ||tidilylattensnetters.qpon^
 ||tidilypeho.shop^
+||tidingsdressed.com^
 ||tidiochat.com^$media
 ||tidiosewanzeantaiva.qpon^
 ||tidjufquvobvr.space^
@@ -172206,6 +172227,7 @@ zznews.cn#@#.ad-wrapper
 ||vtrtl.de^
 ||vtsufsdkrzthc.space^
 ||vttics.world.co.jp^
+||vtttwhpgwjdbyc.com^
 ||vtube.to/api/spots/
 ||vtuzzlfmnpxdq.website^
 ||vtx2r60nuf.com^
@@ -174044,6 +174066,7 @@ zznews.cn#@#.ad-wrapper
 ||wheelchairfactorygoal.com^
 ||wheelify.cartzy.com^
 ||wheelioapp.azureedge.net^
+||wheelszounds.com^
 ||wheemdudism.shop^
 ||whehilru.com^
 ||whelksfumettecuppa.qpon^
@@ -174164,6 +174187,7 @@ zznews.cn#@#.ad-wrapper
 ||whlwcahw1x.com^
 ||whnews.cn/wh_public/xuxu/
 ||whnlerwojyzhi.space^
+||whnovjboihtzx.site^
 ||whoadhoxtojg.com^
 ||whoadonsie.cyou^
 ||whoalinseed.shop^
@@ -178576,6 +178600,7 @@ zznews.cn#@#.ad-wrapper
 ||ymnu5j7kptf716ch859rcon2wte.cfd^
 ||ymokzqilqggeh.space^
 ||ymovooiljamnc.space^
+||ymoxxascwq.com^
 ||ympl9l9b.xyz^
 ||ymprove.gmx.net^
 ||ymprove.web.de^
@@ -180159,6 +180184,7 @@ zznews.cn#@#.ad-wrapper
 ||zmetrics.boston.com^
 ||zmetrics.msn.com^
 ||zmfdxt.megastudy.net^
+||zmfpdfawqsgwd.online^
 ||zmg15qfvi.com^
 ||zmhpphp.forum^
 ||zmhsxr.hometogo.com^
