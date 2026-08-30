@@ -21,7 +21,7 @@ On [KoyebDNS](https://koyeb.com) you can use HaGeZi Blocklists MultiPro+TIF.
 
 | HaGeZi Blocklists | DNS-over-HTTPS |
 | --- | --- |
-| MultiPro + TIF | `https://flaky-liza-ant0ny54-00dc5eb8.koyeb.app/dns-query` |
+| MultiPro + TIF | `https://freedns.koyeb.app/dns-query` |
 
 
 ## How It Works
@@ -54,3 +54,8 @@ A GitHub Action runs daily (fully automatic, zero manual work):
 - **Compliance** — users are solely responsible for compliance with their local laws.
 
 See [LICENSE](LICENSE) for comprehensive legal terms covering all jurisdictions.
+
+## Supporting My Project
+
+If you are interested in supporting the project you can donate :
+ - Bitcoin: 
