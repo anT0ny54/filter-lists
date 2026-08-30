@@ -1,6 +1,6 @@
 # Filter Lists
 
-Comprehensive ads, privacy & annoyance filter list — auto-compiled from trusted sources into a single file.
+Comprehensive blocklist for ads, privacy & annoyance filter list — auto-compiled from trusted sources into a single file.
 
 ## Subscribe
 
@@ -58,4 +58,4 @@ See [LICENSE](LICENSE) for comprehensive legal terms covering all jurisdictions.
 ## Supporting My Project
 
 If you are interested in supporting the project you can donate :
- - Bitcoin: 
+ - Bitcoin: 1HntwKxyqGCfnSGvGLMUTRAqLnTvLarAQP
