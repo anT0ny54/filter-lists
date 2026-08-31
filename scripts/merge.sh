@@ -17,9 +17,12 @@ CURL_RETRIES=2
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-START_TIME=$(date +%s)
+START_TIME="$(date +%s)"
 DOWNLOADED="$TMP_DIR/downloaded.urls"
+FILES="$TMP_DIR/files"
+
 : > "$DOWNLOADED"
+: > "$FILES"
 
 log() {
     printf '%s\n' "$*"
@@ -27,6 +30,10 @@ log() {
 
 timed_out() {
     (( "$(date +%s)" - START_TIME >= TOTAL_TIMEOUT ))
+}
+
+valid_url() {
+    [[ "$1" =~ ^https?://[^[:space:]]+$ ]]
 }
 
 already_downloaded() {
@@ -37,17 +44,24 @@ mark_downloaded() {
     printf '%s\n' "$1" >> "$DOWNLOADED"
 }
 
-valid_url() {
-    [[ "$1" =~ ^https?://[^[:space:]]+$ ]]
+trim() {
+    local value="$1"
+
+    value="${value#"${value%%[![:space:]]*}"}"
+    value="${value%"${value##*[![:space:]]}"}"
+
+    printf '%s' "$value"
 }
 
 validate_filter_list() {
     local file="$1"
     local url="$2"
-    local bytes lines mime
+    local bytes
+    local lines
+    local mime
 
-    bytes=$(wc -c < "$file")
-    lines=$(wc -l < "$file")
+    bytes="$(wc -c < "$file")"
+    lines="$(wc -l < "$file")"
 
     if (( bytes < 500 )); then
         log "   [SKIP] Too small (${bytes} bytes) — $url"
@@ -70,11 +84,18 @@ validate_filter_list() {
         return 1
     fi
 
-    mime=$(file -b --mime-type "$file" 2>/dev/null || true)
+    mime="$(file -b --mime-type "$file" 2>/dev/null || true)"
 
     case "$mime" in
-        application/octet-stream|application/zip|application/gzip|\
-        application/x-executable|application/x-dosexec)
+        application/octet-stream|\
+        application/zip|\
+        application/gzip|\
+        application/x-gzip|\
+        application/x-bzip2|\
+        application/x-7z-compressed|\
+        application/x-rar|\
+        application/x-executable|\
+        application/x-dosexec)
             log "   [SKIP] Binary content — $url"
             return 1
             ;;
@@ -89,11 +110,14 @@ download_list() {
     local timeout="$3"
 
     valid_url "$url" || return 1
-    already_downloaded "$url" && return 2
 
-    mark_downloaded "$url"
+    if already_downloaded "$url"; then
+        return 2
+    fi
 
-    curl \
+    # Do not mark a URL until it downloads successfully. This allows
+    # another occurrence of a failed URL to be retried.
+    if curl \
         --fail \
         --silent \
         --show-error \
@@ -104,18 +128,26 @@ download_list() {
         --connect-timeout 20 \
         --max-time "$timeout" \
         --output "$output" \
-        "$url"
+        "$url"; then
+
+        mark_downloaded "$url"
+        return 0
+    fi
+
+    rm -f "$output"
+    return 1
 }
 
 resolve_url() {
-    local base="$1"
-    local include="$2"
+    local base_url="$1"
+    local include_path="$2"
 
-    if [[ "$include" =~ ^https?:// ]]; then
-        printf '%s\n' "$include"
-    else
-        printf '%s\n' "${base%/*}/$include"
-    fi
+    python3 - "$base_url" "$include_path" <<'PY'
+from urllib.parse import urljoin
+import sys
+
+print(urljoin(sys.argv[1], sys.argv[2]))
+PY
 }
 
 resolve_includes() {
@@ -126,28 +158,37 @@ resolve_includes() {
     (( depth >= MAX_INCLUDE_DEPTH )) && return 0
     timed_out && return 0
 
-    local include_path include_url include_file
-    local include_index=0
+    local include_path
+    local include_url
+    local include_file
 
     while IFS= read -r include_path; do
         include_path="${include_path//$'\r'/}"
+        include_path="$(trim "$include_path")"
+
         [[ -z "$include_path" ]] && continue
 
-        include_url=$(resolve_url "$base_url" "$include_path")
-        include_file="$TMP_DIR/include_${depth}_${include_index}.txt"
-        include_index=$((include_index + 1))
+        include_url="$(resolve_url "$base_url" "$include_path")"
+        include_file="$(mktemp "$TMP_DIR/include.XXXXXX.txt")"
 
         if download_list "$include_url" "$include_file" "$INCLUDE_TIMEOUT"; then
             if validate_filter_list "$include_file" "$include_url"; then
-                printf '%s\n' "$include_file" >> "$TMP_DIR/files"
+                printf '%s\n' "$include_file" >> "$FILES"
+
                 resolve_includes \
                     "$include_file" \
                     "$include_url" \
                     $((depth + 1))
+            else
+                rm -f "$include_file"
             fi
+        else
+            rm -f "$include_file"
         fi
     done < <(
-        sed -n 's/^[[:space:]]*!#include[[:space:]]\+//p' "$file"
+        sed -n \
+            -E 's/^[[:space:]]*!#include[[:space:]]+(.+)$/\1/p' \
+            "$file"
     )
 }
 
@@ -156,15 +197,13 @@ resolve_includes() {
     exit 1
 }
 
-SOURCE_COUNT=$(
+SOURCE_COUNT="$(
     grep -cEv '^[[:space:]]*(#|$)' "$SOURCES" || true
-)
+)"
 
 log ">> Found $SOURCE_COUNT source URLs"
 log ">> Downloading filter lists..."
 log
-
-: > "$TMP_DIR/files"
 
 total=0
 success=0
@@ -174,9 +213,10 @@ index=0
 
 while IFS= read -r url || [[ -n "$url" ]]; do
     url="${url//$'\r'/}"
+    url="$(trim "$url")"
 
     [[ -z "$url" ]] && continue
-    [[ "$url" =~ ^[[:space:]]*# ]] && continue
+    [[ "$url" =~ ^# ]] && continue
 
     if timed_out; then
         log "   [!] Total timeout reached"
@@ -184,44 +224,48 @@ while IFS= read -r url || [[ -n "$url" ]]; do
     fi
 
     total=$((total + 1))
+
     file="$TMP_DIR/source_${index}.txt"
     index=$((index + 1))
 
-    case "$(download_list "$url" "$file" "$DOWNLOAD_TIMEOUT"; echo "$?")" in
-        0)
-            if validate_filter_list "$file" "$url"; then
-                lines=$(wc -l < "$file")
-                log "   [OK] $lines lines — ${url:0:100}"
-                printf '%s\n' "$file" >> "$TMP_DIR/files"
-                success=$((success + 1))
+    if download_list "$url" "$file" "$DOWNLOAD_TIMEOUT"; then
+        if validate_filter_list "$file" "$url"; then
+            lines="$(wc -l < "$file")"
 
-                if grep -qE '^[[:space:]]*!#include[[:space:]]+' "$file"; then
-                    log "      Resolving includes..."
-                    resolve_includes "$file" "$url" 0
-                fi
-            else
-                rm -f "$file"
-                skipped=$((skipped + 1))
+            log "   [OK] $lines lines — ${url:0:100}"
+
+            printf '%s\n' "$file" >> "$FILES"
+            success=$((success + 1))
+
+            if grep -qE \
+                '^[[:space:]]*!#include[[:space:]]+' \
+                "$file"; then
+
+                log "      Resolving includes..."
+                resolve_includes "$file" "$url" 0
             fi
-            ;;
-        2)
-            log "   [SKIP] Duplicate source — $url"
-            skipped=$((skipped + 1))
-            ;;
-        *)
-            log "   [FAIL] ${url:0:100}"
+        else
             rm -f "$file"
-            failed=$((failed + 1))
-            ;;
-    esac
+            skipped=$((skipped + 1))
+        fi
+
+    elif already_downloaded "$url"; then
+        log "   [SKIP] Duplicate source — $url"
+        skipped=$((skipped + 1))
+
+    else
+        log "   [FAIL] ${url:0:100}"
+        failed=$((failed + 1))
+    fi
+
 done < "$SOURCES"
 
 log
 log ">> Downloaded $success/$total lists"
 log ">> $failed failed, $skipped skipped"
-log ">> Processing rules..."
+log ">> Processing strict ABP-only rules..."
 
-python3 - "$TMP_DIR/files" "$OUTPUT" <<'PY'
+python3 - "$FILES" "$OUTPUT" <<'PY'
 from __future__ import annotations
 
 import re
@@ -231,30 +275,216 @@ from datetime import datetime, timezone
 
 files_file, output_file = sys.argv[1:3]
 
-# Rules that are not suitable for combined ABP/uBO syntax.
-UNSUPPORTED_OPTIONS = re.compile(
-    r"(?:^|[,|])(?:app|denyallow|method|header)=",
+
+# Conservative whitelist of broadly supported Adblock Plus options.
+#
+# Options not listed here are rejected. This intentionally removes some
+# newer, uBO-specific, AdGuard-specific, or implementation-dependent rules.
+ALLOWED_OPTIONS = {
+    "3p",
+    "all",
+    "background",
+    "badfilter",
+    "beacon",
+    "collapse",
+    "document",
+    "elemhide",
+    "font",
+    "genericblock",
+    "generichide",
+    "ghide",
+    "image",
+    "important",
+    "jsinject",
+    "match-case",
+    "media",
+    "object",
+    "object-subrequest",
+    "other",
+    "ping",
+    "popup",
+    "script",
+    "sitekey",
+    "specifichide",
+    "stylesheet",
+    "subdocument",
+    "third-party",
+    "webrtc",
+    "websocket",
+    "xmlhttprequest",
+}
+
+# These modifiers are intentionally excluded from the whitelist above.
+# They are listed here for clearer diagnostics.
+KNOWN_NON_ABP_OPTIONS = {
+    "app",
+    "csp",
+    "denyallow",
+    "from",
+    "header",
+    "jsonprune",
+    "method",
+    "mp4",
+    "permissions",
+    "queryprune",
+    "redirect",
+    "redirect-rule",
+    "removeparam",
+    "replace",
+    "to",
+    "uritransform",
+}
+
+INCLUDE_DIRECTIVE = re.compile(
+    r"^\s*!#(?:include|if|endif|else)\b",
     re.IGNORECASE,
 )
 
-INCLUDE_DIRECTIVE = re.compile(r"^\s*!#include\b", re.IGNORECASE)
-COMMENT_LINE = re.compile(r"^\s*(?:!|\[Adblock)")
-COSMETIC_RULE = re.compile(r"^\s*([^#]*?)(##|#@#)(.*)$")
-
-# These are usually subscription metadata or update-control directives.
-SKIP_DIRECTIVES = (
-    "! checksum",
-    "! expires",
-    "! homepage",
-    "! license",
-    "! title",
-    "! version",
-    "! last updated",
-    "! redirect",
-    "! redirect-rule",
-    "! moveto",
-    "! diff-path",
+COMMENT_LINE = re.compile(
+    r"^\s*(?:!|\[Adblock(?:\s+Plus)?\b)",
+    re.IGNORECASE,
 )
+
+COSMETIC_RULE = re.compile(
+    r"^(?P<domains>[^#\s,]+(?:,[^#\s,]+)*)?"
+    r"(?P<separator>##|#@#)"
+    r"(?P<selector>\S.*)$"
+)
+
+DOMAIN_TOKEN = re.compile(
+    r"^(?:~)?"
+    r"(?:[A-Za-z0-9*_-]+\.)*"
+    r"[A-Za-z0-9*_-]+$"
+)
+
+NETWORK_OPTION_NAME = re.compile(
+    r"^[a-z][a-z0-9-]*$",
+    re.IGNORECASE,
+)
+
+HOSTS_FILE_LINE = re.compile(
+    r"^(?:0\.0\.0\.0|127\.0\.0\.1|::1)(?:\s+|$)"
+)
+
+UNSUPPORTED_COSMETIC = re.compile(
+    r"""
+    \#\#\+js\b
+    | \#@\#\+js\b
+    | \#\?\#
+    | \#\$\#
+    | \#@\#\$\#
+    | \#\#\^
+    | \#@\#\^
+    | :has-text\s*\(
+    | :matches-css(?:-before|-after)?\s*\(
+    | :xpath\s*\(
+    | :contains\s*\(
+    | :style\s*\(
+    | :remove\s*\(
+    | :watch-attr\s*\(
+    | :matches-path\s*\(
+    | -abp-properties\s*\(
+    | :-abp-
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+
+def split_network_options(rule: str) -> tuple[str, list[str]]:
+    """
+    Split a network rule into its pattern and options.
+
+    A complete /regular-expression/ filter is kept intact because a '$'
+    inside a regex is not necessarily an option separator.
+    """
+    if rule.startswith("/") and rule.endswith("/"):
+        return rule, []
+
+    if "$" not in rule:
+        return rule, []
+
+    pattern, option_text = rule.rsplit("$", 1)
+
+    if not pattern:
+        return rule, []
+
+    options = [
+        item.strip().lower()
+        for item in option_text.split(",")
+        if item.strip()
+    ]
+
+    return pattern, options
+
+
+def valid_domain_list(value: str) -> bool:
+    if not value:
+        return False
+
+    for domain in value.split("|"):
+        domain = domain.strip()
+
+        if not domain:
+            return False
+
+        if domain.startswith("~"):
+            domain = domain[1:]
+
+        if not DOMAIN_TOKEN.fullmatch(domain):
+            return False
+
+    return True
+
+
+def valid_sitekey(value: str) -> bool:
+    return bool(re.fullmatch(r"[A-Za-z0-9+/=_-]+(?:\|[A-Za-z0-9+/=_-]+)*", value))
+
+
+def valid_network_options(options: list[str]) -> bool:
+    seen: set[str] = set()
+
+    for option in options:
+        if not option:
+            return False
+
+        if "=" in option:
+            name, value = option.split("=", 1)
+            name = name.strip().lower()
+            value = value.strip()
+
+            if name not in {"domain", "sitekey"}:
+                return False
+
+            if not NETWORK_OPTION_NAME.fullmatch(name):
+                return False
+
+            if not value:
+                return False
+
+            if name == "domain" and not valid_domain_list(value):
+                return False
+
+            if name == "sitekey" and not valid_sitekey(value):
+                return False
+
+        else:
+            name = option.lstrip("~").lower()
+
+            if not NETWORK_OPTION_NAME.fullmatch(name):
+                return False
+
+            if name not in ALLOWED_OPTIONS:
+                return False
+
+        # Duplicate options are ambiguous and are not needed in a
+        # normalized combined list.
+        if option in seen:
+            return False
+
+        seen.add(option)
+
+    return True
+
 
 def normalize_domains(value: str) -> str:
     domains = {
@@ -262,103 +492,170 @@ def normalize_domains(value: str) -> str:
         for item in value.split(",")
         if item.strip()
     }
+
     return ",".join(sorted(domains))
 
-def normalize_cosmetic(rule: str) -> str:
-    match = COSMETIC_RULE.match(rule)
+
+def normalize_cosmetic(rule: str) -> str | None:
+    match = COSMETIC_RULE.fullmatch(rule)
+
     if not match:
-        return rule.strip()
+        return None
 
-    domains, separator, selector = match.groups()
+    domains = match.group("domains")
+    separator = match.group("separator")
+    selector = match.group("selector").strip()
 
-    domains = normalize_domains(domains)
-    selector = re.sub(r"\s+", " ", selector.strip())
+    if not selector:
+        return None
+
+    if domains:
+        for domain in domains.split(","):
+            if not DOMAIN_TOKEN.fullmatch(domain):
+                return None
+
+        domains = normalize_domains(domains)
+    else:
+        domains = ""
+
+    # Do not collapse general whitespace in CSS. It can change selector
+    # semantics, especially inside attribute selectors and pseudo-classes.
     selector = re.sub(r"\s*,\s*", ",", selector)
 
-    return f"{domains}{separator}{selector}" if domains else \
-           f"{separator}{selector}"
+    if domains:
+        return f"{domains}{separator}{selector}"
 
-def normalize_network(rule: str) -> str:
-    rule = rule.strip()
+    return f"{separator}{selector}"
 
-    # Remove unnecessary leading/trailing whitespace only.
-    # Do not remove spaces inside ABP regular expressions.
-    return rule
 
-def canonical(rule: str) -> str:
-    if "##" in rule or "#@#" in rule:
-        return normalize_cosmetic(rule)
+def normalize_network(rule: str) -> str | None:
+    pattern, options = split_network_options(rule)
 
-    return normalize_network(rule)
+    if not pattern:
+        return None
+
+    # ABP network filters may not contain literal whitespace outside a
+    # regular-expression filter.
+    if any(character.isspace() for character in pattern):
+        return None
+
+    if pattern.startswith("/") and not pattern.endswith("/"):
+        return None
+
+    if pattern.count("/") >= 2 and pattern.startswith("/"):
+        if not pattern.endswith("/"):
+            return None
+
+    if not valid_network_options(options):
+        return None
+
+    if options:
+        return f"{pattern}${','.join(options)}"
+
+    return pattern
+
+
+def is_cosmetic_rule(line: str) -> bool:
+    return "##" in line or "#@#" in line
+
 
 def is_valid_rule(line: str) -> bool:
+    line = line.strip()
+
     if not line:
         return False
 
-    lower = line.lower()
-
-    if INCLUDE_DIRECTIVE.match(line):
-        return False
-
-    if lower.startswith(SKIP_DIRECTIVES):
+    if len(line) > 100_000:
         return False
 
     if COMMENT_LINE.match(line):
         return False
 
+    if INCLUDE_DIRECTIVE.match(line):
+        return False
+
     if line.startswith(("[", "{", "<")):
         return False
 
-    if "<html" in lower or "<!doctype" in lower:
+    if HOSTS_FILE_LINE.match(line):
         return False
 
-    if UNSUPPORTED_OPTIONS.search(line):
+    if "<html" in line.lower() or "<!doctype" in line.lower():
         return False
 
-    # Remove known uBO-only JavaScript cosmetic rules.
-    if "-abp-properties(" in lower:
+    if UNSUPPORTED_COSMETIC.search(line):
         return False
 
-    # Keep only trusted YouTube cosmetic rules if desired.
-    if "youtube.com" in lower and "##" in line:
-        if "##+js(trusted-" not in lower:
-            return False
+    # ABP supports only standard ## and #@# cosmetic separators here.
+    if is_cosmetic_rule(line):
+        return normalize_cosmetic(line) is not None
 
-    return True
+    # Do not allow stray cosmetic-style or scriptlet syntax.
+    if "#$" in line or "#?" in line:
+        return False
 
-files = []
+    return normalize_network(line) is not None
+
+
+def normalize_rule(line: str) -> str | None:
+    line = line.strip()
+
+    if is_cosmetic_rule(line):
+        return normalize_cosmetic(line)
+
+    return normalize_network(line)
+
+
+files: list[str] = []
+
 with open(files_file, encoding="utf-8", errors="ignore") as source:
-    files = [line.strip() for line in source if line.strip()]
+    for filename in source:
+        filename = filename.strip()
+
+        if filename:
+            files.append(filename)
+
 
 rules: OrderedDict[str, str] = OrderedDict()
+accepted = 0
+rejected = 0
 
 for filename in files:
     try:
         with open(filename, encoding="utf-8", errors="ignore") as source:
             for raw in source:
-                line = raw.strip()
+                line = raw.rstrip("\r\n")
 
                 if not is_valid_rule(line):
+                    rejected += 1
                     continue
 
-                normalized = canonical(line)
+                normalized = normalize_rule(line)
+
+                if normalized is None:
+                    rejected += 1
+                    continue
+
                 rules.setdefault(normalized, normalized)
+                accepted += 1
 
     except OSError:
         continue
 
+
 final_rules = sorted(rules.values(), key=str.casefold)
 
 if not final_rules:
-    print("[ERROR] No valid rules collected.", file=sys.stderr)
+    print("[ERROR] No strict ABP-compatible rules collected.", file=sys.stderr)
     raise SystemExit(1)
+
 
 now = datetime.now(timezone.utc)
 version = now.strftime("v%Y.%m.%d.%H%M")
 timestamp = now.strftime("%Y-%m-%d %H:%M:%S UTC")
 
 header = [
-    "! Title: Combined Adblock Filter List",
+    "! Title: Combined Adblock Plus Filter List",
     f"! Version: {version}",
     f"! Last updated: {timestamp}",
     "! Expires: 1 day",
@@ -366,6 +663,7 @@ header = [
     "! License: https://github.com/SamirPaulb/filter-lists/blob/main/LICENSE",
     f"! Total rules: {len(final_rules)}",
     "!",
+    "! Format: Strict Adblock Plus-compatible syntax",
     "! Auto-generated. Do not edit directly.",
     "! Edit sources.txt and rebuild.",
     "!",
@@ -377,10 +675,12 @@ with open(output_file, "w", encoding="utf-8", newline="\n") as output:
     output.write("\n".join(final_rules))
     output.write("\n")
 
-print(f">> Wrote {len(final_rules)} rules")
+print(f">> Accepted rule lines: {accepted}")
+print(f">> Rejected rule lines: {rejected}")
+print(f">> Unique ABP rules: {len(final_rules)}")
 PY
 
-elapsed=$(( $(date +%s) - START_TIME ))
+elapsed=$(( "$(date +%s)" - START_TIME ))
 
 log
 log ">> Output: $OUTPUT"
