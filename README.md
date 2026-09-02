@@ -42,6 +42,16 @@ On [My Free DNS] you can use HaGeZi Blocklists Multi Pro + TIF.
 | Multi Pro + TIF | `https://freedns-six.vercel.app/api/doh/dns-query` |
 
 
+# ⚡ Bandwidth Hero Server
+
+> A lightweight image optimization proxy designed to reduce bandwidth usage and speed up web browsing.
+
+Bandwidth Hero Server fetches remote images, compresses them, and delivers optimized versions to the client. It helps reduce data consumption while improving loading performance—especially on slow or limited networks.
+
+---
+> If you want, you can see in this [website] (https://bhser.netlify.app)
+
+
 ## Legal Disclaimer
 
 - **Personal use only** — maintained exclusively for the repository owner's personal browsing on personal devices. Not a product, not a service, not offered to the public.
