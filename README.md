@@ -32,6 +32,15 @@ A GitHub Action runs daily (fully automatic, zero manual work):
 - **Add custom rules**: Edit `custom-rules.txt`
 - **Force rebuild**: Actions → Update Filter List → Run workflow
 
+#### :department_store: **My Free DNS Server, free** <a name="dns server"></a>
+
+On [My Free DNS](https://snapdeploy.dev) you can use HaGeZi Blocklists MultiPro+TIF.
+
+| HaGeZi Blocklists | DNS-over-HTTPS |
+| --- | --- |
+| MultiPro + TIF | `https://freedns-0a3e2.containers.snapdeploy.app/api/doh/dns-query`
+|
+
 ## Legal Disclaimer
 
 - **Personal use only** — maintained exclusively for the repository owner's personal browsing on personal devices. Not a product, not a service, not offered to the public.
