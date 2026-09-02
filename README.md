@@ -48,8 +48,8 @@ On [My Free DNS] you can use HaGeZi Blocklists Multi Pro + TIF.
 
 Bandwidth Hero Server fetches remote images, compresses them, and delivers optimized versions to the client. It helps reduce data consumption while improving loading performance—especially on slow or limited networks.
 
----
-> If you want, you can see in this [website] (https://bhser.netlify.app)
+
+> If you want, you can see in this [Website] (https://bhser.netlify.app)
 
 
 ## Legal Disclaimer
