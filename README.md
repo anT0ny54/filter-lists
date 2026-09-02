@@ -46,10 +46,10 @@ On [My Free DNS] you can use HaGeZi Blocklists Multi Pro + TIF.
 
 > A lightweight image optimization proxy designed to reduce bandwidth usage and speed up web browsing.
 
-Bandwidth Hero Server fetches remote images, compresses them, and delivers optimized versions to the client. It helps reduce data consumption while improving loading performance—especially on slow or limited networks.
+Bandwidth Hero Server fetches remote images, compresses them, and delivers optimized versions to the client. It helps reduce data consumption while improving loading performance—especially on sl[...]
 
 
-🖥️ If you want, you can see in this [Website] (https://bhserv.netlify.app)
+🖥️ If you want, you can see this [Website](https://bhserv.netlify.app)
 
 
 ## Legal Disclaimer
@@ -60,7 +60,7 @@ Bandwidth Hero Server fetches remote images, compresses them, and delivers optim
 - **No distribution or recommendation** — the owner does not encourage, recommend, or endorse use by any third party.
 - **No commercial use** — generates no revenue, accepts no payments, serves no business purpose.
 - **No intent to cause harm** — sole purpose is personal privacy and security. No intent to cause economic loss to any advertiser, publisher, or ad network.
-- **Right to privacy** — personal content filtering is a recognized lawful exercise of individual privacy rights under GDPR (EU), DPDPA (India), CCPA (USA), PIPEDA (Canada), UK GDPR, nDSG (Switzerla[...]
+- **Right to privacy** — personal content filtering is a recognized lawful exercise of individual privacy rights under GDPR (EU), DPDPA (India), CCPA (USA), PIPEDA (Canada), UK GDPR, nDSG (Switz[...]
 - **No warranty** — provided "as-is" without warranties of any kind. Use at your own risk.
 - **Compliance** — users are solely responsible for compliance with their local laws.
 
