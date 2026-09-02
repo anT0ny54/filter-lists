@@ -34,12 +34,13 @@ A GitHub Action runs daily (fully automatic, zero manual work):
 
 #### :department_store: **My Free DNS Server, free** <a name="dns server"></a>
 
-On [My Free DNS](https://vercel.com/) you can use HaGeZi Blocklists MultiPro+TIF.
+On [My Free DNS] you can use HaGeZi Blocklists Multi Pro + TIF.
 
-| HaGeZi Blocklists | DNS-over-HTTPS |
-| --- | --- |
-| Multi Pro + TIF | `https://freedns-six.vercel.app/api/doh/dns-query`
-|
+| Hagezi Blocklists | DNS-over-HTTPS |
+|:---------------|:---------------|
+| Multi Pro + TIF | `https://xdns.netlify.app/api/doh/dns-query` |
+| Multi Pro + TIF | `https://freedns-six.vercel.app/api/doh/dns-query` |
+
 
 ## Legal Disclaimer
 
