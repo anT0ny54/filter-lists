@@ -115,8 +115,6 @@ download_list() {
         return 2
     fi
 
-    # Do not mark a URL until it downloads successfully. This allows
-    # another occurrence of a failed URL to be retried.
     if curl \
         --fail \
         --silent \
@@ -268,18 +266,13 @@ log ">> Processing strict ABP-only rules..."
 python3 - "$FILES" "$OUTPUT" <<'PY'
 from __future__ import annotations
 
+import os
 import re
 import sys
-from collections import OrderedDict
 from datetime import datetime, timezone
 
 files_file, output_file = sys.argv[1:3]
 
-
-# Conservative whitelist of broadly supported Adblock Plus options.
-#
-# Options not listed here are rejected. This intentionally removes some
-# newer, uBO-specific, AdGuard-specific, or implementation-dependent rules.
 ALLOWED_OPTIONS = {
     "3p",
     "all",
@@ -312,27 +305,6 @@ ALLOWED_OPTIONS = {
     "webrtc",
     "websocket",
     "xmlhttprequest",
-}
-
-# These modifiers are intentionally excluded from the whitelist above.
-# They are listed here for clearer diagnostics.
-KNOWN_NON_ABP_OPTIONS = {
-    "app",
-    "csp",
-    "denyallow",
-    "from",
-    "header",
-    "jsonprune",
-    "method",
-    "mp4",
-    "permissions",
-    "queryprune",
-    "redirect",
-    "redirect-rule",
-    "removeparam",
-    "replace",
-    "to",
-    "uritransform",
 }
 
 INCLUDE_DIRECTIVE = re.compile(
@@ -392,10 +364,8 @@ UNSUPPORTED_COSMETIC = re.compile(
 
 def split_network_options(rule: str) -> tuple[str, list[str]]:
     """
-    Split a network rule into its pattern and options.
-
-    A complete /regular-expression/ filter is kept intact because a '$'
-    inside a regex is not necessarily an option separator.
+    Keep a complete regular-expression filter intact.
+    A '$' inside a complete regex is not an option separator.
     """
     if rule.startswith("/") and rule.endswith("/"):
         return rule, []
@@ -437,7 +407,12 @@ def valid_domain_list(value: str) -> bool:
 
 
 def valid_sitekey(value: str) -> bool:
-    return bool(re.fullmatch(r"[A-Za-z0-9+/=_-]+(?:\|[A-Za-z0-9+/=_-]+)*", value))
+    return bool(
+        re.fullmatch(
+            r"[A-Za-z0-9+/=_-]+(?:\|[A-Za-z0-9+/=_-]+)*",
+            value,
+        )
+    )
 
 
 def valid_network_options(options: list[str]) -> bool:
@@ -476,8 +451,6 @@ def valid_network_options(options: list[str]) -> bool:
             if name not in ALLOWED_OPTIONS:
                 return False
 
-        # Duplicate options are ambiguous and are not needed in a
-        # normalized combined list.
         if option in seen:
             return False
 
@@ -518,8 +491,6 @@ def normalize_cosmetic(rule: str) -> str | None:
     else:
         domains = ""
 
-    # Do not collapse general whitespace in CSS. It can change selector
-    # semantics, especially inside attribute selectors and pseudo-classes.
     selector = re.sub(r"\s*,\s*", ",", selector)
 
     if domains:
@@ -534,17 +505,11 @@ def normalize_network(rule: str) -> str | None:
     if not pattern:
         return None
 
-    # ABP network filters may not contain literal whitespace outside a
-    # regular-expression filter.
     if any(character.isspace() for character in pattern):
         return None
 
     if pattern.startswith("/") and not pattern.endswith("/"):
         return None
-
-    if pattern.count("/") >= 2 and pattern.startswith("/"):
-        if not pattern.endswith("/"):
-            return None
 
     if not valid_network_options(options):
         return None
@@ -562,10 +527,7 @@ def is_cosmetic_rule(line: str) -> bool:
 def is_valid_rule(line: str) -> bool:
     line = line.strip()
 
-    if not line:
-        return False
-
-    if len(line) > 100_000:
+    if not line or len(line) > 100_000:
         return False
 
     if COMMENT_LINE.match(line):
@@ -586,11 +548,9 @@ def is_valid_rule(line: str) -> bool:
     if UNSUPPORTED_COSMETIC.search(line):
         return False
 
-    # ABP supports only standard ## and #@# cosmetic separators here.
     if is_cosmetic_rule(line):
         return normalize_cosmetic(line) is not None
 
-    # Do not allow stray cosmetic-style or scriptlet syntax.
     if "#$" in line or "#?" in line:
         return False
 
@@ -608,15 +568,18 @@ def normalize_rule(line: str) -> str | None:
 
 files: list[str] = []
 
-with open(files_file, encoding="utf-8", errors="ignore") as source:
-    for filename in source:
-        filename = filename.strip()
+try:
+    with open(files_file, encoding="utf-8", errors="ignore") as source:
+        files = [
+            line.strip()
+            for line in source
+            if line.strip()
+        ]
+except OSError:
+    files = []
 
-        if filename:
-            files.append(filename)
 
-
-rules: OrderedDict[str, str] = OrderedDict()
+unique_rules: set[str] = set()
 accepted = 0
 rejected = 0
 
@@ -636,19 +599,22 @@ for filename in files:
                     rejected += 1
                     continue
 
-                rules.setdefault(normalized, normalized)
+                unique_rules.add(normalized)
                 accepted += 1
 
     except OSError:
         continue
 
 
-final_rules = sorted(rules.values(), key=str.casefold)
-
-if not final_rules:
-    print("[ERROR] No strict ABP-compatible rules collected.", file=sys.stderr)
+if not unique_rules:
+    print(
+        "[ERROR] No strict ABP-compatible rules collected.",
+        file=sys.stderr,
+    )
     raise SystemExit(1)
 
+
+final_rules = sorted(unique_rules, key=str.casefold)
 
 now = datetime.now(timezone.utc)
 version = now.strftime("v%Y.%m.%d.%H%M")
@@ -660,7 +626,7 @@ header = [
     f"! Last updated: {timestamp}",
     "! Expires: 1 day",
     "! Homepage: https://github.com/anT0ny54/filter-lists",
-    "! License: https://github.com/SamirPaulb/filter-lists/blob/main/LICENSE",
+    "! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE",
     f"! Total rules: {len(final_rules)}",
     "!",
     "! Format: Strict Adblock Plus-compatible syntax",
@@ -669,11 +635,29 @@ header = [
     "!",
 ]
 
-with open(output_file, "w", encoding="utf-8", newline="\n") as output:
-    output.write("\n".join(header))
-    output.write("\n")
-    output.write("\n".join(final_rules))
-    output.write("\n")
+temporary_output = f"{output_file}.tmp"
+
+try:
+    with open(
+        temporary_output,
+        "w",
+        encoding="utf-8",
+        newline="\n",
+    ) as output:
+        output.write("\n".join(header))
+        output.write("\n")
+        output.write("\n".join(final_rules))
+        output.write("\n")
+
+    os.replace(temporary_output, output_file)
+
+except OSError:
+    try:
+        os.unlink(temporary_output)
+    except OSError:
+        pass
+    raise
+
 
 print(f">> Accepted rule lines: {accepted}")
 print(f">> Rejected rule lines: {rejected}")
