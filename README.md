@@ -37,20 +37,20 @@ Workflow:
 - `custom-rules.txt` — local custom rules
 - GitHub Actions — manual rebuild trigger
 
-## DNS Server
+#### :department_store: **My Free DNS Server — free** <a name="dns-server"></a>
 
-**My Free DNS Server**
+Use HaGeZi Blocklists Multi Pro + TIF with [My Free DNS].
 
-Use **HaGeZi Blocklists Multi Pro + TIF** with:
+| Hagezi Blocklists | DNS-over-HTTPS |
+| --- | --- |
+| Multi Pro + TIF | `https://freedns-six.vercel.app/api/doh/dns-query` (Recommended) |
+| Multi Pro + TIF | `https://dnssix.netlify.app/api/doh/dns-query` |
 
-- `https://freedns-six.vercel.app/api/doh/dns-query` — recommended
-- `https://dnssix.netlify.app/api/doh/dns-query`
+# ⚡ Bandwidth Hero Server
 
-## Bandwidth Hero Server
+> A lightweight image proxy that cuts bandwidth and speeds up browsing.
 
-A lightweight image optimization proxy designed to reduce bandwidth usage and speed up browsing.
-
-Try it here: https://bhserv.netlify.app/
+Bandwidth Hero Server fetches remote images, compresses them, and returns optimized versions for faster loading and lower data use.
 
 ## Legal Disclaimer
 
@@ -65,8 +65,8 @@ Try it here: https://bhserv.netlify.app/
 
 See [LICENSE](LICENSE) for full legal terms.
 
-## Support
+## Supporting My Project
 
-If you'd like to support the project:
+If you'd like to support the project, donate:
 
 - Bitcoin: `1HntwKxyqGCfnSGvGLMUTRAqLnTvLarAQP`
