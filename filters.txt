@@ -1,6 +1,6 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v2026.09.04.0759
-! Last updated: 2026-09-04 07:59:20 UTC
+! Version: v2026.09.04.0807
+! Last updated: 2026-09-04 08:07:50 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
@@ -50,9 +50,9 @@
 ###accept-use-cookie
 ###accept_cookie
 ###acceptance_of_cookies
-###AcceptCookie
 ###acceptCookie
 ###acceptcookie
+###AcceptCookie
 ###acceptCookieModal
 ###acceptCookiePolicy
 ###AcceptCookies
@@ -389,8 +389,8 @@
 ###ad-teaser
 ###ad-text
 ###ad-three
-###ad-top
 ###Ad-Top
+###ad-top
 ###ad-top-250
 ###ad-top-300x250
 ###ad-top-728
@@ -447,8 +447,8 @@
 ###ad728h
 ###ad728Header
 ###ad728Mid
-###ad728top
 ###ad728Top
+###ad728top
 ###ad728Wrapper
 ###ad728X90
 ###ad728x90
@@ -468,8 +468,8 @@
 ###ad_250
 ###ad_250x250
 ###ad_3
-###ad_300
 ###AD_300
+###ad_300
 ###ad_300_250
 ###ad_300_250_1
 ###ad_300x250
@@ -497,8 +497,8 @@
 ###ad_article3_1
 ###ad_article3_2
 ###ad_B1
-###ad_Banner
 ###ad_banner
+###ad_Banner
 ###ad_banner_1
 ###ad_banner_468x60
 ###ad_banner_728x90
@@ -516,8 +516,8 @@
 ###ad_bigbox_companion
 ###ad_bigrectangle
 ###ad_billboard
-###ad_block
 ###Ad_Block
+###ad_block
 ###ad_block_0
 ###ad_block_1
 ###ad_block_2
@@ -618,8 +618,8 @@
 ###ad_ldb
 ###ad_lead1
 ###ad_leader
-###ad_leaderBoard
 ###ad_leaderboard
+###ad_leaderBoard
 ###ad_leaderboard_top
 ###ad_left
 ###ad_left_1
@@ -646,8 +646,8 @@
 ###ad_medium_rectangular
 ###ad_mediumrectangle
 ###ad_message
-###ad_Middle
 ###ad_middle
+###ad_Middle
 ###ad_Middle1
 ###ad_middle_bottom
 ###ad_midstrip
@@ -749,14 +749,14 @@
 ###ad_tall
 ###ad_tbl
 ###AD_text
-###ad_Top
 ###ad_top
+###ad_Top
 ###ad_top_728x90
 ###ad_top_banner
 ###ad_top_bar
 ###ad_top_holder
-###ad_topbanner
 ###ad_topBanner
+###ad_topbanner
 ###Ad_TopLeaderboard
 ###ad_topmob
 ###ad_topnav
@@ -802,8 +802,8 @@
 ###adBadges
 ###Adbanner
 ###adbanner-container
-###adbanner1
 ###adBanner1
+###adbanner1
 ###adBanner336x280
 ###adBannerBottom
 ###adbannerbox
@@ -815,9 +815,9 @@
 ###adBannerTable
 ###adBannerTop
 ###adbannerwidget
-###AdBar
-###adBar
 ###adbar
+###adBar
+###AdBar
 ###adBelt
 ###adbig
 ###AdBigBox
@@ -848,10 +848,10 @@
 ###adBottom
 ###AdBottomLeader
 ###adbottomleft
-###AdBottomRight
 ###adbottomright
-###adBox
+###AdBottomRight
 ###ADbox
+###adBox
 ###adbox
 ###adbox--hot_news_ad
 ###adbox--page_bottom_ad
@@ -886,9 +886,9 @@
 ###adclose
 ###adCol
 ###adcolContent
-###AdColumn
-###adcolumn
 ###adColumn
+###adcolumn
+###AdColumn
 ###adColumn3
 ###adComponentWrapper
 ###adcontainer
@@ -939,8 +939,8 @@
 ###adGoogleText
 ###adhalfpage
 ###adhead
-###adheader
 ###adHeader
+###adheader
 ###adHeaderTop
 ###adHeaderWrapper
 ###adHeading
@@ -958,8 +958,8 @@
 ###adHolder5
 ###adHolder6
 ###adholderContainerHeader
-###adHome
 ###adhome
+###adHome
 ###adhomepage
 ###adHomeTop
 ###adIframe
@@ -974,31 +974,31 @@
 ###adlabelheader
 ###adlanding
 ###adLarge
-###adLayer
 ###adlayer
+###adLayer
 ###adlayerad
 ###adlayerContainer
 ###adLayerTop
 ###adLayout
 ###adLB
 ###adLeader
-###adleaderboard
 ###adLeaderboard
+###adleaderboard
 ###adLeaderboard-middle
 ###adLeaderTop
-###adleft
 ###adLeft
+###adleft
 ###adLeftFloat
 ###adLink
 ###adLink1
 ###adlinks
 ###adLounge
-###adlrec
 ###adLrec
+###adlrec
 ###adm-inline-article-ad-1
 ###adm-inline-article-ad-2
-###admain
 ###adMain
+###admain
 ###adMarketplace
 ###admasthead
 ###adMed
@@ -1012,8 +1012,8 @@
 ###admobilefoot
 ###admobilefootinside
 ###admobilemiddle
-###adMOBILETOP
 ###admobiletop
+###adMOBILETOP
 ###admobiletopinside
 ###admod2
 ###adModal
@@ -1049,8 +1049,8 @@
 ###adPlacement_9
 ###adPlacer
 ###adPopover
-###adPopup
 ###AdPopUp
+###adPopup
 ###adpos-top
 ###adpos2
 ###adposition
@@ -1072,11 +1072,11 @@
 ###adReady
 ###adrect
 ###AdRectangleBanner
-###adRight
 ###adright
+###adRight
 ###adRight1
-###adright2
 ###adRight2
+###adright2
 ###adRight3
 ###adRight4
 ###adRight5
@@ -1298,23 +1298,23 @@
 ###AdsBillboard
 ###ADSblock
 ###adsbot
-###adsBottom
 ###adsbottom
+###adsBottom
 ###AdsBottomContainer
 ###adsbox
 ###adsbox-left
 ###adsbox-right
 ###adscenter
 ###adscolumn
-###adsContainer
 ###adscontainer
-###AdsContent
-###adscontent
+###adsContainer
 ###adsContent
+###adscontent
+###AdsContent
 ###adScraper
 ###adsDisplay
-###adsdiv
 ###AdsDiv
+###adsdiv
 ###adSection
 ###adsection
 ###adsense-2
@@ -1359,8 +1359,8 @@
 ###AdsenseBottom
 ###adSenseBox
 ###adsenseContainer
-###adsenseHeader
 ###adsenseheader
+###adsenseHeader
 ###adsensehorizontal
 ###adsenseLeft
 ###adSenseModule
@@ -1379,8 +1379,8 @@
 ###adsframe_2
 ###adsHeader
 ###adsHeading
-###adSide
 ###adside
+###adSide
 ###adSide1-container
 ###adSidebar
 ###adSideButton
@@ -1390,18 +1390,18 @@
 ###adskeeper
 ###adSkin
 ###adSkinBackdrop
-###adSkinLeft
 ###adskinleft
+###adSkinLeft
 ###adskinlink
-###adSkinRight
 ###adskinright
+###adSkinRight
 ###adskintop
 ###adSky
 ###adsky
 ###adSkyPosition
-###adSkyscraper
-###adskyscraper
 ###AdSkyscraper
+###adskyscraper
+###adSkyscraper
 ###adskyscraper_flex
 ###adsLeft
 ###adsleft1
@@ -1432,8 +1432,8 @@
 ###adslot3
 ###adslot300x250ATF
 ###adslot300x250BTF
-###adSlot4
 ###adslot4
+###adSlot4
 ###adslot5
 ###adslot6
 ###adslot7
@@ -1486,9 +1486,9 @@
 ###adSquare
 ###adsquare
 ###adsquare2
-###AdsRight
 ###adsright
 ###adsRight
+###AdsRight
 ###adsRightDiv
 ###adsSectionLeft
 ###adsSectionRight
@@ -1520,8 +1520,8 @@
 ###ADtip
 ###adtoniq-msg-bar
 ###adTop
-###AdTop
 ###adtop
+###AdTop
 ###adtop1
 ###adTopContent
 ###adTopLarge
@@ -1557,10 +1557,10 @@
 ###adv-leaderboard
 ###adv-left
 ###adv-masthead
-###adv-middle
 ###adv-Middle
-###adv-middle1
+###adv-middle
 ###adv-Middle1
+###adv-middle1
 ###adv-Middle2
 ###adv-midroll
 ###adv-native
@@ -1611,8 +1611,8 @@
 ###adv_r
 ###adv_Reload
 ###adv_right
-###adv_Skin
 ###adv_skin
+###adv_Skin
 ###adv_sky
 ###adv_textlink
 ###adv_top
@@ -1711,8 +1711,8 @@
 ###advertisement-text
 ###Advertisement1
 ###advertisement1
-###Advertisement2
 ###advertisement2
+###Advertisement2
 ###advertisement3
 ###advertisement728x90
 ###advertisement_banner
@@ -1803,8 +1803,8 @@
 ###advertspace
 ###advertssection
 ###AdvertText
-###adverttop
 ###advertTop
+###adverttop
 ###advertTopLarge
 ###advertTopSmall
 ###advertTower
@@ -1837,8 +1837,8 @@
 ###adwidget2
 ###AdWidgetContainer
 ###adWrap
-###adwrapper
 ###adWrapper
+###adwrapper
 ###adWrapperSky
 ###AdWrapperSuperCA
 ###adx_ad
@@ -2079,22 +2079,22 @@
 ###banner_topad
 ###banner_videoad
 ###banner_wrapper_top
-###BannerAd
 ###bannerAd
+###BannerAd
 ###bannerad-bottom
 ###bannerad-top
 ###bannerad1
 ###bannerad2
 ###bannerAdFrame
 ###banneradrow
-###BannerAds
-###bannerAds
 ###bannerads
+###bannerAds
+###BannerAds
 ###bannerAdsense
 ###banneradspace
 ###bannerAdTop
-###bannerAdvert
 ###BannerAdvert
+###bannerAdvert
 ###banneradvert3
 ###banneradvertise
 ###BannerAdvertisement
@@ -2133,8 +2133,8 @@
 ###big_ad
 ###big_ad_label
 ###big_ads
-###bigad
 ###bigAd
+###bigad
 ###bigAd1
 ###bigAd2
 ###bigadbox
@@ -2143,8 +2143,8 @@
 ###bigadspace
 ###bigadspot
 ###bigboard_ad
-###BigBoxAd
 ###bigBoxAd
+###BigBoxAd
 ###bigBoxAdCont
 ###BigboxAdUnit
 ###bigsidead
@@ -2282,28 +2282,28 @@
 ###bottom_sponsor_ads
 ###bottom_sponsored_links
 ###bottom_text_ad
+###bottomAD
 ###bottomad
 ###bottomAd
-###bottomAD
-###bottomad300
 ###bottomAd300
+###bottomad300
 ###bottomad_table
 ###bottomadbanner
 ###bottomadbar
 ###bottomAdBlcok
-###BottomAdContainer
 ###bottomAdContainer
+###BottomAdContainer
 ###bottomadholder
-###bottomAds
 ###bottomads
+###bottomAds
 ###bottomadsdiv
 ###bottomAdSection
 ###bottomadsense
 ###bottomAdSenseDiv
 ###bottomAdvBox
 ###bottomadvert
-###bottomAdWrapper
 ###bottomadwrapper
+###bottomAdWrapper
 ###bottombanner
 ###bottomBannerAd
 ###bottomContentAd
@@ -2336,8 +2336,8 @@
 ###box_cookie_info
 ###box_text_ads
 ###boxAD
-###boxad
 ###boxAd
+###boxad
 ###boxAd300
 ###boxAdContainer
 ###boxads
@@ -2382,8 +2382,8 @@
 ###button_ads
 ###ButtonAd
 ###buy-sell-ads
-###buySellAds
 ###buysellads
+###buySellAds
 ###buzzblogpro-cookie-banner
 ###bx_cookie_info
 ###c2g_cookie_dialog
@@ -2484,8 +2484,8 @@
 ###compAdvertisement
 ###companion-ad
 ###companion_Ad
-###companionad
 ###companionAd
+###companionad
 ###companionAdDiv
 ###component-taboola-below-article-feed
 ###component-taboola-below-article-feed-2
@@ -2546,9 +2546,9 @@
 ###Content_CA_AD_0_BC
 ###Content_CA_AD_1_BC
 ###content_mpu
-###contentAd
-###contentad
 ###ContentAd
+###contentad
+###contentAd
 ###contentAds
 ###contentads
 ###contentAdSense
@@ -2757,24 +2757,24 @@
 ###cookieagree
 ###cookieAgreement
 ###cookieAgreementContent
-###CookieAlert
 ###cookiealert
+###CookieAlert
 ###cookieAlertMessage
 ###cookieAlertWrapper
 ###cookieAllow
 ###cookieallowbar
-###CookieBanner
-###Cookiebanner
 ###cookieBanner
+###CookieBanner
 ###cookiebanner
+###Cookiebanner
 ###cookiebanner-root
 ###cookiebanner-wrapper
 ###cookiebanner_con
 ###cookieBannerOverlay
 ###cookieBannerWrapper
+###cookiebar
 ###cookieBar
 ###CookieBar
-###cookiebar
 ###cookiebar_content
 ###cookieBgOverlay
 ###cookieBlock
@@ -2819,9 +2819,9 @@
 ###cookieDough
 ###CookieEU
 ###cookieFixed
-###cookiefooter
 ###cookieFooter
 ###CookieFooter
+###cookiefooter
 ###cookieFrame
 ###cookiefy_bar
 ###cookieGuardMsg
@@ -2853,8 +2853,8 @@
 ###CookieManClient
 ###cookiemelding
 ###cookiemenu
-###cookiemessage
 ###CookieMessage
+###cookiemessage
 ###cookieMessageContainer
 ###cookieMessageWrapper
 ###cookieMgn
@@ -2863,8 +2863,8 @@
 ###cookiemonster
 ###cookieMonster
 ###cookiemonster_popup
-###cookieMsg
 ###cookiemsg
+###cookieMsg
 ###cookieMsgBlock
 ###cookiemsgbox
 ###cookienote
@@ -2879,9 +2879,9 @@
 ###cookienotification-block
 ###cookieNotificationBanner
 ###cookieNotify
+###cookieOk
 ###cookieOK
 ###CookieOK
-###cookieOk
 ###cookieok_bar
 ###cookieoverlay
 ###cookiePane
@@ -2892,8 +2892,8 @@
 ###cookiePolicy-layer
 ###cookiepolicy_area
 ###cookiePolicyBar
-###cookiepolicyContainer
 ###cookiePolicyContainer
+###cookiepolicyContainer
 ###cookiePolicyDialog
 ###cookiepolicydiv
 ###cookiePolicyId
@@ -2905,16 +2905,16 @@
 ###cookiePoolicy
 ###cookiePop
 ###cookiePopin
-###cookiePopUp
 ###CookiePopup
+###cookiePopUp
 ###cookiepopup
 ###cookiePopupContainer
 ###cookiePrivacyNotice
 ###cookiePrivacyPopup
 ###cookiePrompt
 ###CookieReportsPanel
-###COOKIES
 ###Cookies
+###COOKIES
 ###cookies > form
 ###cookies-accept-bar
 ###cookies-agree
@@ -3013,16 +3013,16 @@
 ###cookiesBannerContainer
 ###cookiesBar
 ###cookiesbar
-###cookiesbox
 ###cookiesBox
+###cookiesbox
 ###cookiesc
 ###cookiesck
 ###cookiesck_accept
 ###cookiesck_overlay
 ###cookiesconcentbar
 ###cookiesConfirm
-###cookiesContainer
 ###cookiescontainer
+###cookiesContainer
 ###cookiescript_badge
 ###cookiescript_injected_wrapper
 ###CookiesDiv
@@ -3038,16 +3038,16 @@
 ###cookiesMsg
 ###cookiesNotification
 ###cookiesNotifier
-###cookiesNotify
 ###cookiesnotify
+###cookiesNotify
 ###CookiesOverlay
 ###cookiesPanel
 ###cookiesplease
 ###cookiesplus-modal-container
 ###cookiesplus-overlay
 ###cookiespolicy
-###cookiesPolicy
 ###CookiesPolicy
+###cookiesPolicy
 ###cookiesPolicyBanner
 ###cookiesPolicyMessage
 ###cookiesPolicyPopup
@@ -3055,8 +3055,8 @@
 ###cookiespp
 ###cookiesSection
 ###cookiestatement
-###CookiesWarning
 ###cookiesWarning
+###CookiesWarning
 ###cookiesWarningActive
 ###cookiesWrapper
 ###CookieT2Bar
@@ -3088,9 +3088,9 @@
 ###cookieWindowContainer
 ###cookieWrap
 ###cookiewrap
-###CookieWrapper
-###cookiewrapper
 ###cookieWrapper
+###cookiewrapper
+###CookieWrapper
 ###cookit
 ###cornerad
 ###coverads
@@ -3112,8 +3112,8 @@
 ###cult_cookie_accept
 ###custom-ad
 ###custom-tweet-button
-###customad
 ###customAd
+###customad
 ###customAds
 ###cwarn-box
 ###CWCookie
@@ -3243,8 +3243,8 @@
 ###div-cookie
 ###div-footer-ad
 ###div-gpt-ad-Banniere_Haute
-###div-gpt-ad-Habillage
 ###div-gpt-ad-habillage
+###div-gpt-ad-Habillage
 ###div-gpt-ad-mainColumn_double
 ###div-gpt-ad-Pave_Bas
 ###div-gpt-ad-Rectangle
@@ -3385,9 +3385,9 @@
 ###eu_cookie
 ###eu_cookies
 ###eucl_panel
-###eucookie
 ###EUCookie
 ###euCookie
+###eucookie
 ###eucookielaw
 ###EUCookieMsg
 ###eucookies
@@ -3447,17 +3447,17 @@
 ###fbbox1
 ###fbDiv
 ###fbinvite
-###fblike
 ###fbLike
+###fblike
 ###fbLikeButton
-###fbshare
 ###fbShare
+###fbshare
 ###fcbk
 ###fccCookieModal
 ###fdbk_tab
 ###feature_ad
-###featureAd
 ###featuread
+###featureAd
 ###featureAds
 ###featureAdSpace
 ###featured-ads
@@ -3515,8 +3515,8 @@
 ###foot-ad2-wrap
 ###foot-social
 ###foot_pub
-###footAd
 ###footad
+###footAd
 ###footAdArea
 ###footAds
 ###footer > #cookie-law-info-bar
@@ -3594,8 +3594,8 @@
 ###footer_tc_privacy
 ###footer_text_ad
 ###FooterAd
-###footerad
 ###footerAd
+###footerad
 ###footerad728
 ###FooterAdBlock
 ###footerAdBottom
@@ -3607,8 +3607,8 @@
 ###footerAds
 ###footeradsbox
 ###footerAdsPlacement
-###footerAdvert
 ###footeradvert
+###footerAdvert
 ###footerAdvertisement
 ###footerAdverts
 ###footerAdWrap
@@ -3618,8 +3618,8 @@
 ###footerCookieArticle
 ###footerFollow
 ###footerGoogleAd
-###FooterNewsletter
 ###footerNewsletter
+###FooterNewsletter
 ###footerSocial
 ###footerSocialButtons
 ###footerSocialIcons
@@ -3725,8 +3725,8 @@
 ###gdprAgree
 ###gdprAlert
 ###GDPRAlertBanner
-###gdprBanner
 ###gdprbanner
+###gdprBanner
 ###gdprconsent
 ###GDPRConsentBar
 ###gdprCookieBanner
@@ -3736,8 +3736,8 @@
 ###gdprMessage
 ###gdprNotice
 ###gdprNotification
-###gdprpopup
 ###gdprPopup
+###gdprpopup
 ###GDPRtoast
 ###gdprwarning
 ###gdrpNotification
@@ -3806,16 +3806,16 @@
 ###google_ads_frame6_anchor
 ###google_adsense
 ###google_adsense_ad
-###googlead
 ###GoogleAd
+###googlead
 ###googleAd
 ###GoogleAd1
 ###googleAD1
-###googleAD2
 ###GoogleAd2
+###googleAD2
 ###googlead2
-###googleAD3
 ###GoogleAd3
+###googleAD3
 ###googleAdArea
 ###googleAdBottom
 ###googleAdBox
@@ -3824,13 +3824,13 @@
 ###googleads
 ###googleAds
 ###googleads1
+###GoogleAdsense
 ###googleAdsense
 ###googleadsense
-###GoogleAdsense
 ###googleAdsenseAdverts
 ###googleadstop
-###GoogleAdTop
 ###googleAdTop
+###GoogleAdTop
 ###googlebanner
 ###googleSearchAds
 ###googlesponsor
@@ -3887,9 +3887,9 @@
 ###head_ad
 ###head_ads
 ###head_advert
-###HeadAd
-###headAd
 ###headad
+###headAd
+###HeadAd
 ###headAds
 ###headAdv
 ###headadvert
@@ -3964,9 +3964,9 @@
 ###header_sponsors
 ###header_top_ad
 ###headerAd
-###headerad
-###HeaderAD
 ###HeaderAd
+###HeaderAD
+###headerad
 ###headerad_large
 ###headerAdBackground
 ###HeaderAdBlock
@@ -3985,14 +3985,14 @@
 ###headerAdv
 ###headerAdvert
 ###headeradvertholder
-###headeradwrap
 ###headerAdWrap
+###headeradwrap
 ###headercookie
 ###headerCookies
 ###headergooglead
 ###headerpub
-###headerSocial
 ###headersocial
+###headerSocial
 ###headerSocialIcons
 ###headersponsors
 ###headerTopAd
@@ -4064,8 +4064,8 @@
 ###horizontal_ad
 ###horizontal_ad2
 ###horizontal_ad_top
-###horizontalAd
 ###horizontalad
+###horizontalAd
 ###horizontalads
 ###horizontalAdvertisement
 ###hours_ad
@@ -4137,8 +4137,8 @@
 ###info_cookie
 ###infoBottomAd
 ###infoboxadwrapper
-###infoCookie
 ###InfoCookie
+###infoCookie
 ###InfoCookieTlo
 ###informativa_cookie
 ###inhousead
@@ -4151,8 +4151,8 @@
 ###inline-story-ad2
 ###inline_ad
 ###inline_ad_section
-###inlineAd
 ###inlinead
+###inlineAd
 ###inlineAdCont
 ###inlineads
 ###inlineAdtop
@@ -4312,8 +4312,8 @@
 ###leader-board-ad
 ###leader_ad
 ###leader_board_ad
-###leaderad
 ###leaderAd
+###leaderad
 ###leaderad_section
 ###leaderAdContainer
 ###leaderAdContainerOuter
@@ -4326,14 +4326,14 @@
 ###leaderboard.ad
 ###leaderboard.ads
 ###leaderboard_728x90
-###leaderboard_ad
 ###leaderboard_Ad
+###leaderboard_ad
 ###leaderboard_ads
 ###leaderboard_bottom_ad
 ###leaderboard_top_ad
-###leaderboardad
-###leaderboardAd
 ###leaderBoardAd
+###leaderboardAd
+###leaderboardad
 ###leaderboardAds
 ###leaderboardAdTop
 ###leaderboardAdvert
@@ -4364,9 +4364,9 @@
 ###left_side_ads
 ###left_sidebar_ads
 ###left_top_ad
-###leftAD
-###LeftAd
 ###leftad
+###LeftAd
+###leftAD
 ###LeftAd1
 ###leftAd_fmt
 ###leftAd_rdr
@@ -4557,8 +4557,8 @@
 ###middle_ad
 ###middle_ads
 ###middle_mpu
-###middlead
 ###middleAd
+###middlead
 ###middleads
 ###middleads2
 ###midpost_ad
@@ -4739,8 +4739,8 @@
 ###notice-cookie
 ###noticePrivacy
 ###notification-permission
-###notificationPopUp
 ###notificationPopup
+###notificationPopUp
 ###notify_ad
 ###np-cookie-consent
 ###np-scrollup
@@ -4825,8 +4825,8 @@
 ###pause-ad
 ###pause-ads
 ###pauseAd
-###pavePub
 ###pavepub
+###pavePub
 ###pb_cookie_consent
 ###pc-cookie-notice
 ###pc-div-gpt-ad_728-3
@@ -4995,8 +4995,8 @@
 ###privacy_modal
 ###privacy_notice
 ###privacy_popup
-###privacyBanner
 ###PrivacyBanner
+###privacyBanner
 ###privacyBar
 ###privacyConsent
 ###privacyCookie
@@ -5321,8 +5321,8 @@
 ###scroll_totop
 ###scrolltotop
 ###scrolltotop_button
-###scrollToTopButton
 ###ScrollToTopButton
+###scrollToTopButton
 ###search-ad
 ###search-ads1
 ###search-google-ads
@@ -5411,8 +5411,8 @@
 ###shareActions
 ###shareArticle
 ###shareBadges
-###sharebar
 ###shareBar
+###sharebar
 ###shareBarBottom
 ###sharebarTop
 ###shareBarTop
@@ -5422,11 +5422,11 @@
 ###sharebox
 ###shareBox
 ###shareBtn
-###shareBtns
 ###sharebtns
+###shareBtns
 ###sharebtnwrap
-###ShareButton
 ###shareButton
+###ShareButton
 ###shareButton1
 ###shareButtons
 ###sharebuttons
@@ -5442,10 +5442,10 @@
 ###shareId
 ###shareImg
 ###ShareItemBtn
-###sharelink
 ###shareLink
-###shareLinks
+###sharelink
 ###sharelinks
+###shareLinks
 ###sharelist
 ###shareMenu
 ###shareOverlay
@@ -5505,8 +5505,8 @@
 ###side_skyscraper_ad
 ###side_sponsors
 ###sideABlock
-###sidead
 ###sideAD
+###sidead
 ###sideAd
 ###sidead1
 ###sideAd1
@@ -5515,8 +5515,8 @@
 ###sideAd4
 ###sideAdArea
 ###sideAdLarge
-###sideAds
 ###sideads
+###sideAds
 ###sideads_container
 ###sideadscol
 ###sideAdSmall
@@ -5570,19 +5570,19 @@
 ###sideBar_pub2
 ###sidebar_social_icons
 ###sidebar_topad
-###SidebarAd
-###sideBarAd
 ###sidebarAd
+###sideBarAd
+###SidebarAd
 ###sidebarad
 ###sidebarad0
 ###sidebarAd1
 ###sidebarAd2
 ###SidebarAdContainer
 ###sidebaradpane
-###sidebarAds
 ###sidebarads
-###sidebaradsense
+###sidebarAds
 ###sidebarAdSense
+###sidebaradsense
 ###sidebarAdSpace
 ###sidebarAdUnitWidget
 ###sidebarAdvert
@@ -5647,8 +5647,8 @@
 ###sky-right
 ###sky_ad
 ###sky_advert
-###SkyAd
 ###skyAd
+###SkyAd
 ###skyAdContainer
 ###skyads
 ###skyadwrap
@@ -5658,9 +5658,9 @@
 ###skyscraper-ad
 ###skyscraper_ad
 ###skyscraper_advert
-###skyscraperAd
 ###SkyscraperAD
 ###skyScraperAd
+###skyscraperAd
 ###skyscraperadblock
 ###skyscraperAdContainer
 ###skyscraperAds
@@ -5672,8 +5672,8 @@
 ###slashboxes > .deals-rail
 ###slice-container-newsletterForm-exitIntent
 ###slide_ad
-###slideAd
 ###slidead
+###slideAd
 ###slideboxad
 ###slider-ad
 ###slider_ad
@@ -5794,10 +5794,10 @@
 ###social_widget
 ###social_widget-4
 ###socialBanner
-###socialbar
 ###socialBar
-###socialbookmarks
+###socialbar
 ###socialBookmarks
+###socialbookmarks
 ###socialbox
 ###socialButtonOnPage
 ###socialButtons
@@ -5815,12 +5815,12 @@
 ###socialGrid
 ###socialHolder
 ###socialicon
-###socialicons
 ###socialIcons
+###socialicons
 ###socialInstagram
 ###Socialize
-###socialLinks
 ###sociallinks
+###socialLinks
 ###socialLinksContainer
 ###socialMedia
 ###SocialMedia
@@ -5836,12 +5836,12 @@
 ###socialnets
 ###socialNetworks
 ###socialpopup
-###socialshare
-###SocialShare
 ###socialShare
+###SocialShare
+###socialshare
 ###socialshareprivacy
-###socialSharing
 ###socialsharing
+###socialSharing
 ###socialslider
 ###socialTwitter
 ###socialWidgets
@@ -5921,17 +5921,17 @@
 ###sponsored_links
 ###sponsored_native_ad
 ###sponsoredAd
-###SponsoredAd
 ###sponsoredad
+###SponsoredAd
 ###SponsoredAds
 ###sponsoredAdvertisement
 ###sponsoredBottom
 ###sponsoredBox1
 ###sponsoredBox2
 ###sponsoredHoz
-###sponsoredlinks
 ###SponsoredLinks
 ###sponsoredLinks
+###sponsoredlinks
 ###sponsoredLinksBox
 ###sponsoredList
 ###sponsoredProducts
@@ -6037,8 +6037,8 @@
 ###subscribe-widget
 ###subscribe_modal_container
 ###subscribe_popup
-###subscribepopup
 ###subscribePopup
+###subscribepopup
 ###subscribeToPush
 ###subscription-box
 ###surveyshare-buttons
@@ -6126,8 +6126,8 @@
 ###text_ad
 ###text_ads
 ###text_advert
-###textAd
 ###textad
+###textAd
 ###textAd1
 ###textad3
 ###textAds
@@ -6145,8 +6145,8 @@
 ###to_top:not(body)
 ###to_top_scrollup
 ###toaster_ad
-###Top-ad
 ###top-ad
+###Top-ad
 ###top-ad-area
 ###top-ad-banner
 ###top-ad-container
@@ -6191,8 +6191,8 @@
 ###top-skin-ad-bg
 ###top-sponsor-ad
 ###top-story-ad
-###top_AD
 ###top_ad
+###top_AD
 ###top_ad-360
 ###top_ad_area
 ###top_ad_banner
@@ -6230,10 +6230,10 @@
 ###top_span_ad
 ###top_sponsor_ads
 ###top_sponsor_text
-###topad
 ###topAd
-###TopAd
 ###topAD
+###TopAd
+###topad
 ###topad-728x90
 ###topad-block
 ###topad-wrap
@@ -6246,19 +6246,19 @@
 ###topad_right
 ###topad_table
 ###topAdArea
-###topAdBanner
 ###topadbanner
+###topAdBanner
 ###topadbanner2
-###topadbar
 ###topAdBar
+###topadbar
 ###topadblock
 ###topAdBox
 ###TopAdBox
 ###topadcell
+###topAdcontainer
 ###topAdContainer
 ###TopAdContainer
 ###topadcontainer
-###topAdcontainer
 ###topAdDiv
 ###topAdDropdown
 ###topaddwide
@@ -6288,8 +6288,8 @@
 ###TopAdTable
 ###topAdv
 ###topAdvBox
-###TopAdvert
 ###topAdvert
+###TopAdvert
 ###topadvert
 ###topadwrap
 ###topAdWrapper
@@ -6299,8 +6299,8 @@
 ###topBanner-ad
 ###topbanner_ad
 ###topbanner_sponsor
-###TopBannerAd
 ###topbannerad
+###TopBannerAd
 ###topBannerAd
 ###topBannerAdContainer
 ###topbanneradtitle
@@ -6316,13 +6316,13 @@
 ###topheader_ads
 ###topImgAd
 ###topleaderAd
-###topLeaderboardAd
 ###topleaderboardad
+###topLeaderboardAd
 ###topleftad
 ###topMPU
 ###topMpuContainer
-###topNavad
 ###topnavad
+###topNavad
 ###toppannonse
 ###topright-ad
 ###toprightad
@@ -6432,8 +6432,8 @@
 ###vertical.ad
 ###vertical_ad
 ###vertical_ads
-###verticalads
 ###verticalAds
+###verticalads
 ###verticalSnsBar
 ###viber_share
 ###vid_vpaut_div
@@ -6453,8 +6453,8 @@
 ###video_hor_bot_ads
 ###video_overlay_ad
 ###video_playr_side.video_playr_sider.videoplayerside
-###videoAd
 ###videoad
+###videoAd
 ###videoAdContainer
 ###videoADPIC
 ###videoads
@@ -6859,8 +6859,8 @@
 ##.Ad-adhesive
 ##.ad-adlink-bottom
 ##.ad-adlink-side
-##.ad-adsense
 ##.ad-adSense
+##.ad-adsense
 ##.ad-adsense-block-250
 ##.ad-adstir
 ##.Ad-Advert_Container
@@ -7188,8 +7188,8 @@
 ##.ad-halfpage
 ##.ad-halfpage-placeholder
 ##.ad-head
-##.Ad-Header
 ##.ad-header
+##.Ad-Header
 ##.ad-header-below
 ##.ad-header-container
 ##.ad-header-creative
@@ -7246,8 +7246,8 @@
 ##.ad-inline
 ##.ad-inline-article
 ##.ad-inline-block
-##.ad-inner
 ##.Ad-Inner
+##.ad-inner
 ##.ad-inner-container
 ##.ad-inner-container-background
 ##.ad-innr
@@ -7284,8 +7284,8 @@
 ##.ad-leader-wrap
 ##.ad-leader-wrapper
 ##.ad-Leaderboard
-##.Ad-leaderboard
 ##.ad-leaderboard
+##.Ad-leaderboard
 ##.ad-leaderboard-base
 ##.ad-leaderboard-companion
 ##.ad-leaderboard-container
@@ -7376,8 +7376,8 @@
 ##.ad-module
 ##.ad-mount
 ##.ad-mpl
-##.ad-mpu
 ##.ad-MPU
+##.ad-mpu
 ##.ad-mpu-bottom
 ##.ad-mpu-container
 ##.ad-mpu-middle
@@ -7673,8 +7673,8 @@
 ##.ad-spotlight
 ##.ad-spteaser
 ##.ad-sq-super
-##.ad-Square
 ##.ad-square
+##.ad-Square
 ##.ad-square-placeholder
 ##.ad-square2-container
 ##.ad-square300
@@ -7700,8 +7700,8 @@
 ##.ad-subnav-container
 ##.ad-subtitle
 ##.ad-summary
-##.ad-SuperBanner
 ##.ad-superbanner
+##.ad-SuperBanner
 ##.ad-superbanner-node
 ##.ad-t
 ##.ad-t-text
@@ -7954,8 +7954,8 @@
 ##.ad284x134
 ##.ad290
 ##.ad2content_box
-##.ad300
 ##.Ad300
+##.ad300
 ##.ad300-hp-top
 ##.ad3001
 ##.ad300250
@@ -7975,8 +7975,8 @@
 ##.ad300x100
 ##.ad300x120
 ##.ad300x150
-##.ad300X250
 ##.ad300x250
+##.ad300X250
 ##.ad300x250-1
 ##.ad300x250-2
 ##.ad300x250-inline
@@ -8052,8 +8052,8 @@
 ##.ad728cont
 ##.ad728h
 ##.ad728top
-##.Ad728x90
 ##.ad728x90
+##.Ad728x90
 ##.ad728x90-1
 ##.ad728x90-2
 ##.ad728x90box
@@ -8076,8 +8076,8 @@
 ##.ad_188_inner
 ##.ad_1deg5up
 ##.ad_1tdq7q5
-##.ad_2
 ##.AD_2
+##.ad_2
 ##.ad_200
 ##.ad_240
 ##.ad_250250
@@ -8155,8 +8155,8 @@
 ##.ad_adv
 ##.ad_after_section
 ##.ad_amazon
-##.ad_area
 ##.AD_area
+##.ad_area
 ##.ad_area_two
 ##.ad_back
 ##.ad_background
@@ -8318,8 +8318,8 @@
 ##.ad_leaderboard_master
 ##.ad_leaderboard_top
 ##.ad_leaderboard_wrap
-##.ad_left
 ##.ad_Left
+##.ad_left
 ##.ad_left_cell
 ##.ad_left_column
 ##.ad_lft
@@ -8404,8 +8404,8 @@
 ##.ad_reminder
 ##.ad_response
 ##.ad_rhs
-##.Ad_Right
 ##.ad_Right
+##.Ad_Right
 ##.ad_right
 ##.ad_right_1
 ##.ad_right_2
@@ -8571,8 +8571,8 @@
 ##.adArticleSideTop300x250
 ##.adb-top
 ##.adback
-##.adban
 ##.adBan
+##.adban
 ##.adband
 ##.adbanner-300-250
 ##.adbanner-bottom
@@ -8617,9 +8617,9 @@
 ##.adBlockSpot
 ##.adboard
 ##.AdBody:not(body)
-##.adBorder
-##.adborder
 ##.AdBorder
+##.adborder
+##.adBorder
 ##.adborderbottom
 ##.adBorders
 ##.adbordertop
@@ -8629,8 +8629,8 @@
 ##.adbottom
 ##.AdBottomPage
 ##.adbottomright
-##.ADBox
 ##.ADbox
+##.ADBox
 ##.adBox
 ##.adbox-300x250
 ##.adbox-468x60
@@ -8651,8 +8651,8 @@
 ##.adbox1
 ##.adbox160
 ##.AdBox160
-##.adbox2
 ##.adBox2
+##.adbox2
 ##.adbox300
 ##.adbox300x250
 ##.adbox336
@@ -8661,8 +8661,8 @@
 ##.adbox600
 ##.AdBox7
 ##.adBox728
-##.adbox728
 ##.AdBox728
+##.adbox728
 ##.adBox728X90
 ##.adBox728X90_header
 ##.adBox_1
@@ -8685,8 +8685,8 @@
 ##.adboxclass
 ##.adboxcm
 ##.adBoxContainer
-##.adBoxContent
 ##.adboxcontent
+##.adBoxContent
 ##.adboxcontentsum
 ##.adboxes
 ##.adboxesrow
@@ -8724,8 +8724,8 @@
 ##.adcasing
 ##.adCell
 ##.AdCenter
-##.adCenter
 ##.adcenter
+##.adCenter
 ##.adCenterAd
 ##.adCentertile
 ##.adchange
@@ -8754,8 +8754,8 @@
 ##.AdCompactheader
 ##.adComponent
 ##.adcon
-##.adCont
 ##.adcont
+##.adCont
 ##.AdContainer
 ##.adcontainer-Leaderboard
 ##.adcontainer-Rectangle
@@ -8769,8 +8769,8 @@
 ##.adContentAd
 ##.adContour
 ##.adContTop
-##.adCopy
 ##.adcopy
+##.adCopy
 ##.adCreative
 ##.adCreator
 ##.adCube
@@ -8856,8 +8856,8 @@
 ##.adfoxly-overlay
 ##.adfoxly-place-delay
 ##.adfoxly-wrapper
-##.adFrame
 ##.adframe
+##.adFrame
 ##.adframe2
 ##.adframe_banner
 ##.adframe_rectangle
@@ -8880,13 +8880,13 @@
 ##.adguru-content-html
 ##.adguru-modal-popup
 ##.adhalfhome
-##.adHalfPage
 ##.adhalfpage
+##.adHalfPage
 ##.adhalfpageright
-##.adHead
 ##.adhead
-##.adheader
+##.adHead
 ##.adHeader
+##.adheader
 ##.adHeaderAdbanner
 ##.adHeaderblack
 ##.adHeaderText
@@ -8915,12 +8915,12 @@
 ##.adhi
 ##.adhide
 ##.adhint
+##.AdHolder
 ##.adHolder
 ##.adholder
-##.AdHolder
 ##.adholder-300
-##.adholder2
 ##.adHolder2
+##.adholder2
 ##.adholderban
 ##.adHolderStory
 ##.adHoldert
@@ -8933,8 +8933,8 @@
 ##.adHplaceholder
 ##.adHz
 ##.adIDiv
-##.adIframe
 ##.adiframe
+##.adIframe
 ##.adIframeCount
 ##.adImg
 ##.adImgIM
@@ -8943,8 +8943,8 @@
 ##.adindex
 ##.adindicator
 ##.ADInfo
-##.adInfo
 ##.adinfo
+##.adInfo
 ##.adInitRemove
 ##.adinjwidget
 ##.AdInline
@@ -8984,23 +8984,23 @@
 ##.adLargeRect
 ##.adLat
 ##.adlateral
-##.adlayer
 ##.adLayer
-##.adLeader
+##.adlayer
 ##.ADLeader
 ##.adleader
+##.adLeader
 ##.adLeaderboard
 ##.adLeaderBoard_container
 ##.adLeaderboardAdContainer
 ##.adLeaderForum
 ##.adLeft
-##.adleft1
 ##.AdLeft1
+##.adleft1
 ##.AdLeft2
 ##.adleftph
 ##.adlgbox
-##.adline
 ##.adLine
+##.adline
 ##.adlink
 ##.adLink
 ##.adLinkCnt
@@ -9020,8 +9020,8 @@
 ##.admain
 ##.adman
 ##.admania_singleshare
-##.adMarker
 ##.admarker
+##.adMarker
 ##.adMarkerBlock
 ##.admaster
 ##.adMastheadLeft
@@ -9036,11 +9036,11 @@
 ##.adMedRectBoxLeft
 ##.admeldBoxAd
 ##.AdMessage
-##.adMessage
 ##.admessage
+##.adMessage
 ##.ADmid
-##.admiddle
 ##.adMiddle
+##.admiddle
 ##.ADMiddle1
 ##.admiddlesidebar
 ##.adMinHeight280
@@ -9049,21 +9049,21 @@
 ##.admngr
 ##.admngrfr
 ##.admngrft
-##.adMod
 ##.AdMod
+##.adMod
 ##.admods
 ##.admodule
-##.adModule
 ##.AdModule
+##.adModule
 ##.adModule--inner
 ##.adModule--outer
 ##.adModule-outer
 ##.adModule300
 ##.adModuleAd
 ##.admoduleB
+##.adMpu
 ##.admpu
 ##.adMPU
-##.adMpu
 ##.admpu-small
 ##.adMpuHolder
 ##.adMPUHome
@@ -9083,8 +9083,8 @@
 ##.adnotice
 ##.adNotice90
 ##.adNoticeOut
-##.adNotification
 ##.adnotification
+##.adNotification
 ##.adnSpot
 ##.adnz-ad-placeholder
 ##.adObj
@@ -9103,8 +9103,8 @@
 ##.adpacks_content
 ##.adpadding
 ##.adpane
-##.adPanel
 ##.AdPanel
+##.adPanel
 ##.adPanelContent
 ##.adPanorama
 ##.adparent
@@ -9113,10 +9113,10 @@
 ##.adpic
 ##.adplace
 ##.adplace_center
-##.AdPlaceholder
 ##.adplaceholder
 ##.AdPlaceHolder
 ##.adPlaceholder
+##.AdPlaceholder
 ##.adplaceholder-top
 ##.adplacement
 ##.adPlacement
@@ -9140,8 +9140,8 @@
 ##.adrechts
 ##.adRecommend
 ##.adRecommendRight
-##.adrect
 ##.adRect
+##.adrect
 ##.adRectangle
 ##.adrectangle
 ##.adRectangle-pos-large
@@ -9178,8 +9178,8 @@
 ##.adrotate_widgets
 ##.adrotatediv
 ##.adRotator
-##.adrow
 ##.adRow
+##.adrow
 ##.adRowTopWrapper
 ##.adrule
 ##.ads > #video_playr_sider
@@ -9563,9 +9563,9 @@
 ##.ads_h
 ##.ads_h1
 ##.ads_h2
-##.Ads_header
 ##.ads_header
 ##.ads_Header
+##.Ads_header
 ##.ads_header_bottom
 ##.ads_holder
 ##.ads_home
@@ -9627,8 +9627,8 @@
 ##.ads_top_both
 ##.ads_top_middle
 ##.ads_top_nav
-##.ads_topbanner
 ##.ads_topBanner
+##.ads_topbanner
 ##.ads_topleft
 ##.ads_topright
 ##.ads_tr
@@ -9647,8 +9647,8 @@
 ##.adsanity-alignnone
 ##.adsanity-group
 ##.adsanity-single
-##.adsarea
 ##.adsArea
+##.adsarea
 ##.adsartical
 ##.adsBanner
 ##.adsbanner1
@@ -9667,9 +9667,9 @@
 ##.adsborder
 ##.adsBot
 ##.adsboth
+##.adsBottom
 ##.AdsBottom
 ##.adsbottom
-##.adsBottom
 ##.adsbottombox
 ##.adsbox--masthead
 ##.adsbox-square
@@ -9680,8 +9680,8 @@
 ##.adsboxBtn
 ##.adsboxitem
 ##.AdsBoxSection
-##.adsBoxTop
 ##.AdsBoxTop
+##.adsBoxTop
 ##.adsbx728x90
 ##.adsbyadop
 ##.adsbyexoclick
@@ -9713,8 +9713,8 @@
 ##.adscreen
 ##.adsDef
 ##.adsdelivery
-##.adsdesktop
 ##.adsDesktop
+##.adsdesktop
 ##.adsDetailsPage
 ##.adsDisclaimer
 ##.adsdiv
@@ -9727,8 +9727,8 @@
 ##.adSenceImagePush
 ##.adsens
 ##.AdSense
-##.adSense
 ##.Adsense
+##.adSense
 ##.adsense-250
 ##.adsense-300-600
 ##.adsense-336
@@ -9749,8 +9749,8 @@
 ##.adsense-div
 ##.adsense-float
 ##.adsense-googleAds
-##.adSense-header
 ##.adsense-header
+##.adSense-header
 ##.adsense-heading
 ##.adsense-iframe-container
 ##.adsense-inline
@@ -9851,8 +9851,8 @@
 ##.adshowbig
 ##.adshowcase
 ##.adshp
-##.adSide
 ##.adside
+##.adSide
 ##.adside-box-index
 ##.adside-box-single
 ##.adside_box
@@ -9871,15 +9871,15 @@
 ##.adsInner
 ##.adsitem
 ##.adsize728
-##.adSizer
 ##.adsizer
+##.adSizer
 ##.adsizewrapper
 ##.adsk-gdpr-footer-wrapper
 ##.adskeeperWrap
 ##.adSkin
 ##.adsky
-##.adSKY
 ##.adSky
+##.adSKY
 ##.adSkyscaper
 ##.adSkyscraper
 ##.adsLabel
@@ -9905,8 +9905,8 @@
 ##.adsloading
 ##.adslogan
 ##.AdSlot
-##.adSlot
 ##.adslot
+##.adSlot
 ##.adslot--leaderboard
 ##.adslot-area
 ##.adslot-banner
@@ -9945,8 +9945,8 @@
 ##.adslotright
 ##.adslotright_1
 ##.adslotright_2
-##.adSlug
 ##.adslug
+##.adSlug
 ##.adsMag
 ##.adsmaintop
 ##.adsmall
@@ -9974,8 +9974,8 @@
 ##.adsother
 ##.adsOuter
 ##.adsOverPrimary
-##.AdSpace
 ##.adspace
+##.AdSpace
 ##.adSpace
 ##.adspace-300x600
 ##.adspace-336x280
@@ -10000,8 +10000,8 @@
 ##.adspace_rotate
 ##.adspace_skyscraper
 ##.adspace_top
-##.adspacer
 ##.adSpacer
+##.adspacer
 ##.adspacer2
 ##.adspan
 ##.adspanel
@@ -10014,15 +10014,15 @@
 ##.adSplash
 ##.adsplash-160x600
 ##.adsplat
-##.adsponsor
 ##.adSponsor
+##.adsponsor
 ##.adSponsorhipInfo
 ##.adSponsorText
 ##.adspop
 ##.adspost
 ##.adsPostquare
-##.adspot
 ##.adSpot
+##.adspot
 ##.adspot-desk
 ##.adSpot-mrec
 ##.adSpot-textBox
@@ -10041,8 +10041,8 @@
 ##.adsRectangleMedium
 ##.AdsRectangleWrapper
 ##.adsresponsive
-##.adsRight
 ##.adsright
+##.adsRight
 ##.adsRow
 ##.adss
 ##.adsSecond
@@ -10061,13 +10061,13 @@
 ##.adStatementText
 ##.Adsterra
 ##.adsterra
-##.adsText
 ##.adstext
+##.adsText
 ##.adstextpad
 ##.adstipt
 ##.adstitle
-##.adstop
 ##.adsTop
+##.adstop
 ##.adsTopBanner
 ##.adsTopCont
 ##.adstory
@@ -10075,8 +10075,8 @@
 ##.adsTowerWrap
 ##.adstrip
 ##.adsTxt
-##.adstyle
 ##.adStyle
+##.adstyle
 ##.ADStyle
 ##.adStyle1
 ##.adSub
@@ -10087,8 +10087,8 @@
 ##.adsverting
 ##.adsvideo
 ##.adswallpapr
-##.adswidget
 ##.adsWidget
+##.adswidget
 ##.adswiper
 ##.adswitch
 ##.adswordatas
@@ -10143,8 +10143,8 @@
 ##.adthrive-video-player
 ##.adthrive_custom_ad
 ##.adTicker
-##.adtile
 ##.adTile
+##.adtile
 ##.adTiler
 ##.adTileWrap
 ##.adTip
@@ -10155,10 +10155,10 @@
 ##.adtitle
 ##.adTitleR
 ##.adtoggle
-##.adtop
+##.ADTop
 ##.AdTop
 ##.adTop
-##.ADTop
+##.adtop
 ##.adtop-border
 ##.adTopBk
 ##.adTopboxright
@@ -10173,8 +10173,8 @@
 ##.adtravel
 ##.adttl
 ##.adTwo
-##.adtxt
 ##.adTxt
+##.adtxt
 ##.adtxtlinks
 ##.adTXTnew
 ##.adType2
@@ -10380,8 +10380,8 @@
 ##.advads_widget
 ##.advance-ads
 ##.advart
-##.ADVBig
 ##.advbig
+##.ADVBig
 ##.advBottom
 ##.advBottomHome
 ##.advBox
@@ -10451,8 +10451,8 @@
 ##.advert-image
 ##.advert-info
 ##.advert-inner
-##.advert-label
 ##.Advert-label
+##.advert-label
 ##.advert-leaderboard
 ##.advert-leaderboard2
 ##.advert-loader
@@ -10550,8 +10550,8 @@
 ##.advert_wrapper
 ##.adverTag
 ##.advertBanner
-##.advertbar
 ##.advertBar
+##.advertbar
 ##.advertBlock
 ##.advertBottom
 ##.advertBox
@@ -10688,11 +10688,11 @@
 ##.advertisements_heading
 ##.advertisementSection
 ##.advertisementSmall
-##.advertisementText
 ##.AdvertisementText
+##.advertisementText
 ##.AdvertisementTextTag
-##.AdvertisementTop
 ##.advertisementTop
+##.AdvertisementTop
 ##.advertisementwrap
 ##.advertiser
 ##.advertiser-links
@@ -10758,8 +10758,8 @@
 ##.advertisingSlide
 ##.advertisingTable
 ##.advertisingTop
-##.Advertisment
 ##.advertisment
+##.Advertisment
 ##.advertisment-banner
 ##.advertisment-label
 ##.advertisment-left-panal
@@ -10784,8 +10784,8 @@
 ##.advertLink
 ##.advertLink1
 ##.advertMiddle
-##.advertMPU
 ##.advertMpu
+##.advertMPU
 ##.advertnotice
 ##.advertop
 ##.advertorial
@@ -10826,8 +10826,8 @@
 ##.advertText
 ##.advertTitleSky
 ##.adverttop
-##.AdvertWrapper
 ##.advertWrapper
+##.AdvertWrapper
 ##.adverTxt
 ##.ADVFLEX_250
 ##.advfrm
@@ -10870,8 +10870,8 @@
 ##.advtimg
 ##.advtitle
 ##.advtMsg
-##.advtop
 ##.advTop
+##.advtop
 ##.advtop-leaderbord
 ##.AdvtSample
 ##.advttopleft
@@ -10886,8 +10886,8 @@
 ##.adWideSkyscraper
 ##.adWideSkyscraperRight
 ##.adwidget
-##.ADwidget
 ##.adWidget
+##.ADwidget
 ##.AdWidget_ImageWidget
 ##.adWidgetBlock
 ##.adwithspace
@@ -10917,8 +10917,8 @@
 ##.adwrapper
 ##.adwrapper--desktop
 ##.adwrapper-lrec
-##.adWrapper1
 ##.adwrapper1
+##.adWrapper1
 ##.adwrapper948
 ##.adwrappercls
 ##.adwrappercls1
@@ -10935,8 +10935,8 @@
 ##.adz728x90
 ##.adzbanner
 ##.AdzerkBanner
-##.adZone
 ##.adzone
+##.adZone
 ##.adzone-footer
 ##.adzone-preview
 ##.adzone-sidebar
@@ -11137,8 +11137,8 @@
 ##.article-ad-row-inner
 ##.article-ad-section
 ##.article-ads
-##.Article-advert
 ##.article-advert
+##.Article-advert
 ##.article-advert--text
 ##.article-advert-container
 ##.article-advert-dfp
@@ -11241,9 +11241,9 @@
 ##.article_share
 ##.article_social
 ##.article_tower_ad
-##.ArticleAd
 ##.articlead
 ##.articleAd
+##.ArticleAd
 ##.articleADbox
 ##.articleAdHeader
 ##.articleAds
@@ -11415,10 +11415,10 @@
 ##.backgroundAd
 ##.backto-top
 ##.backtopbutton
+##.BackToTop
 ##.Backtotop
 ##.backtotop
 ##.backToTop
-##.BackToTop
 ##.backToTopButton
 ##.backToTopIcon
 ##.backToTopVisible
@@ -11501,8 +11501,8 @@
 ##.banner160x600
 ##.banner200x200
 ##.banner300
-##.banner300x250
 ##.Banner300x250
+##.banner300x250
 ##.banner336
 ##.banner336x280
 ##.banner350
@@ -11535,18 +11535,18 @@
 ##.banner_reklam
 ##.banner_reklam2
 ##.banner_slot
-##.bannerAd
 ##.bannerad
+##.bannerAd
 ##.bannerAd-module
-##.bannerad3
 ##.bannerAd3
+##.bannerad3
 ##.bannerAdContainer
 ##.banneradd
 ##.bannerAdLeaderboard
 ##.bannerAdRectangle
-##.bannerAds
-##.bannerads
 ##.bannerADS
+##.bannerads
+##.bannerAds
 ##.bannerAdSearch
 ##.bannerAdSidebar
 ##.bannerAdTower
@@ -11636,22 +11636,22 @@
 ##.big_ad
 ##.big_ad2
 ##.big_ads
-##.bigAd
 ##.bigad
+##.bigAd
 ##.bigad1
 ##.bigad2
 ##.bigAdContainer
 ##.bigadleft
 ##.bigadright
-##.bigads
 ##.bigAds
+##.bigads
 ##.bigadtxt1
 ##.bigAdvBanner
 ##.bigbox-ad
 ##.bigbox.ad
 ##.bigbox_ad
-##.BigBoxAd
 ##.bigboxad
+##.BigBoxAd
 ##.bigBoxAdArea
 ##.BigBoxAdLabel
 ##.bigcrunch-unit
@@ -11882,18 +11882,18 @@
 ##.bottom_social
 ##.bottom_sponsor
 ##.bottom_sticky_ad
-##.bottomAd
 ##.bottomad
+##.bottomAd
 ##.BottomAd-container
 ##.bottomAdBlock
-##.BottomAdContainer
 ##.bottomAdContainer
+##.BottomAdContainer
 ##.bottomads
 ##.bottomAds
 ##.bottomads + .leftd
 ##.BottomAdsPartial
-##.bottomAdvert
 ##.bottomadvert
+##.bottomAdvert
 ##.bottomAdvertisement
 ##.BottomAffiliate
 ##.bottomd + .leftd
@@ -11925,8 +11925,8 @@
 ##.box-share-group
 ##.box-social
 ##.box-social-icons
-##.box_ad
 ##.BOX_Ad
+##.box_ad
 ##.box_ad_container
 ##.box_ad_content
 ##.box_ad_horizontal
@@ -11946,9 +11946,9 @@
 ##.box_publicidad
 ##.box_sidebar-ads
 ##.box_social
-##.boxAd
-##.boxad
 ##.BoxAd
+##.boxad
+##.boxAd
 ##.boxad1
 ##.boxad2
 ##.boxadcont
@@ -12043,9 +12043,9 @@
 ##.button_right_ad
 ##.button_share
 ##.button_twitter
-##.buttonad
 ##.buttonAd
 ##.ButtonAd
+##.buttonad
 ##.buttonadbox
 ##.buttonAds
 ##.buttonads
@@ -12241,9 +12241,9 @@
 ##.center_add
 ##.center_ads
 ##.center_inline_ad
+##.centerad
 ##.centerAd
 ##.centerAD
-##.centerad
 ##.centerAds
 ##.centerads
 ##.centeradv
@@ -12508,8 +12508,8 @@
 ##.content_left_advert
 ##.content_rb[id^="content_rb_"]
 ##.contentAd
-##.ContentAd
 ##.contentad
+##.ContentAd
 ##.contentAd--sb1
 ##.contentad-end
 ##.contentad-home
@@ -12536,8 +12536,8 @@
 ##.contentShareLeft
 ##.contentSocialBar
 ##.ContentTextAd
-##.ContentTopAd
 ##.contentTopAd
+##.ContentTopAd
 ##.contentTopAds
 ##.contentTopAdSmall
 ##.contest_ad
@@ -12771,8 +12771,8 @@
 ##.cookieBannerWrapper
 ##.cookiebar-container
 ##.cookiebar[aria-live="polite"]
-##.cookiebarcontainer
 ##.cookieBarContainer
+##.cookiebarcontainer
 ##.cookieBottom
 ##.cookiecheck
 ##.cookieclose
@@ -12806,8 +12806,8 @@
 ##.cookieLaw:not(body):not(html)
 ##.cookielaw:not(body):not(html)
 ##.cookielawHinttop
-##.cookieLayer
 ##.cookielayer
+##.cookieLayer
 ##.cookielayer__layer
 ##.cookiemanager
 ##.cookieMaster
@@ -12817,12 +12817,12 @@
 ##.CookieMonsterBox
 ##.cookiemsg
 ##.cookieMsgContainer
-##.cookieNote
 ##.CookieNote
+##.cookieNote
 ##.cookieNotice
 ##.cookienotice-bar
-##.cookieNotification
 ##.CookieNotification
+##.cookieNotification
 ##.CookieNotify
 ##.cookieNotify
 ##.CookieNotifyWidget__wrapper
@@ -12831,8 +12831,8 @@
 ##.cookieOverlay
 ##.cookiePanel
 ##.CookiePerm
-##.CookiePolicy
 ##.cookiepolicy
+##.CookiePolicy
 ##.cookiePolicy-popup
 ##.cookiePolicyNotice
 ##.cookiePopUp
@@ -12930,8 +12930,8 @@
 ##.cookiesbanner
 ##.CookiesBanner-root
 ##.CookiesBanner-show
-##.CookiesBar
 ##.cookiesbar
+##.CookiesBar
 ##.cookiesBox
 ##.cookiesContainer
 ##.cookiesCorreios
@@ -12939,8 +12939,8 @@
 ##.cookieseal-banner-body
 ##.cookieSection
 ##.cookieset
-##.CookiesInfo
 ##.cookiesinfo
+##.CookiesInfo
 ##.cookieslaw
 ##.cookiesLegalRules
 ##.cookiesMessage
@@ -12949,9 +12949,9 @@
 ##.cookiesms
 ##.cookiesNote
 ##.cookiesnotice
-##.CookiesNotification
-##.cookiesNotification
 ##.cookiesnotification
+##.cookiesNotification
+##.CookiesNotification
 ##.cookiesPanel
 ##.cookiesplus-center
 ##.cookiespolicy
@@ -12963,8 +12963,8 @@
 ##.cookieToast
 ##.cookieTooltipKontener
 ##.cookieVisible:not(body)
-##.cookieWarning
 ##.CookieWarning
+##.cookieWarning
 ##.cookieWarningBox
 ##.cookiewrap
 ##.cookieWrap
@@ -13202,9 +13202,9 @@
 ##.dfp_unit
 ##.dfp_unit--interscroller
 ##.dfp_unit-ad_container
-##.dfpad
 ##.dfpAd
 ##.DFPad
+##.dfpad
 ##.dfpAds
 ##.dfpAdspot
 ##.dfpAdUnitContainer
@@ -13234,8 +13234,8 @@
 ##.display-cookies
 ##.display_ad
 ##.display_ads_right
-##.displayAd
 ##.DisplayAd
+##.displayAd
 ##.DisplayAd_Native__XCll3
 ##.DisplayAd_PremiumPlacement__gAXXB
 ##.displayAdCode
@@ -13255,8 +13255,8 @@
 ##.divad2
 ##.divad3
 ##.divAdright
-##.divAds
 ##.divads
+##.divAds
 ##.divAdsBanner
 ##.divAdsLeft
 ##.divAdsRight
@@ -13573,8 +13573,8 @@
 ##.facebooklike
 ##.FacebookLike
 ##.facebookOuter
-##.facebookShare
 ##.FacebookShare
+##.facebookShare
 ##.facebookshare
 ##.FacebookShareButton
 ##.facewrapper
@@ -13666,8 +13666,8 @@
 ##.first_ad
 ##.first_party_ad_wrapper
 ##.first_post_ad
-##.firstad
 ##.FirstAd
+##.firstad
 ##.firstAd-container
 ##.firstpost_advert
 ##.firstpost_advert_container
@@ -13727,8 +13727,8 @@
 ##.float-left12 > .div-list
 ##.float-share
 ##.float_bot_right
-##.floatAd
 ##.floatad
+##.floatAd
 ##.floatads
 ##.floated-ad
 ##.floated_right_ad
@@ -13867,8 +13867,8 @@
 ##.footer-instagram-icon
 ##.footer-leaderboard-ad
 ##.footer-links--social
-##.footer-links-social
 ##.Footer-links-social
+##.footer-links-social
 ##.footer-main-standard-social-list
 ##.footer-main__socials
 ##.footer-n__newsletter
@@ -14018,17 +14018,17 @@
 ##.footerpubright
 ##.footerSeguici
 ##.footerShare
-##.footerSocial
 ##.footersocial
 ##.FooterSocial
+##.footerSocial
 ##.footerSocialIcons
 ##.footersociallinks
 ##.FooterSocialMedia
 ##.footerSocials
 ##.footerTextAd
 ##.footertextadbox
-##.footsocial
 ##.footSocial
+##.footsocial
 ##.forbes-ad-container
 ##.forex_ad_links
 ##.fortune-ad-unit
@@ -14188,8 +14188,8 @@
 ##.gallery_ad_wrapper
 ##.gallery_ads_box
 ##.galleryad
-##.galleryAds
 ##.galleryads
+##.galleryAds
 ##.galleryLeftAd
 ##.galleryRightAd
 ##.gam-ad
@@ -14418,8 +14418,8 @@
 ##.googleadArea
 ##.googleadbottom
 ##.googleAdBox
-##.googleAdContainer
 ##.googleadcontainer
+##.googleAdContainer
 ##.googleAdd
 ##.googleaddiv
 ##.googleAds
@@ -14428,13 +14428,13 @@
 ##.googleads-height
 ##.googleAdsContainer
 ##.googleAdSearch
-##.googleadsense
 ##.googleAdsense
 ##.googleAdSense
+##.googleadsense
 ##.googleadsrectangle
 ##.GoogleAdv
-##.googleadv
 ##.googleAdv
+##.googleadv
 ##.googleadvertisement
 ##.googleadwrap
 ##.googleAdWrapper
@@ -14503,8 +14503,8 @@
 ##.grid-item-ad
 ##.grid__module-sizer_name_taboola
 ##.grid_ad_container
-##.gridAd
 ##.gridad
+##.gridAd
 ##.gridAdRow
 ##.gridlove-ad
 ##.gridlove-content-share
@@ -14719,8 +14719,8 @@
 ##.headerAdPosition
 ##.headeradright
 ##.headerAds
-##.HeaderAds
 ##.headerads
+##.HeaderAds
 ##.headerAds250
 ##.headerAdspace
 ##.headerAdSpacing
@@ -14755,8 +14755,8 @@
 ##.herald-share
 ##.herald-share-content
 ##.herald-soc-nav
-##.Hero-Ad
 ##.hero-ad
+##.Hero-Ad
 ##.hero-ad-slot
 ##.hero-advert
 ##.Hero-Share-SocialLink
@@ -14863,8 +14863,8 @@
 ##.house-ad-small
 ##.house-ad-unit
 ##.house-ads
-##.housead
 ##.houseAd
+##.housead
 ##.houseAd1
 ##.hover_ads
 ##.hover_share
@@ -14996,8 +14996,8 @@
 ##.image-container > a[href*=".yangkeduo.com"]
 ##.image-share
 ##.image-social
-##.imagead
 ##.imageAd
+##.imagead
 ##.imageads
 ##.imageAds
 ##.imagegg-container
@@ -15069,8 +15069,8 @@
 ##.info-sns-list
 ##.info_cookie
 ##.info_share
-##.infoCookies
 ##.infocookies
+##.infoCookies
 ##.infomation + #notice_container > .event-notice
 ##.informativo-lgpd
 ##.inhousead
@@ -15099,8 +15099,8 @@
 ##.inline_ad_title
 ##.inline_ads
 ##.inline_socials
-##.inlinead
 ##.inlineAd
+##.inlinead
 ##.inlinead_lazyload
 ##.inlineAdContainer
 ##.inlineAdImage
@@ -15538,9 +15538,9 @@
 ##.leader-ad
 ##.leader-ad-728
 ##.leader_ad
-##.leaderAd
-##.leaderad
 ##.LeaderAd
+##.leaderad
+##.leaderAd
 ##.leaderAdTop
 ##.leaderAdvert
 ##.LeaderAdvertisement
@@ -15571,15 +15571,15 @@
 ##.leaderboard_adsense
 ##.leaderboard_adv
 ##.leaderboard_banner_ad
-##.LeaderBoardAd
-##.leaderboardAd
 ##.leaderboardad
+##.leaderboardAd
+##.LeaderBoardAd
 ##.leaderboardadmiddle
 ##.leaderboardadtop
 ##.leaderBoardAdvert
 ##.leaderboardadwrap
-##.leaderboardAdWrapper
 ##.leaderBoardAdWrapper
+##.leaderboardAdWrapper
 ##.LearderAd_Border
 ##.lee-track-ilad
 ##.left-ad
@@ -15808,12 +15808,12 @@
 ##.m_cookie
 ##.m_hot_rec_box_base[id^="right"]
 ##.m_share
-##.macad
 ##.macAd
+##.macad
 ##.MacPlayer > #play-pause
 ##.mad_adcontainer
-##.magAd
 ##.magad
+##.magAd
 ##.mai-ad-unit-container
 ##.mai-ad-video
 ##.mailerlite-form
@@ -15988,15 +15988,15 @@
 ##.mid-section-ad
 ##.mid_ad
 ##.mid_banner_ad
-##.midad
 ##.midAd
+##.midad
 ##.midads
 ##.midAdv-cont
 ##.midAdv-cont2
 ##.midAdvert
 ##.midarticlead
-##.middle-ad
 ##.Middle-Ad
+##.middle-ad
 ##.middle-ads
 ##.middle-ads728
 ##.middle-footer-ad
@@ -16222,8 +16222,8 @@
 ##.mpu_placeholder
 ##.mpu_side
 ##.mpu_wrapper
-##.MPUad
 ##.mpuad
+##.MPUad
 ##.mpuAd
 ##.mpuAdArea
 ##.mpuads
@@ -16350,8 +16350,8 @@
 ##.navigate-to-top
 ##.navigation-socials
 ##.NavigationSharingFooter
-##.navsocial
 ##.navSocial
+##.navsocial
 ##.nbn-cookie-info
 ##.nc_socialPanel
 ##.nca-cookiesaccept-line
@@ -16665,9 +16665,9 @@
 ##.ot-sdk-show-settings
 ##.otd-ad-top
 ##.oui-back-to-top
-##.OUTBRAIN
-##.Outbrain
 ##.outbrain
+##.Outbrain
+##.OUTBRAIN
 ##.outbrain-ad-slot
 ##.outbrain-ad-units
 ##.outbrain-ads
@@ -16888,8 +16888,8 @@
 ##.photo-ad-pad
 ##.photo-share
 ##.photo-two > a[onclick^="_czc."]
-##.photoad
 ##.photoAd
+##.photoad
 ##.phpads_container
 ##.phpbb-ads-center
 ##.phs-cookie-popup-area
@@ -17073,8 +17073,8 @@
 ##.postmessage > #googleFirst
 ##.postmessage > #googleSecond
 ##.posts-ad
-##.postshare
 ##.postShare
+##.postshare
 ##.PostSidebarAd
 ##.postWideAd
 ##.powerkit_social_links_widget
@@ -17164,8 +17164,8 @@
 ##.promo-mpu
 ##.promo_ad
 ##.promo_ads
-##.promoAd
 ##.promoad
+##.promoAd
 ##.promoAds
 ##.promoAdvertising
 ##.promoboxAd
@@ -17310,8 +17310,8 @@
 ##.push_back
 ##.push_notification
 ##.pushdown-ad
-##.pushdownAd
 ##.PushdownAd
+##.pushdownAd
 ##.pushDownAd
 ##.pushNotification
 ##.pwa-ad
@@ -17402,8 +17402,8 @@
 ##.Rectangle_2-ad-holder
 ##.Rectangle_3-ad-holder
 ##.rectangle_ad
-##.rectanglead
 ##.RectangleAd
+##.rectanglead
 ##.rectangleAd
 ##.rectangleAdContainer
 ##.rectangleads
@@ -17456,8 +17456,8 @@
 ##.related-ad
 ##.related-ads
 ##.related_ad
-##.RelatedAds
 ##.relatedAds
+##.RelatedAds
 ##.remnant_ad
 ##.remove-ads
 ##.remove-ads-link
@@ -17480,8 +17480,8 @@
 ##.result-ad
 ##.result-sponsored
 ##.result_ad
-##.resultAd
 ##.resultad
+##.resultAd
 ##.results-ads
 ##.return-to-top
 ##.return_top
@@ -17571,9 +17571,9 @@
 ##.right_side_box_ad
 ##.right_sponsor_main
 ##.right_top_ad
+##.RightAd
 ##.rightad
 ##.rightAd
-##.RightAd
 ##.rightAD
 ##.rightAd1
 ##.RightAd1
@@ -17609,8 +17609,8 @@
 ##.rightHeaderAd
 ##.rightPub
 ##.rightrail-ad-placed
-##.RightRailAd
 ##.rightRailAd
+##.RightRailAd
 ##.RightRailAds
 ##.rightRailMiddleAd
 ##.RightRailPanelAd_noPanelSmall__7yQ1M
@@ -17750,15 +17750,15 @@
 ##.scroll_to_top
 ##.scroll_top_btn
 ##.scrolling-ads
-##.scrollto_top
 ##.scrollTo_top
+##.scrollto_top
 ##.ScrollTop
 ##.scrolltop-btn
 ##.scrollTopButton
 ##.scrollToTop:not(.dropdown-content-wrapper)
 ##.scrollToTopBtn
-##.scrolltotopbutton
 ##.scrollToTopButton
+##.scrolltotopbutton
 ##.scrollToTopText
 ##.scroolTop:not(body):not(html)
 ##.scShareBoxRow
@@ -17783,10 +17783,10 @@
 ##.search-social
 ##.search-sponsor
 ##.search-sponsored
-##.searchad
 ##.searchAd
-##.searchads
+##.searchad
 ##.searchAds
+##.searchads
 ##.searchAdTop
 ##.searchCenterBottomAds
 ##.searchCenterTopAds
@@ -17799,8 +17799,8 @@
 ##.SecondaryAd
 ##.SecondaryAdLink
 ##.secondaryNav-social
-##.section-ad
 ##.Section-ad
+##.section-ad
 ##.section-ad-unit
 ##.section-ad-wrapper
 ##.section-ad2
@@ -17809,8 +17809,8 @@
 ##.section-adtag
 ##.section-adv
 ##.section-advertisement
-##.section-cookie
 ##.Section-Cookie
+##.section-cookie
 ##.section-cookies
 ##.section-post-intro-share
 ##.section-social
@@ -18156,21 +18156,21 @@
 ##.shareBlock
 ##.ShareBlock-isReact
 ##.sharebottom
-##.shareBox
 ##.ShareBox
 ##.sharebox
+##.shareBox
 ##.shareBtm
-##.shareBtn
 ##.sharebtn
+##.shareBtn
 ##.shareBtnContainer
 ##.sharebtns
 ##.shareBtns
 ##.sharebutt
-##.sharebutton
 ##.ShareButton
-##.ShareButtons
-##.sharebuttons
+##.sharebutton
 ##.shareButtons
+##.sharebuttons
+##.ShareButtons
 ##.shareButtons-button
 ##.shareButtons-buttons
 ##.shareButtons-label
@@ -18199,19 +18199,19 @@
 ##.shareForm
 ##.shareGroup
 ##.shareHomeButtons
-##.shareIcons
 ##.ShareIcons
+##.shareIcons
 ##.shareit
 ##.shareitem
 ##.shareLeft
 ##.sharelike
 ##.shareline
-##.sharelink
 ##.shareLink
+##.sharelink
 ##.sharelinkedin
-##.ShareLinks
 ##.shareLinks
 ##.sharelinks
+##.ShareLinks
 ##.shareList
 ##.sharelist
 ##.ShareList
@@ -18222,8 +18222,8 @@
 ##.ShareMenu
 ##.shareMore
 ##.shareOption
-##.sharepage
 ##.sharePage
+##.sharepage
 ##.sharepanel
 ##.sharePanel
 ##.sharePinterest
@@ -18248,11 +18248,11 @@
 ##.shareSocialArticle
 ##.shareSprite
 ##.shareSticky
-##.shareText
 ##.sharetext
-##.shareThis
+##.shareText
 ##.sharethis
 ##.ShareThis
+##.shareThis
 ##.sharethis-bottom
 ##.sharethis-button
 ##.sharethis-buttons
@@ -18263,20 +18263,20 @@
 ##.sharethis-wrapper
 ##.shareTitle
 ##.shareto
-##.shareTool
 ##.sharetool
+##.shareTool
 ##.shareToolbar
 ##.sharetools
 ##.sharetop
 ##.shareTop
 ##.shareTrig
 ##.sharetweeter
-##.shareTwitter
 ##.sharetwitter
+##.shareTwitter
 ##.shareVideo
 ##.shareWa
-##.shareWidget
 ##.sharewidget
+##.shareWidget
 ##.shareWrap
 ##.sharewrapper
 ##.sharewykop
@@ -18385,9 +18385,9 @@
 ##.side_sns
 ##.side_social
 ##.side_twitter
+##.sideAd
 ##.SideAd
 ##.sidead
-##.sideAd
 ##.SideAdCol
 ##.sideAdLeft
 ##.sideadmid
@@ -18479,18 +18479,18 @@
 ##.sidebar_social
 ##.sidebar_sponsors
 ##.sidebar_subscribe
-##.sidebarAd
-##.sideBarAd
-##.SidebarAd
 ##.sidebarad
+##.sideBarAd
+##.sidebarAd
+##.SidebarAd
 ##.sidebarAD
 ##.sidebarad_bottom
 ##.sidebaradbox
 ##.sidebaradcontent
 ##.sidebarads
 ##.sidebaradsense
-##.SidebarAdvert
 ##.sidebarAdvert
+##.SidebarAdvert
 ##.sidebarbox__advertising
 ##.sidebarbox_newsletter
 ##.sidebarboxad
@@ -18553,15 +18553,15 @@
 ##.single_share
 ##.single_social
 ##.single_top_ad
-##.singlead
 ##.singleAd
+##.singlead
 ##.singleAdBox
 ##.singleads
 ##.singleAdsContainer
 ##.singleadstopcstm2
 ##.singlepageleftad
-##.singlepostad
 ##.singlePostAd
+##.singlepostad
 ##.singlepostadsense
 ##.singpagead
 ##.sister-ads
@@ -18613,8 +18613,8 @@
 ##.sky-ad1
 ##.sky_ad
 ##.sky_ad_top
-##.skyAd
 ##.skyad
+##.skyAd
 ##.SkyAdContainer
 ##.SkyAdContent
 ##.skyAdd
@@ -18662,8 +18662,8 @@
 ##.small_ad
 ##.small_ad_bg
 ##.small_ads
-##.smallAd
 ##.smallad
+##.smallAd
 ##.smalladblock
 ##.smallAdContainer
 ##.smallads
@@ -19031,8 +19031,8 @@
 ##.socialarea
 ##.socialb
 ##.socialBanner
-##.socialBar
 ##.SocialBar
+##.socialBar
 ##.socialbar-sidebar
 ##.socialbar-sidebar-item
 ##.socialBottom
@@ -19041,22 +19041,22 @@
 ##.socialbtns
 ##.socialbutton
 ##.socialbuttons
-##.socialButtons
 ##.Socialbuttons
+##.socialButtons
 ##.socialButtonv1
 ##.socialConnect
 ##.socialCont
 ##.socialContacts
-##.socialcontainer
 ##.socialContainer
+##.socialcontainer
 ##.socialContainerWrap
-##.socialCount
 ##.socialcount
+##.socialCount
 ##.socialEl
 ##.socialFixed
 ##.socialFollow
-##.socialFooter
 ##.socialfooter
+##.socialFooter
 ##.socialheader
 ##.socialHeader
 ##.socialHubIcon
@@ -19065,8 +19065,8 @@
 ##.socialicon
 ##.SocialIcon
 ##.socialIconContainer
-##.SocialIcons
 ##.socialicons
+##.SocialIcons
 ##.socialIcons_link
 ##.socialIconsRect
 ##.socialIconsWrapper
@@ -19083,15 +19083,15 @@
 ##.socialLabel
 ##.socialLikes
 ##.socialLink
+##.sociallinks
 ##.socialLinks
 ##.SocialLinks
-##.sociallinks
 ##.SocialLinks--footer
 ##.SocialLinks-linkContainer
 ##.socialLinksContainer
-##.socialList
 ##.sociallist
 ##.SocialList
+##.socialList
 ##.socialLogo
 ##.socialLogos
 ##.socialMedia
@@ -19116,8 +19116,8 @@
 ##.socialMenu
 ##.socialmobile
 ##.socialMod
-##.socialnav
 ##.socialNav
+##.socialnav
 ##.socialnetworkbox
 ##.socialNetworks
 ##.socialno
@@ -19137,19 +19137,19 @@
 ##.socials-wrap
 ##.socials_box
 ##.socials_widget
-##.SocialSection
 ##.socialSection
-##.socialshare
+##.SocialSection
 ##.SocialShare
+##.socialshare
 ##.socialShare
 ##.socialshare-wrapper
 ##.socialshare2
 ##.socialShareIcon
 ##.socialShareLinks
 ##.socialshares
+##.socialSharing
 ##.SocialSharing
 ##.socialsharing
-##.socialSharing
 ##.socialside
 ##.socialsider
 ##.socialSite
@@ -19159,15 +19159,15 @@
 ##.socialtags
 ##.socialToggle
 ##.socialToolbar
-##.socialtools
-##.socialTools
 ##.SocialTools
+##.socialTools
+##.socialtools
 ##.socialTop
 ##.socialts
-##.socialwidget
 ##.socialWidget
-##.socialWrap
+##.socialwidget
 ##.socialwrap
+##.socialWrap
 ##.socialWrapper
 ##.sociaPayLasim
 ##.sociaux
@@ -19231,8 +19231,8 @@
 ##.sponsor_popup
 ##.sponsor_post
 ##.sponsor_units
-##.sponsorAd
 ##.sponsorad
+##.sponsorAd
 ##.sponsoradlabel
 ##.sponsorads
 ##.sponsoradtitle
@@ -19315,11 +19315,11 @@
 ##.sponsoredItem
 ##.sponsoredLabel
 ##.sponsoredLeft
-##.sponsoredlink
 ##.sponsoredLink
+##.sponsoredlink
+##.sponsoredlinks
 ##.SponsoredLinks
 ##.sponsoredLinks
-##.sponsoredlinks
 ##.sponsoredLinks2
 ##.sponsoredLinksBox
 ##.SponsoredLinksModule
@@ -19328,13 +19328,13 @@
 ##.sponsoredListing
 ##.sponsoredPrisma
 ##.sponsoredProduct
-##.sponsoredresults
 ##.sponsoredResults
 ##.SponsoredResults
+##.sponsoredresults
 ##.sponsoredSearch
 ##.sponsoredTop
-##.sponsorfooter
 ##.sponsorFooter
+##.sponsorfooter
 ##.sponsorFooter-container
 ##.SponsorHeader
 ##.sponsorheader
@@ -19342,8 +19342,8 @@
 ##.SponsorIsland
 ##.sponsorLabel
 ##.SponsorLink
-##.sponsorLink
 ##.sponsorlink
+##.sponsorLink
 ##.sponsorlink2
 ##.sponsorLinks
 ##.sponsormsg
@@ -19390,12 +19390,12 @@
 ##.square-sidebar-ad
 ##.square-sponsorship
 ##.square_ad
-##.squaread
-##.SquareAd
 ##.squareAd
+##.SquareAd
+##.squaread
 ##.squareAdd
-##.squareAds
 ##.squareads
+##.squareAds
 ##.squareAdWrap
 ##.squared_ad
 ##.sr-adsense
@@ -19477,8 +19477,8 @@
 ##.sticky_ad_sidebar
 ##.sticky_ad_wrapper
 ##.sticky_ads
-##.stickyAd
 ##.stickyad
+##.stickyAd
 ##.StickyAdRail__Inner
 ##.stickyads
 ##.stickyAdsGroup
@@ -19700,8 +19700,8 @@
 ##.textad
 ##.textAd3
 ##.textAdBlock
-##.textAdBox
 ##.textadbox
+##.textAdBox
 ##.textadContainer
 ##.textadlink
 ##.textadlist
@@ -19879,9 +19879,9 @@
 ##.top-story-ad
 ##.top-wide-ad-container
 ##.top__ad
-##.top_Ad
 ##.top_ad
 ##.Top_Ad
+##.top_Ad
 ##.top_ad1
 ##.top_ad_728
 ##.top_ad_728_90
@@ -19926,9 +19926,9 @@
 ##.top_side_adv
 ##.top_social
 ##.top_sponsor
+##.topAd
 ##.topAD
 ##.TopAd
-##.topAd
 ##.topad-area
 ##.topad-bar
 ##.topad-bg
@@ -19944,8 +19944,8 @@
 ##.topadbox
 ##.topAdCenter
 ##.topadcont
-##.TopAdContainer
 ##.topAdContainer
+##.TopAdContainer
 ##.topAdd
 ##.TopAdL
 ##.topAdLeft
@@ -19953,8 +19953,8 @@
 ##.topAdRight
 ##.topadrow
 ##.topAds
-##.TopAds
 ##.topads
+##.TopAds
 ##.topads-spacer
 ##.topAdsArticle
 ##.topadsbx
@@ -19966,8 +19966,8 @@
 ##.topadtara
 ##.topadtxt
 ##.topAdvBox
-##.topadvert
 ##.topAdvert
+##.topadvert
 ##.topAdvertisement
 ##.topAdvertistemt
 ##.topAdverts
@@ -19977,9 +19977,9 @@
 ##.topArtAd
 ##.topArticleAds
 ##.topbanner + .nav + .banner
+##.topBannerAd
 ##.topbannerAd
 ##.TopBannerAd
-##.topBannerAd
 ##.TopBannerstyled__Wrapper-sc-x2ypns-0
 ##.topbar-ad-parent
 ##.topbar-ad-unit
@@ -20023,8 +20023,8 @@
 ##.tower_ad
 ##.tower_ad_desktop
 ##.tower_ad_disclaimer
-##.towerAd
 ##.towerad
+##.towerAd
 ##.towerAdLeft
 ##.towerAds
 ##.toy52_outer
@@ -20116,11 +20116,11 @@
 ##.twitter_link
 ##.twitter_social
 ##.twitter_widget
-##.twitterbox
 ##.twitterBox
+##.twitterbox
 ##.twitterbtn
-##.twitterbutton
 ##.TwitterButton
+##.twitterbutton
 ##.twitterfollow
 ##.twitterFollow
 ##.twitterIcon
@@ -20128,8 +20128,8 @@
 ##.twitterjo
 ##.twitterLink
 ##.twitterlink
-##.twitterShare
 ##.twittershare
+##.twitterShare
 ##.TwitterShareButton
 ##.twitterWidget
 ##.twshare
@@ -20274,8 +20274,8 @@
 ##.video_reklama
 ##.video_share
 ##.video_share_item
-##.VideoAd
 ##.videoad
+##.VideoAd
 ##.videoad-base
 ##.videoAd-wrapper
 ##.videoad2
@@ -20598,8 +20598,8 @@
 ##.widget_wpstealthads_widget
 ##.widget_wysija
 ##.widgetAD
-##.widgetAds
 ##.widgetads
+##.widgetAds
 ##.widgetadv
 ##.WidgetAdvertiser
 ##.widgetsocial
@@ -23124,17 +23124,17 @@
 ##[title^="agen judi poker" i]
 ##[title^="Agen Judi Terpercaya" i]
 ##[title^="Agen Judi Togel" i]
-##[title^="AGEN JUDI" i]
 ##[title^="agen judi" i]
-##[title^="Agen LiveCasino" i]
+##[title^="AGEN JUDI" i]
 ##[title^="agen livecasino" i]
+##[title^="Agen LiveCasino" i]
 ##[title^="Agen Online" i]
 ##[title^="agen poker bandar" i]
 ##[title^="agen poker bola" i]
 ##[title^="Agen Poker Indonesia" i]
 ##[title^="agen poker judi" i]
-##[title^="Agen Poker Online" i]
 ##[title^="agen poker online" i]
+##[title^="Agen Poker Online" i]
 ##[title^="agen poker terpercaya" i]
 ##[title^="agen poker" i]
 ##[title^="Agen QQ Terpercaya" i]
@@ -23421,8 +23421,8 @@
 ##[title^="jpslot88" i]
 ##[title^="JUARAPOKER" i]
 ##[title^="judi bola online" i]
-##[title^="judi bola" i]
 ##[title^="Judi Bola" i]
+##[title^="judi bola" i]
 ##[title^="judi online terpercaya" i]
 ##[title^="Judi Online" i]
 ##[title^="judi poker online" i]
@@ -23490,8 +23490,8 @@
 ##[title^="luxury138" i]
 ##[title^="luxury777" i]
 ##[title^="macau club poker" i]
-##[title^="macau442" i]
 ##[title^="MACAU442" i]
+##[title^="macau442" i]
 ##[title^="MacauBet" i]
 ##[title^="MacauDewa" i]
 ##[title^="Macauslot188" i]
@@ -23578,8 +23578,8 @@
 ##[title^="PEDROQQ" i]
 ##[title^="PELANGIKOIN" i]
 ##[title^="PELANGIQQ" i]
-##[title^="PENTASLOT" i]
 ##[title^="Pentaslot" i]
+##[title^="PENTASLOT" i]
 ##[title^="permainan judi online" i]
 ##[title^="pesonaQQ" i]
 ##[title^="pesqq" i]
@@ -23662,8 +23662,8 @@
 ##[title^="REJEKIPOKER" i]
 ##[title^="Resmidomino" i]
 ##[title^="RGOBET" i]
-##[title^="rgocasino" i]
 ##[title^="RGOCASINO" i]
+##[title^="rgocasino" i]
 ##[title^="RIVALQQ" i]
 ##[title^="RONALDO4D" i]
 ##[title^="royalflush88" i]
@@ -23935,8 +23935,8 @@
 ##a[href*="/33hth.cn"]
 ##a[href*="/445.ee/"]
 ##a[href*="/?aff="][target="_blank"]
-##a[href*="/?Intr="]
 ##a[href*="/?intr="]
+##a[href*="/?Intr="]
 ##a[href*="/?INTR="]
 ##a[href*="/ads/adscenter."]
 ##a[href*="/advertisesimple.info"]
@@ -24400,8 +24400,8 @@
 ##a[href^="https://claring-loccelkin.com/"]
 ##a[href^="https://click.candyoffers.com/"]
 ##a[href^="https://click.dtiserv2.com/"]
-##a[href^="https://Click.ggpickaff.com/"]
 ##a[href^="https://click.Ggpickaff.com/"]
+##a[href^="https://Click.ggpickaff.com/"]
 ##a[href^="https://click.hoolig.app/"]
 ##a[href^="https://click.linksynergy.com/fs-bin/"] > img
 ##a[href^="https://clickadilla.com/"]
@@ -25018,8 +25018,8 @@
 ##div[id^="CGCandy"]
 ##div[id^="cpa_rotator_block"]
 ##div[id^="criteo-"][style]
-##div[id^="crt-"][style]
 ##div[id^="Crt-"][style]
+##div[id^="crt-"][style]
 ##div[id^="dfp-ad-"]
 ##div[id^="div-ads-"]
 ##div[id^="div-gpt-"]
@@ -25154,8 +25154,8 @@
 ##img[alt^="8080SPORT" i]
 ##img[alt^="8080SPORT"]
 ##img[alt^="88 DEWA" i]
-##img[alt^="8TOGEL" i]
 ##img[alt^="8togel" i]
+##img[alt^="8TOGEL" i]
 ##img[alt^="8TOGEL"]
 ##img[alt^="933Bola" i]
 ##img[alt^="99DEWA" i]
@@ -25189,8 +25189,8 @@
 ##img[alt^="Agen Judi Poker" i]
 ##img[alt^="Agen Judi Terpercaya" i]
 ##img[alt^="Agen Judi Togel" i]
-##img[alt^="AGEN JUDI" i]
 ##img[alt^="agen judi" i]
+##img[alt^="AGEN JUDI" i]
 ##img[alt^="AGEN LAPAKQQ" i]
 ##img[alt^="agen livecasino" i]
 ##img[alt^="Agen Online" i]
@@ -25200,8 +25200,8 @@
 ##img[alt^="agen poker judi" i]
 ##img[alt^="Agen Poker Online" i]
 ##img[alt^="Agen Poker Terpercaya" i]
-##img[alt^="Agen Poker" i]
 ##img[alt^="agen poker" i]
+##img[alt^="Agen Poker" i]
 ##img[alt^="Agen QQ Terpercaya" i]
 ##img[alt^="agen qq" i]
 ##img[alt^="AGEN SABUNG" i]
@@ -25216,8 +25216,8 @@
 ##img[alt^="agen taruhan bola" i]
 ##img[alt^="Agen Togel Online" i]
 ##img[alt^="Agen Togel Terpercaya" i]
-##img[alt^="Agen Togel" i]
 ##img[alt^="agen togel" i]
+##img[alt^="Agen Togel" i]
 ##img[alt^="Agen Toto" i]
 ##img[alt^="AgenQQ" i]
 ##img[alt^="AGENQQ365" i]
@@ -25289,12 +25289,12 @@
 ##img[alt^="Bandar QQ" i]
 ##img[alt^="bandar sakong" i]
 ##img[alt^="Bandar Taruhan Judi" i]
-##img[alt^="Bandar Togel" i]
 ##img[alt^="bandar togel" i]
+##img[alt^="Bandar Togel" i]
 ##img[alt^="Bandar toto" i]
 ##img[alt^="bandar303" i]
-##img[alt^="bandar36" i]
 ##img[alt^="Bandar36" i]
+##img[alt^="bandar36" i]
 ##img[alt^="Bandar855" i]
 ##img[alt^="bandar855" i]
 ##img[alt^="BandarCapsa" i]
@@ -25307,9 +25307,9 @@
 ##img[alt^="BANDARQQ" i]
 ##img[alt^="BANDARQQ365" i]
 ##img[alt^="bandarwalet" i]
-##img[alt^="BandarXL" i]
-##img[alt^="bandarxl" i]
 ##img[alt^="BANDARXL" i]
+##img[alt^="bandarxl" i]
+##img[alt^="BandarXL" i]
 ##img[alt^="bandarxl"]
 ##img[alt^="banner sidebar" i]
 ##img[alt^="bannertengah" i]
@@ -25335,8 +25335,8 @@
 ##img[alt^="Binomo" i]
 ##img[alt^="birutoto" i]
 ##img[alt^="BISAQQ" i]
-##img[alt^="Bisnis4D" i]
 ##img[alt^="BISNIS4D" i]
+##img[alt^="Bisnis4D" i]
 ##img[alt^="bisnis4d"]
 ##img[alt^="blatogel" i]
 ##img[alt^="bola tangkas online" i]
@@ -25365,8 +25365,8 @@
 ##img[alt^="BUNDAPOKER" i]
 ##img[alt^="BUNGAQQ" i]
 ##img[alt^="BUYSPINSLOT" i]
-##img[alt^="BuySpinSLOT" i]
 ##img[alt^="buyspinslot" i]
+##img[alt^="BuySpinSLOT" i]
 ##img[alt^="CafeQQ" i]
 ##img[alt^="CAHAYAPOKER" i]
 ##img[alt^="CAHAYAQQ" i]
@@ -25457,16 +25457,16 @@
 ##img[alt^="DWVGAMING" i]
 ##img[alt^="ELANGQQ" i]
 ##img[alt^="ENAKBET" i]
-##img[alt^="EnakSlot" i]
 ##img[alt^="enakslot" i]
 ##img[alt^="Enakslot" i]
+##img[alt^="EnakSlot" i]
 ##img[alt^="enakslot"]
 ##img[alt^="ENJOYQQ" i]
 ##img[alt^="enterslots" i]
 ##img[alt^="entertogel" i]
 ##img[alt^="eqn388"]
-##img[alt^="Eraplay88" i]
 ##img[alt^="EraPlay88" i]
+##img[alt^="Eraplay88" i]
 ##img[alt^="ESIAPOKER" i]
 ##img[alt^="FAIRQQ" i]
 ##img[alt^="FASTBET" i]
@@ -25530,8 +25530,8 @@
 ##img[alt^="IBUQQ" i]
 ##img[alt^="ID88.Com" i]
 ##img[alt^="IDN POKER ONLINE" i]
-##img[alt^="IDN Poker" i]
 ##img[alt^="Idn Poker" i]
+##img[alt^="IDN Poker" i]
 ##img[alt^="IDNCASH" i]
 ##img[alt^="IDNGG" i]
 ##img[alt^="IDNGOAL" i]
@@ -25589,8 +25589,8 @@
 ##img[alt^="JAWA DOMINO" i]
 ##img[alt^="JAWAPOKER88" i]
 ##img[alt^="jayabet" i]
-##img[alt^="JAYAPOKER" i]
 ##img[alt^="jayapoker" i]
+##img[alt^="JAYAPOKER" i]
 ##img[alt^="JELASPOKER" i]
 ##img[alt^="JEMPOLQQ" i]
 ##img[alt^="jendralpoker" i]
@@ -25607,8 +25607,8 @@
 ##img[alt^="juarajitu" i]
 ##img[alt^="JUARAPOKER" i]
 ##img[alt^="judi bola online" i]
-##img[alt^="Judi bola" i]
 ##img[alt^="judi bola" i]
+##img[alt^="Judi bola" i]
 ##img[alt^="judi online terpercaya" i]
 ##img[alt^="Judi Online" i]
 ##img[alt^="judi online" i]
@@ -25622,9 +25622,9 @@
 ##img[alt^="JURAGANQQ" i]
 ##img[alt^="Kaiko Slot" i]
 ##img[alt^="KaikoSlot" i]
-##img[alt^="kaikoslot" i]
 ##img[alt^="Kaikoslot" i]
 ##img[alt^="KAIKOSLOT" i]
+##img[alt^="kaikoslot" i]
 ##img[alt^="Kakak Dewa" i]
 ##img[alt^="KAMPUSBET" i]
 ##img[alt^="KANTINQQ" i]
@@ -25706,8 +25706,8 @@
 ##img[alt^="macau club poker" i]
 ##img[alt^="Macau Dewa" i]
 ##img[alt^="MACAU442" i]
-##img[alt^="MACAUBET" i]
 ##img[alt^="MacauBet" i]
+##img[alt^="MACAUBET" i]
 ##img[alt^="Macaudewa" i]
 ##img[alt^="MacauDewa" i]
 ##img[alt^="Macauslot188" i]
@@ -25717,8 +25717,8 @@
 ##img[alt^="mahkotajitu" i]
 ##img[alt^="MAHKOTAQQ" i]
 ##img[alt^="Main Cuan Slot" i]
-##img[alt^="maincuan" i]
 ##img[alt^="MAINCUAN" i]
+##img[alt^="maincuan" i]
 ##img[alt^="MAINDOMINO99" i]
 ##img[alt^="mainhoki" i]
 ##img[alt^="MAINQQ" i]
@@ -25729,8 +25729,8 @@
 ##img[alt^="MANDALATOTO" i]
 ##img[alt^="MANDIRIQQ" i]
 ##img[alt^="ManiaQQ" i]
-##img[alt^="mansion77" i]
 ##img[alt^="MANSION77" i]
+##img[alt^="mansion77" i]
 ##img[alt^="mantul138" i]
 ##img[alt^="MARIOQQ" i]
 ##img[alt^="MASTERDOMINO88" i]
@@ -25838,8 +25838,8 @@
 ##img[alt^="PELANGIQQ" i]
 ##img[alt^="Penta Slot" i]
 ##img[alt^="Pentaslot" i]
-##img[alt^="PENTASLOT" i]
 ##img[alt^="pentaslot" i]
+##img[alt^="PENTASLOT" i]
 ##img[alt^="percaya4d" i]
 ##img[alt^="permainan judi online" i]
 ##img[alt^="PERMATABET88" i]
@@ -25869,8 +25869,8 @@
 ##img[alt^="POKER855" i]
 ##img[alt^="poker8m" i]
 ##img[alt^="pokerajaib" i]
-##img[alt^="pokerboya" i]
 ##img[alt^="POKERBOYA" i]
+##img[alt^="pokerboya" i]
 ##img[alt^="pokercip" i]
 ##img[alt^="POKEREMAS" i]
 ##img[alt^="Pokerhebat" i]
@@ -25908,11 +25908,11 @@
 ##img[alt^="QQ820" i]
 ##img[alt^="QQ828" i]
 ##img[alt^="QQ882" i]
-##img[alt^="QQ8889" i]
 ##img[alt^="qq8889" i]
+##img[alt^="QQ8889" i]
 ##img[alt^="QQ998" i]
-##img[alt^="QQangpao" i]
 ##img[alt^="QQANGPAO" i]
+##img[alt^="QQangpao" i]
 ##img[alt^="QQasiabet" i]
 ##img[alt^="QQCALO" i]
 ##img[alt^="QQDewa" i]
@@ -25953,8 +25953,8 @@
 ##img[alt^="Resmidomino" i]
 ##img[alt^="RGOBET" i]
 ##img[alt^="rgobet" i]
-##img[alt^="rgocasino" i]
 ##img[alt^="RGOCASINO" i]
+##img[alt^="rgocasino" i]
 ##img[alt^="RGOCASINO"]
 ##img[alt^="rimbatoto" i]
 ##img[alt^="rivalqq" i]
@@ -26006,8 +26006,8 @@
 ##img[alt^="SENIQQ" i]
 ##img[alt^="senyumqq" i]
 ##img[alt^="sepakbola.cc" i]
-##img[alt^="sepakbolacc" i]
 ##img[alt^="SEPAKBOLACC" i]
+##img[alt^="sepakbolacc" i]
 ##img[alt^="SERVERPKV" i]
 ##img[alt^="sexysloto" i]
 ##img[alt^="SHINCHANPOKER" i]
@@ -26039,8 +26039,8 @@
 ##img[alt^="slot casino mpobos" i]
 ##img[alt^="slot demo gratis" i]
 ##img[alt^="Slot Deposit" i]
-##img[alt^="slot gacor" i]
 ##img[alt^="Slot Gacor" i]
+##img[alt^="slot gacor" i]
 ##img[alt^="slot game" i]
 ##img[alt^="Slot MPO" i]
 ##img[alt^="slot online termurah" i]
@@ -26124,8 +26124,8 @@
 ##img[alt^="URA338" i]
 ##img[alt^="UtamaBet" i]
 ##img[alt^="vegas811" i]
-##img[alt^="Vegas88" i]
 ##img[alt^="VEGAS88" i]
+##img[alt^="Vegas88" i]
 ##img[alt^="video bokep online" i]
 ##img[alt^="Vimax Asli" i]
 ##img[alt^="VIP BONUS LIVE" i]
@@ -30499,8 +30499,8 @@ _mobileAds|
 _nedstat.js
 _pages_ad.
 _personalized_ads
-_popAds.
 _popads.
+_popAds.
 _prebid.js$script
 _pub.gif
 _pub_iframe.
@@ -49585,8 +49585,8 @@ wishesh.com##.article-body-banner
 withings.com#@##analytics_cookie
 withings.com#@#.cookie_message
 witt-weiden.de###newsletter-flyout
-wix.com###wixFooter
 wix.com###wixfooter
+wix.com###wixFooter
 wjbc.com##a[href^="http://sweetdeals.com/bloomington/deals"]
 wjbc.com##a[href^="https://www.farmweeknow.com/rfd_radio/"]
 wjunction.com##.global-banner
