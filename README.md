@@ -1,72 +1,84 @@
-# Filter Lists
+# 🚀 Filter Lists
 
-Comprehensive blocklist for ads, privacy & annoyance filter list — auto-compiled from trusted sources into a single file.
+**Comprehensive blocklist for ads, privacy & annoyance** — auto-compiled from trusted sources into a single, powerful file.
 
-## Subscribe
+---
 
-Add this **one URL** to your browser:
+## 📥 Subscribe
+
+Add this **one URL** to your blocker:
 
 ```
 https://raw.githubusercontent.com/anT0ny54/filter-lists/refs/heads/main/filters.txt
 ```
 
-### Supported
+### 🛡️ Supported
 uBlock Origin, AdGuard, AdBlock Plus, and compatible blockers.
 
-### Install
+### ⚙️ Installation
 1. Open your blocker dashboard
-2. Go to **Filter lists**
+2. Navigate to **Filter lists**
 3. Import the URL above
 4. Apply or save changes
 
-## How It Works
+---
 
-This repository is updated automatically by GitHub Actions.
+## 🔧 How It Works
 
-Workflow:
+This repository updates automatically via GitHub Actions.
+
+**Workflow:**
 1. Downloads all sources from `sources.txt`
 2. Resolves nested `!#include` directives
 3. Validates downloads
 4. Removes comments and duplicates
 5. Appends rules from `custom-rules.txt`
-6. Commits `filters.txt` only when changes are detected
+6. Commits `filters.txt` only when changes detected
 
-## Configuration
+---
 
-- `sources.txt` — upstream source list
-- `custom-rules.txt` — local custom rules
-- GitHub Actions — manual rebuild trigger
+## ⚙️ Configuration
 
-#### :department_store: **My Free DNS Server — free** <a name="dns-server"></a>
-
-Use HaGeZi Blocklists Multi Pro + TIF with [My Free DNS].
-
-| Hagezi Blocklists | DNS-over-HTTPS |
+| File | Purpose |
 | --- | --- |
-| Multi Pro + TIF | `https://freedns-six.vercel.app/api/doh/dns-query` (Recommended) |
-| Multi Pro + TIF | `https://dnssix.netlify.app/api/doh/dns-query` |
+| `sources.txt` | Upstream source list |
+| `custom-rules.txt` | Local custom rules |
+| GitHub Actions | Manual rebuild trigger |
 
-# ⚡ Bandwidth Hero Server
+---
 
-> A lightweight image proxy that cuts bandwidth and speeds up browsing.
+## 🏪 My Free DNS Server
 
-Bandwidth Hero Server fetches remote images, compresses them, and returns optimized versions for faster loading and lower data use.
+Use **HaGeZi Blocklists Multi Pro + TIF** with [My Free DNS].
 
-## Legal Disclaimer
+| Service | DNS-over-HTTPS URL |
+| --- | --- |
+| Multi Pro + TIF (Recommended) | `https://freedns-six.vercel.app/api/doh/dns-query` |
+| Multi Pro + TIF (Backup) | `https://dnssix.netlify.app/api/doh/dns-query` |
 
-- Personal use only
-- No affiliation
+---
+
+## ⚡ Bandwidth Hero Server
+
+A lightweight image proxy that cuts bandwidth and speeds up browsing. Fetches remote images, compresses them, and returns optimized versions for faster loading and lower data use.
+
+---
+
+## ⚖️ Legal Notice
+
+- **Personal use only**
+- No official affiliation
 - Third-party content only
-- No distribution or recommendation
-- No commercial use
-- No intent to cause harm
-- No warranty
-- Compliance is the user’s responsibility
+- Not for distribution or commercial use
+- No warranties provided
+- User is responsible for compliance
 
 See [LICENSE](LICENSE) for full legal terms.
 
-## Supporting My Project
+---
 
-If you'd like to support the project, donate:
+## 💜 Support This Project
 
-- Bitcoin: `1HntwKxyqGCfnSGvGLMUTRAqLnTvLarAQP`
+If you'd like to support development, consider donating:
+
+**Bitcoin:** `1HntwKxyqGCfnSGvGLMUTRAqLnTvLarAQP`
