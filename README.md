@@ -62,6 +62,9 @@ Use **HaGeZi Blocklists Multi Pro + TIF** with [My Free DNS].
 
 A lightweight image proxy that cuts bandwidth and speeds up browsing. Fetches remote images, compresses them, and returns optimized versions for faster loading and lower data use.
 
+🖥️ **Try it out:** [Bandwidth Hero](https://bhserv.netlify.app/)
+
+
 ---
 
 ## ⚖️ Legal Notice
