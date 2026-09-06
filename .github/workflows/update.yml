@@ -10,6 +10,7 @@ on:
       - "sources.txt"
       - "custom-rules.txt"
       - "scripts/**"
+      - "tests/**"
       - ".github/workflows/update.yml"
 
 concurrency:
@@ -31,12 +32,17 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
       - name: Validate builder
         shell: bash
         run: |
           set -Eeuo pipefail
-          test -x scripts/merge.sh || chmod +x scripts/merge.sh
-          python3 -m py_compile scripts/merge.py
+          chmod +x scripts/merge.sh scripts/merge.py scripts/validate.py
+          python3 -m py_compile scripts/merge.py scripts/validate.py
           python3 -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Generate filter list
@@ -46,6 +52,12 @@ jobs:
           ./scripts/merge.sh
           test -s filters.txt
           grep -q '^! Total rules: [1-9][0-9]*$' filters.txt
+
+      - name: Strict ABP validation
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 scripts/validate.py filters.txt
 
       - name: Commit and push changes
         shell: bash
