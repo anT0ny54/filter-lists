@@ -28,7 +28,6 @@ https://easylist-downloads.adblockplus.org/easylistchina-minified.txt
 
 # Liste FR
 https://filters.adtidy.org/extension/ublock/filters/16_optimized.txt
-https://filters.adtidy.org/extension/ublock/filters/113_optimized.txt
 https://easylist-downloads.adblockplus.org/liste_fr-minified.txt
 
 # Germany
