@@ -9,7 +9,7 @@
 Add this **one URL** to your blocker:
 
 ```
-https://raw.githubusercontent.com/anT0ny54/filter-lists/refs/heads/main/filters.txt
+https://raw.githubusercontent.com/anT0ny54/filter-lists/main/filters.txt
 ```
 
 ### 🛡️ Supported
