@@ -18,7 +18,6 @@ https://filters.adtidy.org/extension/ublock/filters/123_optimized.txt
 https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt
 
 # Other Adguard
-https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt
 https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt
 https://filters.adtidy.org/extension/ublock/filters/11_optimized.txt
 https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt
