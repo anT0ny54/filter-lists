@@ -9,16 +9,16 @@
 #       format. If you want metadata (enabled/name/category) see `sources.yaml`.
 #
 # Basic Adblock
-https://filters.adtidy.org/extension/ublock/filters/101_optimized.txt
 https://easylist-downloads.adblockplus.org/easylist-minified.txt
-https://filters.adtidy.org/extension/ublock/filters/118_optimized.txt
 https://easylist-downloads.adblockplus.org/easyprivacy-minified.txt
-https://filters.adtidy.org/extension/ublock/filters/122_optimized.txt
-https://filters.adtidy.org/extension/ublock/filters/123_optimized.txt
 https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt
+https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt
+https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt
+https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt
+https://filters.adtidy.org/extension/ublock/filters/17_optimized.txt
 
 # China
-https://filters.adtidy.org/extension/ublock/filters/104_optimized.txt
+https://filters.adtidy.org/extension/ublock/filters/224_optimized.txt
 https://easylist-downloads.adblockplus.org/easylistchina-minified.txt
 
 # Dutch
@@ -34,7 +34,6 @@ https://filters.adtidy.org/extension/ublock/filters/7_optimized.txt
 
 # Liste FR
 https://filters.adtidy.org/extension/ublock/filters/16_optimized.txt
-https://filters.adtidy.org/extension/ublock/filters/113_optimized.txt
 https://easylist-downloads.adblockplus.org/liste_fr-minified.txt
 
 # Russian
