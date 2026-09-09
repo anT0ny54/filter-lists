@@ -1,9 +1,9 @@
 {
   "schema": 2,
-  "generated_at": "2026-09-09T23:32:55.244187+00:00",
+  "generated_at": "2026-09-09T23:33:48.070409+00:00",
   "builder": "Filter-Lists v6.6",
   "profile": "strict-abp",
-  "build_id": "ce80270b12db021d345ca7303c50b6fcb8593f01b71c3143e8facb8b9bf5bd7c",
+  "build_id": "a2f4ed615367094d8fdad863e082a354e59ab6cbeaf5d6b74d46708ec8eeace6",
   "source_count": 33,
   "sources": {
     "requested": 33,
@@ -22,37 +22,12 @@
     "health_threshold": 0.8,
     "results": [
       {
-        "url": "https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt",
-        "depth": 0,
-        "status": "ok"
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/easylist-minified.txt",
-        "depth": 0,
-        "status": "ok"
-      },
-      {
         "url": "https://easylist-downloads.adblockplus.org/easyprivacy-minified.txt",
         "depth": 0,
         "status": "ok"
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/easylistchina-minified.txt",
-        "depth": 0,
-        "status": "ok"
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/easylistdutch-minified.txt",
-        "depth": 0,
-        "status": "ok"
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/easylistgermany-minified.txt",
-        "depth": 0,
-        "status": "ok"
-      },
-      {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/8_optimized.txt",
+        "url": "https://easylist-downloads.adblockplus.org/easylist-minified.txt",
         "depth": 0,
         "status": "ok"
       },
@@ -67,7 +42,7 @@
         "status": "ok"
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/6_optimized.txt",
+        "url": "https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt",
         "depth": 0,
         "status": "ok"
       },
@@ -77,27 +52,27 @@
         "status": "ok"
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt",
-        "depth": 0,
-        "status": "ok"
-      },
-      {
         "url": "https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt",
         "depth": 0,
         "status": "ok"
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/liste_fr-minified.txt",
+        "url": "https://easylist-downloads.adblockplus.org/easylistdutch-minified.txt",
         "depth": 0,
         "status": "ok"
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/1_optimized.txt",
+        "url": "https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt",
         "depth": 0,
         "status": "ok"
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/9_optimized.txt",
+        "url": "https://easylist-downloads.adblockplus.org/easylistchina-minified.txt",
+        "depth": 0,
+        "status": "ok"
+      },
+      {
+        "url": "https://filters.adtidy.org/extension/ublock/filters/8_optimized.txt",
         "depth": 0,
         "status": "ok"
       },
@@ -107,7 +82,12 @@
         "status": "ok"
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/13_optimized.txt",
+        "url": "https://filters.adtidy.org/extension/ublock/filters/6_optimized.txt",
+        "depth": 0,
+        "status": "ok"
+      },
+      {
+        "url": "https://filters.adtidy.org/extension/ublock/filters/1_optimized.txt",
         "depth": 0,
         "status": "ok"
       },
@@ -122,7 +102,37 @@
         "status": "ok"
       },
       {
+        "url": "https://filters.adtidy.org/extension/ublock/filters/13_optimized.txt",
+        "depth": 0,
+        "status": "ok"
+      },
+      {
+        "url": "https://filters.adtidy.org/extension/ublock/filters/23_optimized.txt",
+        "depth": 0,
+        "status": "ok"
+      },
+      {
+        "url": "https://filters.adtidy.org/extension/ublock/filters/9_optimized.txt",
+        "depth": 0,
+        "status": "ok"
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/easylistgermany-minified.txt",
+        "depth": 0,
+        "status": "ok"
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/liste_fr-minified.txt",
+        "depth": 0,
+        "status": "ok"
+      },
+      {
         "url": "https://easylist-downloads.adblockplus.org/ruadlist-minified.txt",
+        "depth": 0,
+        "status": "ok"
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/abpindo-minified.txt",
         "depth": 0,
         "status": "ok"
       },
@@ -132,12 +142,7 @@
         "status": "ok"
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/bulgarian_list-minified.txt",
-        "depth": 0,
-        "status": "ok"
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/abpindo-minified.txt",
+        "url": "https://easylist-downloads.adblockplus.org/easylistitaly-minified.txt",
         "depth": 0,
         "status": "ok"
       },
@@ -152,7 +157,7 @@
         "status": "ok"
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/23_optimized.txt",
+        "url": "https://easylist-downloads.adblockplus.org/bulgarian_list-minified.txt",
         "depth": 0,
         "status": "ok"
       },
@@ -162,17 +167,7 @@
         "status": "ok"
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/easylistitaly-minified.txt",
-        "depth": 0,
-        "status": "ok"
-      },
-      {
         "url": "https://easylist-downloads.adblockplus.org/easylistpolish-minified.txt",
-        "depth": 0,
-        "status": "ok"
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/indianlist-minified.txt",
         "depth": 0,
         "status": "ok"
       },
@@ -183,6 +178,11 @@
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/rolist-minified.txt",
+        "depth": 0,
+        "status": "ok"
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/indianlist-minified.txt",
         "depth": 0,
         "status": "ok"
       }
@@ -205,5 +205,5 @@
       "unknown-option": 10061
     }
   },
-  "build_seconds": 4.679
+  "build_seconds": 4.929
 }
