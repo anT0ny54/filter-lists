@@ -7,11 +7,13 @@ sources:
     category: ads
     enabled: true
     priority: 10
+    required: true
   - name: EasyPrivacy
     url: https://easylist-downloads.adblockplus.org/easyprivacy-minified.txt
     category: privacy
     enabled: true
     priority: 20
+    required: true
   - name: Fanboy Social
     url: https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt
     category: social

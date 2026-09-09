@@ -1,4 +1,4 @@
-# 🚀 Filter-Lists v6
+# 🚀 Filter-Lists v6.6
 
 **A compatibility-first, deterministic filter-list build system** that keeps the project's original merge behavior while making fetching, normalization, policy, validation, testing, and reporting easier to maintain.
 
@@ -21,8 +21,8 @@ V6 deliberately excludes engine-specific syntax such as uBlock procedural snippe
 
 ```text
 filter-lists/
-├── sources.yaml                 # structured source registry
-├── sources.txt                  # legacy URL-only source file, retained
+├── sources.yaml                 # single source of truth
+├── sources.txt                  # generated URL-only compatibility mirror
 ├── policies.yaml                # documented compatibility policy
 ├── custom-rules.txt             # local rules
 │
@@ -31,6 +31,7 @@ filter-lists/
 │   ├── parser.py                # line classification
 │   ├── normalize.py             # canonicalization + strict validation
 │   ├── policy.py                # explicit compatibility policy
+│   ├── config.py                # centralized config + source validation
 │   ├── merge.py                 # build orchestrator + deterministic output
 │   ├── validate.py              # final generated-file validation
 │   └── report.py                # build statistics / rejection report
@@ -79,7 +80,7 @@ sources.yaml / sources.txt
 
 ## 🔒 What V6 preserves
 
-V6 is an evolution of the existing project, **not a replacement rewrite**. The original strict behavior is preserved as the compatibility baseline:
+V6.6 is an evolution of the existing project, **not a replacement rewrite**. The original strict behavior is preserved as the compatibility baseline:
 
 - source downloading with curl
 - concurrent downloads
@@ -123,7 +124,7 @@ python3 scripts/validate.py filters.txt
 cat reports/latest.json
 ```
 
-A live build requires network access to the upstream lists. If upstream sources are unavailable or fewer than 50% of configured sources succeed, V6 fails instead of silently publishing a dangerously incomplete list.
+A live build requires network access to the upstream lists. If upstream sources are unavailable or fewer than 80% of configured sources succeed, or any required source fails, V6 fails instead of silently publishing a dangerously incomplete list.
 
 
 ## 📊 Build reporting
@@ -184,3 +185,15 @@ If you'd like to support development, consider donating:
 
 
 **Bitcoin:** `1HntwKxyqGCfnSGvGLMUTRAqLnTvLarAQP`
+
+
+## V6.6 improvements
+
+- `sources.yaml` is the only authoritative source registry; `sources.txt` is generated as a compatibility mirror.
+- Required sources can fail the build independently of the overall success ratio.
+- Source-health reporting includes success ratio and required-source failures.
+- Rejection reporting distinguishes unknown options, invalid option values, duplicate options, and generic network failures.
+- Canonicalization has idempotence regression coverage.
+- Generated output carries a deterministic SHA-256 Build-ID and V6.6 version marker.
+- Validation checks canonical form, ordering, duplicates, count, and build metadata.
+- The obsolete duplicated V5 implementation/test copy was removed from the active tree.
