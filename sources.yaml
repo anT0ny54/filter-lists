@@ -1,0 +1,169 @@
+# Filter-Lists v6 source registry.
+# `sources.txt` is retained as a legacy URL-only compatibility file.
+version: 1
+sources:
+  - name: EasyList
+    url: https://easylist-downloads.adblockplus.org/easylist-minified.txt
+    category: ads
+    enabled: true
+    priority: 10
+  - name: EasyPrivacy
+    url: https://easylist-downloads.adblockplus.org/easyprivacy-minified.txt
+    category: privacy
+    enabled: true
+    priority: 20
+  - name: Fanboy Social
+    url: https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt
+    category: social
+    enabled: true
+    priority: 30
+  - name: AdGuard Base
+    url: https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt
+    category: ads
+    enabled: true
+    priority: 40
+  - name: AdGuard Tracking Protection
+    url: https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt
+    category: privacy
+    enabled: true
+    priority: 50
+  - name: AdGuard Social Media
+    url: https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt
+    category: social
+    enabled: true
+    priority: 60
+  - name: AdGuard Annoyances
+    url: https://filters.adtidy.org/extension/ublock/filters/17_optimized.txt
+    category: annoyance
+    enabled: true
+    priority: 70
+  - name: AdGuard Chinese
+    url: https://filters.adtidy.org/extension/ublock/filters/224_optimized.txt
+    category: regional-cn
+    enabled: true
+    priority: 80
+  - name: EasyList China
+    url: https://easylist-downloads.adblockplus.org/easylistchina-minified.txt
+    category: regional-cn
+    enabled: true
+    priority: 90
+  - name: AdGuard Dutch
+    url: https://filters.adtidy.org/extension/ublock/filters/8_optimized.txt
+    category: regional-nl
+    enabled: true
+    priority: 100
+  - name: EasyList Dutch
+    url: https://easylist-downloads.adblockplus.org/easylistdutch-minified.txt
+    category: regional-nl
+    enabled: true
+    priority: 110
+  - name: AdGuard German
+    url: https://filters.adtidy.org/extension/ublock/filters/6_optimized.txt
+    category: regional-de
+    enabled: true
+    priority: 120
+  - name: EasyList Germany
+    url: https://easylist-downloads.adblockplus.org/easylistgermany-minified.txt
+    category: regional-de
+    enabled: true
+    priority: 130
+  - name: AdGuard Japanese
+    url: https://filters.adtidy.org/extension/ublock/filters/7_optimized.txt
+    category: regional-jp
+    enabled: true
+    priority: 140
+  - name: AdGuard French
+    url: https://filters.adtidy.org/extension/ublock/filters/16_optimized.txt
+    category: regional-fr
+    enabled: true
+    priority: 150
+  - name: Liste FR
+    url: https://easylist-downloads.adblockplus.org/liste_fr-minified.txt
+    category: regional-fr
+    enabled: true
+    priority: 160
+  - name: AdGuard Russian
+    url: https://filters.adtidy.org/extension/ublock/filters/1_optimized.txt
+    category: regional-ru
+    enabled: true
+    priority: 170
+  - name: RU AdList
+    url: https://easylist-downloads.adblockplus.org/ruadlist-minified.txt
+    category: regional-ru
+    enabled: true
+    priority: 180
+  - name: AdGuard Spanish
+    url: https://filters.adtidy.org/extension/ublock/filters/9_optimized.txt
+    category: regional-es
+    enabled: true
+    priority: 190
+  - name: EasyList Portuguese
+    url: https://easylist-downloads.adblockplus.org/easylistportuguese-minified.txt
+    category: regional-pt
+    enabled: true
+    priority: 200
+  - name: EasyList Spanish
+    url: https://easylist-downloads.adblockplus.org/easylistspanish-minified.txt
+    category: regional-es
+    enabled: true
+    priority: 210
+  - name: AdGuard Turkish
+    url: https://filters.adtidy.org/extension/ublock/filters/13_optimized.txt
+    category: regional-tr
+    enabled: true
+    priority: 220
+  - name: AdGuard Ukrainian
+    url: https://filters.adtidy.org/extension/ublock/filters/23_optimized.txt
+    category: regional-uk
+    enabled: true
+    priority: 230
+  - name: ABP Indo
+    url: https://easylist-downloads.adblockplus.org/abpindo-minified.txt
+    category: regional-id
+    enabled: true
+    priority: 240
+  - name: ABP Vietnam
+    url: https://easylist-downloads.adblockplus.org/abpvn-minified.txt
+    category: regional-vn
+    enabled: true
+    priority: 250
+  - name: Bulgarian List
+    url: https://easylist-downloads.adblockplus.org/bulgarian_list-minified.txt
+    category: regional-bg
+    enabled: true
+    priority: 260
+  - name: Israel List
+    url: https://easylist-downloads.adblockplus.org/israellist-minified.txt
+    category: regional-il
+    enabled: true
+    priority: 270
+  - name: EasyList Italy
+    url: https://easylist-downloads.adblockplus.org/easylistitaly-minified.txt
+    category: regional-it
+    enabled: true
+    priority: 280
+  - name: EasyList Lithuania
+    url: https://easylist-downloads.adblockplus.org/easylistlithuania-minified.txt
+    category: regional-lt
+    enabled: true
+    priority: 290
+  - name: EasyList Polish
+    url: https://easylist-downloads.adblockplus.org/easylistpolish-minified.txt
+    category: regional-pl
+    enabled: true
+    priority: 300
+  - name: Indian List
+    url: https://easylist-downloads.adblockplus.org/indianlist-minified.txt
+    category: regional-in
+    enabled: true
+    priority: 310
+  - name: Latvian List
+    url: https://easylist-downloads.adblockplus.org/latvianlist-minified.txt
+    category: regional-lv
+    enabled: true
+    priority: 320
+  - name: RO List
+    url: https://easylist-downloads.adblockplus.org/rolist-minified.txt
+    category: regional-ro
+    enabled: true
+    priority: 330

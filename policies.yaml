@@ -1,0 +1,26 @@
+# Filter-Lists v6 compatibility policy.
+version: 1
+profile: strict-abp
+compatibility:
+  - Adblock Plus
+  - uBlock Origin
+  - AdGuard
+rules:
+  allow_network_filters: true
+  allow_abp_cosmetic: true
+  allow_extended_css: true
+  reject_ubo_procedural: true
+  reject_ubo_extended_exceptions: true
+  reject_hosts_format: true
+  reject_html_error_pages: true
+  reject_unknown_options: true
+  reject_duplicate_options: true
+  require_domain_for_rewrite: true
+limits:
+  max_rule_length: 100000
+  max_include_depth: 5
+  max_download_bytes: 52428800
+  total_timeout_seconds: 1800
+source_health:
+  minimum_success_ratio: 0.50
+  fail_if_zero_sources: true
