@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "status": "snapshot",
+  "builder": "Filter-Lists v6",
+  "profile": "strict-abp",
+  "note": "This repository snapshot retains the existing generated filters.txt. Live source statistics are produced during the next network-enabled V6 build.",
+  "declared_rules_in_filters_txt": 159290
+}
