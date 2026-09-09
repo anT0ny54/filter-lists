@@ -1,6 +1,6 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v2026.09.09.2327
-! Last updated: 2026-09-09 23:27:46 UTC
+! Version: v2026.09.09.2328
+! Last updated: 2026-09-09 23:28:56 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
@@ -41,8 +41,8 @@
 ###accept_cookie
 ###accept_cookies
 ###acceptance_of_cookies
-###acceptCookie
 ###acceptcookie
+###acceptCookie
 ###acceptCookies
 ###acceptCookiesBar
 ###acookie
@@ -175,8 +175,8 @@
 ###ad_1
 ###ad_2
 ###ad_3
-###ad_300x250
 ###ad_300X250
+###ad_300x250
 ###ad_336_singlebt
 ###ad_4
 ###ad_468_60
@@ -270,17 +270,17 @@
 ###ad_wrapper
 ###adad
 ###Adbanner
-###adbar
 ###AdBar
+###adbar
 ###adbd.overdiv
 ###adbns
 ###adbody
 ###adBody07
-###adBottom
 ###adbottom
+###adBottom
 ###adBoven
-###adbox
 ###adBox
+###adbox
 ###AdBox2
 ###adBrandDev
 ###adCarousel
@@ -303,8 +303,8 @@
 ###Adfox_Banner
 ###adframe:not(frameset)
 ###adHeadBanner
-###adHeader
 ###adheader
+###adHeader
 ###adhesion
 ###adhome
 ###adL
@@ -436,8 +436,8 @@
 ###adslot-download-abovefiles
 ###adslot-site-footer
 ###adslot-site-header
-###adslot1
 ###adSlot1
+###adslot1
 ###adslot2
 ###adslot3
 ###adslot300x250ATF
@@ -457,8 +457,8 @@
 ###adsZone2
 ###adt
 ###AdText
-###adtext
 ###adText
+###adtext
 ###adTile
 ###ADtip
 ###adTop
@@ -745,8 +745,8 @@
 ###bottom_commercial
 ###bottom_pub
 ###bottomAD
-###bottomad
 ###bottomAd
+###bottomad
 ###BottomAdContainer
 ###bottomads
 ###bottomAdWrapper
@@ -979,21 +979,21 @@
 ###cookie_warn
 ###cookie_warning
 ###cookie_widget
-###cookieaccept
 ###cookieAccept
+###cookieaccept
 ###cookieAgree
 ###cookieAgreementContent
-###cookieAlert
 ###CookieAlert
 ###cookiealert
+###cookieAlert
 ###cookieAlertMessage
 ###cookieAlertWrapper
 ###cookiebanner
 ###CookieBanner
 ###cookieBanner
 ###cookieBar
-###cookiebar
 ###CookieBar
+###cookiebar
 ###cookieBgOverlay
 ###cookieBlock
 ###cookieBnr
@@ -1014,13 +1014,13 @@
 ###cookieContainer
 ###CookieContainer
 ###cookieContent
-###cookieControl
 ###cookiecontrol
+###cookieControl
 ###cookiecontrol_notice
 ###cookieDisc
 ###cookieDisclaimer
-###cookiediv
 ###CookieDiv
+###cookiediv
 ###cookieDiv
 ###cookieDivContent
 ###cookieDough
@@ -1032,23 +1032,23 @@
 ###cookieHint
 ###cookiehint
 ###cookieinfo
-###cookieInfo
 ###CookieInfo
+###cookieInfo
 ###cookieinfo-container:not(#style_important)
 ###cookieInfoBanner
 ###cookieInfoBox
 ###CookieInformation
 ###cookieInformerBooklet
 ###cookieInfoWrapper
-###cookieLaw
 ###cookielaw
+###cookieLaw
 ###cookieLawAcknowledgmentDiv
 ###CookielawBanner
 ###cookieLayer
 ###cookieLY
 ###cookiemenu
-###cookiemessage
 ###cookieMessage
+###cookiemessage
 ###cookieMessageBox
 ###cookieMessageContainer
 ###cookieMessageWrapper
@@ -1057,44 +1057,44 @@
 ###cookiemodule
 ###cookiemonster
 ###cookiemonster_popup
-###cookiemsg
 ###cookieMsg
+###cookiemsg
 ###cookieMsgBlock
 ###cookiemsgbox
 ###cookienote
+###cookieNotice
 ###cookienotice
 ###CookieNotice
-###cookieNotice
 ###cookienotice-container
 ###cookieNoticeContainer
 ###cookieNoticePro
 ###cookienotif
-###cookieNotification
 ###CookieNotification
+###cookieNotification
 ###CookieOK
 ###cookieOverlay
 ###cookieoverlay
-###cookiePanel
-###cookiepanel
 ###CookiePanel
+###cookiepanel
+###cookiePanel
 ###cookiePlaceholder
-###cookiepolicy
 ###CookiePolicy
+###cookiepolicy
 ###cookiePolicy
 ###cookiePolicy-layer
 ###cookiePolicyBar
-###cookiepolicyContainer
 ###cookiePolicyContainer
+###cookiepolicyContainer
 ###cookiepolicydiv
 ###cookiePolicyNotice
 ###cookiePolicyPopup
 ###cookiePoolicy
-###cookiepop
 ###cookiePop
+###cookiepop
 ###cookiePopin
 ###cookiepopup
-###cookiePopup
 ###cookiePopUp
+###cookiePopup
 ###cookiePopupContainer
 ###cookiePrompt
 ###CookieQBanner
@@ -1176,8 +1176,8 @@
 ###cookieu_header
 ###cookieUsagePopIn
 ###cookiewarn
-###cookieWarning
 ###cookiewarning
+###cookieWarning
 ###CookieWarning
 ###cookieWarningBox
 ###cookieWarningDiv
@@ -1186,9 +1186,9 @@
 ###cookieWindowContainer
 ###cookieWrap
 ###cookiewrap
-###cookieWrapper
-###CookieWrapper
 ###cookiewrapper
+###CookieWrapper
+###cookieWrapper
 ###cpa-system-banner
 ###cpro_container
 ###crazy_ad_float
@@ -1265,8 +1265,8 @@
 ###div-ads
 ###div-gpt-ad-Banniere_Haute
 ###div-gpt-ad-banniere_haute
-###div-gpt-ad-Habillage
 ###div-gpt-ad-habillage
+###div-gpt-ad-Habillage
 ###div-gpt-ad-mainColumn_double
 ###div-gpt-ad-Pave_Bas
 ###div-gpt-ad-Rectangle
@@ -1351,8 +1351,8 @@
 ###eu_cookies
 ###eucl_panel
 ###euCookie
-###eucookie
 ###EUCookie
+###eucookie
 ###EuCookieBar-8
 ###eucookielaw
 ###EUCookieMsg
@@ -1430,10 +1430,10 @@
 ###footer_haut-publicite
 ###footer_pub
 ###footer_tc_privacy
-###footerAd
 ###footerad
-###footerAds
+###footerAd
 ###footerads
+###footerAds
 ###footerafficode
 ###footerCookieArticle
 ###footerFixedDivWrapper
@@ -1490,8 +1490,8 @@
 ###googleAD3
 ###googleadbox
 ###googleAdIndexTop
-###googleAds
 ###googleads
+###googleAds
 ###googleAdSense
 ###gplusone
 ###gpt-ad-1
@@ -1537,9 +1537,9 @@
 ###header_global_ad
 ###header_pub
 ###header_werbung
+###HeaderAD
 ###headerad
 ###headerAd
-###HeaderAD
 ###headerAdContainer
 ###headerads
 ###headerAds
@@ -1689,8 +1689,8 @@
 ###left_reklama
 ###left_slide_pub
 ###left_up_float_ad
-###leftad
 ###LeftAd
+###leftad
 ###leftads
 ###leftbanners
 ###leftCouple
@@ -1886,8 +1886,8 @@
 ###pause-ads
 ###pauseAd
 ###pave_pub
-###pavepub
 ###pavePub
+###pavepub
 ###pc-cookie-notice
 ###pecr-compliance-banner
 ###persistent-share
@@ -2075,8 +2075,8 @@
 ###pubgoogle
 ###pubhaut
 ###pubHaut
-###pubHeader
 ###pubheader
+###pubHeader
 ###pubhomeheader
 ###pubImg
 ###publ1c1te_728_90
@@ -2108,12 +2108,12 @@
 ###pubRight
 ###pubright
 ###pubsousmenu-md-lg
-###pubTop
 ###pubtop
+###pubTop
 ###pubtopflex
 ###pubVideo
-###pushdownAd
 ###pushDownAd
+###pushdownAd
 ###qcash-extended-block
 ###QEff1
 ###QEff2
@@ -2150,8 +2150,8 @@
 ###reklame
 ###reklame-rechts-mitte
 ###reklami
-###reklamikapat
 ###ReklamiKapat
+###reklamikapat
 ###reklamlar
 ###reklamm
 ###related_ads
@@ -2251,13 +2251,13 @@
 ###sharebar
 ###shareBar
 ###shareBarBottom_gig_containerParent
-###sharebarTop
 ###shareBarTop
+###sharebarTop
 ###shareBox
 ###sharebox
 ###shareBtn
-###shareButtons
 ###sharebuttons
+###shareButtons
 ###shareFloat
 ###shareinit
 ###shareLinks
@@ -2271,8 +2271,8 @@
 ###shopper-widget-wrapper
 ###show-ad
 ###show-sharing-buttons
-###showAd
 ###showad
+###showAd
 ###showcase_links
 ###showcase_links_beg
 ###showcase_links_end
@@ -2284,12 +2284,12 @@
 ###side-banner-ad
 ###side_ad
 ###side_promo.bc_dp
+###sideAD
 ###sidead
 ###sideAd
-###sideAD
 ###sideAd1
-###sidead2
 ###sideAd2
+###sidead2
 ###sideAd3
 ###sideAd4
 ###sideAds
@@ -2427,8 +2427,8 @@
 ###sticky-footer-ad
 ###sticky-rail-ad
 ###sticky_sharing
-###stickyAd
 ###stickyad
+###stickyAd
 ###stickyAdBlock
 ###stickyads
 ###stickyBottomAd
@@ -2534,22 +2534,22 @@
 ###top_right_ad
 ###top_side_pub
 ###top_social
-###topad
-###topAd
-###TopAd
 ###topAD
+###topAd
+###topad
+###TopAd
 ###topad1
 ###topad728
 ###topAd728x90
 ###topadblock
 ###topAdContainer
 ###topAdDiv
-###topads
 ###topAds
+###topads
 ###topAdv
 ###topadzone
-###topBannerAd
 ###topbannerad
+###topBannerAd
 ###topbanners
 ###topBanners
 ###topbar-ad
@@ -2587,8 +2587,8 @@
 ###uo_cookie_banner
 ###user18div
 ###ust_ara_reklam
-###ustReklam
 ###ustreklam
+###ustReklam
 ###UstReklam
 ###ustreklamlar
 ###utilitybar__button--share
@@ -2785,8 +2785,8 @@
 ##.ad-300
 ##.ad-300-x-250
 ##.ad-300x200
-##.ad-300X250
 ##.ad-300x250
+##.ad-300X250
 ##.ad-300x600
 ##.ad-336x280
 ##.ad-4
@@ -3357,13 +3357,13 @@
 ##.adblockcenter
 ##.adBorder
 ##.adbottom
-##.adBox
 ##.ADBox
+##.adBox
 ##.adbox-bg.adscounter
 ##.adbox-rectangle
 ##.adbox-topbanner
-##.adBox1
 ##.adbox1
+##.adBox1
 ##.adbox2
 ##.adBox2
 ##.adbox_310x400
@@ -3375,8 +3375,8 @@
 ##.adCaptionText
 ##.adcard
 ##.adCenter
-##.adcenter
 ##.AdCenter
+##.adcenter
 ##.adCenterAd
 ##.adCentertile
 ##.adchoices
@@ -3404,8 +3404,8 @@
 ##.add_300x250
 ##.addbanner
 ##.addddddwarp
-##.addiv
 ##.adDiv
+##.addiv
 ##.addThis
 ##.addthis-smartlayers
 ##.addthis-smartlayers-desktop
@@ -3423,12 +3423,12 @@
 ##.ADFooter
 ##.adfooter
 ##.adfox_placeholder
-##.adframe
 ##.adFrame
+##.adframe
 ##.adFrameCnt
 ##.adfront
-##.adfull
 ##.adFull
+##.adfull
 ##.adgoogle
 ##.adgoogle-wrapper
 ##.adHalfPage
@@ -3437,8 +3437,8 @@
 ##.adHeader
 ##.adHeading
 ##.adHeight280
-##.adhere
 ##.AdHere
+##.adhere
 ##.adhered
 ##.adhesion-block
 ##.adhesion:not(body)
@@ -3446,8 +3446,8 @@
 ##.adHF3
 ##.adHF6
 ##.adhide
-##.AdHolder
 ##.adHolder
+##.AdHolder
 ##.adholder
 ##.adholder2
 ##.adIframe
@@ -3492,8 +3492,8 @@
 ##.adpcc
 ##.adpic
 ##.adplace
-##.AdPlaceholder
 ##.adPlaceholder
+##.AdPlaceholder
 ##.adplaceholder
 ##.adplacement
 ##.adPlacement
@@ -3508,8 +3508,8 @@
 ##.adRenderer
 ##.adRendererInfinite
 ##.adResponsive
-##.adRight
 ##.adright
+##.adRight
 ##.AdRight1
 ##.adriverBanner
 ##.adrotate_widgets
@@ -3691,8 +3691,8 @@
 ##.ads_wide
 ##.ads_wrap
 ##.adsanity-alignnone
-##.adsArea
 ##.adsarea
+##.adsArea
 ##.adsBanner
 ##.adsblock
 ##.adsBlock
@@ -3714,8 +3714,8 @@
 ##.adsdelivery
 ##.adsDiv
 ##.adSection
-##.AdSense
 ##.adSense
+##.AdSense
 ##.adsense-336
 ##.adsense-area
 ##.adsense-article
@@ -3755,8 +3755,8 @@
 ##.adsLine
 ##.adslist
 ##.adsloading
-##.adSlot
 ##.adslot
+##.adSlot
 ##.AdSlot
 ##.adslot_1
 ##.adslot_2
@@ -3773,12 +3773,12 @@
 ##.adsninja-ad-zone-container-with-set-height
 ##.adsoho
 ##.adsortalaindirim
-##.adSpace
 ##.adspace
+##.adSpace
 ##.adSpacer
 ##.adspop
-##.AdsPot
 ##.adspot
+##.AdsPot
 ##.adSpot-textBox
 ##.adspot468x60
 ##.adSpotBlock
@@ -3813,19 +3813,19 @@
 ##.adthrive-video-player
 ##.adthrive_custom_ad
 ##.adTip
-##.adtitle
-##.AdTitle
 ##.adTitle
-##.AdTop
+##.AdTitle
+##.adtitle
 ##.adTop
+##.AdTop
 ##.adtop
 ##.adtower
 ##.adtxt
 ##.adTxt
 ##.adun
+##.adUnit
 ##.AdUnit
 ##.adunit
-##.adUnit
 ##.adunit-googleadmanager
 ##.adunit-middle
 ##.adunit-wrapper
@@ -4006,8 +4006,8 @@
 ##.advTop
 ##.advtop
 ##.advv_box
-##.adwidget
 ##.adWidget
+##.adwidget
 ##.adwords
 ##.adWords-bg
 ##.adWrap
@@ -4146,8 +4146,8 @@
 ##.article_ad_top
 ##.article_bottom_ad
 ##.article_sns
-##.articlead
 ##.ArticleAd
+##.articlead
 ##.articleADbox
 ##.articleads
 ##.ArticleAdSide
@@ -4291,8 +4291,8 @@
 ##.banner-top-film
 ##.banner-werbung-rechts
 ##.banner-work-in
-##.banner240
 ##.Banner240
+##.banner240
 ##.Banner240 > a
 ##.Banner240 > img
 ##.Banner240 > object
@@ -4457,8 +4457,8 @@
 ##.block_pub
 ##.blockadwide
 ##.blockgrayad
-##.blocPub
 ##.blocpub
+##.blocPub
 ##.blog-ad
 ##.blogAd
 ##.blogads
@@ -4511,8 +4511,8 @@
 ##.bottom_fixed > #imgs_link4
 ##.bottom_mengcheng_ad_wrap
 ##.bottom_sponsor
-##.bottomad
 ##.bottomAd
+##.bottomad
 ##.BottomAd-container
 ##.bottomads
 ##.bottomads + .leftd
@@ -4539,8 +4539,8 @@
 ##.box_publicites2
 ##.box_publicites3
 ##.box_publicites_bg
-##.boxad
 ##.boxAd
+##.boxad
 ##.boxAdRight
 ##.boxAds
 ##.boxadvert
@@ -4732,8 +4732,8 @@
 ##.container-first-ads
 ##.container-lower-ad
 ##.container_cookies
-##.containerads
 ##.containerAds
+##.containerads
 ##.containeradvertising
 ##.contao-cookiebar
 ##.contenedorAds
@@ -4765,8 +4765,8 @@
 ##.content_right_side_werbewrapper
 ##.content_slide_pub
 ##.contentad
-##.ContentAd
 ##.contentAd
+##.ContentAd
 ##.contentadcontainer
 ##.contentAds
 ##.contentSocialBar
@@ -4879,12 +4879,12 @@
 ##.cookieadmin_cookie_modal
 ##.cookieadmin_law_container
 ##.cookieAdvice
-##.cookiealert
 ##.cookieAlert
+##.cookiealert
 ##.cookieAlertBox
 ##.cookieBan
-##.cookiebanner:not(body)
 ##.cookieBanner:not(body)
+##.cookiebanner:not(body)
 ##.CookieBanner:not(body):not(html)
 ##.cookieBannerContainer
 ##.cookiebar:not(body)
@@ -4896,9 +4896,9 @@
 ##.cookieBox
 ##.cookieCompliance
 ##.cookieconsent-popup
-##.cookieConsent:not(body):not(html)
-##.CookieConsent:not(body):not(html)
 ##.cookieconsent:not(body):not(html)
+##.CookieConsent:not(body):not(html)
+##.cookieConsent:not(body):not(html)
 ##.cookieConsentBanner
 ##.cookieConsentContainer
 ##.cookieContainer
@@ -4913,8 +4913,8 @@
 ##.cookiefooter
 ##.cookieInfo:not(body):not(html)
 ##.cookielaw-container
-##.cookielaw:not(body):not(html)
 ##.cookieLaw:not(body):not(html)
+##.cookielaw:not(body):not(html)
 ##.cookieMaster
 ##.CookieMessage
 ##.cookieMessage:not(body):not(html)
@@ -4923,8 +4923,8 @@
 ##.cookieMsgContainer
 ##.CookieNote
 ##.cookienotice-bar
-##.CookieNotice:not(body):not(html)
 ##.cookieNotice:not(body):not(html)
+##.CookieNotice:not(body):not(html)
 ##.CookieNotification
 ##.cookieNotification
 ##.cookieNotify
@@ -4935,8 +4935,8 @@
 ##.cookiePolicy-Modal
 ##.cookiePolicy:not(body):not(html)
 ##.cookiePolicyNotice
-##.cookiePopup
 ##.cookiePopUp
+##.cookiePopup
 ##.cookiePopupContainer
 ##.cookiePrompt
 ##.cookies-alert
@@ -4979,13 +4979,13 @@
 ##.cookies_yum
 ##.cookiesAlert
 ##.cookiesBackground
+##.cookiesbar
 ##.CookiesBar
 ##.cookiesBar
-##.cookiesbar
 ##.cookiesBlock
 ##.cookiesContent
-##.cookiesinfo
 ##.cookiesInfo
+##.cookiesinfo
 ##.cookieslaw
 ##.cookiesMessage
 ##.cookiesMessageBanner
@@ -5103,8 +5103,8 @@
 ##.discourse-adplugin
 ##.display-ad
 ##.display_ad
-##.displayAd
 ##.DisplayAd
+##.displayAd
 ##.DisplayAd_Native__XCll3
 ##.div-gpt-ad:not([style^="width: 1px; height: 1px;"])
 ##.div_ads
@@ -5276,8 +5276,8 @@
 ##.float-left12 > .div-list
 ##.float-share
 ##.float_bot_right
-##.floatAd
 ##.floatad
+##.floatAd
 ##.floatee-social-tail
 ##.floating-ad
 ##.floating-ads
@@ -5311,9 +5311,9 @@
 ##.footer_ad
 ##.footer_ads
 ##.footer_adv
+##.footerAd
 ##.footerad
 ##.FooterAd
-##.footerAd
 ##.footerAds
 ##.footerPageAds
 ##.footerpubright
@@ -5488,8 +5488,8 @@
 ##.googleAd
 ##.googlead
 ##.googleAdFoot
-##.googleAds
 ##.googleads
+##.googleAds
 ##.googleAdsContainer
 ##.googleAdSense
 ##.googleAdsense
@@ -5559,8 +5559,8 @@
 ##.head-ads
 ##.head-pub
 ##.head_ad
-##.headad
 ##.headAd
+##.headad
 ##.header-ad
 ##.header-ad-area
 ##.header-ad-container
@@ -5595,11 +5595,11 @@
 ##.header_bloc_pub
 ##.header_pub
 ##.header_sponsors
-##.headerad
 ##.headerAd
+##.headerad
 ##.headerAdBanner
-##.headerAds
 ##.headerads
+##.headerAds
 ##.headerAdvert
 ##.headerCookies
 ##.headerPub
@@ -5738,8 +5738,8 @@
 ##.inline_ad_title
 ##.inline_ads
 ##.inline_socials
-##.inlineAd
 ##.inlinead
+##.inlineAd
 ##.inlineAdContainer
 ##.inlinePageAds
 ##.inlist-ad
@@ -5926,8 +5926,8 @@
 ##.left_ads_block
 ##.left_back_banner2
 ##.left_bnr
-##.leftAd
 ##.leftad
+##.leftAd
 ##.leftAds
 ##.leftadv
 ##.leftBanns
@@ -6237,8 +6237,8 @@
 ##.news-ad-square-box
 ##.news-item--ad
 ##.news_social_button
-##.newsad
 ##.newsAD
+##.newsad
 ##.newsDetailAssets__sns
 ##.newsfeed-satu-container, .newsfeed-dua-container, .newsfeed-tiga-container
 ##.newsletter-inbodyContent-slice
@@ -6320,8 +6320,8 @@
 ##.ortaReklam
 ##.os-social-bar
 ##.oteaser
-##.OUTBRAIN
 ##.outbrain
+##.OUTBRAIN
 ##.outbrain-module
 ##.outbrain-placeholder
 ##.outbrain-widget
@@ -6346,8 +6346,8 @@
 ##.package_adBox
 ##.padscreen
 ##.page > .wp-none1
-##.page-ad
 ##.Page-ad
+##.page-ad
 ##.page-ads
 ##.page-content__advert
 ##.page-head-ad
@@ -6686,8 +6686,8 @@
 ##.publicidad_big
 ##.publicidad_especial
 ##.publicidad_top
-##.publicidade
 ##.Publicidade
+##.publicidade
 ##.publicidade-abre_padrao
 ##.publicidade-dotted
 ##.publicidade-rodape
@@ -7077,8 +7077,8 @@
 ##.shareBar
 ##.sharebar
 ##.sharebg
-##.shareBox
 ##.sharebox
+##.shareBox
 ##.shareBtn
 ##.ShareButton
 ##.shareButtons
@@ -7091,8 +7091,8 @@
 ##.shareDiv
 ##.shareholder
 ##.shareit
-##.sharelinks
 ##.shareLinks
+##.sharelinks
 ##.sharelist
 ##.sharelist_vertical
 ##.ShareMenu
@@ -7146,8 +7146,8 @@
 ##.side_adv
 ##.side_slide_pub
 ##.side_widget_surfing_adsense_widget
-##.sidead
 ##.sideAd
+##.sidead
 ##.sideads
 ##.Sidebar-ad
 ##.sidebar-ad-container
@@ -7192,8 +7192,8 @@
 ##.single__outbrain
 ##.single_ad
 ##.single_ad_300x250
-##.singlead
 ##.singleAd
+##.singlead
 ##.sisu-cookie-notice
 ##.site-ads
 ##.site-bottom-ad-slot
@@ -7347,8 +7347,8 @@
 ##.socialicons-block
 ##.socialIconsWrapper
 ##.socialleft
-##.socialLinks
 ##.sociallinks
+##.socialLinks
 ##.socialLinksContainer
 ##.socialList
 ##.socialList-type03
@@ -7361,9 +7361,9 @@
 ##.socials-share
 ##.socials-static
 ##.socialsection
-##.socialshare
 ##.SocialShare
 ##.socialShare
+##.socialshare
 ##.socialSharing
 ##.socialtab
 ##.socialthis_button
@@ -7440,8 +7440,8 @@
 ##.sponsored_title
 ##.sponsoredContent
 ##.sponsoredItem
-##.sponsoredlinks
 ##.sponsoredLinks
+##.sponsoredlinks
 ##.sponsoredPrisma
 ##.sponsoredProduct
 ##.sponsoredresults
@@ -7516,8 +7516,8 @@
 ##.sticky-footer-ad
 ##.sticky-navbar-ad-container
 ##.sticky_ads
-##.stickyad
 ##.stickyAd
+##.stickyad
 ##.stickyads
 ##.stickyads:not([style^="width: 32px"], [style^="width: 33px"], [style*="left: -43px"], [style*="-3"][style*="important"][style*="display: block;"], [style*="position: fixed"][style*="-188"], [style*="!important;"][style*="width:"][style*="height:"][style*="position"][style*="left:"][style*="top:"][style*="display"], [data-freestar-ad="123"]):not(:empty)
 ##.stickyRailAd
@@ -7705,13 +7705,13 @@
 ##.top_megabanner
 ##.top_pub_google
 ##.top_reklama
-##.topAd
 ##.topAD
+##.topAd
 ##.TopAd
 ##.topAdContainer
 ##.TopAdContainer
-##.topAds
 ##.topads
+##.topAds
 ##.topAdvertisement
 ##.topAlertAds
 ##.topbanner + .nav + .banner
@@ -7780,8 +7780,8 @@
 ##.upper-ad-box
 ##.us_share_buttons
 ##.ustOrtaSolReklam
-##.ustReklam
 ##.ustreklam
+##.ustReklam
 ##.util-bar-module-share
 ##.van_taboola
 ##.van_vid_carousel
@@ -7829,8 +7829,8 @@
 ##.video_ads_overdiv
 ##.video_details > .banner
 ##.video_reklama
-##.videoad
 ##.videoAd
+##.videoad
 ##.videoad-base
 ##.videoAd300
 ##.videoPlayContainer > div#video-play + div[data-nosnippet]
@@ -10427,17 +10427,17 @@
 ##[title^="agen judi poker" i]
 ##[title^="Agen Judi Terpercaya" i]
 ##[title^="Agen Judi Togel" i]
-##[title^="AGEN JUDI" i]
 ##[title^="agen judi" i]
-##[title^="agen livecasino" i]
+##[title^="AGEN JUDI" i]
 ##[title^="Agen LiveCasino" i]
+##[title^="agen livecasino" i]
 ##[title^="Agen Online" i]
 ##[title^="agen poker bandar" i]
 ##[title^="agen poker bola" i]
 ##[title^="Agen Poker Indonesia" i]
 ##[title^="agen poker judi" i]
-##[title^="agen poker online" i]
 ##[title^="Agen Poker Online" i]
+##[title^="agen poker online" i]
 ##[title^="agen poker terpercaya" i]
 ##[title^="agen poker" i]
 ##[title^="Agen QQ Terpercaya" i]
@@ -10507,8 +10507,8 @@
 ##[title^="bandar sakong" i]
 ##[title^="bandar slot" i]
 ##[title^="Bandar Taruhan Judi" i]
-##[title^="bandar taruhan" i]
 ##[title^="Bandar Taruhan" i]
+##[title^="bandar taruhan" i]
 ##[title^="Bandar Togel" i]
 ##[title^="Bandar toto" i]
 ##[title^="bandar303" i]
@@ -10523,8 +10523,8 @@
 ##[title^="BANDARQQ" i]
 ##[title^="BANDARQQ365" i]
 ##[title^="bandarwalet" i]
-##[title^="bandarxl" i]
 ##[title^="BANDARXL" i]
+##[title^="bandarxl" i]
 ##[title^="banner sidebar" i]
 ##[title^="BCAQQ" i]
 ##[title^="BERANIQQ" i]
@@ -10724,8 +10724,8 @@
 ##[title^="jpslot88" i]
 ##[title^="JUARAPOKER" i]
 ##[title^="judi bola online" i]
-##[title^="Judi Bola" i]
 ##[title^="judi bola" i]
+##[title^="Judi Bola" i]
 ##[title^="judi online terpercaya" i]
 ##[title^="Judi Online" i]
 ##[title^="judi poker online" i]
@@ -10899,8 +10899,8 @@
 ##[title^="poker online indonesia" i]
 ##[title^="poker online terbaik" i]
 ##[title^="Poker Online Terpercaya" i]
-##[title^="Poker Online" i]
 ##[title^="poker online" i]
+##[title^="Poker Online" i]
 ##[title^="Poker Vita" i]
 ##[title^="POKER228" i]
 ##[title^="POKER757" i]
@@ -10965,8 +10965,8 @@
 ##[title^="REJEKIPOKER" i]
 ##[title^="Resmidomino" i]
 ##[title^="RGOBET" i]
-##[title^="rgocasino" i]
 ##[title^="RGOCASINO" i]
+##[title^="rgocasino" i]
 ##[title^="RIVALQQ" i]
 ##[title^="RONALDO4D" i]
 ##[title^="royalflush88" i]
@@ -12182,8 +12182,8 @@
 ##a[title^="togelin" i]
 ##a[title^="TOTO88"]
 ##a[title^="totojitu" i]
-##AD-SLOT
 ##ad-slot
+##AD-SLOT
 ##amp-ad
 ##amp-addthis
 ##amp-apester-media
@@ -12639,13 +12639,13 @@
 ##img[alt^="Agen Domino QQ" i]
 ##img[alt^="Agen Dominoqq" i]
 ##img[alt^="Agen Judi Bola" i]
-##img[alt^="agen judi online" i]
 ##img[alt^="Agen Judi Online" i]
+##img[alt^="agen judi online" i]
 ##img[alt^="Agen Judi Poker" i]
 ##img[alt^="Agen Judi Terpercaya" i]
 ##img[alt^="Agen Judi Togel" i]
-##img[alt^="AGEN JUDI" i]
 ##img[alt^="agen judi" i]
+##img[alt^="AGEN JUDI" i]
 ##img[alt^="AGEN LAPAKQQ" i]
 ##img[alt^="agen livecasino" i]
 ##img[alt^="Agen Online" i]
@@ -12655,8 +12655,8 @@
 ##img[alt^="agen poker judi" i]
 ##img[alt^="Agen Poker Online" i]
 ##img[alt^="Agen Poker Terpercaya" i]
-##img[alt^="agen poker" i]
 ##img[alt^="Agen Poker" i]
+##img[alt^="agen poker" i]
 ##img[alt^="Agen QQ Terpercaya" i]
 ##img[alt^="agen qq" i]
 ##img[alt^="AGEN SABUNG" i]
@@ -12744,12 +12744,12 @@
 ##img[alt^="Bandar QQ" i]
 ##img[alt^="bandar sakong" i]
 ##img[alt^="Bandar Taruhan Judi" i]
-##img[alt^="Bandar Togel" i]
 ##img[alt^="bandar togel" i]
+##img[alt^="Bandar Togel" i]
 ##img[alt^="Bandar toto" i]
 ##img[alt^="bandar303" i]
-##img[alt^="Bandar36" i]
 ##img[alt^="bandar36" i]
+##img[alt^="Bandar36" i]
 ##img[alt^="bandar855" i]
 ##img[alt^="Bandar855" i]
 ##img[alt^="BandarCapsa" i]
@@ -12762,9 +12762,9 @@
 ##img[alt^="BANDARQQ" i]
 ##img[alt^="BANDARQQ365" i]
 ##img[alt^="bandarwalet" i]
-##img[alt^="BandarXL" i]
-##img[alt^="BANDARXL" i]
 ##img[alt^="bandarxl" i]
+##img[alt^="BANDARXL" i]
+##img[alt^="BandarXL" i]
 ##img[alt^="bandarxl"]
 ##img[alt^="banner sidebar" i]
 ##img[alt^="bannertengah" i]
@@ -12790,8 +12790,8 @@
 ##img[alt^="Binomo" i]
 ##img[alt^="birutoto" i]
 ##img[alt^="BISAQQ" i]
-##img[alt^="Bisnis4D" i]
 ##img[alt^="BISNIS4D" i]
+##img[alt^="Bisnis4D" i]
 ##img[alt^="bisnis4d"]
 ##img[alt^="blatogel" i]
 ##img[alt^="bola tangkas online" i]
@@ -12819,9 +12819,9 @@
 ##img[alt^="BUKAQQ" i]
 ##img[alt^="BUNDAPOKER" i]
 ##img[alt^="BUNGAQQ" i]
+##img[alt^="BuySpinSLOT" i]
 ##img[alt^="BUYSPINSLOT" i]
 ##img[alt^="buyspinslot" i]
-##img[alt^="BuySpinSLOT" i]
 ##img[alt^="CafeQQ" i]
 ##img[alt^="CAHAYAPOKER" i]
 ##img[alt^="CAHAYAQQ" i]
@@ -12913,8 +12913,8 @@
 ##img[alt^="ELANGQQ" i]
 ##img[alt^="ENAKBET" i]
 ##img[alt^="enakslot" i]
-##img[alt^="EnakSlot" i]
 ##img[alt^="Enakslot" i]
+##img[alt^="EnakSlot" i]
 ##img[alt^="enakslot"]
 ##img[alt^="ENJOYQQ" i]
 ##img[alt^="enterslots" i]
@@ -12929,8 +12929,8 @@
 ##img[alt^="FUNDOMINO" i]
 ##img[alt^="G11BET" i]
 ##img[alt^="Gacor128" i]
-##img[alt^="gacor88" i]
 ##img[alt^="Gacor88" i]
+##img[alt^="gacor88" i]
 ##img[alt^="GADISQQ" i]
 ##img[alt^="GADUNSLOT" i]
 ##img[alt^="Game Poker Online" i]
@@ -12949,8 +12949,8 @@
 ##img[alt^="gilaslot" i]
 ##img[alt^="gitarpoker" i]
 ##img[alt^="GITARPOKER" i]
-##img[alt^="GITARTOGEL" i]
 ##img[alt^="gitartogel" i]
+##img[alt^="GITARTOGEL" i]
 ##img[alt^="goldenpoker" i]
 ##img[alt^="GOLDENQQ" i]
 ##img[alt^="GUDANGPOKER" i]
@@ -13065,8 +13065,8 @@
 ##img[alt^="Judi bola" i]
 ##img[alt^="judi bola" i]
 ##img[alt^="judi online terpercaya" i]
-##img[alt^="Judi Online" i]
 ##img[alt^="judi online" i]
+##img[alt^="Judi Online" i]
 ##img[alt^="judi poker online" i]
 ##img[alt^="judi slot online" i]
 ##img[alt^="Judi Togel Online" i]
@@ -13076,10 +13076,10 @@
 ##img[alt^="junior toto" i]
 ##img[alt^="JURAGANQQ" i]
 ##img[alt^="Kaiko Slot" i]
-##img[alt^="kaikoslot" i]
-##img[alt^="Kaikoslot" i]
 ##img[alt^="KAIKOSLOT" i]
+##img[alt^="Kaikoslot" i]
 ##img[alt^="KaikoSlot" i]
+##img[alt^="kaikoslot" i]
 ##img[alt^="Kakak Dewa" i]
 ##img[alt^="KAMPUSBET" i]
 ##img[alt^="KANTINQQ" i]
@@ -13161,8 +13161,8 @@
 ##img[alt^="macau club poker" i]
 ##img[alt^="Macau Dewa" i]
 ##img[alt^="MACAU442" i]
-##img[alt^="MacauBet" i]
 ##img[alt^="MACAUBET" i]
+##img[alt^="MacauBet" i]
 ##img[alt^="Macaudewa" i]
 ##img[alt^="MacauDewa" i]
 ##img[alt^="Macauslot188" i]
@@ -13172,16 +13172,16 @@
 ##img[alt^="mahkotajitu" i]
 ##img[alt^="MAHKOTAQQ" i]
 ##img[alt^="Main Cuan Slot" i]
-##img[alt^="MAINCUAN" i]
 ##img[alt^="maincuan" i]
+##img[alt^="MAINCUAN" i]
 ##img[alt^="MAINDOMINO99" i]
 ##img[alt^="mainhoki" i]
 ##img[alt^="MAINQQ" i]
 ##img[alt^="MAJUQQ" i]
 ##img[alt^="Makauqq" i]
 ##img[alt^="Mandala Toto" i]
-##img[alt^="mandalatoto" i]
 ##img[alt^="MANDALATOTO" i]
+##img[alt^="mandalatoto" i]
 ##img[alt^="MANDIRIQQ" i]
 ##img[alt^="ManiaQQ" i]
 ##img[alt^="mansion77" i]
@@ -13206,8 +13206,8 @@
 ##img[alt^="Megapulsa" i]
 ##img[alt^="Megasloto" i]
 ##img[alt^="Megasloto188" i]
-##img[alt^="Megatangkas" i]
 ##img[alt^="MEGATANGKAS" i]
+##img[alt^="Megatangkas" i]
 ##img[alt^="MEJAHOKI" i]
 ##img[alt^="MEJAQQ" i]
 ##img[alt^="mejasakong" i]
@@ -13292,9 +13292,9 @@
 ##img[alt^="PELANGIKOIN" i]
 ##img[alt^="PELANGIQQ" i]
 ##img[alt^="Penta Slot" i]
+##img[alt^="Pentaslot" i]
 ##img[alt^="pentaslot" i]
 ##img[alt^="PENTASLOT" i]
-##img[alt^="Pentaslot" i]
 ##img[alt^="percaya4d" i]
 ##img[alt^="permainan judi online" i]
 ##img[alt^="PERMATABET88" i]
@@ -13363,8 +13363,8 @@
 ##img[alt^="QQ820" i]
 ##img[alt^="QQ828" i]
 ##img[alt^="QQ882" i]
-##img[alt^="QQ8889" i]
 ##img[alt^="qq8889" i]
+##img[alt^="QQ8889" i]
 ##img[alt^="QQ998" i]
 ##img[alt^="QQANGPAO" i]
 ##img[alt^="QQangpao" i]
@@ -13461,8 +13461,8 @@
 ##img[alt^="SENIQQ" i]
 ##img[alt^="senyumqq" i]
 ##img[alt^="sepakbola.cc" i]
-##img[alt^="sepakbolacc" i]
 ##img[alt^="SEPAKBOLACC" i]
+##img[alt^="sepakbolacc" i]
 ##img[alt^="SERVERPKV" i]
 ##img[alt^="sexysloto" i]
 ##img[alt^="SHINCHANPOKER" i]
@@ -13543,14 +13543,14 @@
 ##img[alt^="TERATAIQQ" i]
 ##img[alt^="texas poker" i]
 ##img[alt^="Texaspoker" i]
-##img[alt^="TEXASPOKERCC" i]
 ##img[alt^="texaspokercc" i]
+##img[alt^="TEXASPOKERCC" i]
 ##img[alt^="TEXASQQ" i]
 ##img[alt^="TIKETQQ" i]
 ##img[alt^="Togel Domino" i]
 ##img[alt^="togel online terpercaya" i]
-##img[alt^="togel online" i]
 ##img[alt^="Togel Online" i]
+##img[alt^="togel online" i]
 ##img[alt^="Togel SGP" i]
 ##img[alt^="togel singapore" i]
 ##img[alt^="togel terbesar" i]
@@ -13564,8 +13564,8 @@
 ##img[alt^="TOTO88" i]
 ##img[alt^="toto88" i]
 ##img[alt^="TOTO88"]
-##img[alt^="totobet" i]
 ##img[alt^="TOTOBET" i]
+##img[alt^="totobet" i]
 ##img[alt^="totojitu" i]
 ##img[alt^="totomaniac" i]
 ##img[alt^="totowin" i]
@@ -13579,8 +13579,8 @@
 ##img[alt^="URA338" i]
 ##img[alt^="UtamaBet" i]
 ##img[alt^="vegas811" i]
-##img[alt^="VEGAS88" i]
 ##img[alt^="Vegas88" i]
+##img[alt^="VEGAS88" i]
 ##img[alt^="video bokep online" i]
 ##img[alt^="Vimax Asli" i]
 ##img[alt^="VIP BONUS LIVE" i]
@@ -13600,8 +13600,8 @@
 ##img[alt^="WARNAQQ" i]
 ##img[alt^="WARUNGQQ" i]
 ##img[alt^="WEDEQQ" i]
-##img[alt^="Wigobet" i]
 ##img[alt^="WIGOBET" i]
+##img[alt^="Wigobet" i]
 ##img[alt^="WIGOBET"]
 ##img[alt^="WIN4D" i]
 ##img[alt^="WINNIPOKER" i]
@@ -17322,8 +17322,8 @@
 7info.ru##.td_separator_center
 7info.ru##body:style(background-image: none !important; cursor: default !important;)
 7itv.com,fengchedmp.com,hdwan.net##body > div[style]
-7jours.ca,billie.ca,guideauto.tv,guideautoweb.com,journaldemontreal.com,journaldequebec.com,pesesurstart.com,silo57.ca#@#.AdSense
 7jours.ca,billie.ca,guideauto.tv,guideautoweb.com,journaldemontreal.com,journaldequebec.com,pesesurstart.com,silo57.ca#@#.adSense
+7jours.ca,billie.ca,guideauto.tv,guideautoweb.com,journaldemontreal.com,journaldequebec.com,pesesurstart.com,silo57.ca#@#.AdSense
 7junshi.com##.breaknovel-ave
 7junshi.com##.videoads
 7junshi.com##div[style="position: fixed; right: 0px; bottom: 0;z-index:999;width: 300px;height: 250px;"]
@@ -21627,8 +21627,8 @@
 @@||mssl.fwmrm.net/crossdomain.xml$domain=vplayer.nbcsports.com
 @@||mssl.fwmrm.net/libs/adm/*/AdManager.js$domain=rmcbfmplay.com
 @@||mssl.fwmrm.net/libs/adm/*/AdManager.js$domain=southparkstudios.com.br|southpark.lat
-@@||mssl.fwmrm.net/libs/adm/*/LinkTag2.js$domain=play.tv3.lt
 @@||mssl.fwmrm.net/libs/adm/*/linktag2.js$domain=play.tv3.lt
+@@||mssl.fwmrm.net/libs/adm/*/LinkTag2.js$domain=play.tv3.lt
 @@||mstm.motorsport.com/mstm.js
 @@||mt.de/img
 @@||mtouch.facebook.com/ads/api/preview/$domain=business.facebook.com
@@ -31120,8 +31120,8 @@ baskino.me#@#.text-ads
 baskino.me#@#.text_ad
 baskino.me#@#.text_ads
 baskino.me#@#.textad
-baskino.me#@#.TextAd
 baskino.me#@#.textAd
+baskino.me#@#.TextAd
 baskmedia.jp##div[style="min-height:280px;height: auto"]
 baslattusu.com###sgcboxOverlay
 baslattusu.com###sgcolorbox
@@ -34212,8 +34212,8 @@ borntobefuck.com###player-vip-btn
 borntobefuck.com##.video:has(> a.feed_featured)
 borsadirekt.com##.voa > a[href]
 borsadirekt.com##a[class*="SideBarBanner"]
-borsadirekt.com##div[class*="Bannerdiv"] > a[target="_blank"]
 borsadirekt.com##div[class*="BannerDiv"] > a[target="_blank"]
+borsadirekt.com##div[class*="Bannerdiv"] > a[target="_blank"]
 borsagundem.com.tr,finansgundem.com##.adsnd
 borsanasiloynanir.co###single-banner
 borsanasiloynanir.co##.desktopHeaderBanner
@@ -36894,8 +36894,8 @@ chip.de###footer-white-global
 chip.de###hp-neongelb .copy-sm > a[href]:not([href*=".chip.de"])
 chip.de###M1:has(.page--has-billboard):style(top: 0px !important;)
 chip.de##.Ad-hor-height
-chip.de##.Ad-Slot
 chip.de##.ad-slot
+chip.de##.Ad-Slot
 chip.de##.ae-skyscraper
 chip.de##.ar-67-60-so
 chip.de##.Article > div[class^="fb-col-md-"]:has(> .Article__Ad)
@@ -44860,8 +44860,8 @@ eltrecetv.com.ar##.brick_three_ads
 eltrecetv.com.ar,tn.com.ar##.horizontal-share
 eltrox.pl,hurton.pl,predge.jp,xtv.lv##.modal-gdpr
 elu24.ee#@#.cookie-container
-eluniversal.com##.bannersTop
 eluniversal.com##.BannersTop
+eluniversal.com##.bannersTop
 eluniversal.com.co###tg-adhesion
 eluniversal.com.co##.grid-x > div.cell:has(> div[id^="pub-news-"])
 eluniversal.com.mx##.ELU_VIDEO
@@ -45949,8 +45949,8 @@ ettoday.net##amp-consent:style(display: none !important;)
 ettoday.net##amp-embed[type="dable"]
 ettoday.net##div:has(> a.fb-messenger)
 ettoday.net##div[id^="abp"]
-ettoday.net#@#AMP-AD
 ettoday.net#@#amp-ad
+ettoday.net#@#AMP-AD
 ettoday.net#@#amp-consent
 etude000.com###mainEntity > .clearfix > span[style$="padding:0 10px;font-weight:bold; font-size:large;"] + div[style="text-align: center;"]
 etude000.com###mainEntity > .clearfix > span[style$="padding:0 10px;font-weight:bold; font-size:large;"]:has(+ div[style="text-align: center;"])
@@ -49654,8 +49654,8 @@ freefincal.com##.tve-leads-slide-in
 freefrontend.com##.sidebar-footer > .nav-title
 freefuckporno.com##.video-container-box.has-bn:style(max-width: unset !important; float: unset !important;)
 freefuckporno.com,nacionalporno.com##.headerCode:style(display: none !important;)
-freefuckporno.com,nacionalporno.com##.sideCode:style(display: none !important;)
 freefuckporno.com,nacionalporno.com##.sidecode:style(display: none !important;)
+freefuckporno.com,nacionalporno.com##.sideCode:style(display: none !important;)
 freegame-mugen.jp###relatedContent
 freegame-mugen.jp##div[class^="adArticle"]
 freegames.org###gla
@@ -77885,9 +77885,9 @@ pianba.net,pianba.tv##.play-btn > a[target="_blank"]
 pianetabambini.it##div[class*="clsads"]
 pianetafanta.it,wikitrik.com#@##ad
 pianetafanta.it,wikitrik.com#@##ad-column
-pianetafanta.it,wikitrik.com#@##AdRectangle
 pianetafanta.it,wikitrik.com#@##adrectangle
 pianetafanta.it,wikitrik.com#@##Adrectangle
+pianetafanta.it,wikitrik.com#@##AdRectangle
 pianetafanta.it,wikitrik.com#@##Ads
 pianetafanta.it,wikitrik.com#@##adSense
 pianetafanta.it,wikitrik.com#@##advertising2
@@ -78219,9 +78219,9 @@ pixnet.net##body div[class*="-ad-"]:not(#style_important)
 pixnet.net##div[class*="-Ad-"]
 pixnet.net##div[class*="-ad-"]
 pixnet.net##div[class*="article-ad"]
+pixnet.net##div[id*="-Ad-"]
 pixnet.net##div[id*="-AD-"]
 pixnet.net##div[id*="-aD-"]
-pixnet.net##div[id*="-Ad-"]
 pixnet.net##div[style="width: 620px; height: 250px; padding-bottom: 10px;"]
 pixnet.net##div[style^="width: 630px;"][style*="height: 250px"]
 pixpa.com##.pixpa-cookies-wrapper
@@ -94445,9 +94445,9 @@ uplifers.com##.up-social
 upload-apk.com##.vr-adv-unit
 uploadedpremiumlink.net##footer.v-footer + div
 uploadev.org##.offerstxt > ul > li.anim
-uploadmall.com#@#.adSense
-uploadmall.com#@#.AdSense
 uploadmall.com#@#.Adsense
+uploadmall.com#@#.AdSense
+uploadmall.com#@#.adSense
 uploadmall.com#@#iframe[width="728"][height="90"]
 uploadrar.com##.card.border-warning
 uploadrar.com##.container > form + .text-center:not(:has(>*))
@@ -159272,8 +159272,8 @@ zzzyk.com###Tinfo
 ~assetbar.com##.ad-button
 ~autosalon.tv##.article-line
 ~baby.ru##.article-sharing
-~backpage.com##.AdInfo
 ~backpage.com##.adinfo
+~backpage.com##.AdInfo
 ~baidu.com##a[href*="/cpro."]
 ~baidu.com##a[href*="/cpro/"]
 ~band.us##a[href*="//band.us/plugin/share?"]
@@ -159570,8 +159570,8 @@ zzzyk.com###Tinfo
 ~stumbleupon.com##a[href^="http://www.stumbleupon.com/submit?url"]
 ~stumbleupon.com##a[href^="https://www.stumbleupon.com/submit?url="]
 ~stylebook.de##.facebook-share
-~superbikeplanet.com##.adDiv
 ~superbikeplanet.com##.addiv
+~superbikeplanet.com##.adDiv
 ~superbikeplanet.com##.AdTitle
 ~superhry.cz##.adHolder
 ~swappa.com###social-buttons
