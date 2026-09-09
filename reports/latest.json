@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at": "2026-09-09T23:04:01.939886+00:00",
+  "generated_at": "2026-09-09T23:27:46.331514+00:00",
   "builder": "Filter-Lists v6",
   "profile": "strict-abp",
   "source_count": 33,
@@ -14,11 +14,11 @@
     "timed_out": false
   },
   "rules": {
-    "input_lines": 206536,
-    "accepted_lines": 176325,
+    "input_lines": 206534,
+    "accepted_lines": 176323,
     "rejected_lines": 30211,
-    "duplicate_lines": 16702,
-    "unique_rules": 159623,
+    "duplicate_lines": 16698,
+    "unique_rules": 159625,
     "rejection_reasons": {
       "comment": 2834,
       "invalid-cosmetic-rule": 1937,
@@ -27,5 +27,5 @@
       "ubo-only-syntax": 9948
     }
   },
-  "build_seconds": 6.125
+  "build_seconds": 4.461
 }
