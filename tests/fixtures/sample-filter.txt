@@ -1,0 +1,7 @@
+! fixture
+||example.com^$script,third-party
+@@||example.com^$document
+example.com##.ad
+example.com#?#div:-abp-has(.sponsor)
+0.0.0.0 bad.example.com
+example.com##+js(set-constant, foo, true)
