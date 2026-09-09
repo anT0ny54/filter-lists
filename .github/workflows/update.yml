@@ -1,4 +1,4 @@
-name: Update Filter List
+name: Update Filter List V6.6
 
 on:
   schedule:
@@ -71,7 +71,8 @@ jobs:
           from pathlib import Path
           data = json.loads(Path("reports/latest.json").read_text())
           assert data["rules"]["unique_rules"] > 0
-          assert data["sources"]["successful"] >= max(1, int(data["sources"]["requested"] * 0.5))
+          assert data["sources"]["success_ratio"] >= data["sources"]["health_threshold"]
+          assert not data["sources"]["required_failed"]
           print(json.dumps(data, indent=2))
           PY
 
@@ -81,11 +82,11 @@ jobs:
           set -Eeuo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- filters.txt reports/latest.json
+          git add -- filters.txt reports/latest.json sources.txt
           if git diff --cached --quiet -- filters.txt reports/latest.json; then
             echo "No generated changes"
             exit 0
           fi
           rules="$(sed -n 's/^! Total rules: //p' filters.txt)"
-          git commit -m "chore(filters): auto-update filter list (${rules} rules) [skip ci]"
+          git commit -m "chore(filters): auto-update V6.6 filter list (${rules} rules) [skip ci]"
           git push origin "HEAD:${GITHUB_REF_NAME}"
