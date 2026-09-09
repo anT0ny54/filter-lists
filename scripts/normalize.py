@@ -194,8 +194,25 @@ def rejection_reason(raw: str) -> str:
         return "rule-too-long"
     if "#?@#" in line or "+js(" in line.lower() or ":has-text(" in line.lower():
         return "ubo-only-syntax"
-    if "$" in line and normalize_network(line) is None:
-        return "invalid-option-or-network-rule"
+    if "$" in line:
+        pattern, options = split_options(line)
+        if options:
+            names = []
+            for option in options:
+                name = option.split("=", 1)[0].strip().lower()
+                if name.startswith("~"):
+                    name = name[1:]
+                names.append(name)
+                if "=" in option and name not in VALUE_OPTIONS:
+                    return "unknown-option"
+                if "=" not in option and name not in TYPE_OPTIONS and name not in INVERSE_OPTIONS and name not in SIMPLE_OPTIONS:
+                    return "unknown-option"
+                if not valid_option(option, line.startswith("@@")):
+                    return "invalid-option-value" if "=" in option else "context-invalid-option"
+            if len(names) != len(set(names)):
+                return "duplicate-option"
+        if normalize_network(line) is None:
+            return "invalid-option-or-network-rule"
     if c.kind == "cosmetic":
         return "invalid-cosmetic-rule"
     return "invalid-network-rule"

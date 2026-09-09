@@ -46,12 +46,12 @@ def download(url: str, output: Path, timeout: int) -> tuple[bool, str]:
     return True, ""
 
 
-def validate_download(path: Path) -> tuple[bool, str]:
+def validate_download(path: Path, max_bytes: int = MAX_DOWNLOAD_BYTES) -> tuple[bool, str]:
     try:
         size = path.stat().st_size
         if size < 20:
             return False, "too-small"
-        if size > MAX_DOWNLOAD_BYTES:
+        if size > max_bytes:
             return False, "too-large"
         data = path.read_bytes()[:65536]
         if b"\x00" in data:
@@ -81,13 +81,13 @@ def include_urls(path: Path, base_url: str) -> list[str]:
     return list(dict.fromkeys(result))
 
 
-def collect_sources(source_urls: list[str], tmp: Path, started: float, workers: int, log) -> tuple[list[Path], dict]:
+def collect_sources(source_urls: list[str], tmp: Path, started: float, workers: int, log, *, total_timeout: int = TOTAL_TIMEOUT, max_include_depth: int = MAX_INCLUDE_DEPTH, max_download_bytes: int = MAX_DOWNLOAD_BYTES) -> tuple[list[Path], dict]:
     files: list[Path] = []
     visited: set[str] = set()
     current = [(url, 0) for url in source_urls]
     sequence = 0
-    stats = {"requested": len(source_urls), "successful": 0, "failed": 0, "included": 0, "failures": []}
-    while current and time.monotonic() - started < TOTAL_TIMEOUT:
+    stats = {"requested": len(source_urls), "successful": 0, "failed": 0, "included": 0, "failures": [], "results": []}
+    while current and time.monotonic() - started < total_timeout:
         batch = []
         for url, depth in current:
             if url not in visited and valid_url(url):
@@ -111,23 +111,25 @@ def collect_sources(source_urls: list[str], tmp: Path, started: float, workers: 
                 except Exception as exc:
                     ok, error = False, str(exc)
                 if ok:
-                    ok, validation_error = validate_download(target)
+                    ok, validation_error = validate_download(target, max_download_bytes)
                     error = validation_error or error
                 if ok:
                     files.append(target)
                     stats["successful"] += 1
+                    stats["results"].append({"url": url, "depth": depth, "status": "ok", "path": str(target)})
                     log(f"   [OK] {url[:110]}")
-                    if depth < MAX_INCLUDE_DEPTH:
+                    if depth < max_include_depth:
                         children = include_urls(target, url)
                         stats["included"] += len(children)
                         next_batch.extend((child, depth + 1) for child in children)
                 else:
                     stats["failed"] += 1
+                    stats["results"].append({"url": url, "depth": depth, "status": "failed", "reason": error or "invalid response"})
                     if len(stats["failures"]) < 100:
                         stats["failures"].append({"url": url, "reason": error or "invalid response", "depth": depth})
                     target.unlink(missing_ok=True)
                     log(f"   [SKIP] {url[:110]} — {error or 'invalid response'}")
         current = next_batch
     stats["visited"] = len(visited)
-    stats["timed_out"] = bool(current and time.monotonic() - started >= TOTAL_TIMEOUT)
+    stats["timed_out"] = bool(current and time.monotonic() - started >= total_timeout)
     return files, stats
