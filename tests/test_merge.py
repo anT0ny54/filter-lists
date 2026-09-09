@@ -6,6 +6,7 @@ SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "merge.py"
 spec = importlib.util.spec_from_file_location("merge", SCRIPT)
 merge = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(merge)
+from urllib.parse import urljoin
 
 class ABPStrictTests(unittest.TestCase):
     def test_network_exception_is_preserved(self):
@@ -42,7 +43,7 @@ class ABPStrictTests(unittest.TestCase):
         self.assertIsNone(merge.normalize_rule("! comment"))
         self.assertIsNone(merge.normalize_rule("0.0.0.0 ads.example.com"))
     def test_include_url_resolution(self):
-        self.assertEqual(merge.urljoin("https://example.com/lists/main.txt", "../child.txt"), "https://example.com/child.txt")
+        self.assertEqual(urljoin("https://example.com/lists/main.txt", "../child.txt"), "https://example.com/child.txt")
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
