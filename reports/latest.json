@@ -1,8 +1,31 @@
 {
   "schema": 1,
-  "status": "snapshot",
+  "generated_at": "2026-09-09T23:04:01.939886+00:00",
   "builder": "Filter-Lists v6",
   "profile": "strict-abp",
-  "note": "This repository snapshot retains the existing generated filters.txt. Live source statistics are produced during the next network-enabled V6 build.",
-  "declared_rules_in_filters_txt": 159290
+  "source_count": 33,
+  "sources": {
+    "requested": 33,
+    "successful": 33,
+    "failed": 0,
+    "included": 0,
+    "failures": [],
+    "visited": 33,
+    "timed_out": false
+  },
+  "rules": {
+    "input_lines": 206536,
+    "accepted_lines": 176325,
+    "rejected_lines": 30211,
+    "duplicate_lines": 16702,
+    "unique_rules": 159623,
+    "rejection_reasons": {
+      "comment": 2834,
+      "invalid-cosmetic-rule": 1937,
+      "invalid-network-rule": 3186,
+      "invalid-option-or-network-rule": 12306,
+      "ubo-only-syntax": 9948
+    }
+  },
+  "build_seconds": 6.125
 }
