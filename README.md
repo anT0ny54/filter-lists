@@ -53,6 +53,7 @@ Use **HaGeZi Blocklists Multi Pro + TIF** with [My Free DNS].
 
 | Service | DNS-over-HTTPS URL |
 | --- | --- |
+| **Multi Pro + TIF** | `https://freedns.koyeb.app/dns-query` (Recommended) |
 | Multi Pro + TIF (Recommended) | `https://freedns-six.vercel.app/api/doh/dns-query` |
 | Multi Pro + TIF (Backup) | `https://dnssix.netlify.app/api/doh/dns-query` |
 
