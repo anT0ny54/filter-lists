@@ -1,3 +1,14 @@
+## v7.2.0 — Observability, anomaly detection, and fuzz hardening
+
+- Added per-source input/accepted/rejected/duplicate/unique-rule statistics.
+- Added per-source rejection-reason diagnostics.
+- Added SHA-256 content hashes for successful downloaded sources.
+- Added previous-build anomaly detection for source bytes, line counts, rule counts, and rejection-rate shifts.
+- Added warning/critical anomaly severity while keeping normal upstream content changes publishable.
+- Added deterministic Unicode and syntax fuzz/property tests for the normalizer.
+- Added anomaly-policy validation to centralized `policies.yaml` configuration.
+- Expanded report schema from 3 to 4.
+
 ## v7.1.1 — Source-health, retry, and validator hardening
 
 - Fixed the V7.1 global-budget scheduling bug that falsely counted queued root sources as failures when the worker pool exceeded the safe byte reservation capacity.

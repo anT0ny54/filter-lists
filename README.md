@@ -1,4 +1,4 @@
-# 🚀 Filter-Lists v7.1.1
+# 🚀 Filter-Lists v7.2.0
 
 **A compatibility-first, deterministic filter-list compiler** that fetches trusted sources, resolves bounded `!#include` graphs, canonicalizes rules, applies a strict ABP-compatible policy, validates the generated list, and publishes reproducible build metadata.
 
@@ -42,9 +42,9 @@ sources.yaml                 # authoritative source registry
  filters.txt + reports/latest.json + generated sources.txt
 ```
 
-## 🔐 V7.1.1 hardening
+## 🔐 V7.2.0 hardening
 
-V7.1.1 preserves the established strict-ABP behavior while fixing the previous P0–P3 issues:
+V7.2.0 preserves the established strict-ABP behavior while fixing the previous P0–P3 issues:
 
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`; Python modules no longer maintain independent copies of those limits.
 - **Correct source health:** the health ratio is calculated from **root sources only**. Nested `!#include` sources are reported separately and cannot artificially inflate the health ratio.
@@ -59,6 +59,10 @@ V7.1.1 preserves the established strict-ABP behavior while fixing the previous P
 - **Action pinning:** GitHub Actions are pinned to immutable commit SHAs rather than floating tags.
 - **Generated-source hygiene:** `sources.txt` is generated from `sources.yaml` and no longer triggers its own update workflow.
 - **Historical build deltas:** the report format is prepared for deterministic operational comparisons.
+- **Per-source observability:** every successful source records bytes, input/accepted/rejected/duplicate counts, unique-rule count, rejection rate, rejection reasons, and a SHA-256 content hash.
+- **Rejection diagnostics:** rejection reasons are retained globally and per source, making upstream format changes attributable instead of opaque.
+- **Anomaly detection:** the builder compares current source size, line count, rule count, and rejection rate with the previous report and records warning/critical anomalies without confusing expected content-hash changes with failures.
+- **Deterministic property/fuzz testing:** the test suite exercises normalization with 2,000 deterministic fuzz inputs and checks canonicalization idempotence/determinism plus anomaly behavior without adding a runtime testing dependency.
 
 ## 📊 Build reporting
 
@@ -74,6 +78,8 @@ V7.1.1 preserves the established strict-ABP behavior while fixing the previous P
 - input / accepted / rejected / duplicate rules
 - final unique-rule count
 - rejection reasons
+- per-source rule diagnostics and SHA-256 content hashes
+- anomaly baseline, thresholds, severity, and affected sources
 - build duration
 
 ## ⚙️ Source configuration
@@ -120,6 +126,9 @@ The suite covers:
 - source-health accounting
 - global source/download limits
 - deterministic reporting
+- per-source hashes and diagnostics
+- anomaly detection
+- deterministic property/fuzz tests for arbitrary input
 - regression behavior
 
 ## 🏪 My Free DNS Server

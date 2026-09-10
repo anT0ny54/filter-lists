@@ -26,3 +26,10 @@ limits:
 source_health:
   minimum_success_ratio: 0.80
   fail_if_zero_sources: true
+
+anomaly_detection:
+  enabled: true
+  max_bytes_change_ratio: 0.75
+  max_rule_count_change_ratio: 0.75
+  max_rejection_rate_change: 0.25
+  min_lines: 100
