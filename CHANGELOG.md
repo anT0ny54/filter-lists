@@ -1,3 +1,10 @@
+## V7.5.1
+
+- Fixed test HTTP-server teardown to call `server_close()` and remove the temporary fixture directory, eliminating the `ResourceWarning` from the fetch test suite.
+- Added a true `merge.py` end-to-end test using a local HTTP server and the real `collect_sources()` + `analyze_files()` pipeline, including a bounded `!#include` child source.
+- Verified the full suite remains deterministic and free of the previous socket warning.
+- Kept the release profile strictly `strict-abp`; no engine-specific syntax was added.
+
 ## V7.5.0
 
 - **Strict-ABP remains the only release profile.**
