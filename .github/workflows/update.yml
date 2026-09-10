@@ -1,4 +1,4 @@
-name: Update Filter List V7.1.1
+name: Update Filter List V7.2.0
 
 on:
   schedule:
@@ -69,13 +69,14 @@ jobs:
           import json
           from pathlib import Path
           data = json.loads(Path("reports/latest.json").read_text())
-          assert data["schema"] == 3
-          assert data["builder"] == "Filter-Lists v7.1.1"
+          assert data["schema"] == 4
+          assert data["builder"] == "Filter-Lists v7.2.0"
           assert data["rules"]["unique_rules"] > 0
           assert data["sources"]["success_ratio"] >= data["sources"]["health_threshold"]
           assert not data["sources"]["required_failed"]
           assert not data["sources"]["timed_out"]
           assert not data["sources"]["source_limit_reached"]
+          assert data["anomalies"]["critical_count"] == 0
           assert data["sources"]["total_download_bytes"] <= data["sources"]["max_total_download_bytes"]
           print(json.dumps(data, indent=2))
           PY
@@ -92,5 +93,5 @@ jobs:
             exit 0
           fi
           rules="$(sed -n 's/^! Total rules: //p' filters.txt)"
-          git commit -m "chore(filters): auto-update V7.1.1 filter list (${rules} rules) [skip ci]"
+          git commit -m "chore(filters): auto-update V7.2.0 filter list (${rules} rules) [skip ci]"
           git push origin "HEAD:${GITHUB_REF_NAME}"
