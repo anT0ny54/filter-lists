@@ -1,4 +1,4 @@
-## v7.1.1 — Source-health and retry hardening
+## v7.1.1 — Source-health, retry, and validator hardening
 
 - Fixed the V7.1 global-budget scheduling bug that falsely counted queued root sources as failures when the worker pool exceeded the safe byte reservation capacity.
 - Process downloads in budget-safe waves sized from the remaining global byte budget.
