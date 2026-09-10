@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Filter-Lists V6.6 deterministic build orchestrator."""
+"""Filter-Lists V7.0 deterministic build orchestrator."""
 from __future__ import annotations
 
 import hashlib
@@ -57,11 +57,11 @@ def sync_legacy_sources(config) -> None:
 
 
 def write_output(rules: set[str], build_id: str) -> None:
-    final_rules = sorted(rules, key=lambda x: x.casefold())
+    final_rules = sorted(rules, key=lambda x: (x.casefold(), x))
     now = datetime.now(timezone.utc)
     header = [
         "! Title: Combined Adblock Plus Filter List",
-        f"! Version: v6.6-{build_id[:12]}",
+        f"! Version: v7.0-{build_id[:12]}",
         f"! Last updated: {now:%Y-%m-%d %H:%M:%S UTC}",
         "! Expires: 1 day",
         "! Homepage: https://github.com/anT0ny54/filter-lists",
@@ -104,22 +104,23 @@ def main() -> int:
         return 1
     log(f">> Found {len(source_urls)} enabled source URLs")
     with tempfile.TemporaryDirectory(prefix="filter-lists-") as temp_dir:
-        files, source_stats = collect_sources(source_urls, Path(temp_dir), started, WORKERS, log, total_timeout=config.total_timeout_seconds, max_include_depth=config.max_include_depth, max_download_bytes=config.max_download_bytes)
+        files, source_stats = collect_sources(source_urls, Path(temp_dir), started, WORKERS, log, total_timeout=config.total_timeout_seconds, max_include_depth=config.max_include_depth, max_download_bytes=config.max_download_bytes, max_total_download_bytes=config.max_total_download_bytes, max_total_sources=config.max_total_sources)
         source_stats["required"] = [s.url for s in config.sources if s.required]
-        failed_urls = {x["url"] for x in source_stats.get("results", []) if x.get("status") == "failed"}
-        source_stats["required_failed"] = [u for u in source_stats["required"] if u in failed_urls]
-        source_stats["success_ratio"] = round(source_stats["successful"] / source_stats["requested"], 4) if source_stats["requested"] else 0.0
+        failed_root_urls = {x["url"] for x in source_stats.get("results", []) if x.get("status") == "failed" and x.get("depth") == 0}
+        source_stats["required_failed"] = [u for u in source_stats["required"] if u in failed_root_urls]
+        source_stats["success_ratio"] = round(source_stats["root_successful"] / source_stats["root_requested"], 4) if source_stats["root_requested"] else 0.0
+        source_stats["health_basis"] = "root sources only; nested !#include sources are reported separately"
         source_stats["health_threshold"] = config.minimum_success_ratio
-        unhealthy = ((config.fail_if_zero_sources and source_stats["successful"] == 0) or source_stats["success_ratio"] < config.minimum_success_ratio or bool(source_stats["required_failed"]))
+        unhealthy = ((config.fail_if_zero_sources and source_stats["root_successful"] == 0) or source_stats["success_ratio"] < config.minimum_success_ratio or bool(source_stats["required_failed"]) or source_stats.get("source_limit_reached") or source_stats.get("timed_out"))
         if unhealthy:
-            log(f"[ERROR] Source health failed: {source_stats['successful']}/{source_stats['requested']} ({source_stats['success_ratio']:.1%})")
+            log(f"[ERROR] Source health failed: {source_stats['root_successful']}/{source_stats['root_requested']} root sources ({source_stats['success_ratio']:.1%})")
             if source_stats["required_failed"]:
                 log(f"[ERROR] Required sources failed: {len(source_stats['required_failed'])}")
             stats = {"input_lines": 0, "accepted_lines": 0, "rejected_lines": 0, "duplicate_lines": 0, "unique_rules": 0, "rejection_reasons": {}}
             write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=config_fingerprint(config))
             return 1
-        rules, rule_stats = analyze_files(files, CUSTOM_RULES)
-        build_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(sorted(rules, key=str.casefold))).encode()).hexdigest()
+        rules, rule_stats = analyze_files(files, CUSTOM_RULES, max_rule_length=config.max_rule_length)
+        build_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(sorted(rules, key=lambda x: (x.casefold(), x)))).encode()).hexdigest()
         write_output(rules, build_id)
         write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id)
     return 0

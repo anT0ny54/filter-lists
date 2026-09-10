@@ -9,13 +9,14 @@ from __future__ import annotations
 import re
 from collections import Counter
 
+from config import load_policy_limits
 from parser import classify
 from policy import (
     INVERSE_OPTIONS, REWRITE_RESOURCES, SIMPLE_OPTIONS, TYPE_OPTIONS,
     VALUE_OPTIONS,
 )
 
-MAX_RULE_LENGTH = 100_000
+MAX_RULE_LENGTH = load_policy_limits()[0]
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 DOMAIN_RE = re.compile(
     r"^~?(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+"
@@ -156,15 +157,16 @@ def normalize_cosmetic(rule: str) -> str | None:
         items = [x.strip() for x in domains.split(",")]
         if any(not x or not DOMAIN_RE.fullmatch(x) for x in items):
             return None
-        domains = ",".join(sorted(set(items), key=str.casefold))
+        domains = ",".join(sorted(set(items), key=lambda x: (x.casefold(), x)))
     if "+js(" in body.lower() or ":has-text(" in body.lower():
         return None
     return f"{domains}{separator}{body}"
 
 
-def normalize_rule(raw: str) -> str | None:
+def normalize_rule(raw: str, *, max_rule_length: int | None = None) -> str | None:
     line = raw.strip().lstrip("\ufeff")
-    if not line or len(line) > MAX_RULE_LENGTH:
+    limit = MAX_RULE_LENGTH if max_rule_length is None else max_rule_length
+    if not line or len(line) > limit:
         return None
     classification = classify(line)
     if classification.kind in {"comment", "directive", "blank", "invalid"}:
@@ -181,7 +183,7 @@ def normalize_rule(raw: str) -> str | None:
     return normalize_network(line)
 
 
-def rejection_reason(raw: str) -> str:
+def rejection_reason(raw: str, *, max_rule_length: int | None = None) -> str:
     line = raw.strip().lstrip("\ufeff")
     if not line:
         return "blank"
@@ -190,7 +192,8 @@ def rejection_reason(raw: str) -> str:
         return c.reason
     if c.kind in {"comment", "directive"}:
         return c.kind
-    if len(line) > MAX_RULE_LENGTH:
+    limit = MAX_RULE_LENGTH if max_rule_length is None else max_rule_length
+    if len(line) > limit:
         return "rule-too-long"
     if "#?@#" in line or "+js(" in line.lower() or ":has-text(" in line.lower():
         return "ubo-only-syntax"
