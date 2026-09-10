@@ -141,6 +141,7 @@ def load_config() -> BuildConfig:
         "max_rule_count_change_ratio": rule_change,
         "max_rejection_rate_change": rejection_change,
         "min_lines": _positive_int(anomaly.get("min_lines", 100), "anomaly_detection.min_lines"),
+        "fail_on_warning": _strict_bool(anomaly.get("fail_on_warning", False), "policies.yaml: anomaly_detection.fail_on_warning"),
     }
     return BuildConfig(
         tuple(sources),

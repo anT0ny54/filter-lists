@@ -12,10 +12,12 @@ ROOT = SCRIPT_DIR.parent
 sys.path.insert(0, str(SCRIPT_DIR))
 from config import load_config  # noqa: E402
 from normalize import normalize_rule  # noqa: E402
+from report import BUILDER_VERSION  # noqa: E402
 
 TOTAL_RE = re.compile(r"^! Total rules: ([0-9]+)$")
 BUILD_RE = re.compile(r"^! Build-ID: ([0-9a-f]{64})$")
-VERSION_RE = re.compile(r"^! Version: v7\.2\.0-[0-9a-f]{12}$")
+SOURCE_MANIFEST_RE = re.compile(r"^! Source manifest SHA-256: ([0-9a-f]{64})$")
+VERSION_RE = re.compile(r"^! Version: v" + re.escape(BUILDER_VERSION) + r"-[0-9a-f]{12}$")
 
 
 def config_fingerprint(config) -> str:
@@ -44,6 +46,7 @@ def main() -> int:
     errors: list[str] = []
     declared_total = None
     declared_build_id = None
+    declared_source_manifest = None
     version_ok = False
 
     for number, raw in enumerate(path.read_text(encoding="utf-8", errors="strict").splitlines(), 1):
@@ -52,6 +55,9 @@ def main() -> int:
             continue
         if m := BUILD_RE.match(raw):
             declared_build_id = m.group(1)
+            continue
+        if m := SOURCE_MANIFEST_RE.match(raw):
+            declared_source_manifest = m.group(1)
             continue
         if raw.startswith("! Version:"):
             version_ok = bool(VERSION_RE.match(raw))
@@ -81,6 +87,14 @@ def main() -> int:
         actual_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(sorted(seen, key=lambda x: (x.casefold(), x)))).encode()).hexdigest()
         if actual_id != declared_build_id:
             errors.append("[BUILD-ID] does not match configuration and normalized rules")
+    if declared_source_manifest is None:
+        errors.append("[PROVENANCE] source manifest SHA-256 missing or invalid")
+    else:
+        manifest = hashlib.sha256()
+        for source in config.sources:
+            manifest.update(f"{source.name}\0{source.url}\0{source.category}\0{source.priority}\0{source.required}\n".encode())
+        if manifest.hexdigest() != declared_source_manifest:
+            errors.append("[PROVENANCE] source manifest hash does not match sources.yaml")
     if not version_ok:
         errors.append("[VERSION] missing or invalid")
 

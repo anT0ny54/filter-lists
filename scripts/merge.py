@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Filter-Lists V7.1 deterministic build orchestrator."""
+"""Filter-Lists V7.4 deterministic build orchestrator."""
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import shutil
 import sys
@@ -15,7 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 CUSTOM_RULES = ROOT / "custom-rules.txt"
 OUTPUT = ROOT / "filters.txt"
 REPORT = ROOT / "reports" / "latest.json"
-BUILDER_VERSION = "7.2.0"
+BUILDER_VERSION = "7.4.0"
+HISTORY_DIR = ROOT / "reports" / "history"
 SOURCES_TXT = ROOT / "sources.txt"
 WORKERS = min(16, max(4, (os.cpu_count() or 2) * 2))
 
@@ -48,6 +50,38 @@ def config_fingerprint(config) -> str:
     return h.hexdigest()
 
 
+def source_manifest_sha256(config) -> str:
+    h = hashlib.sha256()
+    for source in config.sources:
+        h.update(f"{source.name}\0{source.url}\0{source.category}\0{source.priority}\0{source.required}\n".encode())
+    return h.hexdigest()
+
+
+def load_previous_report() -> dict | None:
+    candidates = []
+    if REPORT.is_file():
+        candidates.append(REPORT)
+    candidates.extend(sorted(HISTORY_DIR.glob("*.json"), reverse=True))
+    for path in candidates:
+        try:
+            data = __import__("json").loads(path.read_text(encoding="utf-8"))
+            if data.get("status", "success") == "success":
+                return data
+        except (OSError, ValueError):
+            continue
+    return None
+
+
+def archive_successful_report(build_id: str) -> None:
+    """Archive one successful build identity exactly once."""
+    if not REPORT.is_file():
+        return
+    HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+    target = HISTORY_DIR / f"build-{build_id}.json"
+    if not target.exists():
+        shutil.copy2(REPORT, target)
+
+
 def sync_legacy_sources(config) -> None:
     """Keep sources.txt as a generated compatibility mirror, never as input."""
     text = "# Generated compatibility mirror of sources.yaml. Do not edit directly.\n"
@@ -57,7 +91,7 @@ def sync_legacy_sources(config) -> None:
         SOURCES_TXT.write_text(text, encoding="utf-8", newline="\n")
 
 
-def write_output(rules: set[str], build_id: str) -> None:
+def write_output(rules: set[str], build_id: str, *, source_manifest_sha256: str, source_count: int) -> None:
     final_rules = sorted(rules, key=lambda x: (x.casefold(), x))
     now = datetime.now(timezone.utc)
     header = [
@@ -68,6 +102,8 @@ def write_output(rules: set[str], build_id: str) -> None:
         "! Homepage: https://github.com/anT0ny54/filter-lists",
         "! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE",
         f"! Build-ID: {build_id}",
+        f"! Source manifest SHA-256: {source_manifest_sha256}",
+        f"! Root sources: {source_count}",
         f"! Total rules: {len(final_rules)}",
         "!",
         "! Format: Strict Adblock Plus-compatible syntax",
@@ -91,13 +127,7 @@ def write_output(rules: set[str], build_id: str) -> None:
 
 def main() -> int:
     started = time.monotonic()
-    previous_report = None
-    if REPORT.is_file():
-        try:
-            import json
-            previous_report = json.loads(REPORT.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            previous_report = None
+    previous_report = load_previous_report()
     if shutil.which("curl") is None:
         log("[ERROR] curl is required")
         return 1
@@ -115,6 +145,8 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="filter-lists-") as temp_dir:
         files, source_stats = collect_sources(source_urls, Path(temp_dir), started, WORKERS, log, total_timeout=config.total_timeout_seconds, max_include_depth=config.max_include_depth, max_download_bytes=config.max_download_bytes, max_total_download_bytes=config.max_total_download_bytes, max_total_sources=config.max_total_sources)
         source_stats["required"] = [s.url for s in config.sources if s.required]
+        source_metadata = {s.url: {"name": s.name, "category": s.category, "priority": s.priority, "required": s.required} for s in config.sources}
+        provenance = {"source_manifest_sha256": source_manifest_sha256(config), "source_registry": "sources.yaml", "source_registry_sha256": hashlib.sha256((ROOT / "sources.yaml").read_bytes()).hexdigest(), "builder": f"Filter-Lists v{BUILDER_VERSION}", "policy_sha256": hashlib.sha256((ROOT / "policies.yaml").read_bytes()).hexdigest()}
         failed_root_urls = {x["url"] for x in source_stats.get("results", []) if x.get("status") == "failed" and x.get("depth") == 0}
         source_stats["required_failed"] = [u for u in source_stats["required"] if u in failed_root_urls]
         source_stats["success_ratio"] = round(source_stats["root_successful"] / source_stats["root_requested"], 4) if source_stats["root_requested"] else 0.0
@@ -133,7 +165,7 @@ def main() -> int:
             if source_stats.get("source_limit_reached"):
                 log("[ERROR] Global source traversal limit was reached before all queued sources completed")
             stats = {"input_lines": 0, "accepted_lines": 0, "rejected_lines": 0, "duplicate_lines": 0, "unique_rules": 0, "rejection_reasons": {}}
-            write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=config_fingerprint(config), previous_report=previous_report, anomaly_policy=config.anomaly_detection)
+            write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=config_fingerprint(config), previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="failed")
             return 1
         rules, rule_stats = analyze_files(files, CUSTOM_RULES, max_rule_length=config.max_rule_length)
         by_path = {item.get("path"): item for item in rule_stats.get("per_file", [])}
@@ -143,8 +175,15 @@ def main() -> int:
                 item.update({k: v for k, v in detail.items() if k != "path"})
         source_stats["content_hash_algorithm"] = "sha256"
         build_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(sorted(rules, key=lambda x: (x.casefold(), x)))).encode()).hexdigest()
-        write_output(rules, build_id)
-        write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id, previous_report=previous_report, anomaly_policy=config.anomaly_detection)
+        write_output(rules, build_id, source_manifest_sha256=provenance["source_manifest_sha256"], source_count=len(source_urls))
+        write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="success")
+        data = json.loads(REPORT.read_text(encoding="utf-8"))
+        if data.get("anomalies", {}).get("enforced_failure", False):
+            data["status"] = "failed"
+            REPORT.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            log("[ERROR] Anomaly policy rejected this build")
+            return 1
+        archive_successful_report(build_id)
     return 0
 
 

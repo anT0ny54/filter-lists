@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compatibility policy for the Filter-Lists v6 build.
+"""Compatibility policy for the Filter-Lists v7.4 build.
 
 The existing strict ABP policy is intentionally preserved. This module makes
 that policy explicit and reusable without changing the accepted rule profile.
