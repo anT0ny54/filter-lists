@@ -66,3 +66,42 @@ class FetchTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+class FetchBudgetWaveTests(unittest.TestCase):
+    setUpClass = FetchTests.setUpClass
+    tearDownClass = FetchTests.tearDownClass
+
+    def test_global_budget_queues_sources_instead_of_marking_them_failed(self):
+        urls = [FetchTests.base + "/main.txt"] * 11
+        # Use unique paths that all resolve to the same fixture, while the
+        # global budget allows only two 1-byte-sized reservations at once.
+        urls = [FetchTests.base + f"/child.txt?source={i}" for i in range(5)]
+        started = __import__("time").monotonic()
+        with tempfile.TemporaryDirectory() as tmp:
+            files, stats = collect_sources(
+                urls, Path(tmp), started, 8, lambda _: None,
+                total_timeout=30,
+                max_include_depth=0,
+                max_download_bytes=64,
+                max_total_download_bytes=256,
+                max_total_sources=20,
+            )
+        self.assertEqual(stats["root_requested"], 5)
+        self.assertEqual(stats["root_successful"], 5)
+        self.assertEqual(stats["root_failed"], 0)
+        self.assertEqual(len(files), 5)
+        self.assertLessEqual(stats["total_download_bytes"], 256)
+
+    def test_budget_parallelism_is_bounded_by_global_budget(self):
+        started = __import__("time").monotonic()
+        with tempfile.TemporaryDirectory() as tmp:
+            _, stats = collect_sources(
+                [FetchTests.base + "/child.txt"], Path(tmp), started, 32, lambda _: None,
+                total_timeout=30,
+                max_include_depth=0,
+                max_download_bytes=50,
+                max_total_download_bytes=500,
+                max_total_sources=10,
+            )
+        self.assertEqual(stats["max_parallel_by_budget"], 10)
+        self.assertEqual(stats["parallelism"], 10)
