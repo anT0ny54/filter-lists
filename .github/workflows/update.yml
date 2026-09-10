@@ -1,4 +1,4 @@
-name: Update Filter List V7.4.0
+name: Update Filter List V7.5.0
 
 on:
   schedule:
@@ -76,7 +76,7 @@ jobs:
           from pathlib import Path
           data = json.loads(Path("reports/latest.json").read_text())
           assert data["schema"] == 5
-          assert data["builder"] == "Filter-Lists v7.4.0"
+          assert data["builder"] == "Filter-Lists v7.5.0"
           assert data["rules"]["unique_rules"] > 0
           assert data["sources"]["success_ratio"] >= data["sources"]["health_threshold"]
           assert not data["sources"]["required_failed"]
@@ -101,5 +101,5 @@ jobs:
             exit 0
           fi
           rules="$(sed -n 's/^! Total rules: //p' filters.txt)"
-          git commit -m "chore(filters): auto-update V7.4.0 filter list (${rules} rules) [skip ci]"
+          git commit -m "chore(filters): auto-update V7.5.0 filter list (${rules} rules) [skip ci]"
           git push origin "HEAD:${GITHUB_REF_NAME}"
