@@ -1,3 +1,13 @@
+## v7.1.1 — Source-health and retry hardening
+
+- Fixed the V7.1 global-budget scheduling bug that falsely counted queued root sources as failures when the worker pool exceeded the safe byte reservation capacity.
+- Process downloads in budget-safe waves sized from the remaining global byte budget.
+- Added bounded curl retries for transient transport/HTTP failures, with Retry-After support left to curl's retry handling and no blanket retry of permanent HTTP errors.
+- Made fetch timeouts deadline-aware across retries.
+- Added explicit root-source failure diagnostics to CI output.
+- Added regression tests for budget-safe queueing and parallelism limits.
+- Kept the strict ABP-compatible syntax gate unchanged and non-negotiable.
+
 # Changelog
 
 ## v7.1 — Strict ABP hardening

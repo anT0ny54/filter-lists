@@ -1,4 +1,4 @@
-# 🚀 Filter-Lists v7.1
+# 🚀 Filter-Lists v7.1.1
 
 **A compatibility-first, deterministic filter-list compiler** that fetches trusted sources, resolves bounded `!#include` graphs, canonicalizes rules, applies a strict ABP-compatible policy, validates the generated list, and publishes reproducible build metadata.
 
@@ -42,20 +42,20 @@ sources.yaml                 # authoritative source registry
  filters.txt + reports/latest.json + generated sources.txt
 ```
 
-## 🔐 V7.1 hardening
+## 🔐 V7.1.1 hardening
 
-V7 preserves the established behavior while fixing the previous P0–P3 issues:
+V7.1.1 preserves the established strict-ABP behavior while fixing the previous P0–P3 issues:
 
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`; Python modules no longer maintain independent copies of those limits.
 - **Correct source health:** the health ratio is calculated from **root sources only**. Nested `!#include` sources are reported separately and cannot artificially inflate the health ratio.
 - **Required-source correctness:** required-source failures are evaluated only against configured root sources.
 - **Global include protection:** bounded total source traversal prevents pathological include graphs even when individual include depth is valid.
-- **Global download budget:** concurrent downloads reserve their per-file maximum before starting, preventing the worker pool from overshooting the build-wide byte budget.
+- **Global download budget:** downloads are processed in budget-safe waves. Queued sources are not counted as failures, and each new wave is sized from the remaining byte budget.
 - **URL canonicalization:** include-cycle detection normalizes scheme/host/path and removes fragments.
-- **Deadline-aware fetching:** each download receives only the remaining build deadline, and timeout/limit failures are fatal.
+- **Deadline-aware fetching:** each download receives only the remaining build deadline, and timeout/limit failures are fatal. Retry attempts are bounded and transient HTTP/connection failures are retried without retrying permanent 4xx failures.
 - **Full Build-ID validation:** `validate.py` recomputes the build hash from the active configuration and normalized rules.
 - **Strict ABP grammar gate:** network filters reject interior `|`, whitespace/control characters, malformed regex envelopes, duplicate/unknown options, and non-ABP procedural syntax.
-- **Integration coverage:** tests exercise fetching, nested includes, source-health accounting, global limits, strict ABP normalization, and the rule-analysis pipeline.
+- **Source-health diagnostics:** failed root URLs and exact fetch/validation reasons are printed when the health gate fails.
 - **Action pinning:** GitHub Actions are pinned to immutable commit SHAs rather than floating tags.
 - **Generated-source hygiene:** `sources.txt` is generated from `sources.yaml` and no longer triggers its own update workflow.
 - **Historical build deltas:** the report format is prepared for deterministic operational comparisons.
