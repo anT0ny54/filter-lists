@@ -1,4 +1,4 @@
-# 🚀 Filter-Lists v7.5.1
+# 🚀 Filter-Lists v7.5.2
 
 **A compatibility-first, deterministic filter-list compiler** that fetches trusted sources, resolves bounded `!#include` graphs, canonicalizes rules, applies a strict ABP-compatible policy, validates the generated list, and publishes reproducible build metadata.
 
@@ -30,7 +30,7 @@ The generated list targets a **strict Adblock Plus-compatible syntax profile**. 
 
 The goal is **syntax compatibility first, not maximum engine-specific filtering power**. A downstream blocker may support additional features, but this project will not emit those non-ABP extensions.
 
-## 🏗️ V7.5.1 architecture
+## 🏗️ V7.5.2 architecture
 
 ```text
 sources.yaml                 # authoritative source registry
@@ -58,9 +58,9 @@ sources.yaml                 # authoritative source registry
  filters.txt + reports/latest.json + generated sources.txt
 ```
 
-## 🔐 V7.5.1 hardening
+## 🔐 V7.5.2 hardening
 
-V7.5.1 preserves the established strict-ABP behavior while fixing the previous issues:
+V7.5.2 preserves the established strict-ABP behavior while fixing the previous issues:
 
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`; Python modules no longer maintain independent copies of those limits.
 - **Correct source health:** the health ratio is calculated from **root sources only**. Nested `!#include` sources are reported separately and cannot artificially inflate the health ratio.
@@ -89,7 +89,7 @@ anomaly_detection:
   fail_on_warning: true
 ```
 
-Successful builds are archived under `reports/history/`. Failed builds remain in `reports/latest.json` for diagnostics but are excluded from future anomaly baselines.
+Successful builds are archived under `reports/history/`, with the oldest reports automatically pruned to the configured `history.retention` (default 10). Failed builds remain in `reports/latest.json` for diagnostics but are excluded from future anomaly baselines.
 
 ## 📊 Build reporting
 

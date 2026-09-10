@@ -23,6 +23,11 @@ limits:
   max_total_download_bytes: 524288000
   max_total_sources: 500
   total_timeout_seconds: 1800
+history:
+  # Successful reports retained under reports/history/.
+  # Retention is chronological by generated_at, never by build-id filename.
+  retention: 10
+
 source_health:
   minimum_success_ratio: 0.80
   fail_if_zero_sources: true
