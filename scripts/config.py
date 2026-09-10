@@ -56,6 +56,7 @@ class BuildConfig:
     max_total_download_bytes: int
     max_total_sources: int
     total_timeout_seconds: int
+    anomaly_detection: dict
 
 
 def _positive_int(value: object, name: str) -> int:
@@ -125,6 +126,22 @@ def load_config() -> BuildConfig:
         raise ValueError("policies.yaml: minimum_success_ratio must be between 0 and 1")
 
     max_rule_length, max_include_depth, max_download_bytes, max_total_download_bytes, max_total_sources, total_timeout = load_policy_limits()
+    anomaly = policy.get("anomaly_detection", {})
+    if not isinstance(anomaly, dict):
+        raise ValueError("policies.yaml: anomaly_detection must be an object")
+    anomaly_enabled = _strict_bool(anomaly.get("enabled", True), "policies.yaml: anomaly_detection.enabled")
+    byte_change = float(anomaly.get("max_bytes_change_ratio", 0.75))
+    rule_change = float(anomaly.get("max_rule_count_change_ratio", 0.75))
+    rejection_change = float(anomaly.get("max_rejection_rate_change", 0.25))
+    if not 0 <= byte_change <= 10 or not 0 <= rule_change <= 10 or not 0 <= rejection_change <= 1:
+        raise ValueError("policies.yaml: invalid anomaly thresholds")
+    anomaly_config = {
+        "enabled": anomaly_enabled,
+        "max_bytes_change_ratio": byte_change,
+        "max_rule_count_change_ratio": rule_change,
+        "max_rejection_rate_change": rejection_change,
+        "min_lines": _positive_int(anomaly.get("min_lines", 100), "anomaly_detection.min_lines"),
+    }
     return BuildConfig(
         tuple(sources),
         ratio,
@@ -135,6 +152,7 @@ def load_config() -> BuildConfig:
         max_total_download_bytes,
         max_total_sources,
         total_timeout,
+        anomaly_config,
     )
 
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import concurrent.futures
+import hashlib
 import re
 import subprocess
 import time
@@ -46,7 +47,7 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
         "--retry-max-time", str(timeout),
         "--connect-timeout", str(connect_timeout), "--max-time", str(timeout),
         "--max-filesize", str(max_download_bytes),
-        "--user-agent", "filter-lists-builder/7.1.1", "--output", str(output), url,
+        "--user-agent", "filter-lists-builder/7.2.0", "--output", str(output), url,
     ]
     try:
         proc = subprocess.run(command, text=True, capture_output=True, timeout=timeout + 5)
@@ -57,6 +58,14 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
         output.unlink(missing_ok=True)
         return False, proc.stderr.strip() or f"curl exit {proc.returncode}"
     return True, ""
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def validate_download(path: Path, max_bytes: int) -> tuple[bool, str]:
@@ -204,7 +213,7 @@ def collect_sources(
                         stats["total_download_bytes"] += size
                         if depth == 0:
                             stats["root_successful"] += 1
-                        stats["results"].append({"url": url, "depth": depth, "status": "ok", "bytes": size})
+                        stats["results"].append({"url": url, "depth": depth, "status": "ok", "bytes": size, "sha256": sha256_file(target), "path": str(target)})
                         log(f"   [OK] {url[:110]}")
                         if depth < max_include_depth:
                             children = include_urls(target, url)
@@ -216,7 +225,7 @@ def collect_sources(
                         if depth == 0:
                             stats["root_failed"] += 1
                         reason = error or "invalid response"
-                        stats["results"].append({"url": url, "depth": depth, "status": "failed", "reason": reason})
+                        stats["results"].append({"url": url, "depth": depth, "status": "failed", "reason": reason, "bytes": size, "path": str(target)})
                         if len(stats["failures"]) < 100:
                             stats["failures"].append({"url": url, "reason": reason, "depth": depth})
                         target.unlink(missing_ok=True)

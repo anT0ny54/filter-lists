@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CUSTOM_RULES = ROOT / "custom-rules.txt"
 OUTPUT = ROOT / "filters.txt"
 REPORT = ROOT / "reports" / "latest.json"
+BUILDER_VERSION = "7.2.0"
 SOURCES_TXT = ROOT / "sources.txt"
 WORKERS = min(16, max(4, (os.cpu_count() or 2) * 2))
 
@@ -61,7 +62,7 @@ def write_output(rules: set[str], build_id: str) -> None:
     now = datetime.now(timezone.utc)
     header = [
         "! Title: Combined Adblock Plus Filter List",
-        f"! Version: v7.1.1-{build_id[:12]}",
+        f"! Version: v{BUILDER_VERSION}-{build_id[:12]}",
         f"! Last updated: {now:%Y-%m-%d %H:%M:%S UTC}",
         "! Expires: 1 day",
         "! Homepage: https://github.com/anT0ny54/filter-lists",
@@ -71,6 +72,7 @@ def write_output(rules: set[str], build_id: str) -> None:
         "!",
         "! Format: Strict Adblock Plus-compatible syntax",
         "! Profile: Strict Adblock Plus-compatible syntax; uBlock/AdGuard-only rules are excluded.",
+        "! Diagnostics: per-source hashes/statistics and anomaly detection are recorded in reports/latest.json.",
         "! Auto-generated. Do not edit directly.",
         "! Edit sources.yaml and rebuild.",
         "!",
@@ -89,6 +91,13 @@ def write_output(rules: set[str], build_id: str) -> None:
 
 def main() -> int:
     started = time.monotonic()
+    previous_report = None
+    if REPORT.is_file():
+        try:
+            import json
+            previous_report = json.loads(REPORT.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            previous_report = None
     if shutil.which("curl") is None:
         log("[ERROR] curl is required")
         return 1
@@ -124,12 +133,18 @@ def main() -> int:
             if source_stats.get("source_limit_reached"):
                 log("[ERROR] Global source traversal limit was reached before all queued sources completed")
             stats = {"input_lines": 0, "accepted_lines": 0, "rejected_lines": 0, "duplicate_lines": 0, "unique_rules": 0, "rejection_reasons": {}}
-            write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=config_fingerprint(config))
+            write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=config_fingerprint(config), previous_report=previous_report, anomaly_policy=config.anomaly_detection)
             return 1
         rules, rule_stats = analyze_files(files, CUSTOM_RULES, max_rule_length=config.max_rule_length)
+        by_path = {item.get("path"): item for item in rule_stats.get("per_file", [])}
+        for item in source_stats.get("results", []):
+            detail = by_path.get(item.get("path"))
+            if detail:
+                item.update({k: v for k, v in detail.items() if k != "path"})
+        source_stats["content_hash_algorithm"] = "sha256"
         build_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(sorted(rules, key=lambda x: (x.casefold(), x)))).encode()).hexdigest()
         write_output(rules, build_id)
-        write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id)
+        write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id, previous_report=previous_report, anomaly_policy=config.anomaly_detection)
     return 0
 
 
