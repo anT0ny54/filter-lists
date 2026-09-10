@@ -1,4 +1,4 @@
-name: Update Filter List V6.6
+name: Update Filter List V7.0
 
 on:
   schedule:
@@ -8,7 +8,6 @@ on:
     branches: [main]
     paths:
       - "sources.yaml"
-      - "sources.txt"
       - "custom-rules.txt"
       - "policies.yaml"
       - "scripts/**"
@@ -31,12 +30,12 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
           cache: pip
@@ -61,7 +60,7 @@ jobs:
           test -s reports/latest.json
           grep -q '^! Total rules: [1-9][0-9]*$' filters.txt
 
-      - name: Strict V6 validation
+      - name: Strict V7 validation
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -70,9 +69,14 @@ jobs:
           import json
           from pathlib import Path
           data = json.loads(Path("reports/latest.json").read_text())
+          assert data["schema"] == 3
+          assert data["builder"] == "Filter-Lists v7.0"
           assert data["rules"]["unique_rules"] > 0
           assert data["sources"]["success_ratio"] >= data["sources"]["health_threshold"]
           assert not data["sources"]["required_failed"]
+          assert not data["sources"]["timed_out"]
+          assert not data["sources"]["source_limit_reached"]
+          assert data["sources"]["total_download_bytes"] <= data["sources"]["max_total_download_bytes"]
           print(json.dumps(data, indent=2))
           PY
 
@@ -83,10 +87,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- filters.txt reports/latest.json sources.txt
-          if git diff --cached --quiet -- filters.txt reports/latest.json; then
+          if git diff --cached --quiet -- filters.txt reports/latest.json sources.txt; then
             echo "No generated changes"
             exit 0
           fi
           rules="$(sed -n 's/^! Total rules: //p' filters.txt)"
-          git commit -m "chore(filters): auto-update V6.6 filter list (${rules} rules) [skip ci]"
+          git commit -m "chore(filters): auto-update V7.0 filter list (${rules} rules) [skip ci]"
           git push origin "HEAD:${GITHUB_REF_NAME}"
