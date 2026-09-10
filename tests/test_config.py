@@ -33,6 +33,11 @@ class ConfigTests(unittest.TestCase):
         cfg = load_config()
         self.assertGreaterEqual(sum(s.required for s in cfg.sources), 2)
 
+    def test_anomaly_detection_policy_is_loaded(self):
+        cfg = load_config()
+        self.assertTrue(cfg.anomaly_detection["enabled"])
+        self.assertEqual(cfg.anomaly_detection["min_lines"], 100)
+
     def test_source_booleans_are_real_yaml_booleans(self):
         cfg = load_config()
         self.assertTrue(all(isinstance(s.enabled, bool) for s in cfg.sources))

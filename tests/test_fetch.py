@@ -49,6 +49,7 @@ class FetchTests(unittest.TestCase):
         self.assertEqual(stats["root_successful"], 1)
         self.assertEqual(stats["included_successful"], 1)
         self.assertEqual(stats["successful"], 2)
+        self.assertTrue(all(len(item["sha256"]) == 64 for item in stats["results"]))
 
     def test_global_source_limit_stops_include_explosion(self):
         started = __import__("time").monotonic()
