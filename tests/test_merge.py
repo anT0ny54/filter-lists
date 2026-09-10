@@ -187,6 +187,30 @@ class MergeMainE2ETests(unittest.TestCase):
             with patch.object(merge, "write_report", side_effect=writer):
                 return merge.main()
 
+    def test_history_retention_keeps_newest_reports_by_generated_at(self):
+        merge.REPORT.parent.mkdir(parents=True, exist_ok=True)
+        merge.HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+        for index in range(12):
+            path = merge.HISTORY_DIR / f"build-old-{index}.json"
+            path.write_text(json.dumps({
+                "status": "success",
+                "generated_at": f"2026-09-10T00:{index:02d}:00+00:00",
+                "build_id": f"old-{index}",
+            }), encoding="utf-8")
+        merge.REPORT.write_text(json.dumps({
+            "status": "success",
+            "generated_at": "2026-09-10T12:00:00+00:00",
+            "build_id": "new-build",
+        }), encoding="utf-8")
+
+        merge.archive_successful_report("new-build", retention=10)
+
+        kept = sorted(p.name for p in merge.HISTORY_DIR.glob("*.json"))
+        self.assertEqual(len(kept), 10)
+        self.assertIn("build-new-build.json", kept)
+        self.assertNotIn("build-old-0.json", kept)
+        self.assertNotIn("build-old-1.json", kept)
+
     def test_main_success_writes_output_report_and_history(self):
         self.assertEqual(self._run(), 0)
         self.assertTrue(merge.OUTPUT.is_file())
