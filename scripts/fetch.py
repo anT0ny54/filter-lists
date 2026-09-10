@@ -12,7 +12,7 @@ from urllib.parse import urljoin, urlsplit, urlunsplit
 
 DOWNLOAD_TIMEOUT = 90
 INCLUDE_TIMEOUT = 60
-CURL_RETRIES = 3
+CURL_RETRIES = 5
 HTML_RE = re.compile(r"^\s*(?:<!doctype\b|<html\b|<head\b|<body\b)", re.I)
 
 
@@ -31,15 +31,25 @@ def valid_url(url: str) -> bool:
 
 
 def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> tuple[bool, str]:
+    """Download one source with bounded, transient-error-aware curl retries.
+
+    curl handles retryable HTTP responses (including 429/5xx) and transport
+    failures, and honors Retry-After when supplied by the server.  We avoid
+    --retry-all-errors so permanent HTTP failures such as 404 are not retried
+    unnecessarily.
+    """
+    timeout = max(1, int(timeout))
+    connect_timeout = min(20, timeout)
     command = [
         "curl", "--fail", "--silent", "--show-error", "--location", "--compressed",
-        "--retry", str(CURL_RETRIES), "--retry-delay", "2",
-        "--connect-timeout", "20", "--max-time", str(timeout),
+        "--retry", str(CURL_RETRIES), "--retry-connrefused",
+        "--retry-max-time", str(timeout),
+        "--connect-timeout", str(connect_timeout), "--max-time", str(timeout),
         "--max-filesize", str(max_download_bytes),
-        "--user-agent", "filter-lists-builder/7.0", "--output", str(output), url,
+        "--user-agent", "filter-lists-builder/7.1.1", "--output", str(output), url,
     ]
     try:
-        proc = subprocess.run(command, text=True, capture_output=True, timeout=timeout + 30)
+        proc = subprocess.run(command, text=True, capture_output=True, timeout=timeout + 5)
     except (OSError, subprocess.TimeoutExpired) as exc:
         output.unlink(missing_ok=True)
         return False, str(exc)
@@ -100,9 +110,18 @@ def collect_sources(
     visited: set[str] = set()
     current = [(canonical_url(url), 0) for url in source_urls]
     sequence = 0
-    budget_lock = threading.Lock()
-    reserved_bytes = 0
     deadline = started + total_timeout
+
+    # A source is allowed to consume at most max_download_bytes.  Bound the
+    # number of simultaneous downloads so that the *reserved* worst-case
+    # bytes can never exceed the global budget.  Sources waiting for a slot
+    # are queued, not counted as failures.  This fixes the V7.1 bug where a
+    # 500 MiB global budget + 50 MiB per-source limit caused only 10 of 33
+    # root sources to be submitted and the remaining 23 to be falsely marked
+    # failed.
+    per_source_limit = min(max_download_bytes, max_total_download_bytes)
+    max_parallel_by_budget = max(1, max_total_download_bytes // per_source_limit)
+    parallelism = max(1, min(int(workers), max_parallel_by_budget))
 
     stats = {
         "requested": len(source_urls),
@@ -116,6 +135,8 @@ def collect_sources(
         "total_download_bytes": 0,
         "max_total_download_bytes": max_total_download_bytes,
         "max_total_sources": max_total_sources,
+        "max_parallel_by_budget": max_parallel_by_budget,
+        "parallelism": parallelism,
         "failures": [],
         "results": [],
     }
@@ -132,71 +153,75 @@ def collect_sources(
         if not batch:
             break
 
-        log(f">> Download batch: {len(batch)} URL(s), workers={workers}")
+        log(f">> Download batch: {len(batch)} URL(s), workers={parallelism}")
         next_batch: list[tuple[str, int]] = []
-        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
-            futures = {}
-            immediate_failures = []
-            for url, depth in batch:
-                target = tmp / f"source-{sequence:06d}.txt"
-                sequence += 1
-                timeout = min(INCLUDE_TIMEOUT if depth else DOWNLOAD_TIMEOUT, max(1, int(deadline - time.monotonic())))
-                with budget_lock:
-                    if reserved_bytes + max_download_bytes > max_total_download_bytes:
-                        immediate_failures.append((url, depth, target, "global-download-budget-exceeded"))
-                        continue
-                    reserved_bytes += max_download_bytes
-                futures[pool.submit(download, url, target, timeout, max_download_bytes)] = (url, depth, target, None)
 
-            for url, depth, target, immediate_error in immediate_failures:
-                ok, error = False, immediate_error
-                target.unlink(missing_ok=True)
-                stats["failed"] += 1
-                if depth == 0:
-                    stats["root_failed"] += 1
-                stats["results"].append({"url": url, "depth": depth, "status": "failed", "reason": error})
-                if len(stats["failures"]) < 100:
-                    stats["failures"].append({"url": url, "reason": error, "depth": depth})
-                log(f"   [SKIP] {url[:110]} — {error}")
+        # Process the batch in budget-safe waves.  Each wave reserves the
+        # maximum possible bytes for every submitted source.  Once a wave
+        # finishes, the next wave is sized from the *remaining* global budget.
+        # This gives a real global upper bound without treating queued sources
+        # as failed.
+        wave_start = 0
+        while wave_start < len(batch):
+            if time.monotonic() >= deadline:
+                break
+            remaining_budget = max_total_download_bytes - stats["total_download_bytes"]
+            if remaining_budget <= 0:
+                log("   [STOP] Global download budget exhausted; remaining sources were not attempted")
+                break
+            wave_limit = min(per_source_limit, remaining_budget)
+            available_slots = max(1, remaining_budget // wave_limit)
+            wave_size = min(parallelism, available_slots, len(batch) - wave_start)
+            wave = batch[wave_start:wave_start + wave_size]
+            wave_start += wave_size
+            with concurrent.futures.ThreadPoolExecutor(max_workers=len(wave)) as pool:
+                futures = {}
+                for url, depth in wave:
+                    target = tmp / f"source-{sequence:06d}.txt"
+                    sequence += 1
+                    remaining = max(1, int(deadline - time.monotonic()))
+                    timeout = min(INCLUDE_TIMEOUT if depth else DOWNLOAD_TIMEOUT, remaining)
+                    futures[pool.submit(download, url, target, timeout, wave_limit)] = (url, depth, target, wave_limit)
 
-            pending = futures
-            for future in concurrent.futures.as_completed(pending):
-                url, depth, target, _ = pending[future]
-                try:
-                    ok, error = future.result()
-                except Exception as exc:
-                    ok, error = False, str(exc)
-                size = target.stat().st_size if target.exists() else 0
-                with budget_lock:
-                    reserved_bytes -= max_download_bytes
-                if ok:
-                    ok, validation_error = validate_download(target, max_download_bytes)
-                    error = validation_error or error
-                if ok and stats["total_download_bytes"] + size > max_total_download_bytes:
-                    ok = False
-                    error = "global-download-budget-exceeded"
-                if ok:
-                    files.append(target)
-                    stats["successful"] += 1
-                    stats["total_download_bytes"] += size
-                    if depth == 0:
-                        stats["root_successful"] += 1
-                    stats["results"].append({"url": url, "depth": depth, "status": "ok", "bytes": size})
-                    log(f"   [OK] {url[:110]}")
-                    if depth < max_include_depth:
-                        children = include_urls(target, url)
-                        stats["included"] += len(children)
-                        stats["included_requested"] += len(children)
-                        next_batch.extend((child, depth + 1) for child in children)
-                else:
-                    stats["failed"] += 1
-                    if depth == 0:
-                        stats["root_failed"] += 1
-                    stats["results"].append({"url": url, "depth": depth, "status": "failed", "reason": error or "invalid response"})
-                    if len(stats["failures"]) < 100:
-                        stats["failures"].append({"url": url, "reason": error or "invalid response", "depth": depth})
-                    target.unlink(missing_ok=True)
-                    log(f"   [SKIP] {url[:110]} — {error or 'invalid response'}")
+                for future in concurrent.futures.as_completed(futures):
+                    url, depth, target, wave_limit = futures[future]
+                    try:
+                        ok, error = future.result()
+                    except Exception as exc:
+                        ok, error = False, str(exc)
+
+                    size = target.stat().st_size if target.exists() else 0
+                    if ok:
+                        ok, validation_error = validate_download(target, wave_limit)
+                        error = validation_error or error
+                    if ok and stats["total_download_bytes"] + size > max_total_download_bytes:
+                        ok = False
+                        error = "global-download-budget-exceeded"
+
+                    if ok:
+                        files.append(target)
+                        stats["successful"] += 1
+                        stats["total_download_bytes"] += size
+                        if depth == 0:
+                            stats["root_successful"] += 1
+                        stats["results"].append({"url": url, "depth": depth, "status": "ok", "bytes": size})
+                        log(f"   [OK] {url[:110]}")
+                        if depth < max_include_depth:
+                            children = include_urls(target, url)
+                            stats["included"] += len(children)
+                            stats["included_requested"] += len(children)
+                            next_batch.extend((child, depth + 1) for child in children)
+                    else:
+                        stats["failed"] += 1
+                        if depth == 0:
+                            stats["root_failed"] += 1
+                        reason = error or "invalid response"
+                        stats["results"].append({"url": url, "depth": depth, "status": "failed", "reason": reason})
+                        if len(stats["failures"]) < 100:
+                            stats["failures"].append({"url": url, "reason": reason, "depth": depth})
+                        target.unlink(missing_ok=True)
+                        log(f"   [SKIP] {url[:110]} — {reason}")
+
         current = next_batch
 
     stats["visited"] = len(visited)
@@ -206,3 +231,4 @@ def collect_sources(
     stats["included_successful"] = stats["successful"] - stats["root_successful"]
     stats["included_failed"] = stats["failed"] - stats["root_failed"]
     return files, stats
+

@@ -61,7 +61,7 @@ def write_output(rules: set[str], build_id: str) -> None:
     now = datetime.now(timezone.utc)
     header = [
         "! Title: Combined Adblock Plus Filter List",
-        f"! Version: v7.1-{build_id[:12]}",
+        f"! Version: v7.1.1-{build_id[:12]}",
         f"! Last updated: {now:%Y-%m-%d %H:%M:%S UTC}",
         "! Expires: 1 day",
         "! Homepage: https://github.com/anT0ny54/filter-lists",
@@ -116,6 +116,13 @@ def main() -> int:
             log(f"[ERROR] Source health failed: {source_stats['root_successful']}/{source_stats['root_requested']} root sources ({source_stats['success_ratio']:.1%})")
             if source_stats["required_failed"]:
                 log(f"[ERROR] Required sources failed: {len(source_stats['required_failed'])}")
+            failed_roots = [x for x in source_stats.get("failures", []) if x.get("depth") == 0]
+            for item in failed_roots:
+                log(f"[ERROR] Root source failed: {item.get('url')} — {item.get('reason', 'unknown error')}")
+            if source_stats.get("timed_out"):
+                log("[ERROR] Global fetch deadline was reached before all queued sources completed")
+            if source_stats.get("source_limit_reached"):
+                log("[ERROR] Global source traversal limit was reached before all queued sources completed")
             stats = {"input_lines": 0, "accepted_lines": 0, "rejected_lines": 0, "duplicate_lines": 0, "unique_rules": 0, "rejection_reasons": {}}
             write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=config_fingerprint(config))
             return 1
