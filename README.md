@@ -60,7 +60,7 @@ sources.yaml                 # authoritative source registry
 
 ## 🔐 V7.5.1 hardening
 
-V7.2.0 preserves the established strict-ABP behavior while fixing the previous P0–P3 issues:
+V7.5.1 preserves the established strict-ABP behavior while fixing the previous issues:
 
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`; Python modules no longer maintain independent copies of those limits.
 - **Correct source health:** the health ratio is calculated from **root sources only**. Nested `!#include` sources are reported separately and cannot artificially inflate the health ratio.
