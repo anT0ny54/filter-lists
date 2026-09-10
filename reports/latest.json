@@ -1,9 +1,9 @@
 {
   "schema": 3,
-  "generated_at": "2026-09-10T00:28:01.366712+00:00",
-  "builder": "Filter-Lists v7.0",
+  "generated_at": "2026-09-10T00:46:04.066056+00:00",
+  "builder": "Filter-Lists v7.1.1",
   "profile": "strict-abp",
-  "build_id": "7a31c5bcc515627155a0cec600a501ee9dc27ee16da89f2daedc23e2ab838ab1",
+  "build_id": "5f79e281844440db8417b3babf48637384dcbc8c0dd6747327aa070d8ff3be60",
   "source_count": 33,
   "sources": {
     "requested": 33,
@@ -14,9 +14,11 @@
     "root_failed": 0,
     "included": 0,
     "included_requested": 0,
-    "total_download_bytes": 9993224,
+    "total_download_bytes": 9993243,
     "max_total_download_bytes": 524288000,
     "max_total_sources": 500,
+    "max_parallel_by_budget": 10,
+    "parallelism": 8,
     "failures": [],
     "visited": 33,
     "timed_out": false,
@@ -32,6 +34,24 @@
     "health_basis": "root sources only; nested !#include sources are reported separately",
     "health_threshold": 0.8,
     "results": [
+      {
+        "url": "https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 59627
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/easyprivacy-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 130676
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/easylist-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 600362
+      },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/17_optimized.txt",
         "depth": 0,
@@ -51,28 +71,16 @@
         "bytes": 730111
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 2406928
-      },
-      {
         "url": "https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt",
         "depth": 0,
         "status": "ok",
         "bytes": 1993060
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/easylist-minified.txt",
+        "url": "https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 600343
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/easyprivacy-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 130676
+        "bytes": 2406928
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/8_optimized.txt",
@@ -81,10 +89,10 @@
         "bytes": 91796
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/7_optimized.txt",
+        "url": "https://easylist-downloads.adblockplus.org/easylistdutch-minified.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 705814
+        "bytes": 7947
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/6_optimized.txt",
@@ -93,46 +101,16 @@
         "bytes": 272619
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 59627
-      },
-      {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/9_optimized.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 304761
-      },
-      {
         "url": "https://filters.adtidy.org/extension/ublock/filters/16_optimized.txt",
         "depth": 0,
         "status": "ok",
         "bytes": 218475
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/1_optimized.txt",
+        "url": "https://filters.adtidy.org/extension/ublock/filters/7_optimized.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 371118
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/easylistdutch-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 7947
-      },
-      {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/23_optimized.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 195089
-      },
-      {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/13_optimized.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 459326
+        "bytes": 705814
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/easylistchina-minified.txt",
@@ -147,34 +125,34 @@
         "bytes": 34718
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/abpvn-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 19996
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/ruadlist-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 144580
-      },
-      {
         "url": "https://easylist-downloads.adblockplus.org/liste_fr-minified.txt",
         "depth": 0,
         "status": "ok",
         "bytes": 88779
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/easylistportuguese-minified.txt",
+        "url": "https://filters.adtidy.org/extension/ublock/filters/23_optimized.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 13648
+        "bytes": 195089
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/easylistitaly-minified.txt",
+        "url": "https://filters.adtidy.org/extension/ublock/filters/13_optimized.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 34122
+        "bytes": 459326
+      },
+      {
+        "url": "https://filters.adtidy.org/extension/ublock/filters/9_optimized.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 304761
+      },
+      {
+        "url": "https://filters.adtidy.org/extension/ublock/filters/1_optimized.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 371118
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/easylistspanish-minified.txt",
@@ -183,10 +161,16 @@
         "bytes": 10418
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/bulgarian_list-minified.txt",
+        "url": "https://easylist-downloads.adblockplus.org/easylistportuguese-minified.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 3415
+        "bytes": 13648
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/ruadlist-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 144580
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/abpindo-minified.txt",
@@ -195,22 +179,22 @@
         "bytes": 142414
       },
       {
+        "url": "https://easylist-downloads.adblockplus.org/latvianlist-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 998
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/abpvn-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 19996
+      },
+      {
         "url": "https://easylist-downloads.adblockplus.org/israellist-minified.txt",
         "depth": 0,
         "status": "ok",
         "bytes": 38611
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/easylistlithuania-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 3520
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/rolist-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 2967
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/easylistpolish-minified.txt",
@@ -219,35 +203,53 @@
         "bytes": 34901
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/latvianlist-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 998
-      },
-      {
         "url": "https://easylist-downloads.adblockplus.org/indianlist-minified.txt",
         "depth": 0,
         "status": "ok",
         "bytes": 90560
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/easylistlithuania-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 3520
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/easylistitaly-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 34122
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/bulgarian_list-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 3415
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/rolist-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 2967
       }
     ]
   },
   "rules": {
-    "input_lines": 206562,
-    "accepted_lines": 176351,
-    "rejected_lines": 30211,
-    "duplicate_lines": 16707,
-    "unique_rules": 159644,
+    "input_lines": 206563,
+    "accepted_lines": 176329,
+    "rejected_lines": 30234,
+    "duplicate_lines": 16688,
+    "unique_rules": 159641,
     "rejection_reasons": {
       "comment": 2834,
       "context-invalid-option": 455,
       "invalid-cosmetic-rule": 1937,
-      "invalid-network-rule": 3186,
+      "invalid-network-rule": 3209,
       "invalid-option-or-network-rule": 1688,
       "invalid-option-value": 102,
       "ubo-only-syntax": 9948,
       "unknown-option": 10061
     }
   },
-  "build_seconds": 7.348
+  "build_seconds": 11.635
 }

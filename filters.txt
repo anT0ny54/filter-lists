@@ -1,20 +1,17 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.0-7a31c5bcc515
-! Last updated: 2026-09-10 00:28:01 UTC
+! Version: v7.1.1-5f79e2818444
+! Last updated: 2026-09-10 00:46:04 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 7a31c5bcc515627155a0cec600a501ee9dc27ee16da89f2daedc23e2ab838ab1
-! Total rules: 159644
+! Build-ID: 5f79e281844440db8417b3babf48637384dcbc8c0dd6747327aa070d8ff3be60
+! Total rules: 159641
 !
 ! Format: Strict Adblock Plus-compatible syntax
-! Profile: ABP external-list-safe; uBlock/AdGuard-only rules are excluded.
+! Profile: Strict Adblock Plus-compatible syntax; uBlock/AdGuard-only rules are excluded.
 ! Auto-generated. Do not edit directly.
 ! Edit sources.yaml and rebuild.
 !
-# One Adblock Plus-compatible rule per line.
-# Optional local rules.
-# This file is intentionally empty by default.
 ###\31 280_adv
 ###\31 x1_container.float-banner-footer
 ###___follow_0
@@ -23949,7 +23946,6 @@
 @@||zxc.nyaa-tan.my.id/js/-ads-banner.js$domain=kusonime.com
 @@||zxmee.com^$generichide
 @@||теплорасчет.рф/advertisement.js
-[Adblock Plus 2.0]
 ^a-posters^$domain=minskmaz.com
 ^ad^$domain=pieniny24.pl|sportowepodhale.pl
 ^ads^$domain=podhale24.pl|sportowepodhale.pl|zw.pl
@@ -152183,6 +152179,7 @@ zzzyk.com###Tinfo
 ||universitycleaninglunch.com^
 ||universityshocksooner.com^
 ||uniway.cn.com^
+||uniwearuvid.cfd^
 ||unjfhsdntducr.website^
 ||unjnxrzonftrw.online^
 ||unjrkrxme.com^
