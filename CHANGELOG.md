@@ -1,3 +1,10 @@
+## V7.5.0
+
+- **Strict-ABP remains the only release profile.**
+- Added end-to-end `merge.py` tests covering successful publication, source-health failure, required-source failure, and anomaly-enforced failure.
+- Verified successful builds archive exactly one successful report and failed builds do not archive failed reports.
+- Verified output/report/profile/provenance flow through the real `merge.py` orchestration path.
+
 ## V7.4.0
 
 - Fixed the successful-build anomaly handling path in `scripts/merge.py` so report data is always loaded before inspection.
@@ -79,3 +86,10 @@
 - Improved rejection reason granularity.
 - Removed the duplicated active V5 implementation/test copy.
 - Preserved the existing strict-ABP normalization behavior as the compatibility baseline.
+
+## v7.5.0
+
+- **Strict-ABP remains the only release profile.**
+- Added end-to-end `merge.py` tests covering successful publication, source-health failure, required-source failure, and anomaly-enforced failure.
+- Verified that successful builds archive exactly one successful report and failed builds do not archive failed reports.
+- Verified generated output/report/profile/provenance flow through the real `merge.py` orchestration path.

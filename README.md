@@ -1,4 +1,4 @@
-# 🚀 Filter-Lists v7.4.0
+# 🚀 Filter-Lists v7.5.0
 
 **A compatibility-first, deterministic filter-list compiler** that fetches trusted sources, resolves bounded `!#include` graphs, canonicalizes rules, applies a strict ABP-compatible policy, validates the generated list, and publishes reproducible build metadata.
 
@@ -30,7 +30,7 @@ The generated list targets a **strict Adblock Plus-compatible syntax profile**. 
 
 The goal is **syntax compatibility first, not maximum engine-specific filtering power**. A downstream blocker may support additional features, but this project will not emit those non-ABP extensions.
 
-## 🏗️ V7.4 architecture
+## 🏗️ V7.5 architecture
 
 ```text
 sources.yaml                 # authoritative source registry
@@ -58,7 +58,7 @@ sources.yaml                 # authoritative source registry
  filters.txt + reports/latest.json + generated sources.txt
 ```
 
-## 🔐 V7.4.0 hardening
+## 🔐 V7.5.0 hardening
 
 V7.2.0 preserves the established strict-ABP behavior while fixing the previous P0–P3 issues:
 
@@ -179,7 +179,7 @@ A lightweight image proxy that cuts bandwidth and speeds up browsing. Fetches re
 
 ## 🚀 Release model
 
-V7.4 focused on compatibility/reproducibility. adds advanced reliability: historical reports, source reputation, configurable anomaly enforcement, optional differential testing, stronger fuzzing, and benchmarking.
+V7.5 focused on compatibility/reproducibility. adds advanced reliability: historical reports, source reputation, configurable anomaly enforcement, optional differential testing, stronger fuzzing, and benchmarking.
 
 ## ⚖️ Legal
 
