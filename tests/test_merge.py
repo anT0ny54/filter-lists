@@ -1,6 +1,9 @@
+import functools
+import http.server
 import importlib.util
 import json
 import tempfile
+import threading
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -100,6 +103,64 @@ class MergeMainE2ETests(unittest.TestCase):
 
     def tearDown(self):
         self.tmp.cleanup()
+
+    def test_main_real_local_http_fetch_and_analysis(self):
+        with tempfile.TemporaryDirectory(prefix="filter-merge-http-") as server_dir:
+            server_root = Path(server_dir)
+            (server_root / "main.txt").write_text(
+                "! fixture root\n!#include child.txt\n||root.example^\n",
+                encoding="utf-8",
+            )
+            (server_root / "child.txt").write_text(
+                "||child.example^$script\n",
+                encoding="utf-8",
+            )
+            handler = functools.partial(
+                http.server.SimpleHTTPRequestHandler, directory=str(server_root)
+            )
+            server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                base = f"http://127.0.0.1:{server.server_port}"
+                source_url = f"{base}/main.txt"
+                config = SimpleNamespace(
+                    sources=(SimpleNamespace(
+                        name="local-fixture", url=source_url, category="test",
+                        priority=1, required=True, enabled=True,
+                    ),),
+                    minimum_success_ratio=1.0,
+                    fail_if_zero_sources=True,
+                    max_rule_length=100000,
+                    max_include_depth=5,
+                    max_download_bytes=1024 * 1024,
+                    max_total_download_bytes=1024 * 1024,
+                    max_total_sources=10,
+                    total_timeout_seconds=30,
+                    anomaly_detection={"enabled": False, "fail_on_warning": False},
+                )
+                (merge.ROOT / "sources.yaml").write_text(
+                    "sources:\n  - name: local-fixture\n    url: " + source_url + "\n    category: test\n    priority: 1\n    required: true\n",
+                    encoding="utf-8",
+                )
+                with patch.object(merge, "load_config", return_value=config):
+                    result = merge.main()
+            finally:
+                server.shutdown()
+                thread.join(timeout=5)
+                server.server_close()
+
+        self.assertEqual(result, 0)
+        output = merge.OUTPUT.read_text(encoding="utf-8")
+        self.assertIn("||root.example^", output)
+        self.assertIn("||child.example^$script", output)
+        report = json.loads(merge.REPORT.read_text(encoding="utf-8"))
+        self.assertEqual(report["status"], "success")
+        self.assertEqual(report["sources"]["root_successful"], 1)
+        self.assertEqual(report["sources"]["included_successful"], 1)
+        self.assertEqual(report["rules"]["unique_rules"], 3)
+        self.assertEqual(report["sources"]["results"][0]["status"], "ok")
+        self.assertEqual(len(report["sources"]["results"]), 2)
 
     def _run(self, *, source_stats=None, rules=None, rule_stats=None, anomaly=None):
         source_stats = source_stats or {

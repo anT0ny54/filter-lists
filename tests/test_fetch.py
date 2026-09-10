@@ -1,4 +1,5 @@
 import functools
+import shutil
 import http.server
 import threading
 import tempfile
@@ -26,6 +27,8 @@ class FetchTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.server.shutdown()
         cls.thread.join(timeout=5)
+        cls.server.server_close()
+        shutil.rmtree(cls.root, ignore_errors=True)
 
     def test_canonical_url_drops_fragment(self):
         self.assertEqual(canonical_url("HTTP://Example.COM/a#frag"), "http://example.com/a")
