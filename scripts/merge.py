@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CUSTOM_RULES = ROOT / "custom-rules.txt"
 OUTPUT = ROOT / "filters.txt"
 REPORT = ROOT / "reports" / "latest.json"
-BUILDER_VERSION = "7.5.1"
+BUILDER_VERSION = "7.5.2"
 HISTORY_DIR = ROOT / "reports" / "history"
 SOURCES_TXT = ROOT / "sources.txt"
 WORKERS = min(16, max(4, (os.cpu_count() or 2) * 2))
@@ -61,7 +61,18 @@ def load_previous_report() -> dict | None:
     candidates = []
     if REPORT.is_file():
         candidates.append(REPORT)
-    candidates.extend(sorted(HISTORY_DIR.glob("*.json"), reverse=True))
+    # Build IDs are hashes, so filename order is not chronological. Use the
+    # report timestamp when selecting the newest successful baseline.
+    history = []
+    for path in HISTORY_DIR.glob("*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if data.get("status", "success") == "success":
+                history.append((str(data.get("generated_at", "")), path, data))
+        except (OSError, ValueError):
+            continue
+    history.sort(key=lambda item: item[0], reverse=True)
+    candidates.extend(path for _, path, _ in history)
     for path in candidates:
         try:
             data = __import__("json").loads(path.read_text(encoding="utf-8"))
@@ -72,14 +83,35 @@ def load_previous_report() -> dict | None:
     return None
 
 
-def archive_successful_report(build_id: str) -> None:
-    """Archive one successful build identity exactly once."""
+def archive_successful_report(build_id: str, *, retention: int = 10) -> None:
+    """Archive one successful build identity, then retain only the newest N reports."""
     if not REPORT.is_file():
         return
+    if retention < 1:
+        raise ValueError("history retention must be >= 1")
     HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+
     target = HISTORY_DIR / f"build-{build_id}.json"
     if not target.exists():
         shutil.copy2(REPORT, target)
+
+    # Keep retention based on generated_at, not filenames: build IDs are hashes.
+    reports = []
+    for path in HISTORY_DIR.glob("*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if data.get("status", "success") == "success":
+                reports.append((str(data.get("generated_at", "")), path))
+        except (OSError, ValueError):
+            continue
+    reports.sort(key=lambda item: (item[0], item[1].name), reverse=True)
+
+    for _, path in reports[retention:]:
+        try:
+            path.unlink()
+            log(f">> Removed old history report: {path.name}")
+        except OSError as exc:
+            log(f"[WARN] Could not remove old history report {path.name}: {exc}")
 
 
 def sync_legacy_sources(config) -> None:
@@ -183,7 +215,8 @@ def main() -> int:
             REPORT.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             log("[ERROR] Anomaly policy rejected this build")
             return 1
-        archive_successful_report(build_id)
+        retention = int(getattr(config, "history_retention", 10))
+    archive_successful_report(build_id, retention=retention)
     return 0
 
 

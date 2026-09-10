@@ -57,6 +57,7 @@ class BuildConfig:
     max_total_sources: int
     total_timeout_seconds: int
     anomaly_detection: dict
+    history_retention: int
 
 
 def _positive_int(value: object, name: str) -> int:
@@ -126,6 +127,11 @@ def load_config() -> BuildConfig:
         raise ValueError("policies.yaml: minimum_success_ratio must be between 0 and 1")
 
     max_rule_length, max_include_depth, max_download_bytes, max_total_download_bytes, max_total_sources, total_timeout = load_policy_limits()
+    history = policy.get("history", {})
+    if not isinstance(history, dict):
+        raise ValueError("policies.yaml: history must be an object")
+    history_retention = _positive_int(history.get("retention", 10), "history.retention")
+
     anomaly = policy.get("anomaly_detection", {})
     if not isinstance(anomaly, dict):
         raise ValueError("policies.yaml: anomaly_detection must be an object")
@@ -154,6 +160,7 @@ def load_config() -> BuildConfig:
         max_total_sources,
         total_timeout,
         anomaly_config,
+        history_retention,
     )
 
 
