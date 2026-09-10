@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Filter-Lists V7.0 deterministic build orchestrator."""
+"""Filter-Lists V7.1 deterministic build orchestrator."""
 from __future__ import annotations
 
 import hashlib
@@ -61,7 +61,7 @@ def write_output(rules: set[str], build_id: str) -> None:
     now = datetime.now(timezone.utc)
     header = [
         "! Title: Combined Adblock Plus Filter List",
-        f"! Version: v7.0-{build_id[:12]}",
+        f"! Version: v7.1-{build_id[:12]}",
         f"! Last updated: {now:%Y-%m-%d %H:%M:%S UTC}",
         "! Expires: 1 day",
         "! Homepage: https://github.com/anT0ny54/filter-lists",
@@ -70,7 +70,7 @@ def write_output(rules: set[str], build_id: str) -> None:
         f"! Total rules: {len(final_rules)}",
         "!",
         "! Format: Strict Adblock Plus-compatible syntax",
-        "! Profile: ABP external-list-safe; uBlock/AdGuard-only rules are excluded.",
+        "! Profile: Strict Adblock Plus-compatible syntax; uBlock/AdGuard-only rules are excluded.",
         "! Auto-generated. Do not edit directly.",
         "! Edit sources.yaml and rebuild.",
         "!",

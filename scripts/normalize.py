@@ -23,6 +23,59 @@ DOMAIN_RE = re.compile(
     r"[A-Za-z]{2,63}$"
 )
 SITEKEY_RE = re.compile(r"^[A-Za-z0-9+/._-]+={0,2}$")
+ASCII_WS_RE = re.compile(r"[\t\n\r\f\v ]")
+NETWORK_FORBIDDEN_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+
+
+def valid_regex_filter(pattern: str) -> bool:
+    """Validate the ABP regex envelope without interpreting regex semantics.
+
+    ABP regex filters are delimited by the first/last unescaped slash. The
+    payload is intentionally not compiled with Python's regex engine because
+    ABP engines use JavaScript-compatible regex semantics and Python would
+    reject some valid ABP expressions.
+    """
+    if len(pattern) < 2 or not pattern.startswith("/"):
+        return False
+    escaped = False
+    last = -1
+    for i in range(1, len(pattern)):
+        ch = pattern[i]
+        if ch == "\\" and not escaped:
+            escaped = True
+            continue
+        if ch == "/" and not escaped:
+            last = i
+        escaped = False
+    if last != len(pattern) - 1 or last <= 1:
+        return False
+    payload = pattern[1:-1]
+    return not NETWORK_FORBIDDEN_RE.search(payload) and not ASCII_WS_RE.search(payload)
+
+
+def valid_network_pattern(pattern: str) -> bool:
+    """Conservative ABP network-filter grammar gate."""
+    if not pattern or NETWORK_FORBIDDEN_RE.search(pattern):
+        return False
+    if any(c in pattern for c in "\r\n"):
+        return False
+    if pattern.startswith("/"):
+        return valid_regex_filter(pattern)
+    if any(c.isspace() for c in pattern):
+        return False
+    if "|" in pattern:
+        # ABP allows | as a beginning/end anchor and || as the domain anchor.
+        # No interior | is valid in a network pattern.
+        interior = pattern[2:-1] if pattern.startswith("||") else pattern[1:-1] if pattern.startswith("|") or pattern.endswith("|") else pattern
+        if "|" in interior:
+            return False
+    # An exception marker is parsed outside this function. No bare @@ here.
+    if pattern.startswith("@@"):
+        return False
+    # A caret is an ABP separator token; it may occur anywhere in a pattern.
+    # Empty patterns and whitespace/control characters are the only universal
+    # lexical exclusions at this stage.
+    return True
 
 
 def split_options(rule: str) -> tuple[str, list[str]]:
@@ -107,11 +160,8 @@ def normalize_network(rule: str) -> str | None:
     pattern_body = pattern[2:] if pattern.startswith("@@") else pattern
     if not pattern_body or (rule.startswith("@@") and not pattern_body):
         return None
-    if CONTROL_RE.search(pattern_body) or any(c in pattern_body for c in "\r\n"):
+    if not valid_network_pattern(pattern_body):
         return None
-    if pattern_body.startswith("/"):
-        if len(pattern_body) < 2 or not pattern_body.endswith("/") or pattern_body.count("/") < 2:
-            return None
     if not options:
         return pattern
     normalized: list[str] = []

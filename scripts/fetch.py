@@ -6,6 +6,7 @@ import concurrent.futures
 import re
 import subprocess
 import time
+import threading
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
@@ -99,6 +100,10 @@ def collect_sources(
     visited: set[str] = set()
     current = [(canonical_url(url), 0) for url in source_urls]
     sequence = 0
+    budget_lock = threading.Lock()
+    reserved_bytes = 0
+    deadline = started + total_timeout
+
     stats = {
         "requested": len(source_urls),
         "root_requested": len(source_urls),
@@ -115,7 +120,7 @@ def collect_sources(
         "results": [],
     }
 
-    while current and time.monotonic() - started < total_timeout:
+    while current and time.monotonic() < deadline:
         batch: list[tuple[str, int]] = []
         for url, depth in current:
             if len(visited) >= max_total_sources:
@@ -131,22 +136,42 @@ def collect_sources(
         next_batch: list[tuple[str, int]] = []
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
             futures = {}
+            immediate_failures = []
             for url, depth in batch:
                 target = tmp / f"source-{sequence:06d}.txt"
                 sequence += 1
-                timeout = INCLUDE_TIMEOUT if depth else DOWNLOAD_TIMEOUT
-                futures[pool.submit(download, url, target, timeout, max_download_bytes)] = (url, depth, target)
+                timeout = min(INCLUDE_TIMEOUT if depth else DOWNLOAD_TIMEOUT, max(1, int(deadline - time.monotonic())))
+                with budget_lock:
+                    if reserved_bytes + max_download_bytes > max_total_download_bytes:
+                        immediate_failures.append((url, depth, target, "global-download-budget-exceeded"))
+                        continue
+                    reserved_bytes += max_download_bytes
+                futures[pool.submit(download, url, target, timeout, max_download_bytes)] = (url, depth, target, None)
 
-            for future in concurrent.futures.as_completed(futures):
-                url, depth, target = futures[future]
+            for url, depth, target, immediate_error in immediate_failures:
+                ok, error = False, immediate_error
+                target.unlink(missing_ok=True)
+                stats["failed"] += 1
+                if depth == 0:
+                    stats["root_failed"] += 1
+                stats["results"].append({"url": url, "depth": depth, "status": "failed", "reason": error})
+                if len(stats["failures"]) < 100:
+                    stats["failures"].append({"url": url, "reason": error, "depth": depth})
+                log(f"   [SKIP] {url[:110]} — {error}")
+
+            pending = futures
+            for future in concurrent.futures.as_completed(pending):
+                url, depth, target, _ = pending[future]
                 try:
                     ok, error = future.result()
                 except Exception as exc:
                     ok, error = False, str(exc)
+                size = target.stat().st_size if target.exists() else 0
+                with budget_lock:
+                    reserved_bytes -= max_download_bytes
                 if ok:
                     ok, validation_error = validate_download(target, max_download_bytes)
                     error = validation_error or error
-                size = target.stat().st_size if target.exists() else 0
                 if ok and stats["total_download_bytes"] + size > max_total_download_bytes:
                     ok = False
                     error = "global-download-budget-exceeded"
@@ -175,7 +200,7 @@ def collect_sources(
         current = next_batch
 
     stats["visited"] = len(visited)
-    stats["timed_out"] = bool(current and time.monotonic() - started >= total_timeout)
+    stats["timed_out"] = bool(current and time.monotonic() >= deadline)
     stats["source_limit_reached"] = len(visited) >= max_total_sources and bool(current)
     stats["requested"] = len(visited)
     stats["included_successful"] = stats["successful"] - stats["root_successful"]

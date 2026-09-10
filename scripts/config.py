@@ -15,6 +15,18 @@ LEGACY_SOURCES = ROOT / "sources.txt"
 POLICY_FILE = ROOT / "policies.yaml"
 
 
+def _strict_bool(value, field: str) -> bool:
+    if isinstance(value, bool):
+        return value
+    raise ValueError(f"{field} must be a boolean")
+
+
+def _strict_int(value, field: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError(f"{field} must be an integer")
+    return value
+
+
 def valid_url(url: str) -> bool:
     try:
         p = urlsplit(url)
@@ -99,9 +111,9 @@ def load_config() -> BuildConfig:
             name=name,
             url=url,
             category=str(item.get("category", "uncategorized")),
-            enabled=bool(item.get("enabled", True)),
-            priority=int(item.get("priority", 999999)),
-            required=bool(item.get("required", False)),
+            enabled=_strict_bool(item.get("enabled", True), f"sources.yaml: source #{index + 1}.enabled"),
+            priority=_strict_int(item.get("priority", 999999), f"sources.yaml: source #{index + 1}.priority"),
+            required=_strict_bool(item.get("required", False), f"sources.yaml: source #{index + 1}.required"),
         ))
 
     sources.sort(key=lambda s: (s.priority, s.name.casefold(), s.name, s.url))
