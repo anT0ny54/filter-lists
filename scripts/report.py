@@ -39,7 +39,7 @@ def write_report(path: Path, *, source_stats: dict, rule_stats: dict, elapsed_se
     payload = {
         "schema": 3,
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "builder": "Filter-Lists v7.1",
+        "builder": "Filter-Lists v7.1.1",
         "profile": "strict-abp",
         "build_id": build_id,
         "source_count": len(source_urls),

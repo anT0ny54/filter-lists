@@ -15,7 +15,7 @@ from normalize import normalize_rule  # noqa: E402
 
 TOTAL_RE = re.compile(r"^! Total rules: ([0-9]+)$")
 BUILD_RE = re.compile(r"^! Build-ID: ([0-9a-f]{64})$")
-VERSION_RE = re.compile(r"^! Version: v7\.1-[0-9a-f]{12}$")
+VERSION_RE = re.compile(r"^! Version: v7\.1\.1-[0-9a-f]{12}$")
 
 
 def config_fingerprint(config) -> str:
