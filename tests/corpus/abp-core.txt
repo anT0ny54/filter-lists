@@ -1,0 +1,7 @@
+! Curated real-world syntax corpus: representative ABP/EasyList-style forms.
+||ads.example.test^
+@@||ads.example.test^$document
+||cdn.example.test/banner$image,third-party
+||tracker.example.test^$script,domain=example.test
+example.test##.advertisement
+example.test#?#div:-abp-has(.sponsor)
