@@ -1,11 +1,11 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.0-bfbf1e07a332
-! Last updated: 2026-09-10 00:07:39 UTC
+! Version: v7.0-7a31c5bcc515
+! Last updated: 2026-09-10 00:28:01 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: bfbf1e07a332afe15a60fb8361c8f60aaa733936633ae256b86854aa0e53db79
-! Total rules: 159634
+! Build-ID: 7a31c5bcc515627155a0cec600a501ee9dc27ee16da89f2daedc23e2ab838ab1
+! Total rules: 159644
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: ABP external-list-safe; uBlock/AdGuard-only rules are excluded.
@@ -102804,6 +102804,7 @@ zzzyk.com###Tinfo
 ||63007.com:82/haodxi.js
 ||6341e249b2.com^
 ||634f8fb116.com^
+||63794fc885.com^
 ||637e3634c5.com^
 ||63b51241b6.com^
 ||63dcf0124c.86c67c238d.com^
@@ -108451,6 +108452,7 @@ zzzyk.com###Tinfo
 ||azideavicide.top^
 ||azimidetubbist.qpon^
 ||azjmp.com^
+||azjqiqacpgz.in^
 ||azkwwrmmzkewm.top^
 ||azlyrics.com/local/anew.js
 ||aznapoz.info^
@@ -115022,6 +115024,7 @@ zzzyk.com###Tinfo
 ||cpg-cdn.com^
 ||cpgve9dnj.com^
 ||cphdrifdksdcr.site^
+||cpisuphjvjjuis.com^
 ||cplayer.pw^
 ||cpm.admeridianopenrtb.com^
 ||cpm.amateurcommunity.de^
@@ -130238,6 +130241,7 @@ zzzyk.com###Tinfo
 ||jzleekzmevqzy.top^
 ||jzmwxos.com^
 ||jzokkeaebbjbw.top^
+||jzpg3f8jv5c59f5lurip8gzui.rest^
 ||jzpgspqbmbhxk.site^
 ||jzuivotw.com^
 ||jzunxmvygkfne.website^
@@ -132521,6 +132525,7 @@ zzzyk.com###Tinfo
 ||ljzwuvseqsecn.online^
 ||lk0v8teerw.com^
 ||lk21static.buzz/assets/dlapps.png
+||lk2vr84mkricuveci9xtuy.cfd^
 ||lkdvvxvtsq6o.com^
 ||lkdykbudv.com^
 ||lkeyidvswkszr.space^
@@ -142131,6 +142136,7 @@ zzzyk.com###Tinfo
 ||qrumjhxsjryzl.space^
 ||qrumphathu.com^
 ||qrwfktjfjnqcp.website^
+||qrwoayzreybmz.top^
 ||qrz.com/ads/
 ||qrzasjcufufeh.site^
 ||qrzvsmxtpsmdw.site^
@@ -143290,6 +143296,7 @@ zzzyk.com###Tinfo
 ||resewseremuriyolden.cfd^
 ||reshakeclifts.cfd^
 ||residuatankerslapels.cfd^
+||resilesmyaliabosnian.cfd^
 ||resim.samsungazetesi.com/banner/
 ||resimupload.org/*/*.gif$domain=pamukovasosyalmedya.com,image
 ||resimupload.org/images/*/reklam
@@ -154409,6 +154416,7 @@ zzzyk.com###Tinfo
 ||wbnmobumkflth.website^
 ||wboptim.online^
 ||wbraekvint.com^
+||wbrqykwbeazwn.space^
 ||wbsleixbsbbrf.space^
 ||wbtrkk.teufel.de^
 ||wbvgjhejkunhb.site^
@@ -158782,6 +158790,7 @@ zzzyk.com###Tinfo
 ||zj7coeb5i.com^
 ||zjdyhjhgsohaw.site^
 ||zjflf9epfe.com^
+||zjfouzmsszcbp.website^
 ||zjg.js.cn/Public/config/Couplet/Index4
 ||zjhwrbopbrnzu.online^
 ||zjjfmf9m3q.com^
@@ -159191,6 +159200,7 @@ zzzyk.com###Tinfo
 ||zxcvbnmasdfghjklqwertyuiop.work^
 ||zxcwifosxcrlc.site^
 ||zxdnsx7si.com^
+||zxgokjzrugpms.online^
 ||zxirf29qivqh8.uzokb1ivryvorr28cuhhhx2nb2p.cfd^
 ||zxiws.cn^
 ||zxn2u72vyrejmmw9tnb7wh.cfd^
