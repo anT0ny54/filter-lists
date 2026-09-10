@@ -1,4 +1,4 @@
-name: Validate Filter List V7.2.0
+name: Validate Filter List V7.4.0
 
 on:
   pull_request:
@@ -30,3 +30,7 @@ jobs:
           set -Eeuo pipefail
           python -m py_compile scripts/*.py
           python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Run benchmark
+        run: python3 scripts/benchmark.py --repeats 3
+      - name: Optional differential engine test
+        run: python3 scripts/differential.py
