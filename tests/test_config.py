@@ -37,6 +37,7 @@ class ConfigTests(unittest.TestCase):
         cfg = load_config()
         self.assertTrue(cfg.anomaly_detection["enabled"])
         self.assertEqual(cfg.anomaly_detection["min_lines"], 100)
+        self.assertFalse(cfg.anomaly_detection["fail_on_warning"])
 
     def test_source_booleans_are_real_yaml_booleans(self):
         cfg = load_config()

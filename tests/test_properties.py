@@ -13,7 +13,7 @@ class PropertyAndFuzzTests(unittest.TestCase):
     def test_normalizer_never_raises_on_deterministic_unicode_fuzz(self):
         rng = random.Random(0xF17E)
         alphabet = string.printable + "é中🙂\u0000\u0007\u001f\ufeff"
-        for _ in range(1000):
+        for _ in range(5000):
             value = "".join(rng.choice(alphabet) for _ in range(rng.randrange(0, 501)))
             result = normalize_rule(value)
             self.assertTrue(result is None or isinstance(result, str))
@@ -34,7 +34,7 @@ class PropertyAndFuzzTests(unittest.TestCase):
     def test_normalizer_is_deterministic_for_fuzzed_input(self):
         rng = random.Random(0xC0DE)
         alphabet = string.ascii_letters + string.digits + "|$^/\\#@,.:_-"
-        for _ in range(1000):
+        for _ in range(5000):
             value = "".join(rng.choice(alphabet) for _ in range(rng.randrange(0, 251)))
             self.assertEqual(normalize_rule(value), normalize_rule(value))
 

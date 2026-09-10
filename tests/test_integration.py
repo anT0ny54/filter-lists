@@ -26,8 +26,10 @@ class PipelineIntegrationTests(unittest.TestCase):
             self.assertEqual(stats["rejection_reasons"]["ubo-only-syntax"], 1)
             write_report(report, source_stats={"root_requested": 1, "root_successful": 1}, rule_stats=stats, elapsed_seconds=0.01, source_urls=["https://example.test/list"], build_id="a" * 64)
             data = json.loads(report.read_text())
-            self.assertEqual(data["schema"], 4)
+            self.assertEqual(data["schema"], 5)
             self.assertEqual(data["rules"]["unique_rules"], 4)
+            self.assertIn("source_reputation", data)
+            self.assertEqual(data["status"], "success")
 
 
 if __name__ == "__main__":
