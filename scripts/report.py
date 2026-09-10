@@ -13,7 +13,7 @@ from normalize import normalize_rule, rejection_reason
 from health import build_source_reputation
 
 SCHEMA_VERSION = 5
-BUILDER_VERSION = "7.5.0"
+BUILDER_VERSION = "7.5.1"
 
 
 def sha256_file(path: Path) -> str:

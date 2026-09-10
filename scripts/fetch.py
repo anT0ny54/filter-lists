@@ -47,7 +47,7 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
         "--retry-max-time", str(timeout),
         "--connect-timeout", str(connect_timeout), "--max-time", str(timeout),
         "--max-filesize", str(max_download_bytes),
-        "--user-agent", "filter-lists-builder/7.4.0", "--output", str(output), url,
+        "--user-agent", "filter-lists-builder/7.5.1", "--output", str(output), url,
     ]
     try:
         proc = subprocess.run(command, text=True, capture_output=True, timeout=timeout + 5)
