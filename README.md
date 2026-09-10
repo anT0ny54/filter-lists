@@ -1,4 +1,4 @@
-# 🚀 Filter-Lists v7.0
+# 🚀 Filter-Lists v7.1
 
 **A compatibility-first, deterministic filter-list compiler** that fetches trusted sources, resolves bounded `!#include` graphs, canonicalizes rules, applies a strict ABP-compatible policy, validates the generated list, and publishes reproducible build metadata.
 
@@ -10,11 +10,11 @@ https://raw.githubusercontent.com/anT0ny54/filter-lists/main/filters.txt
 
 ### 🛡️ Compatibility
 
-The generated list targets the **strict ABP-compatible core profile** and is intended for Adblock Plus, uBlock Origin, AdGuard, and compatible blockers.
+The generated list targets a **strict Adblock Plus-compatible syntax profile**. ABP network filters, exceptions, supported ABP options, element hiding, and ABP extended CSS are accepted; uBlock/AdGuard-only syntax is rejected.
 
-V7 deliberately excludes engine-specific syntax such as uBlock procedural snippets and extended exception syntax. This trades some engine-specific filtering power for predictable cross-engine compatibility.
+The goal is **syntax compatibility first, not maximum engine-specific filtering power**. A downstream blocker may support additional features, but this project will not emit those non-ABP extensions.
 
-## 🏗️ V7 architecture
+## 🏗️ V7.1 architecture
 
 ```text
 sources.yaml                 # authoritative source registry
@@ -42,7 +42,7 @@ sources.yaml                 # authoritative source registry
  filters.txt + reports/latest.json + generated sources.txt
 ```
 
-## 🔐 V7 hardening
+## 🔐 V7.1 hardening
 
 V7 preserves the established behavior while fixing the previous P0–P3 issues:
 
@@ -50,11 +50,12 @@ V7 preserves the established behavior while fixing the previous P0–P3 issues:
 - **Correct source health:** the health ratio is calculated from **root sources only**. Nested `!#include` sources are reported separately and cannot artificially inflate the health ratio.
 - **Required-source correctness:** required-source failures are evaluated only against configured root sources.
 - **Global include protection:** bounded total source traversal prevents pathological include graphs even when individual include depth is valid.
-- **Global download budget:** accepted downloads have a build-wide byte budget in addition to the per-file limit.
+- **Global download budget:** concurrent downloads reserve their per-file maximum before starting, preventing the worker pool from overshooting the build-wide byte budget.
 - **URL canonicalization:** include-cycle detection normalizes scheme/host/path and removes fragments.
-- **Timeout/limit failures are fatal:** a timed-out or source-limit-truncated build is not published.
+- **Deadline-aware fetching:** each download receives only the remaining build deadline, and timeout/limit failures are fatal.
 - **Full Build-ID validation:** `validate.py` recomputes the build hash from the active configuration and normalized rules.
-- **Integration coverage:** tests exercise fetching, nested includes, source-health accounting, global limits, and the rule-analysis pipeline.
+- **Strict ABP grammar gate:** network filters reject interior `|`, whitespace/control characters, malformed regex envelopes, duplicate/unknown options, and non-ABP procedural syntax.
+- **Integration coverage:** tests exercise fetching, nested includes, source-health accounting, global limits, strict ABP normalization, and the rule-analysis pipeline.
 - **Action pinning:** GitHub Actions are pinned to immutable commit SHAs rather than floating tags.
 - **Generated-source hygiene:** `sources.txt` is generated from `sources.yaml` and no longer triggers its own update workflow.
 - **Historical build deltas:** the report format is prepared for deterministic operational comparisons.

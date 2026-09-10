@@ -1,5 +1,14 @@
 # Changelog
 
+## v7.1 — Strict ABP hardening
+
+- Enforced a conservative strict ABP network-filter grammar gate.
+- Preserved ABP regex filters without incorrectly applying Python regex semantics.
+- Continued to reject uBlock/AdGuard-only procedural and extended-exception syntax.
+- Added strict YAML boolean/integer validation for source configuration.
+- Added concurrent global-download budget reservation and deadline-aware download timeouts.
+- Added regression tests for malformed regex envelopes, whitespace, interior pipe syntax, and configuration typing.
+
 ## v7.0 — P0–P3 hardening
 
 - Fixed root-source health accounting so nested `!#include` sources cannot inflate success ratios.
