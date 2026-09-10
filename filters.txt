@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.5.0-532b31068b36
-! Last updated: 2026-09-10 07:42:54 UTC
+! Version: v7.5.0-b6e5f3c55c4e
+! Last updated: 2026-09-10 07:54:59 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 532b31068b36188082a2059e3b6bc69a556d196aeaa517b2e773d520c260631b
+! Build-ID: b6e5f3c55c4e823725c2c68cf43e326a2e46c364ddf4a871c906058a4d9a5e49
 ! Source manifest SHA-256: 2f87bc9b88421e1b431098c5f33387602c6c38286e2533c1890c26ec59fcfd77
 ! Root sources: 33
-! Total rules: 159546
+! Total rules: 159548
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus-compatible syntax; uBlock/AdGuard-only rules are excluded.
@@ -105816,6 +105816,7 @@ zzzyk.com###Tinfo
 ||ainouzaudre.net^
 ||ainu.intel.com^
 ||ainunu.*/vad.js
+||aiopfjpikqblq.space^
 ||aipp99.com/haose/
 ||aiqbxpxeztuqs.online^
 ||aiqidwcfrm.com^
@@ -113249,6 +113250,7 @@ zzzyk.com###Tinfo
 ||chordsdowment.qpon^
 ||chorgilaxly.cfd^
 ||choribitrowane.qpon^
+||chorioapargia.cfd^
 ||choristlibget.cfd^
 ||chortenurocele.qpon^
 ||chorumebbbbgoza.xyz^
