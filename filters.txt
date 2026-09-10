@@ -1,6 +1,6 @@
 ! Title: Combined Adblock Plus Filter List
 ! Version: v7.0-bfbf1e07a332
-! Last updated: 2026-09-10 00:06:39 UTC
+! Last updated: 2026-09-10 00:07:39 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
