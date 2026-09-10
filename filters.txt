@@ -1,11 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.2.0-458da1696d91
-! Last updated: 2026-09-10 07:22:31 UTC
+! Version: v7.4.0-c681e1dc9bfe
+! Last updated: 2026-09-10 07:29:07 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 458da1696d91bb138762b315a234b45397ca7e83fd67545296a5b9c2229e84e9
-! Total rules: 159541
+! Build-ID: c681e1dc9bfefb89848769b9003a7fac5e1dc6cbca409bb2376d678b4e36d3bb
+! Source manifest SHA-256: 2f87bc9b88421e1b431098c5f33387602c6c38286e2533c1890c26ec59fcfd77
+! Root sources: 33
+! Total rules: 159545
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus-compatible syntax; uBlock/AdGuard-only rules are excluded.
@@ -108117,6 +108119,7 @@ zzzyk.com###Tinfo
 ||avysloobiescecca.cyou^
 ||avzwkkmaqlvbb.top^
 ||awaaalxhkqivc.site^
+||awaeyfxxpsbifja.com^
 ||awaitsrereel.qpon^
 ||awaps.yandex.
 ||awardchirpingenunciate.com^
@@ -148699,6 +148702,7 @@ zzzyk.com###Tinfo
 ||syringesornerssimars.cyou^
 ||syrupimmediate.com^
 ||sysadmins.ru/vps.gif
+||sysdlctxcvmab.online^
 ||syseen.com/content/uploadfile/*/hongbao.png
 ||sysin.org/img/promotion-
 ||sysmeasuring.net^
@@ -149202,6 +149206,7 @@ zzzyk.com###Tinfo
 ||tcpcharms.com^
 ||tcpglvrgiaezc.website^
 ||tcppu.com^
+||tcpqpwuedappll.com^
 ||tcptest.cn/prod-api/web/adLinks/
 ||tcragarnh.com^
 ||tcsqcikxilqfq.site^
@@ -154765,6 +154770,7 @@ zzzyk.com###Tinfo
 ||whekilambes.cyou^
 ||whelksfumettecuppa.qpon^
 ||whelmlegge.com^$third-party
+||whemmlehuttedsleets.cyou^
 ||whentai.com^*.gif
 ||whereermisdoer.cfd^
 ||whereisdalle.cfd^
