@@ -1,5 +1,5 @@
-# Filter-Lists v6.6 compatibility policy.
-version: 2
+# Filter-Lists v7.0 compatibility policy.
+version: 3
 profile: strict-abp
 compatibility:
   - Adblock Plus
@@ -20,6 +20,8 @@ limits:
   max_rule_length: 100000
   max_include_depth: 5
   max_download_bytes: 52428800
+  max_total_download_bytes: 524288000
+  max_total_sources: 500
   total_timeout_seconds: 1800
 source_health:
   minimum_success_ratio: 0.80
