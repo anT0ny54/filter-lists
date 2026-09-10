@@ -33,6 +33,11 @@ class ConfigTests(unittest.TestCase):
         cfg = load_config()
         self.assertGreaterEqual(sum(s.required for s in cfg.sources), 2)
 
+    def test_source_booleans_are_real_yaml_booleans(self):
+        cfg = load_config()
+        self.assertTrue(all(isinstance(s.enabled, bool) for s in cfg.sources))
+        self.assertTrue(all(isinstance(s.required, bool) for s in cfg.sources))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

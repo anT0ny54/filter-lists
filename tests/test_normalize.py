@@ -14,5 +14,15 @@ class NormalizeTests(unittest.TestCase):
     def test_cosmetic_domains_are_sorted_and_deduplicated(self):
         self.assertEqual(normalize_rule("B.com,a.com,B.com##.ad"), "a.com,B.com##.ad")
 
+    def test_strict_network_grammar_rejects_interior_pipe(self):
+        self.assertIsNone(normalize_rule("||example.com|/ads"))
+
+    def test_strict_network_grammar_rejects_whitespace(self):
+        self.assertIsNone(normalize_rule("||example.com/foo bar"))
+
+    def test_regex_envelope_is_validated_without_python_regex_semantics(self):
+        self.assertIsNotNone(normalize_rule(r"/foo\$bar/"))
+        self.assertIsNone(normalize_rule(r"/unterminated"))
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
