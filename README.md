@@ -1,6 +1,22 @@
-# 🚀 Filter-Lists v7.2.0
+# 🚀 Filter-Lists v7.4.0
 
 **A compatibility-first, deterministic filter-list compiler** that fetches trusted sources, resolves bounded `!#include` graphs, canonicalizes rules, applies a strict ABP-compatible policy, validates the generated list, and publishes reproducible build metadata.
+
+## ✨ Why use this project?
+
+- **Compatibility-first:** emits a conservative strict-ABP profile instead of leaking engine-specific syntax.
+- **Deterministic:** identical configuration + normalized rules produce the same Build-ID.
+- **Reproducible:** source, policy, and content hashes provide provenance for every build.
+- **Resilient:** bounded includes, download budgets, deadlines, required-source gates, and anomaly detection protect the build.
+- **Observable:** per-source diagnostics and rolling source reputation make upstream failures explainable.
+- **Tested:** curated corpus, regression/property/fuzz tests, optional differential engine tests, and a repeatable benchmark.
+
+## 📚 Compatibility & reproducibility
+
+- [Syntax policy](docs/SYNTAX-POLICY.md)
+- [Compatibility matrix](docs/COMPATIBILITY.md)
+- [Build report schema](docs/REPORT-SCHEMA.md)
+- [Differential engine testing](docs/DIFFERENTIAL-TESTING.md)
 
 ## 📥 Subscribe
 
@@ -14,7 +30,7 @@ The generated list targets a **strict Adblock Plus-compatible syntax profile**. 
 
 The goal is **syntax compatibility first, not maximum engine-specific filtering power**. A downstream blocker may support additional features, but this project will not emit those non-ABP extensions.
 
-## 🏗️ V7.1 architecture
+## 🏗️ V7.4 architecture
 
 ```text
 sources.yaml                 # authoritative source registry
@@ -42,7 +58,7 @@ sources.yaml                 # authoritative source registry
  filters.txt + reports/latest.json + generated sources.txt
 ```
 
-## 🔐 V7.2.0 hardening
+## 🔐 V7.4.0 hardening
 
 V7.2.0 preserves the established strict-ABP behavior while fixing the previous P0–P3 issues:
 
@@ -63,6 +79,17 @@ V7.2.0 preserves the established strict-ABP behavior while fixing the previous P
 - **Rejection diagnostics:** rejection reasons are retained globally and per source, making upstream format changes attributable instead of opaque.
 - **Anomaly detection:** the builder compares current source size, line count, rule count, and rejection rate with the previous report and records warning/critical anomalies without confusing expected content-hash changes with failures.
 - **Deterministic property/fuzz testing:** the test suite exercises normalization with 2,000 deterministic fuzz inputs and checks canonicalization idempotence/determinism plus anomaly behavior without adding a runtime testing dependency.
+
+## ⚙️ Reliability policy
+
+Warning-level anomalies are advisory by default. To make anomaly warnings fail the build, set:
+
+```yaml
+anomaly_detection:
+  fail_on_warning: true
+```
+
+Successful builds are archived under `reports/history/`. Failed builds remain in `reports/latest.json` for diagnostics but are excluded from future anomaly baselines.
 
 ## 📊 Build reporting
 
@@ -113,7 +140,7 @@ cat reports/latest.json
 
 A live build requires network access to the upstream lists. If fewer than 80% of configured **root** sources succeed, any required source fails, the traversal reaches its global source limit, or the build times out, V7 fails instead of publishing a dangerously incomplete list.
 
-## 🧪 Tests
+## 🧪 Tests & verification
 
 The suite covers:
 
@@ -128,7 +155,10 @@ The suite covers:
 - deterministic reporting
 - per-source hashes and diagnostics
 - anomaly detection
-- deterministic property/fuzz tests for arbitrary input
+- deterministic property/fuzz tests for arbitrary input (5,000 iterations per fuzz property)
+- curated real-world syntax corpus
+- optional differential engine testing via `scripts/differential.py`
+- performance benchmark via `python3 scripts/benchmark.py`
 - regression behavior
 
 ## 🏪 My Free DNS Server
@@ -146,6 +176,10 @@ Use **HaGeZi Blocklists Multi Pro + TIF** with My Free DNS.
 A lightweight image proxy that cuts bandwidth and speeds up browsing. Fetches remote images, compresses them, and returns optimized versions for faster loading and lower data use.
 
 🖥️ **Try it out:** https://bhserv.netlify.app/
+
+## 🚀 Release model
+
+V7.4 focused on compatibility/reproducibility. adds advanced reliability: historical reports, source reputation, configurable anomaly enforcement, optional differential testing, stronger fuzzing, and benchmarking.
 
 ## ⚖️ Legal
 

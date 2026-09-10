@@ -1,4 +1,16 @@
-## v7.2.0 — Observability, anomaly detection, and fuzz hardening
+## V7.4.0
+
+- Fixed the successful-build anomaly handling path in `scripts/merge.py` so report data is always loaded before inspection.
+- Kept the project on the `strict-abp` profile; uBlock/AdGuard-only procedural syntax remains rejected.
+- Made generated-list validation derive its expected version from the builder version instead of a second hard-coded version string.
+- Regenerated build artifacts after the V7.4 update so provenance, Build-ID, and version metadata stay aligned.
+
+# Changelog
+
+## V7.3.0
+
+- Compatibility and reproducibility hardening.
+
 
 - Added per-source input/accepted/rejected/duplicate/unique-rule statistics.
 - Added per-source rejection-reason diagnostics.
@@ -8,6 +20,17 @@
 - Added deterministic Unicode and syntax fuzz/property tests for the normalizer.
 - Added anomaly-policy validation to centralized `policies.yaml` configuration.
 - Expanded report schema from 3 to 4.
+- Added historical successful build reports under `reports/history/`.
+- Added rolling source reputation and health tracking.
+- Added optional `anomaly_detection.fail_on_warning`.
+- Added source registry/policy/content provenance to reports and generated headers.
+- Added schema 5 report documentation.
+- Added compatibility/syntax policy documentation and matrix.
+- Added curated real-world syntax corpus tests.
+- Added optional external-engine differential harness.
+- Expanded deterministic fuzzing to 5,000 iterations per property.
+- Added stdlib performance benchmark.
+- Improved README landing section and reliability documentation.
 
 ## v7.1.1 — Source-health, retry, and validator hardening
 

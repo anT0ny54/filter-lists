@@ -1,4 +1,4 @@
-# Filter-Lists v7.1 compatibility policy.
+# Filter-Lists v7.4 compatibility policy.
 version: 3
 profile: strict-abp
 compatibility:
@@ -33,3 +33,5 @@ anomaly_detection:
   max_rule_count_change_ratio: 0.75
   max_rejection_rate_change: 0.25
   min_lines: 100
+  # If true, warning-level anomalies fail the build; default keeps them advisory.
+  fail_on_warning: false
