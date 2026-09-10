@@ -1,0 +1,7 @@
+! Curated corpus covering syntax commonly seen in regional/community lists.
+||example.test^$image,third-party
+@@||example.test^$script
+foo.example.test,bar.example.test##.ad-slot
+/ads?[0-9]+/
+||example.test^$domain=example.test|sub.example.test
+||example.test^$rewrite=abp-resource:blank-text,domain=example.test
