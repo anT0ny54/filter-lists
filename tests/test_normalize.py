@@ -9,6 +9,21 @@ class NormalizeTests(unittest.TestCase):
         self.assertIsNone(normalize_rule("||example.com^$"))
     def test_long_rule_is_rejected(self):
         self.assertIsNone(normalize_rule("||example.com^" + ("x" * 100001)))
+
+    def test_one_sided_pipe_anchors_are_valid_and_interior_pipes_rejected(self):
+        self.assertEqual(normalize_rule("|https://example.com/ads"), "|https://example.com/ads")
+        self.assertEqual(normalize_rule("https://example.com/ads|"), "https://example.com/ads|")
+        self.assertEqual(normalize_rule("|https://example.com/ads|"), "|https://example.com/ads|")
+        self.assertEqual(normalize_rule(r"||example.com/path\|part"), r"||example.com/path\|part")
+        self.assertIsNone(normalize_rule("https://example.com/a|b"))
+        self.assertIsNone(normalize_rule("|||example.com"))
+
+    def test_option_whitespace_is_rejected(self):
+        self.assertIsNone(normalize_rule("||example.com^$script, image"))
+        self.assertIsNone(normalize_rule("||example.com^$script ,image"))
+        self.assertIsNone(normalize_rule("||example.com^$script,domain =example.com"))
+        self.assertEqual(normalize_rule("||example.com^$csp=script-src 'none'"), "||example.com^$csp=script-src 'none'")
+
     def test_rejection_reason_is_specific(self):
         self.assertEqual(rejection_reason("0.0.0.0 ads.example.com"), "hosts-format")
     def test_cosmetic_domains_are_sorted_and_deduplicated(self):
