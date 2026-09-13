@@ -7,14 +7,12 @@ import hashlib
 import re
 import subprocess
 import time
-import threading
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
 DOWNLOAD_TIMEOUT = 90
 INCLUDE_TIMEOUT = 60
 CURL_RETRIES = 5
-HTML_RE = re.compile(r"^\s*(?:<!doctype\b|<html\b|<head\b|<body\b)", re.I)
 
 
 def canonical_url(url: str) -> str:
@@ -47,7 +45,7 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
         "--retry-max-time", str(timeout),
         "--connect-timeout", str(connect_timeout), "--max-time", str(timeout),
         "--max-filesize", str(max_download_bytes),
-        "--user-agent", "filter-lists-builder/7.5.1", "--output", str(output), url,
+        "--user-agent", "filter-lists-builder/7.5.2", "--output", str(output), url,
     ]
     try:
         proc = subprocess.run(command, text=True, capture_output=True, timeout=timeout + 5)

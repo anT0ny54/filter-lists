@@ -7,8 +7,6 @@ behavior changes covered by regression tests before changing this module.
 from __future__ import annotations
 
 import re
-from collections import Counter
-
 from config import load_policy_limits
 from parser import classify
 from policy import (
@@ -63,12 +61,23 @@ def valid_network_pattern(pattern: str) -> bool:
         return valid_regex_filter(pattern)
     if any(c.isspace() for c in pattern):
         return False
-    if "|" in pattern:
-        # ABP allows | as a beginning/end anchor and || as the domain anchor.
-        # No interior | is valid in a network pattern.
-        interior = pattern[2:-1] if pattern.startswith("||") else pattern[1:-1] if pattern.startswith("|") or pattern.endswith("|") else pattern
-        if "|" in interior:
-            return False
+    # ABP allows an unescaped `|` only as a start/end anchor (`|` or `||` at
+    # the beginning, `|` at the end). Escaped pipes are literal pattern data.
+    unescaped_pipes: list[int] = []
+    escaped = False
+    for index, char in enumerate(pattern):
+        if char == "|" and not escaped:
+            unescaped_pipes.append(index)
+        escaped = char == "\\" and not escaped
+    allowed_pipes: set[int] = set()
+    if pattern.startswith("||"):
+        allowed_pipes.update((0, 1))
+    elif pattern.startswith("|"):
+        allowed_pipes.add(0)
+    if pattern.endswith("|"):
+        allowed_pipes.add(len(pattern) - 1)
+    if any(index not in allowed_pipes for index in unescaped_pipes):
+        return False
     # An exception marker is parsed outside this function. No bare @@ here.
     if pattern.startswith("@@"):
         return False
@@ -101,9 +110,13 @@ def split_options(rule: str) -> tuple[str, list[str]]:
     option_text = rule[pos + 1:]
     if not option_text:
         return rule, []
-    options = [x.strip() for x in option_text.split(",")]
-    if not options or any(not x for x in options):
+    raw_options = option_text.split(",")
+    # Whitespace around option tokens is not part of the canonical ABP option
+    # grammar. CSP values may contain spaces, so whitespace checks are applied
+    # to token boundaries here and to option names later.
+    if not raw_options or any(not x or x != x.strip() for x in raw_options):
         return rule, []
+    options = raw_options
     return rule[:pos], options
 
 
@@ -138,7 +151,9 @@ def valid_option(option: str, is_exception: bool) -> bool:
             return True
         return False
     name, value = option.split("=", 1)
-    name = name.strip().lower()
+    if not name or name != name.strip() or any(char.isspace() for char in name):
+        return False
+    name = name.lower()
     if name not in VALUE_OPTIONS or not value:
         return False
     if name == "domain":
@@ -170,7 +185,8 @@ def normalize_network(rule: str) -> str | None:
             return None
         if "=" in option:
             name, value = option.split("=", 1)
-            normalized.append(f"{name.lower()}={value}")
+            name = name.lower()
+            normalized.append(f"{name}={value}")
         elif option.startswith("~"):
             normalized.append("~" + option[1:].lower())
         else:
