@@ -1,3 +1,16 @@
+## V7.5.2
+
+- Tightened strict ABP network grammar for one-sided/domain anchors and escaped literal pipes.
+- Rejected whitespace around network-filter option tokens while preserving spaces inside CSP values.
+- Removed unused imports/constants and pinned the keep-alive checkout action to an immutable commit.
+- Corrected documentation/version drift without changing the generated V7.5.2 rule set.
+
+- Tightened strict ABP network grammar for one-sided/domain anchors and escaped literal pipes.
+- Rejected whitespace around network-filter option tokens while preserving spaces inside CSP values.
+- Canonicalized `domain=` and `sitekey=` value lists to remove order/duplicate redundancy.
+- Removed unused imports/constants and corrected builder/version metadata drift.
+- Pinned the keep-alive workflow checkout action to an immutable commit.
+
 ## V7.5.1
 
 - Fixed test HTTP-server teardown to call `server_close()` and remove the temporary fixture directory, eliminating the `ResourceWarning` from the fetch test suite.
@@ -93,10 +106,3 @@
 - Improved rejection reason granularity.
 - Removed the duplicated active V5 implementation/test copy.
 - Preserved the existing strict-ABP normalization behavior as the compatibility baseline.
-
-## v7.5.0
-
-- **Strict-ABP remains the only release profile.**
-- Added end-to-end `merge.py` tests covering successful publication, source-health failure, required-source failure, and anomaly-enforced failure.
-- Verified that successful builds archive exactly one successful report and failed builds do not archive failed reports.
-- Verified generated output/report/profile/provenance flow through the real `merge.py` orchestration path.
