@@ -1,4 +1,4 @@
-name: Validate Filter List V7.5.1
+name: Validate Filter List
 
 on:
   pull_request:
