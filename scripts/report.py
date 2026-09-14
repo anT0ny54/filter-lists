@@ -2,26 +2,18 @@
 """Build statistics, provenance, source health, and anomaly detection."""
 from __future__ import annotations
 
-import hashlib
 import json
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from config import sha256_file
 from normalize import normalize_rule, rejection_reason
 from health import build_source_reputation
 
 SCHEMA_VERSION = 5
 BUILDER_VERSION = "7.5.2"
-
-
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as source:
-        for chunk in iter(lambda: source.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_rule_length: int | None = None) -> tuple[set[str], dict]:

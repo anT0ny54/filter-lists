@@ -10,7 +10,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
 sys.path.insert(0, str(SCRIPT_DIR))
-from config import load_config  # noqa: E402
+from config import config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
 from normalize import normalize_rule  # noqa: E402
 from report import BUILDER_VERSION  # noqa: E402
 
@@ -18,16 +18,6 @@ TOTAL_RE = re.compile(r"^! Total rules: ([0-9]+)$")
 BUILD_RE = re.compile(r"^! Build-ID: ([0-9a-f]{64})$")
 SOURCE_MANIFEST_RE = re.compile(r"^! Source manifest SHA-256: ([0-9a-f]{64})$")
 VERSION_RE = re.compile(r"^! Version: v" + re.escape(BUILDER_VERSION) + r"-[0-9a-f]{12}$")
-
-
-def config_fingerprint(config) -> str:
-    h = hashlib.sha256()
-    for source in config.sources:
-        h.update(f"{source.name}\0{source.url}\0{source.category}\0{source.priority}\0{source.required}\n".encode())
-    for path in (ROOT / "policies.yaml", ROOT / "custom-rules.txt"):
-        if path.exists():
-            h.update(path.read_bytes())
-    return h.hexdigest()
 
 
 def main() -> int:
@@ -90,10 +80,7 @@ def main() -> int:
     if declared_source_manifest is None:
         errors.append("[PROVENANCE] source manifest SHA-256 missing or invalid")
     else:
-        manifest = hashlib.sha256()
-        for source in config.sources:
-            manifest.update(f"{source.name}\0{source.url}\0{source.category}\0{source.priority}\0{source.required}\n".encode())
-        if manifest.hexdigest() != declared_source_manifest:
+        if source_manifest_sha256(config) != declared_source_manifest:
             errors.append("[PROVENANCE] source manifest hash does not match sources.yaml")
     if not version_ok:
         errors.append("[VERSION] missing or invalid")

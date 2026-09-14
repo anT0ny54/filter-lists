@@ -22,10 +22,13 @@ def classify(line: str) -> LineClassification:
     value = line.strip().lstrip("\ufeff")
     if not value:
         return LineClassification("blank")
-    if COMMENT_RE.match(value):
-        return LineClassification("comment")
+    # Directives (`!#include`, `!#if`, ...) start with the same `!` prefix as
+    # comments, so the directive check must run first or it is unreachable
+    # and every directive line is silently misreported as a comment.
     if DIRECTIVE_RE.match(value):
         return LineClassification("directive")
+    if COMMENT_RE.match(value):
+        return LineClassification("comment")
     if HOSTS_RE.match(value):
         return LineClassification("invalid", "hosts-format")
     if HTML_RE.match(value):

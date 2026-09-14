@@ -2,6 +2,7 @@
 """Centralized build configuration loading and validation."""
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -11,8 +12,8 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_REGISTRY = ROOT / "sources.yaml"
-LEGACY_SOURCES = ROOT / "sources.txt"
 POLICY_FILE = ROOT / "policies.yaml"
+CUSTOM_RULES = ROOT / "custom-rules.txt"
 
 
 def _strict_bool(value, field: str) -> bool:
@@ -164,11 +165,33 @@ def load_config() -> BuildConfig:
     )
 
 
-def load_legacy_urls() -> list[str]:
-    if not LEGACY_SOURCES.is_file():
-        return []
-    return [
-        x.strip()
-        for x in LEGACY_SOURCES.read_text(encoding="utf-8", errors="replace").splitlines()
-        if x.strip() and not x.strip().startswith("#")
-    ]
+def sha256_file(path: Path) -> str:
+    """Stream-hash a file. Single shared implementation for fetch/merge/report."""
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def source_manifest_sha256(config: BuildConfig) -> str:
+    """Hash the ordered (name, url, category, priority, required) source manifest.
+
+    Shared by the builder (to publish the manifest hash) and the validator
+    (to confirm a generated list matches its declared sources.yaml).
+    """
+    h = hashlib.sha256()
+    for source in config.sources:
+        h.update(f"{source.name}\0{source.url}\0{source.category}\0{source.priority}\0{source.required}\n".encode())
+    return h.hexdigest()
+
+
+def config_fingerprint(config: BuildConfig) -> str:
+    """Hash the source manifest plus policy/custom-rules content for the Build-ID."""
+    h = hashlib.sha256()
+    for source in config.sources:
+        h.update(f"{source.name}\0{source.url}\0{source.category}\0{source.priority}\0{source.required}\n".encode())
+    for path in (POLICY_FILE, CUSTOM_RULES):
+        if path.exists():
+            h.update(path.read_bytes())
+    return h.hexdigest()

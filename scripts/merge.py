@@ -22,39 +22,14 @@ SOURCES_TXT = ROOT / "sources.txt"
 WORKERS = min(16, max(4, (os.cpu_count() or 2) * 2))
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from config import load_config  # noqa: E402
+from config import config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
 from fetch import collect_sources, valid_url  # noqa: E402
 from report import analyze_files, write_report  # noqa: E402
-from normalize import normalize_rule  # noqa: E402
+from normalize import normalize_rule  # noqa: E402  (re-exported for tests/tools that import merge.normalize_rule)
 
 
 def log(message: str) -> None:
     print(message, flush=True)
-
-
-def sha256_file(path: Path) -> str:
-    h = hashlib.sha256()
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(1024 * 1024), b""):
-            h.update(chunk)
-    return h.hexdigest()
-
-
-def config_fingerprint(config) -> str:
-    h = hashlib.sha256()
-    for source in config.sources:
-        h.update(f"{source.name}\0{source.url}\0{source.category}\0{source.priority}\0{source.required}\n".encode())
-    for path in (ROOT / "policies.yaml", CUSTOM_RULES):
-        if path.exists():
-            h.update(path.read_bytes())
-    return h.hexdigest()
-
-
-def source_manifest_sha256(config) -> str:
-    h = hashlib.sha256()
-    for source in config.sources:
-        h.update(f"{source.name}\0{source.url}\0{source.category}\0{source.priority}\0{source.required}\n".encode())
-    return h.hexdigest()
 
 
 def load_previous_report() -> dict | None:

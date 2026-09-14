@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import concurrent.futures
-import hashlib
 import re
 import subprocess
 import time
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit, urlunsplit
+
+from config import sha256_file
 
 DOWNLOAD_TIMEOUT = 90
 INCLUDE_TIMEOUT = 60
@@ -56,14 +57,6 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
         output.unlink(missing_ok=True)
         return False, proc.stderr.strip() or f"curl exit {proc.returncode}"
     return True, ""
-
-
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as source:
-        for chunk in iter(lambda: source.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def validate_download(path: Path, max_bytes: int) -> tuple[bool, str]:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compatibility policy for the Filter-Lists v7.4 build.
+"""Compatibility policy for the Filter-Lists v7.5.2 build.
 
 The existing strict ABP policy is intentionally preserved. This module makes
 that policy explicit and reusable without changing the accepted rule profile.
@@ -30,7 +30,3 @@ PROFILE_DESCRIPTION = (
     "ABP external-list-safe core syntax; engine-specific uBO/AdGuard-only "
     "features are excluded."
 )
-
-
-def allowed_option_names() -> set[str]:
-    return TYPE_OPTIONS | INVERSE_OPTIONS | SIMPLE_OPTIONS | VALUE_OPTIONS
