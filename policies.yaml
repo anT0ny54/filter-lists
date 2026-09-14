@@ -1,4 +1,4 @@
-# Filter-Lists v7.4 compatibility policy.
+# Filter-Lists v7.5.2 compatibility policy.
 version: 3
 profile: strict-abp
 compatibility:
