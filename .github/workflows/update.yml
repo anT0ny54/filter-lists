@@ -30,12 +30,12 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
@@ -101,5 +101,5 @@ jobs:
             exit 0
           fi
           rules="$(sed -n 's/^! Total rules: //p' filters.txt)"
-          git commit -m "chore(filters): auto-update V7.5.1 filter list (${rules} rules) [skip ci]"
+          git commit -m "chore(filters): auto-update V7.5.2 filter list (${rules} rules) [skip ci]"
           git push origin "HEAD:${GITHUB_REF_NAME}"
