@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.5.2-b73ee3d6f88e
-! Last updated: 2026-09-14 04:40:49 UTC
+! Version: v7.5.2-11cf836c0493
+! Last updated: 2026-09-14 05:05:37 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: b73ee3d6f88e1ae472fa228b63550258fb4ba222bc73c468da0ca1ae28e5d9ea
+! Build-ID: 11cf836c049312387b2759d64d5654f6bdde9a796191d140312f29e5b08a06e7
 ! Source manifest SHA-256: 2f87bc9b88421e1b431098c5f33387602c6c38286e2533c1890c26ec59fcfd77
 ! Root sources: 33
-! Total rules: 178347
+! Total rules: 178349
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus-compatible syntax; uBlock/AdGuard-only rules are excluded.
@@ -129768,6 +129768,7 @@ zzzyk.com###Tinfo
 ||gqbzbszzbqsdi.online^
 ||gqcrgyufg.com^
 ||gqfsjyhaoqzxs.website^
+||gqgyurwgwlcux.space^
 ||gqhufphizxbjc.site^
 ||gqiikkuqzsxrt.store^
 ||gqiqpebzsgcrc.website^
@@ -145163,6 +145164,7 @@ zzzyk.com###Tinfo
 ||mywovcjadrtcb.online^
 ||myxacholent.qpon^
 ||myxoidlackey.qpon^
+||myxzlowmrjldr.space^
 ||myxzwqjsmfmgf.space^
 ||myyqzpaipkkox.site^
 ||myztaimlepqtz.site^
