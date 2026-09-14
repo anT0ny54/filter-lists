@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.5.2-01184222ea48
-! Last updated: 2026-09-14 04:35:02 UTC
+! Version: v7.5.2-b73ee3d6f88e
+! Last updated: 2026-09-14 04:40:49 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 01184222ea482fd60201aae3b87c45f92df18a587592b7eff64e661ac39fafb8
+! Build-ID: b73ee3d6f88e1ae472fa228b63550258fb4ba222bc73c468da0ca1ae28e5d9ea
 ! Source manifest SHA-256: 2f87bc9b88421e1b431098c5f33387602c6c38286e2533c1890c26ec59fcfd77
 ! Root sources: 33
-! Total rules: 178345
+! Total rules: 178347
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus-compatible syntax; uBlock/AdGuard-only rules are excluded.
@@ -108524,6 +108524,7 @@ zzzyk.com###Tinfo
 ||azknucfjdcecq.online^
 ||azkwwrejomwjb.top^
 ||azkwwrmmzkewm.top^
+||azlakrqumofqk.space^
 ||azlyrics.com/local/anew.js
 ||azmexngawjzhx.space^
 ||aznapoz.info^
@@ -153353,6 +153354,7 @@ zzzyk.com###Tinfo
 ||pyknicfuror.shop^
 ||pyloricqueried.shop^
 ||pylqeypkcxzka.site^
+||pympjthnuzu.com^
 ||pynnywwoczyub.website^
 ||pyntbz.icu^
 ||pyocyteequally.qpon^
