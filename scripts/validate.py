@@ -37,6 +37,7 @@ def main() -> int:
     declared_total = None
     declared_build_id = None
     declared_source_manifest = None
+    version_seen = False
     version_ok = False
 
     for number, raw in enumerate(path.read_text(encoding="utf-8", errors="strict").splitlines(), 1):
@@ -50,9 +51,10 @@ def main() -> int:
             declared_source_manifest = m.group(1)
             continue
         if raw.startswith("! Version:"):
+            version_seen = True
             version_ok = bool(VERSION_RE.match(raw))
             if not version_ok:
-                errors.append(f"[VERSION] line {number}: invalid V7 version")
+                errors.append(f"[VERSION] line {number}: invalid version")
         if not raw or raw.lstrip().startswith("!"):
             continue
 
@@ -82,8 +84,8 @@ def main() -> int:
     else:
         if source_manifest_sha256(config) != declared_source_manifest:
             errors.append("[PROVENANCE] source manifest hash does not match sources.yaml")
-    if not version_ok:
-        errors.append("[VERSION] missing or invalid")
+    if not version_seen:
+        errors.append("[VERSION] missing")
 
     for error in errors[:100]:
         print(error)

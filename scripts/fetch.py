@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
-from config import sha256_file
+from config import sha256_file, valid_url
 
 DOWNLOAD_TIMEOUT = 90
 INCLUDE_TIMEOUT = 60
@@ -20,14 +20,6 @@ def canonical_url(url: str) -> str:
     """Canonicalize harmless URL variations for include-cycle detection."""
     p = urlsplit(url.strip())
     return urlunsplit((p.scheme.lower(), p.netloc.lower(), p.path or "/", p.query, ""))
-
-
-def valid_url(url: str) -> bool:
-    try:
-        p = urlsplit(url)
-        return p.scheme in {"http", "https"} and bool(p.netloc) and not any(c.isspace() for c in url)
-    except ValueError:
-        return False
 
 
 def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> tuple[bool, str]:

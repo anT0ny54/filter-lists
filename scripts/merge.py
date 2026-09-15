@@ -50,7 +50,7 @@ def load_previous_report() -> dict | None:
     candidates.extend(path for _, path, _ in history)
     for path in candidates:
         try:
-            data = __import__("json").loads(path.read_text(encoding="utf-8"))
+            data = json.loads(path.read_text(encoding="utf-8"))
             if data.get("status", "success") == "success":
                 return data
         except (OSError, ValueError):
@@ -98,7 +98,7 @@ def sync_legacy_sources(config) -> None:
         SOURCES_TXT.write_text(text, encoding="utf-8", newline="\n")
 
 
-def write_output(rules: set[str], build_id: str, *, source_manifest_sha256: str, source_count: int) -> None:
+def write_output(rules: set[str], build_id: str, *, manifest_sha256: str, source_count: int) -> None:
     final_rules = sorted(rules, key=lambda x: (x.casefold(), x))
     now = datetime.now(timezone.utc)
     header = [
@@ -109,7 +109,7 @@ def write_output(rules: set[str], build_id: str, *, source_manifest_sha256: str,
         "! Homepage: https://github.com/anT0ny54/filter-lists",
         "! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE",
         f"! Build-ID: {build_id}",
-        f"! Source manifest SHA-256: {source_manifest_sha256}",
+        f"! Source manifest SHA-256: {manifest_sha256}",
         f"! Root sources: {source_count}",
         f"! Total rules: {len(final_rules)}",
         "!",
@@ -182,7 +182,7 @@ def main() -> int:
                 item.update({k: v for k, v in detail.items() if k != "path"})
         source_stats["content_hash_algorithm"] = "sha256"
         build_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(sorted(rules, key=lambda x: (x.casefold(), x)))).encode()).hexdigest()
-        write_output(rules, build_id, source_manifest_sha256=provenance["source_manifest_sha256"], source_count=len(source_urls))
+        write_output(rules, build_id, manifest_sha256=provenance["source_manifest_sha256"], source_count=len(source_urls))
         write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="success")
         data = json.loads(REPORT.read_text(encoding="utf-8"))
         if data.get("anomalies", {}).get("enforced_failure", False):

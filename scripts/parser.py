@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Small, dependency-free filter-list line classifier used by V6."""
+"""Small, dependency-free filter-list line classifier."""
 from __future__ import annotations
 
 import re

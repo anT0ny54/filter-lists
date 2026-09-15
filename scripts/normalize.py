@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Canonicalization and strict ABP validation.
 
-This is deliberately compatible with the working V5 implementation. Keep
-behavior changes covered by regression tests before changing this module.
+Behavior here is the compatibility baseline for the whole build. Keep any
+behavior change covered by regression tests before changing this module.
 """
 from __future__ import annotations
 
@@ -15,14 +15,17 @@ from policy import (
 )
 
 MAX_RULE_LENGTH = load_policy_limits()[0]
+# Shared control-character gate. Same pattern is reused under a second name
+# below (NETWORK_FORBIDDEN_RE) purely so call sites read as domain-specific;
+# keep both names pointed at one compiled pattern instead of two copies.
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+NETWORK_FORBIDDEN_RE = CONTROL_RE
 DOMAIN_RE = re.compile(
     r"^~?(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+"
     r"[A-Za-z]{2,63}$"
 )
 SITEKEY_RE = re.compile(r"^[A-Za-z0-9+/._-]+={0,2}$")
 ASCII_WS_RE = re.compile(r"[\t\n\r\f\v ]")
-NETWORK_FORBIDDEN_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 
 def valid_regex_filter(pattern: str) -> bool:

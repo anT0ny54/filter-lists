@@ -174,23 +174,27 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _hash_source_manifest(digest, config: BuildConfig) -> None:
+    """Feed the ordered (name, url, category, priority, required) source manifest into `digest`."""
+    for source in config.sources:
+        digest.update(f"{source.name}\0{source.url}\0{source.category}\0{source.priority}\0{source.required}\n".encode())
+
+
 def source_manifest_sha256(config: BuildConfig) -> str:
-    """Hash the ordered (name, url, category, priority, required) source manifest.
+    """Hash the ordered source manifest.
 
     Shared by the builder (to publish the manifest hash) and the validator
     (to confirm a generated list matches its declared sources.yaml).
     """
     h = hashlib.sha256()
-    for source in config.sources:
-        h.update(f"{source.name}\0{source.url}\0{source.category}\0{source.priority}\0{source.required}\n".encode())
+    _hash_source_manifest(h, config)
     return h.hexdigest()
 
 
 def config_fingerprint(config: BuildConfig) -> str:
     """Hash the source manifest plus policy/custom-rules content for the Build-ID."""
     h = hashlib.sha256()
-    for source in config.sources:
-        h.update(f"{source.name}\0{source.url}\0{source.category}\0{source.priority}\0{source.required}\n".encode())
+    _hash_source_manifest(h, config)
     for path in (POLICY_FILE, CUSTOM_RULES):
         if path.exists():
             h.update(path.read_bytes())

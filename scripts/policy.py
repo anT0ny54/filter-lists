@@ -10,13 +10,15 @@ TYPE_OPTIONS = {
     "script", "image", "stylesheet", "object", "xmlhttprequest",
     "subdocument", "ping", "websocket", "webrtc", "document",
     "elemhide", "generichide", "genericblock", "popup", "font",
-    "media", "other", "match-case",
+    "media", "other",
 }
 INVERSE_OPTIONS = {f"~{x}" for x in {
     "script", "image", "stylesheet", "object", "xmlhttprequest",
     "subdocument", "ping", "websocket", "webrtc", "document",
     "elemhide", "other",
 }}
+# match-case is a standalone modifier, not a resource type, so it belongs
+# only in SIMPLE_OPTIONS (it was previously duplicated into TYPE_OPTIONS too).
 SIMPLE_OPTIONS = {"third-party", "~third-party", "match-case"}
 VALUE_OPTIONS = {"domain", "sitekey", "csp", "rewrite"}
 REWRITE_RESOURCES = {
