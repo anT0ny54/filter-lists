@@ -10,13 +10,14 @@ Filter-Lists emits a **strict ABP-compatible** subset intended to be safe for ex
 - ABP anchors, separators, and regular-expression filters.
 - Supported ABP request-type and context options.
 - `domain=`, `sitekey=`, `csp=`, and the allow-listed `rewrite=` resources.
-- ABP element hiding (`##`) and supported extended CSS (`#?#`).
+- ABP element hiding (`##`), its ABP exception form (`#@#`), and supported extended CSS (`#?#`).
 - Comments and directives are consumed as metadata/input and are not emitted as rules.
 
 ### Rejected
 
 - uBlock Origin procedural filters such as `##+js(...)`.
-- uBO-only extended exceptions such as `#@#` and `#?@#` where unsupported.
+- The uBO-only extended-CSS exception form `#?@#`.
+- Snippet-injection filters (`#$#`).
 - AdGuard/uBO-only options not present in the policy allow-list.
 - Duplicate or malformed options.
 - Hosts-file lines (`0.0.0.0 host`).
