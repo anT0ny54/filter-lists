@@ -3,6 +3,7 @@ import shutil
 import http.server
 import threading
 import tempfile
+import time
 import unittest
 from pathlib import Path
 import sys
@@ -37,7 +38,7 @@ class FetchTests(unittest.TestCase):
         self.assertEqual(include_urls(self.root / "main.txt", self.base + "/main.txt"), [self.base + "/child.txt"])
 
     def test_root_health_is_separate_from_nested_sources(self):
-        started = __import__("time").monotonic()
+        started = time.monotonic()
         with tempfile.TemporaryDirectory() as tmp:
             files, stats = collect_sources(
                 [self.base + "/main.txt"], Path(tmp), started, 2, lambda _: None,
@@ -55,7 +56,7 @@ class FetchTests(unittest.TestCase):
         self.assertTrue(all(len(item["sha256"]) == 64 for item in stats["results"]))
 
     def test_global_source_limit_stops_include_explosion(self):
-        started = __import__("time").monotonic()
+        started = time.monotonic()
         with tempfile.TemporaryDirectory() as tmp:
             _, stats = collect_sources(
                 [self.base + "/main.txt"], Path(tmp), started, 2, lambda _: None,
@@ -80,7 +81,7 @@ class FetchBudgetWaveTests(unittest.TestCase):
         # Use unique paths that all resolve to the same fixture, while the
         # global budget allows only two 1-byte-sized reservations at once.
         urls = [FetchTests.base + f"/child.txt?source={i}" for i in range(5)]
-        started = __import__("time").monotonic()
+        started = time.monotonic()
         with tempfile.TemporaryDirectory() as tmp:
             files, stats = collect_sources(
                 urls, Path(tmp), started, 8, lambda _: None,
@@ -97,7 +98,7 @@ class FetchBudgetWaveTests(unittest.TestCase):
         self.assertLessEqual(stats["total_download_bytes"], 256)
 
     def test_budget_parallelism_is_bounded_by_global_budget(self):
-        started = __import__("time").monotonic()
+        started = time.monotonic()
         with tempfile.TemporaryDirectory() as tmp:
             _, stats = collect_sources(
                 [FetchTests.base + "/child.txt"], Path(tmp), started, 32, lambda _: None,
