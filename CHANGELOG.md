@@ -1,15 +1,12 @@
-## V7.5.2
+# Changelog
 
-- Tightened strict ABP network grammar for one-sided/domain anchors and escaped literal pipes.
-- Rejected whitespace around network-filter option tokens while preserving spaces inside CSP values.
-- Removed unused imports/constants and pinned the keep-alive checkout action to an immutable commit.
-- Corrected documentation/version drift without changing the generated V7.5.2 rule set.
+## V7.5.2
 
 - Tightened strict ABP network grammar for one-sided/domain anchors and escaped literal pipes.
 - Rejected whitespace around network-filter option tokens while preserving spaces inside CSP values.
 - Canonicalized `domain=` and `sitekey=` value lists to remove order/duplicate redundancy.
 - Removed unused imports/constants and corrected builder/version metadata drift.
-- Pinned the keep-alive workflow checkout action to an immutable commit.
+- Corrected documentation/version drift without changing the generated V7.5.2 rule set.
 
 ## V7.5.1
 
@@ -32,13 +29,9 @@
 - Made generated-list validation derive its expected version from the builder version instead of a second hard-coded version string.
 - Regenerated build artifacts after the V7.4 update so provenance, Build-ID, and version metadata stay aligned.
 
-# Changelog
-
 ## V7.3.0
 
 - Compatibility and reproducibility hardening.
-
-
 - Added per-source input/accepted/rejected/duplicate/unique-rule statistics.
 - Added per-source rejection-reason diagnostics.
 - Added SHA-256 content hashes for successful downloaded sources.
@@ -68,8 +61,6 @@
 - Added explicit root-source failure diagnostics to CI output.
 - Added regression tests for budget-safe queueing and parallelism limits.
 - Kept the strict ABP-compatible syntax gate unchanged and non-negotiable.
-
-# Changelog
 
 ## v7.1 — Strict ABP hardening
 

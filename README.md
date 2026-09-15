@@ -138,7 +138,7 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 cat reports/latest.json
 ```
 
-A live build requires network access to the upstream lists. If fewer than 80% of configured **root** sources succeed, any required source fails, the traversal reaches its global source limit, or the build times out, V7 fails instead of publishing a dangerously incomplete list.
+A live build requires network access to the upstream lists. If fewer than 80% of configured **root** sources succeed, any required source fails, the traversal reaches its global source limit, or the build times out, the build fails instead of publishing a dangerously incomplete list.
 
 ## 🧪 Tests & verification
 
@@ -179,7 +179,7 @@ A lightweight image proxy that cuts bandwidth and speeds up browsing. Fetches re
 
 ## 🚀 Release model
 
-V7.5 focused on compatibility/reproducibility. adds advanced reliability: historical reports, source reputation, configurable anomaly enforcement, optional differential testing, stronger fuzzing, and benchmarking.
+V7.5.2 builds on the V7.5 compatibility/reproducibility baseline by adding advanced reliability: historical reports, source reputation, configurable anomaly enforcement, optional differential testing, stronger fuzzing, and benchmarking.
 
 ## ⚖️ Legal
 
