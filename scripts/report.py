@@ -8,12 +8,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from config import sha256_file
+from config import BUILDER_VERSION, sha256_file
 from normalize import normalize_rule, rejection_reason
 from health import build_source_reputation
+from policy import PROFILE_NAME
 
 SCHEMA_VERSION = 5
-BUILDER_VERSION = "7.5.2"
 
 
 def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_rule_length: int | None = None) -> tuple[set[str], dict]:
@@ -97,7 +97,7 @@ def write_report(path: Path, *, source_stats: dict, rule_stats: dict, elapsed_se
     clean_sources["results"] = results
     anomalies = detect_anomalies(results, previous_report, anomaly_policy or {"enabled": False})
     payload = {
-        "schema": SCHEMA_VERSION, "status": status, "generated_at": datetime.now(timezone.utc).isoformat(), "builder": f"Filter-Lists v{BUILDER_VERSION}", "profile": "strict-abp", "build_id": build_id, "source_count": len(source_urls),
+        "schema": SCHEMA_VERSION, "status": status, "generated_at": datetime.now(timezone.utc).isoformat(), "builder": f"Filter-Lists v{BUILDER_VERSION}", "profile": PROFILE_NAME, "build_id": build_id, "source_count": len(source_urls),
         "provenance": provenance or {}, "sources": clean_sources, "source_reputation": build_source_reputation(history_dir or path.parent / "history", results),
         "rules": {k: v for k, v in rule_stats.items() if k != "per_file"}, "anomalies": anomalies, "build_seconds": round(elapsed_seconds, 3),
     }

@@ -10,9 +10,8 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
 sys.path.insert(0, str(SCRIPT_DIR))
-from config import config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
+from config import BUILDER_VERSION, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
 from normalize import normalize_rule  # noqa: E402
-from report import BUILDER_VERSION  # noqa: E402
 
 TOTAL_RE = re.compile(r"^! Total rules: ([0-9]+)$")
 BUILD_RE = re.compile(r"^! Build-ID: ([0-9a-f]{64})$")

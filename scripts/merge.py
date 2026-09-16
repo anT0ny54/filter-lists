@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Filter-Lists V7.5 deterministic build orchestrator."""
+"""Filter-Lists deterministic build orchestrator."""
 from __future__ import annotations
 
 import hashlib
@@ -16,13 +16,12 @@ ROOT = Path(__file__).resolve().parents[1]
 CUSTOM_RULES = ROOT / "custom-rules.txt"
 OUTPUT = ROOT / "filters.txt"
 REPORT = ROOT / "reports" / "latest.json"
-BUILDER_VERSION = "7.5.2"
 HISTORY_DIR = ROOT / "reports" / "history"
 SOURCES_TXT = ROOT / "sources.txt"
 WORKERS = min(16, max(4, (os.cpu_count() or 2) * 2))
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from config import config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
+from config import BUILDER_VERSION, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
 from fetch import collect_sources, valid_url  # noqa: E402
 from report import analyze_files, write_report  # noqa: E402
 from normalize import normalize_rule  # noqa: E402  (re-exported for tests/tools that import merge.normalize_rule)

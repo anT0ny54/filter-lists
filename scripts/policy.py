@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compatibility policy for the Filter-Lists v7.5.2 build.
+"""Compatibility policy for the Filter-Lists build.
 
 The existing strict ABP policy is intentionally preserved. This module makes
 that policy explicit and reusable without changing the accepted rule profile.
@@ -12,11 +12,12 @@ TYPE_OPTIONS = {
     "elemhide", "generichide", "genericblock", "popup", "font",
     "media", "other",
 }
-INVERSE_OPTIONS = {f"~{x}" for x in {
-    "script", "image", "stylesheet", "object", "xmlhttprequest",
-    "subdocument", "ping", "websocket", "webrtc", "document",
-    "elemhide", "other",
-}}
+# These content types are exception-only or otherwise not negatable in the
+# strict profile, so they are excluded from TYPE_OPTIONS when deriving the
+# `~`-prefixed inverse set below. Deriving from TYPE_OPTIONS instead of
+# retyping the members keeps the two sets from silently drifting apart.
+NO_INVERSE_OPTIONS = {"generichide", "genericblock", "popup", "font", "media"}
+INVERSE_OPTIONS = {f"~{x}" for x in TYPE_OPTIONS if x not in NO_INVERSE_OPTIONS}
 # match-case is a standalone modifier, not a resource type, so it belongs
 # only in SIMPLE_OPTIONS (it was previously duplicated into TYPE_OPTIONS too).
 SIMPLE_OPTIONS = {"third-party", "~third-party", "match-case"}

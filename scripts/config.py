@@ -15,6 +15,12 @@ SOURCE_REGISTRY = ROOT / "sources.yaml"
 POLICY_FILE = ROOT / "policies.yaml"
 CUSTOM_RULES = ROOT / "custom-rules.txt"
 
+# Single source of truth for the builder version. merge.py, report.py,
+# validate.py, and fetch.py's outbound User-Agent all import this instead of
+# each keeping an independent copy, which previously let the string drift
+# out of sync between modules on a version bump.
+BUILDER_VERSION = "7.5.2"
+
 
 def _strict_bool(value, field: str) -> bool:
     if isinstance(value, bool):
