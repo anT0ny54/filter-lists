@@ -7,6 +7,12 @@
 - Canonicalized `domain=` and `sitekey=` value lists to remove order/duplicate redundancy.
 - Removed unused imports/constants and corrected builder/version metadata drift.
 - Corrected documentation/version drift without changing the generated V7.5.2 rule set.
+- Consolidated `BUILDER_VERSION`, which had drifted into three independent copies (`merge.py`, `report.py`, and a hardcoded string in `fetch.py`'s User-Agent), into a single definition in `config.py`; `merge.py`, `report.py`, `validate.py`, and `fetch.py` now all import it.
+- Wired the previously unused `policy.PROFILE_NAME` into the build report instead of a second, separately maintained `"strict-abp"` string literal in `report.py`.
+- Replaced a hand-typed duplicate of `TYPE_OPTIONS`'s members inside `policy.INVERSE_OPTIONS` with a derived set, so the two can no longer silently drift apart; verified behavior-identical before and after.
+- Removed hardcoded patch-version numbers from module docstrings and README section headers that had to be manually kept in sync on every release.
+- Corrected a README/CHANGELOG claim that GitHub Actions are pinned to immutable commit SHAs; the workflows actually pin to major version tags (`@v5`), and the documentation now says so.
+- Removed `.gitattributes` line-ending rules for languages (`.go`, `.ts`, `.tsx`, `.js`, `.jsx`) that have no files anywhere in this repository.
 
 ## V7.5.1
 
@@ -80,7 +86,7 @@
 - Added full Build-ID recomputation during generated-list validation.
 - Fixed deterministic sorting when case-folded rule names collide.
 - Added offline fetch/integration regression tests.
-- Pinned GitHub Actions to immutable commit SHAs.
+- Pinned GitHub Actions to major version tags instead of `@main`/`@master`.
 - Removed `sources.txt` from workflow triggers because it is generated output.
 - Expanded build reporting for root/nested source health and traversal limits.
 

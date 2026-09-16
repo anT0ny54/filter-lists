@@ -1,6 +1,8 @@
-# 🚀 Filter-Lists v7.5.2
+# 🚀 Filter-Lists
 
 **A compatibility-first, deterministic filter-list compiler** that fetches trusted sources, resolves bounded `!#include` graphs, canonicalizes rules, applies a strict ABP-compatible policy, validates the generated list, and publishes reproducible build metadata.
+
+Current builder version: **7.5.2**. See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 
 ## ✨ Why use this project?
 
@@ -30,7 +32,7 @@ The generated list targets a **strict Adblock Plus-compatible syntax profile**. 
 
 The goal is **syntax compatibility first, not maximum engine-specific filtering power**. A downstream blocker may support additional features, but this project will not emit those non-ABP extensions.
 
-## 🏗️ V7.5.2 architecture
+## 🏗️ Architecture
 
 ```text
 sources.yaml                 # authoritative source registry
@@ -58,9 +60,9 @@ sources.yaml                 # authoritative source registry
  filters.txt + reports/latest.json + generated sources.txt
 ```
 
-## 🔐 V7.5.2 hardening
+## 🔐 Reliability & correctness
 
-V7.5.2 preserves the established strict-ABP behavior while fixing the previous issues:
+These properties have accumulated across releases (see [CHANGELOG.md](CHANGELOG.md) for which release introduced what) and describe the build's current behavior:
 
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`; Python modules no longer maintain independent copies of those limits.
 - **Correct source health:** the health ratio is calculated from **root sources only**. Nested `!#include` sources are reported separately and cannot artificially inflate the health ratio.
@@ -72,13 +74,13 @@ V7.5.2 preserves the established strict-ABP behavior while fixing the previous i
 - **Full Build-ID validation:** `validate.py` recomputes the build hash from the active configuration and normalized rules.
 - **Strict ABP grammar gate:** network filters reject interior `|`, whitespace/control characters, malformed regex envelopes, duplicate/unknown options, and non-ABP procedural syntax.
 - **Source-health diagnostics:** failed root URLs and exact fetch/validation reasons are printed when the health gate fails.
-- **Action pinning:** GitHub Actions are pinned to immutable commit SHAs rather than floating tags.
+- **Action version pinning:** GitHub Actions are pinned to major version tags (e.g. `@v5`) rather than `@main`/`@master`, so workflow runs aren't silently affected by an upstream action's unreleased changes.
 - **Generated-source hygiene:** `sources.txt` is generated from `sources.yaml` and no longer triggers its own update workflow.
 - **Historical build deltas:** the report format is prepared for deterministic operational comparisons.
 - **Per-source observability:** every successful source records bytes, input/accepted/rejected/duplicate counts, unique-rule count, rejection rate, rejection reasons, and a SHA-256 content hash.
 - **Rejection diagnostics:** rejection reasons are retained globally and per source, making upstream format changes attributable instead of opaque.
 - **Anomaly detection:** the builder compares current source size, line count, rule count, and rejection rate with the previous report and records warning/critical anomalies without confusing expected content-hash changes with failures.
-- **Deterministic property/fuzz testing:** the test suite exercises normalization with 2,000 deterministic fuzz inputs and checks canonicalization idempotence/determinism plus anomaly behavior without adding a runtime testing dependency.
+- **Deterministic property/fuzz testing:** the test suite exercises normalization with 5,000 deterministic fuzz inputs per property and checks canonicalization idempotence/determinism plus anomaly behavior without adding a runtime testing dependency.
 
 ## ⚙️ Reliability policy
 
@@ -161,9 +163,15 @@ The suite covers:
 - performance benchmark via `python3 scripts/benchmark.py`
 - regression behavior
 
-## 🏪 My Free DNS Server
+## ⚖️ Legal
 
-Use **HaGeZi Blocklists Multi Pro + TIF** with My Free DNS.
+See [LICENSE](LICENSE). This project is not affiliated with any upstream filter-list maintainer.
+
+## 🔗 Other projects by the maintainer
+
+These are unrelated to the filter-list compiler above but are run by the same maintainer.
+
+**My Free DNS** — DNS-over-HTTPS resolvers using HaGeZi Blocklists Multi Pro + TIF:
 
 | Service | DNS-over-HTTPS URL |
 | --- | --- |
@@ -171,21 +179,9 @@ Use **HaGeZi Blocklists Multi Pro + TIF** with My Free DNS.
 | Multi Pro + TIF (Recommended) | `https://freedns-six.vercel.app/api/doh/dns-query` |
 | Multi Pro + TIF (Backup) | `https://dnssix.netlify.app/api/doh/dns-query` |
 
-## ⚡ Bandwidth Hero Server
+**Bandwidth Hero Server** — a lightweight image proxy that fetches remote images, compresses them, and returns optimized versions for faster loading and lower data use: https://bhserv.netlify.app/
 
-A lightweight image proxy that cuts bandwidth and speeds up browsing. Fetches remote images, compresses them, and returns optimized versions for faster loading and lower data use.
-
-🖥️ **Try it out:** https://bhserv.netlify.app/
-
-## 🚀 Release model
-
-V7.5.2 builds on the V7.5 compatibility/reproducibility baseline by adding advanced reliability: historical reports, source reputation, configurable anomaly enforcement, optional differential testing, stronger fuzzing, and benchmarking.
-
-## ⚖️ Legal
-
-See [LICENSE](LICENSE). This project is not affiliated with any upstream filter-list maintainer.
-
-## 💜 Support This Project
+## 💜 Support this project
 
 If you'd like to support development, consider donating:
 
