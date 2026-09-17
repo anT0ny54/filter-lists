@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased (maintenance)
+
+Non-functional audit pass. Nothing here changes `normalize.py`/`merge.py`
+rule behavior, `BUILDER_VERSION`, or the generated `filters.txt`.
+
+- `.gitattributes` actually removed the `.go`/`.ts`/`.tsx`/`.js`/`.jsx` line-ending
+  rules: V7.5.2 documented this cleanup below, but the entries were still
+  present; confirmed no files with those extensions exist anywhere in the
+  repository and removed them.
+- Fixed `tests/test_fetch.py`: an `if __name__ == "__main__":` guard sat
+  between two test classes, so running the file directly
+  (`python3 tests/test_fetch.py`) silently skipped `FetchBudgetWaveTests`.
+  `python3 -m unittest discover` was unaffected. Moved the guard to the end
+  of the file.
+- Fixed `validate.py`'s sortedness check, which compared `casefold()` only
+  and so could miss a file whose two rules share a casefold but are in the
+  wrong tie-break order (`merge.py` sorts by `(casefold(), x)`, not
+  `casefold()` alone). The check now compares the same tuple key `merge.py`
+  writes with. Added `tests/test_validate.py` to cover both the violation
+  and the correctly-ordered case.
+
 ## V7.5.2
 
 - Tightened strict ABP network grammar for one-sided/domain anchors and escaped literal pipes.
