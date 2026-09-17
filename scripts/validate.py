@@ -65,8 +65,11 @@ def main() -> int:
             errors.append(f"[DUPLICATE] line {number}: {raw[:180]}")
         seen.add(normalized)
         canonical_rules.append(normalized)
-        if len(canonical_rules) > 1 and canonical_rules[-1].casefold() < canonical_rules[-2].casefold():
-            errors.append(f"[UNSORTED] line {number}: {raw[:180]}")
+        if len(canonical_rules) > 1:
+            previous_key = (canonical_rules[-2].casefold(), canonical_rules[-2])
+            current_key = (canonical_rules[-1].casefold(), canonical_rules[-1])
+            if current_key < previous_key:
+                errors.append(f"[UNSORTED] line {number}: {raw[:180]}")
         if normalized != raw:
             errors.append(f"[NONCANONICAL] line {number}: {raw[:180]}")
 
