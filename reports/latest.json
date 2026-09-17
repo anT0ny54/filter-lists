@@ -1,7 +1,7 @@
 {
   "schema": 5,
   "status": "success",
-  "generated_at": "2026-09-17T16:07:21.689478+00:00",
+  "generated_at": "2026-09-17T16:11:59.685758+00:00",
   "builder": "Filter-Lists v7.5.2",
   "profile": "strict-abp",
   "build_id": "cb0fdf95b9779eb801eeae793641770c94acd765413e6d1af8b00ada5f89da6e",
@@ -116,57 +116,30 @@
         "required": false
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt",
+        "url": "https://filters.adtidy.org/extension/ublock/filters/224_optimized.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 592177,
-        "sha256": "f5927d6d5a05dedc96af01078e0bc97047f6d22b07c904a41aedf9fca2f9b94f",
-        "input_lines": 10457,
-        "accepted_lines": 10004,
-        "rejected_lines": 453,
-        "duplicate_lines": 37,
-        "unique_rules": 10002,
-        "rejection_rate": 0.04332,
+        "bytes": 722290,
+        "sha256": "ec0d51606827b74a7c58d08a474916dedcb47809e476466b61f587b8c448eb33",
+        "input_lines": 22069,
+        "accepted_lines": 20316,
+        "rejected_lines": 1753,
+        "duplicate_lines": 33,
+        "unique_rules": 20310,
+        "rejection_rate": 0.079433,
         "rejection_reasons": {
-          "comment": 79,
-          "context-invalid-option": 1,
-          "invalid-cosmetic-rule": 112,
-          "invalid-network-rule": 69,
-          "invalid-option-or-network-rule": 19,
-          "invalid-option-value": 4,
-          "ubo-only-syntax": 25,
-          "unknown-option": 144
-        },
-        "name": "AdGuard Tracking Protection",
-        "category": "privacy",
-        "priority": 50,
-        "required": false
-      },
-      {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 1980629,
-        "sha256": "b2db3d1d1b03888a9f003ac42966aa2d307d03d701634a45235551cc1162795d",
-        "input_lines": 30839,
-        "accepted_lines": 25219,
-        "rejected_lines": 5620,
-        "duplicate_lines": 340,
-        "unique_rules": 25161,
-        "rejection_rate": 0.182237,
-        "rejection_reasons": {
-          "comment": 591,
+          "comment": 89,
           "context-invalid-option": 2,
-          "invalid-cosmetic-rule": 519,
-          "invalid-network-rule": 245,
-          "invalid-option-or-network-rule": 105,
-          "invalid-option-value": 14,
-          "ubo-only-syntax": 3469,
-          "unknown-option": 675
+          "invalid-cosmetic-rule": 27,
+          "invalid-network-rule": 558,
+          "invalid-option-or-network-rule": 170,
+          "invalid-option-value": 3,
+          "ubo-only-syntax": 249,
+          "unknown-option": 655
         },
-        "name": "AdGuard Social Media",
-        "category": "social",
-        "priority": 60,
+        "name": "AdGuard Chinese",
+        "category": "regional-cn",
+        "priority": 80,
         "required": false
       },
       {
@@ -197,6 +170,33 @@
         "required": false
       },
       {
+        "url": "https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 1980629,
+        "sha256": "b2db3d1d1b03888a9f003ac42966aa2d307d03d701634a45235551cc1162795d",
+        "input_lines": 30839,
+        "accepted_lines": 25219,
+        "rejected_lines": 5620,
+        "duplicate_lines": 340,
+        "unique_rules": 25161,
+        "rejection_rate": 0.182237,
+        "rejection_reasons": {
+          "comment": 591,
+          "context-invalid-option": 2,
+          "invalid-cosmetic-rule": 519,
+          "invalid-network-rule": 245,
+          "invalid-option-or-network-rule": 105,
+          "invalid-option-value": 14,
+          "ubo-only-syntax": 3469,
+          "unknown-option": 675
+        },
+        "name": "AdGuard Social Media",
+        "category": "social",
+        "priority": 60,
+        "required": false
+      },
+      {
         "url": "https://filters.adtidy.org/extension/ublock/filters/17_optimized.txt",
         "depth": 0,
         "status": "ok",
@@ -219,57 +219,124 @@
         "required": false
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/224_optimized.txt",
+        "url": "https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 722290,
-        "sha256": "ec0d51606827b74a7c58d08a474916dedcb47809e476466b61f587b8c448eb33",
-        "input_lines": 22069,
-        "accepted_lines": 20316,
-        "rejected_lines": 1753,
-        "duplicate_lines": 33,
-        "unique_rules": 20310,
-        "rejection_rate": 0.079433,
+        "bytes": 592177,
+        "sha256": "f5927d6d5a05dedc96af01078e0bc97047f6d22b07c904a41aedf9fca2f9b94f",
+        "input_lines": 10457,
+        "accepted_lines": 10004,
+        "rejected_lines": 453,
+        "duplicate_lines": 37,
+        "unique_rules": 10002,
+        "rejection_rate": 0.04332,
         "rejection_reasons": {
-          "comment": 89,
-          "context-invalid-option": 2,
-          "invalid-cosmetic-rule": 27,
-          "invalid-network-rule": 558,
-          "invalid-option-or-network-rule": 170,
-          "invalid-option-value": 3,
-          "ubo-only-syntax": 249,
-          "unknown-option": 655
+          "comment": 79,
+          "context-invalid-option": 1,
+          "invalid-cosmetic-rule": 112,
+          "invalid-network-rule": 69,
+          "invalid-option-or-network-rule": 19,
+          "invalid-option-value": 4,
+          "ubo-only-syntax": 25,
+          "unknown-option": 144
         },
-        "name": "AdGuard Chinese",
-        "category": "regional-cn",
-        "priority": 80,
+        "name": "AdGuard Tracking Protection",
+        "category": "privacy",
+        "priority": 50,
         "required": false
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/16_optimized.txt",
+        "url": "https://easylist-downloads.adblockplus.org/easylistgermany-minified.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 216923,
-        "sha256": "7091aedbf63a8211073b9b1d6ffb93a2cd5263dc09bcebd016b290306276ad78",
-        "input_lines": 5198,
-        "accepted_lines": 4123,
-        "rejected_lines": 1075,
-        "duplicate_lines": 79,
-        "unique_rules": 4107,
-        "rejection_rate": 0.20681,
+        "bytes": 35481,
+        "sha256": "e7527a4d33829844ea24fa03d0eea66371b659216a756dcb211bebf21d2aef9e",
+        "input_lines": 663,
+        "accepted_lines": 608,
+        "rejected_lines": 55,
+        "duplicate_lines": 425,
+        "unique_rules": 608,
+        "rejection_rate": 0.082956,
         "rejection_reasons": {
-          "comment": 31,
-          "context-invalid-option": 1,
-          "invalid-cosmetic-rule": 20,
-          "invalid-network-rule": 222,
-          "invalid-option-or-network-rule": 24,
-          "invalid-option-value": 3,
-          "ubo-only-syntax": 166,
-          "unknown-option": 608
+          "comment": 7,
+          "context-invalid-option": 4,
+          "invalid-cosmetic-rule": 10,
+          "invalid-network-rule": 21,
+          "invalid-option-or-network-rule": 9,
+          "invalid-option-value": 1,
+          "ubo-only-syntax": 3
         },
-        "name": "AdGuard French",
+        "name": "EasyList Germany",
+        "category": "regional-de",
+        "priority": 130,
+        "required": false
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/easylistdutch-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 7947,
+        "sha256": "1e0c19c847268f4ede819d89aebd689bb80e2af404e231c36efa891e83b5e664",
+        "input_lines": 147,
+        "accepted_lines": 128,
+        "rejected_lines": 19,
+        "duplicate_lines": 102,
+        "unique_rules": 128,
+        "rejection_rate": 0.129252,
+        "rejection_reasons": {
+          "comment": 7,
+          "invalid-cosmetic-rule": 1,
+          "invalid-network-rule": 9,
+          "invalid-option-or-network-rule": 2
+        },
+        "name": "EasyList Dutch",
+        "category": "regional-nl",
+        "priority": 110,
+        "required": false
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/liste_fr-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 88950,
+        "sha256": "a25bd18b443d4d2e051f8dcd991aca0eabd16c7876c35f9fbbc0dfae698c778b",
+        "input_lines": 2280,
+        "accepted_lines": 2134,
+        "rejected_lines": 146,
+        "duplicate_lines": 950,
+        "unique_rules": 2133,
+        "rejection_rate": 0.064035,
+        "rejection_reasons": {
+          "comment": 7,
+          "invalid-network-rule": 50,
+          "invalid-option-or-network-rule": 25,
+          "ubo-only-syntax": 64
+        },
+        "name": "Liste FR",
         "category": "regional-fr",
-        "priority": 150,
+        "priority": 160,
+        "required": false
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/easylistchina-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 73397,
+        "sha256": "629c3883226122de0582fae90c5bd3a29a5554b418fb49a2e22c6c0dbe89be3d",
+        "input_lines": 2210,
+        "accepted_lines": 2079,
+        "rejected_lines": 131,
+        "duplicate_lines": 2027,
+        "unique_rules": 2079,
+        "rejection_rate": 0.059276,
+        "rejection_reasons": {
+          "comment": 7,
+          "invalid-network-rule": 84,
+          "invalid-option-or-network-rule": 40
+        },
+        "name": "EasyList China",
+        "category": "regional-cn",
+        "priority": 90,
         "required": false
       },
       {
@@ -324,29 +391,30 @@
         "required": false
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/easylistgermany-minified.txt",
+        "url": "https://filters.adtidy.org/extension/ublock/filters/16_optimized.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 35481,
-        "sha256": "e7527a4d33829844ea24fa03d0eea66371b659216a756dcb211bebf21d2aef9e",
-        "input_lines": 663,
-        "accepted_lines": 608,
-        "rejected_lines": 55,
-        "duplicate_lines": 425,
-        "unique_rules": 608,
-        "rejection_rate": 0.082956,
+        "bytes": 216923,
+        "sha256": "7091aedbf63a8211073b9b1d6ffb93a2cd5263dc09bcebd016b290306276ad78",
+        "input_lines": 5198,
+        "accepted_lines": 4123,
+        "rejected_lines": 1075,
+        "duplicate_lines": 79,
+        "unique_rules": 4107,
+        "rejection_rate": 0.20681,
         "rejection_reasons": {
-          "comment": 7,
-          "context-invalid-option": 4,
-          "invalid-cosmetic-rule": 10,
-          "invalid-network-rule": 21,
-          "invalid-option-or-network-rule": 9,
-          "invalid-option-value": 1,
-          "ubo-only-syntax": 3
+          "comment": 31,
+          "context-invalid-option": 1,
+          "invalid-cosmetic-rule": 20,
+          "invalid-network-rule": 222,
+          "invalid-option-or-network-rule": 24,
+          "invalid-option-value": 3,
+          "ubo-only-syntax": 166,
+          "unknown-option": 608
         },
-        "name": "EasyList Germany",
-        "category": "regional-de",
-        "priority": 130,
+        "name": "AdGuard French",
+        "category": "regional-fr",
+        "priority": 150,
         "required": false
       },
       {
@@ -377,98 +445,127 @@
         "required": false
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/liste_fr-minified.txt",
+        "url": "https://easylist-downloads.adblockplus.org/easylistspanish-minified.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 88950,
-        "sha256": "a25bd18b443d4d2e051f8dcd991aca0eabd16c7876c35f9fbbc0dfae698c778b",
-        "input_lines": 2280,
-        "accepted_lines": 2134,
-        "rejected_lines": 146,
-        "duplicate_lines": 950,
-        "unique_rules": 2133,
-        "rejection_rate": 0.064035,
+        "bytes": 10418,
+        "sha256": "7c599cc9d3da2380135c5bd520c5103c3f3bf36f0ce6442f9cd4e52185d4fa5b",
+        "input_lines": 137,
+        "accepted_lines": 120,
+        "rejected_lines": 17,
+        "duplicate_lines": 10,
+        "unique_rules": 120,
+        "rejection_rate": 0.124088,
         "rejection_reasons": {
           "comment": 7,
-          "invalid-network-rule": 50,
-          "invalid-option-or-network-rule": 25,
-          "ubo-only-syntax": 64
+          "context-invalid-option": 2,
+          "invalid-network-rule": 1,
+          "invalid-option-or-network-rule": 6,
+          "ubo-only-syntax": 1
         },
-        "name": "Liste FR",
-        "category": "regional-fr",
-        "priority": 160,
+        "name": "EasyList Spanish",
+        "category": "regional-es",
+        "priority": 210,
         "required": false
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/easylistdutch-minified.txt",
+        "url": "https://easylist-downloads.adblockplus.org/abpindo-minified.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 7947,
-        "sha256": "1e0c19c847268f4ede819d89aebd689bb80e2af404e231c36efa891e83b5e664",
-        "input_lines": 147,
-        "accepted_lines": 128,
-        "rejected_lines": 19,
-        "duplicate_lines": 102,
-        "unique_rules": 128,
-        "rejection_rate": 0.129252,
+        "bytes": 141325,
+        "sha256": "91a9b928af015f21364592f97e6487f5b7b9f72aa8062bc781e87356c0ef8748",
+        "input_lines": 4544,
+        "accepted_lines": 4337,
+        "rejected_lines": 207,
+        "duplicate_lines": 6,
+        "unique_rules": 4337,
+        "rejection_rate": 0.045555,
         "rejection_reasons": {
           "comment": 7,
-          "invalid-cosmetic-rule": 1,
-          "invalid-network-rule": 9,
+          "invalid-cosmetic-rule": 52,
+          "invalid-network-rule": 3,
+          "invalid-option-or-network-rule": 110,
+          "invalid-option-value": 2,
+          "ubo-only-syntax": 21,
+          "unknown-option": 12
+        },
+        "name": "ABP Indo",
+        "category": "regional-id",
+        "priority": 240,
+        "required": false
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/ruadlist-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 141332,
+        "sha256": "df5850fe279c930a29fd484757c5110a60690ab67f7b1d0353198835fb278e44",
+        "input_lines": 2155,
+        "accepted_lines": 1952,
+        "rejected_lines": 203,
+        "duplicate_lines": 109,
+        "unique_rules": 1952,
+        "rejection_rate": 0.0942,
+        "rejection_reasons": {
+          "comment": 7,
+          "context-invalid-option": 30,
+          "invalid-cosmetic-rule": 38,
+          "invalid-network-rule": 24,
+          "invalid-option-or-network-rule": 90,
+          "invalid-option-value": 13,
+          "unknown-option": 1
+        },
+        "name": "RU AdList",
+        "category": "regional-ru",
+        "priority": 180,
+        "required": false
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/easylistportuguese-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 13606,
+        "sha256": "c94c7a9ea09a3caf84b5886cf407ab0cf678add3e9ffbf4f1e649250293d3cc9",
+        "input_lines": 253,
+        "accepted_lines": 240,
+        "rejected_lines": 13,
+        "duplicate_lines": 21,
+        "unique_rules": 240,
+        "rejection_rate": 0.051383,
+        "rejection_reasons": {
+          "comment": 7,
+          "invalid-network-rule": 4,
           "invalid-option-or-network-rule": 2
         },
-        "name": "EasyList Dutch",
-        "category": "regional-nl",
-        "priority": 110,
+        "name": "EasyList Portuguese",
+        "category": "regional-pt",
+        "priority": 200,
         "required": false
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/easylistchina-minified.txt",
+        "url": "https://filters.adtidy.org/extension/ublock/filters/9_optimized.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 73397,
-        "sha256": "629c3883226122de0582fae90c5bd3a29a5554b418fb49a2e22c6c0dbe89be3d",
-        "input_lines": 2210,
-        "accepted_lines": 2079,
-        "rejected_lines": 131,
-        "duplicate_lines": 2027,
-        "unique_rules": 2079,
-        "rejection_rate": 0.059276,
+        "bytes": 306182,
+        "sha256": "c250227824ab627b15e5c21fb78694807f549363164331cddb5c78222f6deab3",
+        "input_lines": 5698,
+        "accepted_lines": 4800,
+        "rejected_lines": 898,
+        "duplicate_lines": 16,
+        "unique_rules": 4796,
+        "rejection_rate": 0.157599,
         "rejection_reasons": {
-          "comment": 7,
-          "invalid-network-rule": 84,
-          "invalid-option-or-network-rule": 40
+          "comment": 53,
+          "invalid-cosmetic-rule": 32,
+          "invalid-network-rule": 58,
+          "invalid-option-or-network-rule": 22,
+          "invalid-option-value": 7,
+          "ubo-only-syntax": 508,
+          "unknown-option": 218
         },
-        "name": "EasyList China",
-        "category": "regional-cn",
-        "priority": 90,
-        "required": false
-      },
-      {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/1_optimized.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 367030,
-        "sha256": "9cbfe1f3adb05d66331e780cd8ac410b3308a745a3fc7c24babea9af1d67258e",
-        "input_lines": 7611,
-        "accepted_lines": 6024,
-        "rejected_lines": 1587,
-        "duplicate_lines": 66,
-        "unique_rules": 6019,
-        "rejection_rate": 0.208514,
-        "rejection_reasons": {
-          "comment": 74,
-          "context-invalid-option": 2,
-          "invalid-cosmetic-rule": 137,
-          "invalid-network-rule": 211,
-          "invalid-option-or-network-rule": 51,
-          "invalid-option-value": 6,
-          "ubo-only-syntax": 274,
-          "unknown-option": 832
-        },
-        "name": "AdGuard Russian",
-        "category": "regional-ru",
-        "priority": 170,
+        "name": "AdGuard Spanish",
+        "category": "regional-es",
+        "priority": 190,
         "required": false
       },
       {
@@ -525,171 +622,30 @@
         "required": false
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/9_optimized.txt",
+        "url": "https://filters.adtidy.org/extension/ublock/filters/1_optimized.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 306182,
-        "sha256": "c250227824ab627b15e5c21fb78694807f549363164331cddb5c78222f6deab3",
-        "input_lines": 5698,
-        "accepted_lines": 4800,
-        "rejected_lines": 898,
-        "duplicate_lines": 16,
-        "unique_rules": 4796,
-        "rejection_rate": 0.157599,
+        "bytes": 367030,
+        "sha256": "9cbfe1f3adb05d66331e780cd8ac410b3308a745a3fc7c24babea9af1d67258e",
+        "input_lines": 7611,
+        "accepted_lines": 6024,
+        "rejected_lines": 1587,
+        "duplicate_lines": 66,
+        "unique_rules": 6019,
+        "rejection_rate": 0.208514,
         "rejection_reasons": {
-          "comment": 53,
-          "invalid-cosmetic-rule": 32,
-          "invalid-network-rule": 58,
-          "invalid-option-or-network-rule": 22,
-          "invalid-option-value": 7,
-          "ubo-only-syntax": 508,
-          "unknown-option": 218
-        },
-        "name": "AdGuard Spanish",
-        "category": "regional-es",
-        "priority": 190,
-        "required": false
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/easylistspanish-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 10418,
-        "sha256": "7c599cc9d3da2380135c5bd520c5103c3f3bf36f0ce6442f9cd4e52185d4fa5b",
-        "input_lines": 137,
-        "accepted_lines": 120,
-        "rejected_lines": 17,
-        "duplicate_lines": 10,
-        "unique_rules": 120,
-        "rejection_rate": 0.124088,
-        "rejection_reasons": {
-          "comment": 7,
+          "comment": 74,
           "context-invalid-option": 2,
-          "invalid-network-rule": 1,
-          "invalid-option-or-network-rule": 6,
-          "ubo-only-syntax": 1
+          "invalid-cosmetic-rule": 137,
+          "invalid-network-rule": 211,
+          "invalid-option-or-network-rule": 51,
+          "invalid-option-value": 6,
+          "ubo-only-syntax": 274,
+          "unknown-option": 832
         },
-        "name": "EasyList Spanish",
-        "category": "regional-es",
-        "priority": 210,
-        "required": false
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/ruadlist-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 141332,
-        "sha256": "df5850fe279c930a29fd484757c5110a60690ab67f7b1d0353198835fb278e44",
-        "input_lines": 2155,
-        "accepted_lines": 1952,
-        "rejected_lines": 203,
-        "duplicate_lines": 109,
-        "unique_rules": 1952,
-        "rejection_rate": 0.0942,
-        "rejection_reasons": {
-          "comment": 7,
-          "context-invalid-option": 30,
-          "invalid-cosmetic-rule": 38,
-          "invalid-network-rule": 24,
-          "invalid-option-or-network-rule": 90,
-          "invalid-option-value": 13,
-          "unknown-option": 1
-        },
-        "name": "RU AdList",
+        "name": "AdGuard Russian",
         "category": "regional-ru",
-        "priority": 180,
-        "required": false
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/easylistportuguese-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 13606,
-        "sha256": "c94c7a9ea09a3caf84b5886cf407ab0cf678add3e9ffbf4f1e649250293d3cc9",
-        "input_lines": 253,
-        "accepted_lines": 240,
-        "rejected_lines": 13,
-        "duplicate_lines": 21,
-        "unique_rules": 240,
-        "rejection_rate": 0.051383,
-        "rejection_reasons": {
-          "comment": 7,
-          "invalid-network-rule": 4,
-          "invalid-option-or-network-rule": 2
-        },
-        "name": "EasyList Portuguese",
-        "category": "regional-pt",
-        "priority": 200,
-        "required": false
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/abpindo-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 141325,
-        "sha256": "91a9b928af015f21364592f97e6487f5b7b9f72aa8062bc781e87356c0ef8748",
-        "input_lines": 4544,
-        "accepted_lines": 4337,
-        "rejected_lines": 207,
-        "duplicate_lines": 6,
-        "unique_rules": 4337,
-        "rejection_rate": 0.045555,
-        "rejection_reasons": {
-          "comment": 7,
-          "invalid-cosmetic-rule": 52,
-          "invalid-network-rule": 3,
-          "invalid-option-or-network-rule": 110,
-          "invalid-option-value": 2,
-          "ubo-only-syntax": 21,
-          "unknown-option": 12
-        },
-        "name": "ABP Indo",
-        "category": "regional-id",
-        "priority": 240,
-        "required": false
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/easylistlithuania-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 3231,
-        "sha256": "4bd50d5a6aee0e0b2b13d6f7e9cec37ab6c7a1d6e21d9ef32db4d7e695d5fe63",
-        "input_lines": 90,
-        "accepted_lines": 74,
-        "rejected_lines": 16,
-        "duplicate_lines": 4,
-        "unique_rules": 74,
-        "rejection_rate": 0.177778,
-        "rejection_reasons": {
-          "comment": 7,
-          "invalid-network-rule": 5,
-          "invalid-option-or-network-rule": 4
-        },
-        "name": "EasyList Lithuania",
-        "category": "regional-lt",
-        "priority": 290,
-        "required": false
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/bulgarian_list-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 3415,
-        "sha256": "cecfb354e94da76c5be382f5bb52fd05032de3496f1ac9f750f8be8c29c36a11",
-        "input_lines": 85,
-        "accepted_lines": 73,
-        "rejected_lines": 12,
-        "duplicate_lines": 0,
-        "unique_rules": 73,
-        "rejection_rate": 0.141176,
-        "rejection_reasons": {
-          "comment": 7,
-          "invalid-network-rule": 3,
-          "invalid-option-or-network-rule": 2
-        },
-        "name": "Bulgarian List",
-        "category": "regional-bg",
-        "priority": 260,
+        "priority": 170,
         "required": false
       },
       {
@@ -715,24 +671,91 @@
         "required": false
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/israellist-minified.txt",
+        "url": "https://easylist-downloads.adblockplus.org/easylistlithuania-minified.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 40593,
-        "sha256": "e6bf9d930de43482929e40a2a37b0318d9d90eaf46a87a85f31fa2c74894e193",
-        "input_lines": 171,
-        "accepted_lines": 163,
-        "rejected_lines": 8,
-        "duplicate_lines": 2,
-        "unique_rules": 163,
-        "rejection_rate": 0.046784,
+        "bytes": 3231,
+        "sha256": "4bd50d5a6aee0e0b2b13d6f7e9cec37ab6c7a1d6e21d9ef32db4d7e695d5fe63",
+        "input_lines": 90,
+        "accepted_lines": 74,
+        "rejected_lines": 16,
+        "duplicate_lines": 4,
+        "unique_rules": 74,
+        "rejection_rate": 0.177778,
         "rejection_reasons": {
           "comment": 7,
-          "invalid-network-rule": 1
+          "invalid-network-rule": 5,
+          "invalid-option-or-network-rule": 4
         },
-        "name": "Israel List",
-        "category": "regional-il",
-        "priority": 270,
+        "name": "EasyList Lithuania",
+        "category": "regional-lt",
+        "priority": 290,
+        "required": false
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/easylistpolish-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 34490,
+        "sha256": "c4888b0cf3ff9b6216496385282e9004e855edf3e8ca8c57bec07787b80a7696",
+        "input_lines": 313,
+        "accepted_lines": 304,
+        "rejected_lines": 9,
+        "duplicate_lines": 1,
+        "unique_rules": 304,
+        "rejection_rate": 0.028754,
+        "rejection_reasons": {
+          "comment": 7,
+          "invalid-network-rule": 2
+        },
+        "name": "EasyList Polish",
+        "category": "regional-pl",
+        "priority": 300,
+        "required": false
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/indianlist-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 92387,
+        "sha256": "4fb2d10eb5dd08dd570d41fd1040d3f079611ce7382343315af26bbee878fb11",
+        "input_lines": 638,
+        "accepted_lines": 626,
+        "rejected_lines": 12,
+        "duplicate_lines": 1,
+        "unique_rules": 626,
+        "rejection_rate": 0.018809,
+        "rejection_reasons": {
+          "comment": 7,
+          "invalid-cosmetic-rule": 1,
+          "invalid-network-rule": 2,
+          "invalid-option-or-network-rule": 2
+        },
+        "name": "Indian List",
+        "category": "regional-in",
+        "priority": 310,
+        "required": false
+      },
+      {
+        "url": "https://easylist-downloads.adblockplus.org/bulgarian_list-minified.txt",
+        "depth": 0,
+        "status": "ok",
+        "bytes": 3415,
+        "sha256": "cecfb354e94da76c5be382f5bb52fd05032de3496f1ac9f750f8be8c29c36a11",
+        "input_lines": 85,
+        "accepted_lines": 73,
+        "rejected_lines": 12,
+        "duplicate_lines": 0,
+        "unique_rules": 73,
+        "rejection_rate": 0.141176,
+        "rejection_reasons": {
+          "comment": 7,
+          "invalid-network-rule": 3,
+          "invalid-option-or-network-rule": 2
+        },
+        "name": "Bulgarian List",
+        "category": "regional-bg",
+        "priority": 260,
         "required": false
       },
       {
@@ -759,24 +782,24 @@
         "required": false
       },
       {
-        "url": "https://easylist-downloads.adblockplus.org/easylistpolish-minified.txt",
+        "url": "https://easylist-downloads.adblockplus.org/israellist-minified.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 34490,
-        "sha256": "c4888b0cf3ff9b6216496385282e9004e855edf3e8ca8c57bec07787b80a7696",
-        "input_lines": 313,
-        "accepted_lines": 304,
-        "rejected_lines": 9,
-        "duplicate_lines": 1,
-        "unique_rules": 304,
-        "rejection_rate": 0.028754,
+        "bytes": 40593,
+        "sha256": "e6bf9d930de43482929e40a2a37b0318d9d90eaf46a87a85f31fa2c74894e193",
+        "input_lines": 171,
+        "accepted_lines": 163,
+        "rejected_lines": 8,
+        "duplicate_lines": 2,
+        "unique_rules": 163,
+        "rejection_rate": 0.046784,
         "rejection_reasons": {
           "comment": 7,
-          "invalid-network-rule": 2
+          "invalid-network-rule": 1
         },
-        "name": "EasyList Polish",
-        "category": "regional-pl",
-        "priority": 300,
+        "name": "Israel List",
+        "category": "regional-il",
+        "priority": 270,
         "required": false
       },
       {
@@ -798,29 +821,6 @@
         "name": "Latvian List",
         "category": "regional-lv",
         "priority": 320,
-        "required": false
-      },
-      {
-        "url": "https://easylist-downloads.adblockplus.org/indianlist-minified.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 92387,
-        "sha256": "4fb2d10eb5dd08dd570d41fd1040d3f079611ce7382343315af26bbee878fb11",
-        "input_lines": 638,
-        "accepted_lines": 626,
-        "rejected_lines": 12,
-        "duplicate_lines": 1,
-        "unique_rules": 626,
-        "rejection_rate": 0.018809,
-        "rejection_reasons": {
-          "comment": 7,
-          "invalid-cosmetic-rule": 1,
-          "invalid-network-rule": 2,
-          "invalid-option-or-network-rule": 2
-        },
-        "name": "Indian List",
-        "category": "regional-in",
-        "priority": 310,
         "required": false
       },
       {
@@ -848,15 +848,6 @@
     ]
   },
   "source_reputation": {
-    "https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
     "https://easylist-downloads.adblockplus.org/easyprivacy-minified.txt": {
       "observations": 11,
       "successes": 11,
@@ -866,7 +857,7 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://easylist-downloads.adblockplus.org/easylist-minified.txt": {
+    "https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -876,24 +867,6 @@
       "reputation": "excellent"
     },
     "https://filters.adtidy.org/extension/ublock/filters/17_optimized.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
-    "https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
-    "https://filters.adtidy.org/extension/ublock/filters/224_optimized.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -920,7 +893,7 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://filters.adtidy.org/extension/ublock/filters/8_optimized.txt": {
+    "https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -929,7 +902,25 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://filters.adtidy.org/extension/ublock/filters/16_optimized.txt": {
+    "https://easylist-downloads.adblockplus.org/easylist-minified.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://filters.adtidy.org/extension/ublock/filters/224_optimized.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://filters.adtidy.org/extension/ublock/filters/8_optimized.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -948,6 +939,24 @@
       "reputation": "excellent"
     },
     "https://filters.adtidy.org/extension/ublock/filters/7_optimized.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://easylist-downloads.adblockplus.org/liste_fr-minified.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://filters.adtidy.org/extension/ublock/filters/16_optimized.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -983,7 +992,7 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://easylist-downloads.adblockplus.org/liste_fr-minified.txt": {
+    "https://filters.adtidy.org/extension/ublock/filters/23_optimized.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -992,7 +1001,7 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://filters.adtidy.org/extension/ublock/filters/23_optimized.txt": {
+    "https://filters.adtidy.org/extension/ublock/filters/1_optimized.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -1019,25 +1028,7 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://filters.adtidy.org/extension/ublock/filters/1_optimized.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
     "https://easylist-downloads.adblockplus.org/easylistspanish-minified.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
-    "https://easylist-downloads.adblockplus.org/easylistportuguese-minified.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -1055,7 +1046,52 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
+    "https://easylist-downloads.adblockplus.org/easylistportuguese-minified.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
     "https://easylist-downloads.adblockplus.org/ruadlist-minified.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://easylist-downloads.adblockplus.org/latvianlist-minified.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://easylist-downloads.adblockplus.org/indianlist-minified.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://easylist-downloads.adblockplus.org/easylistpolish-minified.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://easylist-downloads.adblockplus.org/abpvn-minified.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -1082,15 +1118,6 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://easylist-downloads.adblockplus.org/easylistpolish-minified.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
     "https://easylist-downloads.adblockplus.org/israellist-minified.txt": {
       "observations": 11,
       "successes": 11,
@@ -1100,34 +1127,7 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://easylist-downloads.adblockplus.org/latvianlist-minified.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
-    "https://easylist-downloads.adblockplus.org/abpvn-minified.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
     "https://easylist-downloads.adblockplus.org/easylistitaly-minified.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
-    "https://easylist-downloads.adblockplus.org/indianlist-minified.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -1166,7 +1166,7 @@
   },
   "anomalies": {
     "enabled": true,
-    "baseline": "a77a95f6254fe8c9f3d7a8244794aa298e5c10987c222944c7f12533b384113d",
+    "baseline": "cb0fdf95b9779eb801eeae793641770c94acd765413e6d1af8b00ada5f89da6e",
     "count": 0,
     "critical_count": 0,
     "warning_count": 0,
@@ -1174,5 +1174,5 @@
     "fail_on_warning": false,
     "enforced_failure": false
   },
-  "build_seconds": 8.234
+  "build_seconds": 7.003
 }
