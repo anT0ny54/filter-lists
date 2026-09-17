@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.5.2-cb0fdf95b977
-! Last updated: 2026-09-17 16:11:59 UTC
+! Version: v7.5.2-de98510debec
+! Last updated: 2026-09-17 16:16:17 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: cb0fdf95b9779eb801eeae793641770c94acd765413e6d1af8b00ada5f89da6e
+! Build-ID: de98510debec1818485743f755ebd42d2cafdc8316cd3d19ed25692021e2284e
 ! Source manifest SHA-256: 2f87bc9b88421e1b431098c5f33387602c6c38286e2533c1890c26ec59fcfd77
 ! Root sources: 33
-! Total rules: 175700
+! Total rules: 175701
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus-compatible syntax; uBlock/AdGuard-only rules are excluded.
@@ -110096,6 +110096,7 @@ zzzyk.com###Tinfo
 ||bkbhaestxgkor.online^
 ||bkbndrunglued.cyou^
 ||bkbntniwbhlntm.com^
+||bkcubzzabtoda.site^
 ||bkezgkhgnqcpb.online^
 ||bkfhvpacslvjh.site^
 ||bkgclwupffqez.site^
