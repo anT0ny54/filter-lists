@@ -69,9 +69,6 @@ class FetchTests(unittest.TestCase):
         self.assertTrue(stats["source_limit_reached"])
 
 
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
-
 class FetchBudgetWaveTests(unittest.TestCase):
     setUpClass = FetchTests.setUpClass
     tearDownClass = FetchTests.tearDownClass
@@ -110,3 +107,7 @@ class FetchBudgetWaveTests(unittest.TestCase):
             )
         self.assertEqual(stats["max_parallel_by_budget"], 10)
         self.assertEqual(stats["parallelism"], 10)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
