@@ -2,8 +2,45 @@
 
 ## Unreleased (maintenance)
 
+Security hardening pass:
+
+- `fetch.py`: replaced automatic curl redirect following with one-hop redirect handling so every destination is validated before connection; blocks non-public DNS/IP targets, pins validated DNS answers with `--resolve`, disables proxy environment variables for direct fetching, restricts redirect protocols to HTTP(S), and enforces a redirect limit.
+- `tests/test_fetch.py`: added regression coverage for non-public address blocking, redirect validation, and the new fetch command hardening while keeping local HTTP integration tests explicitly isolated from the production SSRF policy.
+- `README.md`: clarified that queued sources are not failures while waiting, but become deliberately recorded failures when a hard cutoff prevents an attempt.
+
+Non-functional correctness pass:
+
+- `fetch.py`: queued sources that remain unattempted when the global deadline, source traversal limit, or global byte budget is reached are now recorded explicitly instead of being silently dropped from accounting.
+- `config.py`: source duplicate detection now uses the same canonical URL identity as include traversal; fragments and scheme/host casing no longer create duplicate source identities.
+- `normalize.py`: `#?#` extended-CSS rules now require a domain scope; ABP's documented `:has-text()` alias is accepted only with `#?#` and is no longer mislabeled as uBO-only syntax.
+- `report.py`: source result records are sorted by stable `(depth, url, status)` keys before being written.
+- Added regression tests for timeout queue accounting, canonical URL duplicates, `#?#` domain requirements, `:has-text()` handling, and deterministic report ordering.
+
 Non-functional audit pass. Nothing here changes `normalize.py`/`merge.py`
 rule behavior, `BUILDER_VERSION`, or the generated `filters.txt`.
+
+- `fetch.py`: removed the misleading `included` counter (it duplicated
+  `included_requested` and counted requested, not successful, includes) and
+  eliminated a redundant full-file read in download validation.
+- `normalize.py`: removed three dead/subsumed conditions (the `@@` emptiness
+  check, a redundant regex disjunct in `split_options`, and an unreachable
+  `#?@#` check in `normalize_cosmetic`); `rewrite=` now also rejects
+  `~third-party`; `rejection_reason` classifies cosmetic rules before option
+  analysis so `$`-in-selector cosmetics report `invalid-cosmetic-rule`.
+- `config.py`: `load_config()` parses `policies.yaml` once instead of twice.
+- `merge.py`: the canonical rule sort is computed once and shared by the
+  output writer and the Build-ID; `valid_url` is imported from `config.py`
+  (its owner) instead of through `fetch`; `load_previous_report` no longer
+  reads `latest.json` twice.
+- `validate.py`: streams `filters.txt` line-by-line instead of loading it
+  fully into memory.
+- `report.py`: per-file read errors now increment the global rejected
+  counter, keeping report totals consistent.
+- `tests/test_fetch.py`: removed a dead overwritten line in the
+  budget-wave test.
+
+Non-functional pass. Nothing here changes the accepted strict-ABP rule
+profile, `BUILDER_VERSION`, or the generated `filters.txt` content/ordering.
 
 - `.gitattributes` actually removed the `.go`/`.ts`/`.tsx`/`.js`/`.jsx` line-ending
   rules: V7.5.2 documented this cleanup below, but the entries were still

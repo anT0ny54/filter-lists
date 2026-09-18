@@ -68,15 +68,16 @@ These properties have accumulated across releases (see [CHANGELOG.md](CHANGELOG.
 - **Correct source health:** the health ratio is calculated from **root sources only**. Nested `!#include` sources are reported separately and cannot artificially inflate the health ratio.
 - **Required-source correctness:** required-source failures are evaluated only against configured root sources.
 - **Global include protection:** bounded total source traversal prevents pathological include graphs even when individual include depth is valid.
-- **Global download budget:** downloads are processed in budget-safe waves. Queued sources are not counted as failures, and each new wave is sized from the remaining byte budget.
-- **URL canonicalization:** include-cycle detection normalizes scheme/host/path and removes fragments.
-- **Deadline-aware fetching:** each download receives only the remaining build deadline, and timeout/limit failures are fatal. Retry attempts are bounded and transient HTTP/connection failures are retried without retrying permanent 4xx failures.
+- **Global download budget:** downloads are processed in budget-safe waves. Sources waiting for a wave remain queued and are not counted as failures while they wait; if a hard byte-budget cutoff prevents them from being attempted, they are explicitly recorded as failed for source-health accounting.
+- **URL canonicalization:** source identity and include-cycle detection normalize scheme/host/path and remove fragments.
+- **Fetch SSRF protection:** source and include targets are resolved before connection; non-public addresses are blocked, validated DNS answers are pinned with curl `--resolve`, proxy environment variables are bypassed, and HTTP redirects are validated one hop at a time with a hard redirect limit.
+- **Deadline-aware fetching:** each download receives only the remaining build deadline. Sources are not counted as failed merely because they are waiting; once a hard deadline, source-count limit, or byte-budget cutoff prevents an unattempted source from being tried, it is deliberately recorded as failed for health accounting. Retry attempts are bounded and transient HTTP/connection failures are retried without retrying permanent 4xx failures.
 - **Full Build-ID validation:** `validate.py` recomputes the build hash from the active configuration and normalized rules.
 - **Strict ABP grammar gate:** network filters reject interior `|`, whitespace/control characters, malformed regex envelopes, duplicate/unknown options, and non-ABP procedural syntax.
 - **Source-health diagnostics:** failed root URLs and exact fetch/validation reasons are printed when the health gate fails.
 - **Action version pinning:** GitHub Actions are pinned to major version tags (e.g. `@v5`) rather than `@main`/`@master`, so workflow runs aren't silently affected by an upstream action's unreleased changes.
 - **Generated-source hygiene:** `sources.txt` is generated from `sources.yaml` and no longer triggers its own update workflow.
-- **Historical build deltas:** the report format is prepared for deterministic operational comparisons.
+- **Historical build deltas:** source-result records are sorted deterministically before reporting, so network completion order cannot reorder the report.
 - **Per-source observability:** every successful source records bytes, input/accepted/rejected/duplicate counts, unique-rule count, rejection rate, rejection reasons, and a SHA-256 content hash.
 - **Rejection diagnostics:** rejection reasons are retained globally and per source, making upstream format changes attributable instead of opaque.
 - **Anomaly detection:** the builder compares current source size, line count, rule count, and rejection rate with the previous report and records warning/critical anomalies without confusing expected content-hash changes with failures.
