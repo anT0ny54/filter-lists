@@ -10,8 +10,9 @@ Filter-Lists emits a **strict ABP-compatible** subset intended to be safe for ex
 - ABP anchors, separators, and regular-expression filters.
 - Supported ABP request-type and context options.
 - `domain=`, `sitekey=`, `csp=`, and the allow-listed `rewrite=` resources.
-- ABP element hiding (`##`), its ABP exception form (`#@#`), and supported extended CSS (`#?#`).
+- ABP element hiding (`##`), its ABP exception form (`#@#`), and supported extended CSS (`#?#`) with a required domain scope.
 - Comments and directives are consumed as metadata/input and are not emitted as rules.
+- In `#?#` extended CSS, the ABP-documented `:has-text()` alias is accepted; on ordinary `##` selectors it is rejected because extended selectors require `#?#`.
 
 ### Rejected
 
