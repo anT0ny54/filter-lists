@@ -21,10 +21,13 @@ SOURCES_TXT = ROOT / "sources.txt"
 WORKERS = min(16, max(4, (os.cpu_count() or 2) * 2))
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from config import BUILDER_VERSION, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
-from fetch import collect_sources, valid_url  # noqa: E402
+from config import BUILDER_VERSION, canonical_url, config_fingerprint, load_config, source_manifest_sha256, valid_url  # noqa: E402
+from fetch import collect_sources  # noqa: E402
 from report import analyze_files, write_report  # noqa: E402
 from normalize import normalize_rule  # noqa: E402  (re-exported for tests/tools that import merge.normalize_rule)
+
+
+_RULE_SORT_KEY = lambda x: (x.casefold(), x)
 
 
 def log(message: str) -> None:
@@ -32,9 +35,13 @@ def log(message: str) -> None:
 
 
 def load_previous_report() -> dict | None:
-    candidates = []
     if REPORT.is_file():
-        candidates.append(REPORT)
+        try:
+            data = json.loads(REPORT.read_text(encoding="utf-8"))
+            if data.get("status", "success") == "success":
+                return data
+        except (OSError, ValueError):
+            pass
     # Build IDs are hashes, so filename order is not chronological. Use the
     # report timestamp when selecting the newest successful baseline.
     history = []
@@ -46,8 +53,7 @@ def load_previous_report() -> dict | None:
         except (OSError, ValueError):
             continue
     history.sort(key=lambda item: item[0], reverse=True)
-    candidates.extend(path for _, path, _ in history)
-    for path in candidates:
+    for _, path, _ in history:
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
             if data.get("status", "success") == "success":
@@ -97,8 +103,7 @@ def sync_legacy_sources(config) -> None:
         SOURCES_TXT.write_text(text, encoding="utf-8", newline="\n")
 
 
-def write_output(rules: set[str], build_id: str, *, manifest_sha256: str, source_count: int) -> None:
-    final_rules = sorted(rules, key=lambda x: (x.casefold(), x))
+def write_output(final_rules: list[str], build_id: str, *, manifest_sha256: str, source_count: int) -> None:
     now = datetime.now(timezone.utc)
     header = [
         "! Title: Combined Adblock Plus Filter List",
@@ -143,7 +148,7 @@ def main() -> int:
         log(f"[ERROR] Configuration: {exc}")
         return 1
     sync_legacy_sources(config)
-    source_urls = [s.url for s in config.sources if valid_url(s.url)]
+    source_urls = [canonical_url(s.url) for s in config.sources if valid_url(s.url)]
     if not source_urls:
         log("[ERROR] No enabled source URLs found")
         return 1
@@ -158,7 +163,14 @@ def main() -> int:
         source_stats["success_ratio"] = round(source_stats["root_successful"] / source_stats["root_requested"], 4) if source_stats["root_requested"] else 0.0
         source_stats["health_basis"] = "root sources only; nested !#include sources are reported separately"
         source_stats["health_threshold"] = config.minimum_success_ratio
-        unhealthy = ((config.fail_if_zero_sources and source_stats["root_successful"] == 0) or source_stats["success_ratio"] < config.minimum_success_ratio or bool(source_stats["required_failed"]) or source_stats.get("source_limit_reached") or source_stats.get("timed_out"))
+        unhealthy = (
+            (config.fail_if_zero_sources and source_stats["root_successful"] == 0)
+            or source_stats["success_ratio"] < config.minimum_success_ratio
+            or bool(source_stats["required_failed"])
+            or source_stats.get("source_limit_reached")
+            or source_stats.get("timed_out")
+            or source_stats.get("budget_exhausted")
+        )
         if unhealthy:
             log(f"[ERROR] Source health failed: {source_stats['root_successful']}/{source_stats['root_requested']} root sources ({source_stats['success_ratio']:.1%})")
             if source_stats["required_failed"]:
@@ -180,8 +192,9 @@ def main() -> int:
             if detail:
                 item.update({k: v for k, v in detail.items() if k != "path"})
         source_stats["content_hash_algorithm"] = "sha256"
-        build_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(sorted(rules, key=lambda x: (x.casefold(), x)))).encode()).hexdigest()
-        write_output(rules, build_id, manifest_sha256=provenance["source_manifest_sha256"], source_count=len(source_urls))
+        final_rules = sorted(rules, key=_RULE_SORT_KEY)
+        build_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(final_rules)).encode()).hexdigest()
+        write_output(final_rules, build_id, manifest_sha256=provenance["source_manifest_sha256"], source_count=len(source_urls))
         write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="success")
         data = json.loads(REPORT.read_text(encoding="utf-8"))
         if data.get("anomalies", {}).get("enforced_failure", False):

@@ -44,7 +44,7 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
                         rules.add(rule)
             per_file.append({"path": str(path), "input_lines": local_lines, "accepted_lines": local_accepted, "rejected_lines": local_rejected, "duplicate_lines": local_duplicates, "unique_rules": len(local_rules), "rejection_rate": round(local_rejected / local_lines, 6) if local_lines else 0.0, "rejection_reasons": dict(sorted(local_reasons.items())), "sha256": sha256_file(path)})
         except OSError as exc:
-            reasons["read-error"] += 1; local_rejected += 1
+            reasons["read-error"] += 1; rejected += 1; local_rejected += 1
             per_file.append({"path": str(path), "input_lines": local_lines, "accepted_lines": local_accepted, "rejected_lines": local_rejected, "duplicate_lines": local_duplicates, "unique_rules": len(local_rules), "rejection_rate": round(local_rejected / local_lines, 6) if local_lines else 1.0, "rejection_reasons": {"read-error": 1}, "error": str(exc)})
     return rules, {"input_lines": input_lines, "accepted_lines": accepted, "rejected_lines": rejected, "duplicate_lines": duplicates, "unique_rules": len(rules), "rejection_rate": round(rejected / input_lines, 6) if input_lines else 0.0, "rejection_reasons": dict(sorted(reasons.items())), "per_file": per_file}
 
@@ -94,6 +94,9 @@ def write_report(path: Path, *, source_stats: dict, rule_stats: dict, elapsed_se
         meta = (source_metadata or {}).get(result.get("url"), {})
         result.update({k: v for k, v in meta.items() if k not in result})
         results.append(result)
+    # Fetch completion order is network-dependent. Sort report records by
+    # stable traversal identity so reports are reproducible across runs.
+    results.sort(key=lambda item: (int(item.get("depth", 0)), str(item.get("url", "")), str(item.get("status", ""))))
     clean_sources["results"] = results
     anomalies = detect_anomalies(results, previous_report, anomaly_policy or {"enabled": False})
     payload = {

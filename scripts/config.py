@@ -6,7 +6,7 @@ import hashlib
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, urlunsplit
 
 import yaml
 
@@ -32,6 +32,12 @@ def _strict_int(value, field: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
         raise ValueError(f"{field} must be an integer")
     return value
+
+
+def canonical_url(url: str) -> str:
+    """Canonicalize URL identity for source de-duplication and include traversal."""
+    p = urlsplit(url.strip())
+    return urlunsplit((p.scheme.lower(), p.netloc.lower(), p.path or "/", p.query, ""))
 
 
 def valid_url(url: str) -> bool:
@@ -113,8 +119,9 @@ def load_config() -> BuildConfig:
         url = str(item.get("url", "")).strip()
         if not name or not valid_url(url):
             raise ValueError(f"sources.yaml: invalid source #{index + 1}: {name or url}")
+        url = canonical_url(url)
         if url in seen:
-            raise ValueError(f"sources.yaml: duplicate URL: {url}")
+            raise ValueError(f"sources.yaml: duplicate canonical URL: {url}")
         seen.add(url)
         sources.append(Source(
             name=name,
@@ -133,7 +140,13 @@ def load_config() -> BuildConfig:
     if not 0 <= ratio <= 1:
         raise ValueError("policies.yaml: minimum_success_ratio must be between 0 and 1")
 
-    max_rule_length, max_include_depth, max_download_bytes, max_total_download_bytes, max_total_sources, total_timeout = load_policy_limits()
+    limits = policy.get("limits", {})
+    max_rule_length = _positive_int(limits.get("max_rule_length", 100_000), "max_rule_length")
+    max_include_depth = _positive_int(limits.get("max_include_depth", 5), "max_include_depth")
+    max_download_bytes = _positive_int(limits.get("max_download_bytes", 50 * 1024 * 1024), "max_download_bytes")
+    max_total_download_bytes = _positive_int(limits.get("max_total_download_bytes", 500 * 1024 * 1024), "max_total_download_bytes")
+    max_total_sources = _positive_int(limits.get("max_total_sources", 500), "max_total_sources")
+    total_timeout = _positive_int(limits.get("total_timeout_seconds", 1800), "total_timeout_seconds")
     history = policy.get("history", {})
     if not isinstance(history, dict):
         raise ValueError("policies.yaml: history must be an object")

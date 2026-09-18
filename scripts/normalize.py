@@ -105,7 +105,7 @@ def split_options(rule: str) -> tuple[str, list[str]]:
     if not positions:
         return rule, []
     pattern_start = 2 if rule.startswith("@@/") else 0
-    if rule.startswith("/", pattern_start) or rule.startswith("@@/", 0):
+    if rule.startswith("/", pattern_start):
         last_slash = rule.rfind("/")
         if last_slash > positions[-1]:
             return rule, []
@@ -176,7 +176,7 @@ def normalize_network(rule: str) -> str | None:
     if not pattern:
         return None
     pattern_body = pattern[2:] if pattern.startswith("@@") else pattern
-    if not pattern_body or (rule.startswith("@@") and not pattern_body):
+    if not pattern_body:
         return None
     if not valid_network_pattern(pattern_body):
         return None
@@ -197,7 +197,7 @@ def normalize_network(rule: str) -> str | None:
     if len(normalized) != len(set(normalized)):
         return None
     if any(x.startswith("rewrite=") for x in normalized):
-        if "third-party" in normalized:
+        if "third-party" in normalized or "~third-party" in normalized:
             return None
         if not (pattern_body == "*" or pattern_body.startswith("||")):
             return None
@@ -218,7 +218,7 @@ def normalize_cosmetic(rule: str) -> str | None:
     pos, separator = match
     domains = rule[:pos].strip()
     body = rule[pos + len(separator):].strip()
-    if separator == "#$#" or "#?@#" in rule:
+    if separator == "#$#":
         return None
     if not body or CONTROL_RE.search(body):
         return None
@@ -227,7 +227,15 @@ def normalize_cosmetic(rule: str) -> str | None:
         if any(not x or not DOMAIN_RE.fullmatch(x) for x in items):
             return None
         domains = ",".join(sorted(set(items), key=lambda x: (x.casefold(), x)))
-    if "+js(" in body.lower() or ":has-text(" in body.lower():
+    # Extended CSS is deliberately domain-scoped in this strict profile.
+    if separator == "#?#" and not domains:
+        return None
+    body_lower = body.lower()
+    # ABP documents :has-text() as an alias of :-abp-contains(). Accept it
+    # only in #?# extended-CSS rules; it is not a uBO-only construct.
+    if ":has-text(" in body_lower and separator != "#?#":
+        return None
+    if "+js(" in body_lower:
         return None
     return f"{domains}{separator}{body}"
 
@@ -264,8 +272,16 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None) -> str:
     limit = MAX_RULE_LENGTH if max_rule_length is None else max_rule_length
     if len(line) > limit:
         return "rule-too-long"
-    if "#?@#" in line or "+js(" in line.lower() or ":has-text(" in line.lower():
+    if "#?@#" in line or "+js(" in line.lower():
         return "ubo-only-syntax"
+    if c.kind == "cosmetic":
+        if "#?#" in line:
+            cosmetic_match = re.search(r"#\?#", line)
+            if cosmetic_match and not line[:cosmetic_match.start()].strip():
+                return "extended-css-domain-required"
+        if ":has-text(" in line.lower() and "#?#" not in line:
+            return "extended-css-selector-requires-#?#"
+        return "invalid-cosmetic-rule"
     if "$" in line:
         pattern, options = split_options(line)
         if options:
@@ -285,6 +301,4 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None) -> str:
                 return "duplicate-option"
         if normalize_network(line) is None:
             return "invalid-option-or-network-rule"
-    if c.kind == "cosmetic":
-        return "invalid-cosmetic-rule"
     return "invalid-network-rule"

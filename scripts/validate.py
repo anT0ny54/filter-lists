@@ -39,7 +39,12 @@ def main() -> int:
     version_seen = False
     version_ok = False
 
-    for number, raw in enumerate(path.read_text(encoding="utf-8", errors="strict").splitlines(), 1):
+    def _numbered_lines():
+        with path.open(encoding="utf-8", errors="strict") as handle:
+            for number, raw in enumerate(handle, 1):
+                yield number, raw.rstrip("\r\n")
+
+    for number, raw in _numbered_lines():
         if m := TOTAL_RE.match(raw):
             declared_total = int(m.group(1))
             continue
