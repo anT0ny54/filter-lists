@@ -5,6 +5,8 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from config import load_config
+from unittest.mock import patch
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -32,6 +34,31 @@ class ConfigTests(unittest.TestCase):
     def test_required_sources_exist(self):
         cfg = load_config()
         self.assertGreaterEqual(sum(s.required for s in cfg.sources), 2)
+
+
+    def test_duplicate_urls_are_checked_after_canonicalization(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source_file = root / "sources.yaml"
+            policy_file = root / "policies.yaml"
+            source_file.write_text("""sources:
+  - name: first
+    url: https://EXAMPLE.com/list#one
+    enabled: true
+  - name: second
+    url: https://example.com/list#two
+    enabled: true
+""", encoding="utf-8")
+            policy_file.write_text("""limits: {}
+source_health: {}
+history: {}
+anomaly_detection:
+  enabled: false
+""", encoding="utf-8")
+            import config as config_module
+            with patch.object(config_module, "SOURCE_REGISTRY", source_file),                  patch.object(config_module, "POLICY_FILE", policy_file):
+                with self.assertRaisesRegex(ValueError, "duplicate canonical URL"):
+                    config_module.load_config()
 
     def test_anomaly_detection_policy_is_loaded(self):
         cfg = load_config()

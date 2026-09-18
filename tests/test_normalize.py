@@ -26,6 +26,28 @@ class NormalizeTests(unittest.TestCase):
 
     def test_rejection_reason_is_specific(self):
         self.assertEqual(rejection_reason("0.0.0.0 ads.example.com"), "hosts-format")
+
+    def test_extended_css_requires_domain(self):
+        self.assertIsNone(normalize_rule("#?#div:-abp-has(.ad)"))
+        self.assertEqual(
+            normalize_rule("example.com#?#div:-abp-has(.ad)"),
+            "example.com#?#div:-abp-has(.ad)",
+        )
+        self.assertEqual(
+            rejection_reason("#?#div:-abp-has(.ad)"),
+            "extended-css-domain-required",
+        )
+
+    def test_has_text_alias_is_supported_in_extended_css(self):
+        rule = "example.com#?#div:has-text(Advertisement)"
+        self.assertEqual(normalize_rule(rule), rule)
+        self.assertNotEqual(rejection_reason(rule), "ubo-only-syntax")
+
+    def test_has_text_requires_extended_css_separator(self):
+        rule = "example.com##div:has-text(Advertisement)"
+        self.assertIsNone(normalize_rule(rule))
+        self.assertEqual(rejection_reason(rule), "extended-css-selector-requires-#?#")
+
     def test_cosmetic_domains_are_sorted_and_deduplicated(self):
         self.assertEqual(normalize_rule("B.com,a.com,B.com##.ad"), "a.com,B.com##.ad")
 

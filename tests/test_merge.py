@@ -5,6 +5,7 @@ import json
 import tempfile
 import threading
 import unittest
+import importlib
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -14,6 +15,7 @@ SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "merge.py"
 spec = importlib.util.spec_from_file_location("merge", SCRIPT)
 merge = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(merge)
+fetch = importlib.import_module("fetch")
 
 
 class ABPStrictTests(unittest.TestCase):
@@ -143,7 +145,8 @@ class MergeMainE2ETests(unittest.TestCase):
                     "sources:\n  - name: local-fixture\n    url: " + source_url + "\n    category: test\n    priority: 1\n    required: true\n",
                     encoding="utf-8",
                 )
-                with patch.object(merge, "load_config", return_value=config):
+                with patch.object(merge, "load_config", return_value=config), \
+                     patch.object(fetch, "_public_address_for_url", return_value=("127.0.0.1", "")):
                     result = merge.main()
             finally:
                 server.shutdown()

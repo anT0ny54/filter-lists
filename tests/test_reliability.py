@@ -34,6 +34,37 @@ class ReliabilityTests(unittest.TestCase):
         self.assertEqual(result["warning_count"], 1)
         self.assertTrue(result["enforced_failure"])
 
+
+    def test_report_source_results_are_stably_ordered(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "latest.json"
+            source_stats = {
+                "root_requested": 2,
+                "root_successful": 2,
+                "results": [
+                    {"url": "https://example.test/z", "status": "ok", "depth": 0, "path": "z", "bytes": 20},
+                    {"url": "https://example.test/a", "status": "ok", "depth": 0, "path": "a", "bytes": 20},
+                    {"url": "https://example.test/b-child", "status": "ok", "depth": 1, "path": "b", "bytes": 20},
+                ],
+            }
+            write_report(
+                path,
+                source_stats=source_stats,
+                rule_stats={"unique_rules": 3},
+                elapsed_seconds=0.1,
+                source_urls=["https://example.test/z", "https://example.test/a"],
+                build_id="b" * 64,
+                anomaly_policy={"enabled": False},
+                history_dir=Path(tmp) / "history",
+            )
+            data = json.loads(path.read_text(encoding="utf-8"))
+            ordered = [(item["depth"], item["url"]) for item in data["sources"]["results"]]
+            self.assertEqual(ordered, [
+                (0, "https://example.test/a"),
+                (0, "https://example.test/z"),
+                (1, "https://example.test/b-child"),
+            ])
+
     def test_failed_report_is_not_a_future_baseline(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "latest.json"
