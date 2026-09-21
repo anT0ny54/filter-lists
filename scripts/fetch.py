@@ -202,7 +202,8 @@ def validate_download(path: Path, max_bytes: int) -> tuple[bool, str]:
             return False, "too-small"
         if size > max_bytes:
             return False, "too-large"
-        data = path.read_bytes()[:65536]
+        with path.open("rb") as handle:
+            data = handle.read(65536)
         if b"\x00" in data:
             return False, "binary-data"
         sample = data.decode("utf-8", errors="ignore")

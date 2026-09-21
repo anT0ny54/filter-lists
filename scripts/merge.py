@@ -18,7 +18,7 @@ OUTPUT = ROOT / "filters.txt"
 REPORT = ROOT / "reports" / "latest.json"
 HISTORY_DIR = ROOT / "reports" / "history"
 SOURCES_TXT = ROOT / "sources.txt"
-WORKERS = min(16, max(4, (os.cpu_count() or 2) * 2))
+WORKERS = 2
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from config import BUILDER_VERSION, canonical_url, config_fingerprint, load_config, source_manifest_sha256, valid_url  # noqa: E402

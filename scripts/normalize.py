@@ -20,12 +20,14 @@ MAX_RULE_LENGTH = load_policy_limits()[0]
 # keep both names pointed at one compiled pattern instead of two copies.
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 NETWORK_FORBIDDEN_RE = CONTROL_RE
+# Regex filters may contain ordinary whitespace, but raw control characters
+# (including TAB) are never valid in the ABP regex payload.
+REGEX_CONTROL_RE = re.compile(r"[\x00-\x1f\x7f-\x9f]")
 DOMAIN_RE = re.compile(
     r"^~?(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+"
     r"[A-Za-z]{2,63}$"
 )
 SITEKEY_RE = re.compile(r"^[A-Za-z0-9+/._-]+={0,2}$")
-ASCII_WS_RE = re.compile(r"[\t\n\r\f\v ]")
 
 
 def valid_regex_filter(pattern: str) -> bool:
@@ -51,7 +53,7 @@ def valid_regex_filter(pattern: str) -> bool:
     if last != len(pattern) - 1 or last <= 1:
         return False
     payload = pattern[1:-1]
-    return not NETWORK_FORBIDDEN_RE.search(payload) and not ASCII_WS_RE.search(payload)
+    return not REGEX_CONTROL_RE.search(payload)
 
 
 def valid_network_pattern(pattern: str) -> bool:

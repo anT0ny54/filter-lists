@@ -123,13 +123,18 @@ def load_config() -> BuildConfig:
         if url in seen:
             raise ValueError(f"sources.yaml: duplicate canonical URL: {url}")
         seen.add(url)
+        enabled = _strict_bool(item.get("enabled", True), f"sources.yaml: source #{index + 1}.enabled")
+        priority = _strict_int(item.get("priority", 999999), f"sources.yaml: source #{index + 1}.priority")
+        required = _strict_bool(item.get("required", False), f"sources.yaml: source #{index + 1}.required")
+        if required and not enabled:
+            raise ValueError(f"sources.yaml: source #{index + 1} cannot be required and disabled")
         sources.append(Source(
             name=name,
             url=url,
             category=str(item.get("category", "uncategorized")),
-            enabled=_strict_bool(item.get("enabled", True), f"sources.yaml: source #{index + 1}.enabled"),
-            priority=_strict_int(item.get("priority", 999999), f"sources.yaml: source #{index + 1}.priority"),
-            required=_strict_bool(item.get("required", False), f"sources.yaml: source #{index + 1}.required"),
+            enabled=enabled,
+            priority=priority,
+            required=required,
         ))
 
     sources.sort(key=lambda s: (s.priority, s.name.casefold(), s.name, s.url))
