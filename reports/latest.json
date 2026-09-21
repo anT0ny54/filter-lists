@@ -1,7 +1,7 @@
 {
   "schema": 5,
   "status": "success",
-  "generated_at": "2026-09-21T19:47:50.834661+00:00",
+  "generated_at": "2026-09-21T19:48:58.832905+00:00",
   "builder": "Filter-Lists v7.5.2",
   "profile": "strict-abp",
   "build_id": "f420fca3ff3c8358493598d89320cadf1ac825c24d85114a8fb96f56ed627182",
@@ -842,7 +842,52 @@
     ]
   },
   "source_reputation": {
+    "https://easylist-downloads.adblockplus.org/easyprivacy-minified.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://easylist-downloads.adblockplus.org/easylist-minified.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
     "https://filters.adtidy.org/extension/ublock/filters/17_optimized.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -869,43 +914,7 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
-    "https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
-    "https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
-    "https://easylist-downloads.adblockplus.org/easyprivacy-minified.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
-    "https://easylist-downloads.adblockplus.org/easylist-minified.txt": {
+    "https://filters.adtidy.org/extension/ublock/filters/7_optimized.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -941,7 +950,7 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://filters.adtidy.org/extension/ublock/filters/7_optimized.txt": {
+    "https://easylist-downloads.adblockplus.org/easylistdutch-minified.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -959,24 +968,6 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://easylist-downloads.adblockplus.org/easylistdutch-minified.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
-    "https://easylist-downloads.adblockplus.org/easylistchina-minified.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
     "https://easylist-downloads.adblockplus.org/liste_fr-minified.txt": {
       "observations": 11,
       "successes": 11,
@@ -986,16 +977,7 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://filters.adtidy.org/extension/ublock/filters/23_optimized.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
-    "https://filters.adtidy.org/extension/ublock/filters/13_optimized.txt": {
+    "https://easylist-downloads.adblockplus.org/easylistchina-minified.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -1022,7 +1004,16 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://easylist-downloads.adblockplus.org/easylistspanish-minified.txt": {
+    "https://filters.adtidy.org/extension/ublock/filters/23_optimized.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://filters.adtidy.org/extension/ublock/filters/13_optimized.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -1040,7 +1031,7 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://easylist-downloads.adblockplus.org/abpindo-minified.txt": {
+    "https://easylist-downloads.adblockplus.org/easylistspanish-minified.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -1050,6 +1041,33 @@
       "reputation": "excellent"
     },
     "https://easylist-downloads.adblockplus.org/ruadlist-minified.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://easylist-downloads.adblockplus.org/abpindo-minified.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://easylist-downloads.adblockplus.org/latvianlist-minified.txt": {
+      "observations": 11,
+      "successes": 11,
+      "failures": 0,
+      "success_rate": 1.0,
+      "score": 100.0,
+      "consecutive_failures": 0,
+      "reputation": "excellent"
+    },
+    "https://easylist-downloads.adblockplus.org/easylistpolish-minified.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -1076,25 +1094,7 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://easylist-downloads.adblockplus.org/easylistpolish-minified.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
-    "https://easylist-downloads.adblockplus.org/easylistitaly-minified.txt": {
-      "observations": 11,
-      "successes": 11,
-      "failures": 0,
-      "success_rate": 1.0,
-      "score": 100.0,
-      "consecutive_failures": 0,
-      "reputation": "excellent"
-    },
-    "https://easylist-downloads.adblockplus.org/latvianlist-minified.txt": {
+    "https://easylist-downloads.adblockplus.org/israellist-minified.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -1112,7 +1112,7 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://easylist-downloads.adblockplus.org/israellist-minified.txt": {
+    "https://easylist-downloads.adblockplus.org/indianlist-minified.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -1121,7 +1121,7 @@
       "consecutive_failures": 0,
       "reputation": "excellent"
     },
-    "https://easylist-downloads.adblockplus.org/indianlist-minified.txt": {
+    "https://easylist-downloads.adblockplus.org/easylistitaly-minified.txt": {
       "observations": 11,
       "successes": 11,
       "failures": 0,
@@ -1161,7 +1161,7 @@
   },
   "anomalies": {
     "enabled": true,
-    "baseline": "c2da0ddc4e598398b6eeae9babbb723bed3685b0af045c71389b6b7c6ec96366",
+    "baseline": "f420fca3ff3c8358493598d89320cadf1ac825c24d85114a8fb96f56ed627182",
     "count": 0,
     "critical_count": 0,
     "warning_count": 0,
@@ -1169,5 +1169,5 @@
     "fail_on_warning": false,
     "enforced_failure": false
   },
-  "build_seconds": 16.747
+  "build_seconds": 20.305
 }
