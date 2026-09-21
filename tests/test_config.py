@@ -71,6 +71,29 @@ anomaly_detection:
         self.assertTrue(all(isinstance(s.enabled, bool) for s in cfg.sources))
         self.assertTrue(all(isinstance(s.required, bool) for s in cfg.sources))
 
+    def test_required_source_cannot_be_disabled(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source_file = root / "sources.yaml"
+            policy_file = root / "policies.yaml"
+            source_file.write_text("""sources:
+  - name: required-but-disabled
+    url: https://example.com/list.txt
+    enabled: false
+    required: true
+""", encoding="utf-8")
+            policy_file.write_text("""limits: {}
+source_health: {}
+history: {}
+anomaly_detection:
+  enabled: false
+""", encoding="utf-8")
+            import config as config_module
+            with patch.object(config_module, "SOURCE_REGISTRY", source_file), \
+                 patch.object(config_module, "POLICY_FILE", policy_file):
+                with self.assertRaisesRegex(ValueError, "cannot be required and disabled"):
+                    config_module.load_config()
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import fetch
-from fetch import canonical_url, collect_sources, include_urls
+from fetch import canonical_url, collect_sources, include_urls, validate_download
 
 
 class FetchSecurityTests(unittest.TestCase):
@@ -24,6 +24,15 @@ class FetchSecurityTests(unittest.TestCase):
         address, reason = fetch._public_address_for_url("http://localhost:8080/list.txt")
         self.assertIsNone(address)
         self.assertEqual(reason, "blocked-non-public-address")
+
+    def test_validate_download_reads_only_sample(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "large.txt"
+            path.write_bytes(b"||example.com^\n" + (b"x" * (256 * 1024)))
+            with patch.object(Path, "read_bytes", side_effect=AssertionError("whole-file read")):
+                ok, reason = validate_download(path, 1024 * 1024)
+        self.assertTrue(ok)
+        self.assertEqual(reason, "")
 
     def test_mixed_public_private_dns_answer_is_blocked(self):
         with patch.object(fetch.socket, "getaddrinfo", return_value=[

@@ -61,5 +61,8 @@ class NormalizeTests(unittest.TestCase):
         self.assertIsNotNone(normalize_rule(r"/foo\$bar/"))
         self.assertIsNone(normalize_rule(r"/unterminated"))
 
+    def test_regex_payload_may_contain_whitespace(self):
+        self.assertEqual(normalize_rule(r"/foo bar/"), r"/foo bar/")
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
