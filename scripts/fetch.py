@@ -9,7 +9,7 @@ import socket
 import subprocess
 import time
 from pathlib import Path
-from urllib.parse import urljoin, urlsplit, urlunsplit
+from urllib.parse import urljoin, urlsplit
 
 from config import BUILDER_VERSION, canonical_url, sha256_file, valid_url
 

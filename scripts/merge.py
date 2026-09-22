@@ -185,7 +185,14 @@ def main() -> int:
             stats = {"input_lines": 0, "accepted_lines": 0, "rejected_lines": 0, "duplicate_lines": 0, "unique_rules": 0, "rejection_reasons": {}}
             write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=config_fingerprint(config), previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="failed")
             return 1
-        rules, rule_stats = analyze_files(files, CUSTOM_RULES, max_rule_length=config.max_rule_length)
+        # Reuse the per-source digest fetch.collect_sources already computed
+        # instead of hashing every downloaded file a second time in analyze_files.
+        known_hashes = {
+            Path(item["path"]): item["sha256"]
+            for item in source_stats.get("results", [])
+            if item.get("status") == "ok" and item.get("path") and item.get("sha256")
+        }
+        rules, rule_stats = analyze_files(files, CUSTOM_RULES, max_rule_length=config.max_rule_length, known_hashes=known_hashes)
         by_path = {item.get("path"): item for item in rule_stats.get("per_file", [])}
         for item in source_stats.get("results", []):
             detail = by_path.get(item.get("path"))

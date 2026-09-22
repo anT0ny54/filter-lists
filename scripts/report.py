@@ -16,11 +16,12 @@ from policy import PROFILE_NAME
 SCHEMA_VERSION = 5
 
 
-def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_rule_length: int | None = None) -> tuple[set[str], dict]:
+def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_rule_length: int | None = None, known_hashes: dict[Path, str] | None = None) -> tuple[set[str], dict]:
     rules: set[str] = set()
     accepted = rejected = duplicates = input_lines = 0
     reasons: Counter[str] = Counter()
     per_file: list[dict[str, Any]] = []
+    known_hashes = known_hashes or {}
     paths = sorted(files, key=lambda p: str(p))
     if custom_rules and custom_rules.exists():
         paths.append(custom_rules)
@@ -42,7 +43,12 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
                         if rule in rules:
                             duplicates += 1; local_duplicates += 1
                         rules.add(rule)
-            per_file.append({"path": str(path), "input_lines": local_lines, "accepted_lines": local_accepted, "rejected_lines": local_rejected, "duplicate_lines": local_duplicates, "unique_rules": len(local_rules), "rejection_rate": round(local_rejected / local_lines, 6) if local_lines else 0.0, "rejection_reasons": dict(sorted(local_reasons.items())), "sha256": sha256_file(path)})
+            # Downloaded sources are already hashed once during fetch (see
+            # fetch.collect_sources). Reuse that digest instead of re-reading
+            # and re-hashing the same file a second time here; only files
+            # without a known digest (e.g. custom-rules.txt) get hashed now.
+            file_hash = known_hashes.get(path) or sha256_file(path)
+            per_file.append({"path": str(path), "input_lines": local_lines, "accepted_lines": local_accepted, "rejected_lines": local_rejected, "duplicate_lines": local_duplicates, "unique_rules": len(local_rules), "rejection_rate": round(local_rejected / local_lines, 6) if local_lines else 0.0, "rejection_reasons": dict(sorted(local_reasons.items())), "sha256": file_hash})
         except OSError as exc:
             reasons["read-error"] += 1; rejected += 1; local_rejected += 1
             per_file.append({"path": str(path), "input_lines": local_lines, "accepted_lines": local_accepted, "rejected_lines": local_rejected, "duplicate_lines": local_duplicates, "unique_rules": len(local_rules), "rejection_rate": round(local_rejected / local_lines, 6) if local_lines else 1.0, "rejection_reasons": {"read-error": 1}, "error": str(exc)})
