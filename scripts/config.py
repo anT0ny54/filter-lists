@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import math
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -34,6 +35,15 @@ def _strict_int(value, field: str) -> int:
     return value
 
 
+def _strict_float(value, field: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{field} must be a number")
+    result = float(value)
+    if not math.isfinite(result):
+        raise ValueError(f"{field} must be a finite number")
+    return result
+
+
 def canonical_url(url: str) -> str:
     """Canonicalize URL identity for source de-duplication and include traversal."""
     p = urlsplit(url.strip())
@@ -43,7 +53,19 @@ def canonical_url(url: str) -> str:
 def valid_url(url: str) -> bool:
     try:
         p = urlsplit(url)
-        return p.scheme in {"http", "https"} and bool(p.netloc) and not any(c.isspace() for c in url)
+        if p.scheme not in {"http", "https"} or not p.netloc or not p.hostname:
+            return False
+        # Source/redirect URLs are written to logs and reports. Reject
+        # userinfo so credentials can never be accidentally exposed there.
+        if p.username is not None or p.password is not None:
+            return False
+        # Force URL port parsing here so malformed ports fail configuration
+        # validation instead of surfacing later during a network fetch.
+        _ = p.port
+        # An explicit trailing colon is an empty port, not an omitted port.
+        if p.netloc.endswith(":"):
+            return False
+        return not any(c.isspace() for c in url)
     except ValueError:
         return False
 
@@ -74,7 +96,7 @@ class BuildConfig:
 
 
 def _positive_int(value: object, name: str) -> int:
-    result = int(value)
+    result = _strict_int(value, f"policies.yaml: {name}")
     if result <= 0:
         raise ValueError(f"policies.yaml: {name} must be > 0")
     return result
@@ -83,7 +105,10 @@ def _positive_int(value: object, name: str) -> int:
 def _load_policy() -> dict:
     if not POLICY_FILE.is_file():
         raise FileNotFoundError(f"Missing policy file: {POLICY_FILE}")
-    return yaml.safe_load(POLICY_FILE.read_text(encoding="utf-8")) or {}
+    data = yaml.safe_load(POLICY_FILE.read_text(encoding="utf-8")) or {}
+    if not isinstance(data, dict):
+        raise ValueError("policies.yaml: top level must be an object")
+    return data
 
 
 @lru_cache(maxsize=1)
@@ -91,6 +116,8 @@ def load_policy_limits() -> tuple[int, int, int, int, int, int]:
     """Return policy limits in one cached, single-source-of-truth tuple."""
     policy = _load_policy()
     limits = policy.get("limits", {})
+    if not isinstance(limits, dict):
+        raise ValueError("policies.yaml: limits must be an object")
     return (
         _positive_int(limits.get("max_rule_length", 100_000), "max_rule_length"),
         _positive_int(limits.get("max_include_depth", 5), "max_include_depth"),
@@ -106,6 +133,8 @@ def load_config() -> BuildConfig:
         raise FileNotFoundError(f"Missing source registry: {SOURCE_REGISTRY}")
     policy = _load_policy()
     source_data = yaml.safe_load(SOURCE_REGISTRY.read_text(encoding="utf-8")) or {}
+    if not isinstance(source_data, dict):
+        raise ValueError("sources.yaml: top level must be an object")
     raw_sources = source_data.get("sources")
     if not isinstance(raw_sources, list):
         raise ValueError("sources.yaml: 'sources' must be a list")
@@ -141,11 +170,15 @@ def load_config() -> BuildConfig:
     sources = [s for s in sources if s.enabled]
 
     health = policy.get("source_health", {})
-    ratio = float(health.get("minimum_success_ratio", 0.50))
+    if not isinstance(health, dict):
+        raise ValueError("policies.yaml: source_health must be an object")
+    ratio = _strict_float(health.get("minimum_success_ratio", 0.50), "policies.yaml: minimum_success_ratio")
     if not 0 <= ratio <= 1:
         raise ValueError("policies.yaml: minimum_success_ratio must be between 0 and 1")
 
     limits = policy.get("limits", {})
+    if not isinstance(limits, dict):
+        raise ValueError("policies.yaml: limits must be an object")
     max_rule_length = _positive_int(limits.get("max_rule_length", 100_000), "max_rule_length")
     max_include_depth = _positive_int(limits.get("max_include_depth", 5), "max_include_depth")
     max_download_bytes = _positive_int(limits.get("max_download_bytes", 50 * 1024 * 1024), "max_download_bytes")
@@ -161,9 +194,9 @@ def load_config() -> BuildConfig:
     if not isinstance(anomaly, dict):
         raise ValueError("policies.yaml: anomaly_detection must be an object")
     anomaly_enabled = _strict_bool(anomaly.get("enabled", True), "policies.yaml: anomaly_detection.enabled")
-    byte_change = float(anomaly.get("max_bytes_change_ratio", 0.75))
-    rule_change = float(anomaly.get("max_rule_count_change_ratio", 0.75))
-    rejection_change = float(anomaly.get("max_rejection_rate_change", 0.25))
+    byte_change = _strict_float(anomaly.get("max_bytes_change_ratio", 0.75), "policies.yaml: max_bytes_change_ratio")
+    rule_change = _strict_float(anomaly.get("max_rule_count_change_ratio", 0.75), "policies.yaml: max_rule_count_change_ratio")
+    rejection_change = _strict_float(anomaly.get("max_rejection_rate_change", 0.25), "policies.yaml: max_rejection_rate_change")
     if not 0 <= byte_change <= 10 or not 0 <= rule_change <= 10 or not 0 <= rejection_change <= 1:
         raise ValueError("policies.yaml: invalid anomaly thresholds")
     anomaly_config = {
@@ -177,7 +210,7 @@ def load_config() -> BuildConfig:
     return BuildConfig(
         tuple(sources),
         ratio,
-        bool(health.get("fail_if_zero_sources", True)),
+        _strict_bool(health.get("fail_if_zero_sources", True), "policies.yaml: source_health.fail_if_zero_sources"),
         max_rule_length,
         max_include_depth,
         max_download_bytes,

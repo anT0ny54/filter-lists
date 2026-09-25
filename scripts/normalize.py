@@ -191,12 +191,17 @@ def normalize_network(rule: str) -> str | None:
         if "=" in option:
             name, value = option.split("=", 1)
             name = name.lower()
+            if name == "domain":
+                value = "|".join(item.lower() for item in value.split("|"))
             normalized.append(f"{name}={value}")
         elif option.startswith("~"):
             normalized.append("~" + option[1:].lower())
         else:
             normalized.append(option.lower())
-    if len(normalized) != len(set(normalized)):
+    # `foo` and `~foo` are opposite forms of the same option name and cannot
+    # be combined. Keep this canonical name check aligned with rejection_reason().
+    option_names = [option.split("=", 1)[0].lstrip("~").lower() for option in normalized]
+    if len(option_names) != len(set(option_names)):
         return None
     if any(x.startswith("rewrite=") for x in normalized):
         if "third-party" in normalized or "~third-party" in normalized:
@@ -225,7 +230,7 @@ def normalize_cosmetic(rule: str) -> str | None:
     if not body or CONTROL_RE.search(body):
         return None
     if domains:
-        items = [x.strip() for x in domains.split(",")]
+        items = [x.strip().lower() for x in domains.split(",")]
         if any(not x or not DOMAIN_RE.fullmatch(x) for x in items):
             return None
         domains = ",".join(sorted(set(items), key=lambda x: (x.casefold(), x)))

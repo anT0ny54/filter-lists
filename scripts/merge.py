@@ -21,7 +21,7 @@ SOURCES_TXT = ROOT / "sources.txt"
 WORKERS = 2
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from config import BUILDER_VERSION, canonical_url, config_fingerprint, load_config, source_manifest_sha256, valid_url  # noqa: E402
+from config import BUILDER_VERSION, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
 from fetch import collect_sources  # noqa: E402
 from report import analyze_files, write_report  # noqa: E402
 from normalize import normalize_rule  # noqa: E402  (re-exported for tests/tools that import merge.normalize_rule)
@@ -53,13 +53,8 @@ def load_previous_report() -> dict | None:
         except (OSError, ValueError):
             continue
     history.sort(key=lambda item: item[0], reverse=True)
-    for _, path, _ in history:
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-            if data.get("status", "success") == "success":
-                return data
-        except (OSError, ValueError):
-            continue
+    for _, _, data in history:
+        return data
     return None
 
 
@@ -148,7 +143,10 @@ def main() -> int:
         log(f"[ERROR] Configuration: {exc}")
         return 1
     sync_legacy_sources(config)
-    source_urls = [canonical_url(s.url) for s in config.sources if valid_url(s.url)]
+    # load_config() already validates and canonicalizes every enabled source.
+    # Revalidating and recanonicalizing here only adds work and another place
+    # where source-selection logic could drift from configuration semantics.
+    source_urls = [s.url for s in config.sources]
     if not source_urls:
         log("[ERROR] No enabled source URLs found")
         return 1

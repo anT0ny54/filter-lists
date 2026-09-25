@@ -219,9 +219,14 @@ def validate_download(path: Path, max_bytes: int) -> tuple[bool, str]:
 def include_urls(path: Path, base_url: str) -> list[str]:
     result: list[str] = []
     try:
-        for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
-            match = re.match(r"^\s*!#include\s+(.+?)\s*$", raw, re.I)
-            if match:
+        # Stream the include scan instead of materializing a potentially
+        # 50 MiB source plus all of its split-line objects at once.
+        with path.open(encoding="utf-8", errors="replace") as source:
+            for raw in source:
+                raw = raw.rstrip("\r\n")
+                match = re.match(r"^\s*!#include\s+(.+?)\s*$", raw, re.I)
+                if not match:
+                    continue
                 child = urljoin(base_url, match.group(1).strip())
                 if valid_url(child):
                     result.append(canonical_url(child))
@@ -279,7 +284,12 @@ def collect_sources(
 
     def record_unattempted(entries: list[tuple[str, int]], reason: str) -> None:
         """Record queued-but-never-attempted sources so accounting stays complete."""
+        already_reported = {item.get("url") for item in stats["results"] if item.get("url")}
         for url, depth in entries:
+            url = canonical_url(url)
+            if url in already_reported:
+                continue
+            already_reported.add(url)
             stats["failed"] += 1
             if depth == 0:
                 stats["root_failed"] += 1
@@ -328,6 +338,7 @@ def collect_sources(
 
         log(f">> Download batch: {len(batch)} URL(s), workers={parallelism}")
         next_batch: list[tuple[str, int]] = []
+        discovered_children: list[tuple[str, int]] = []
 
         # Process the batch in budget-safe waves. Each wave reserves the
         # maximum possible bytes for every submitted source.
@@ -392,7 +403,7 @@ def collect_sources(
                         if depth < max_include_depth:
                             children = include_urls(target, url)
                             stats["included_requested"] += len(children)
-                            next_batch.extend((child, depth + 1) for child in children)
+                            discovered_children.extend((child, depth + 1) for child in children)
                     else:
                         stats["failed"] += 1
                         if depth == 0:
@@ -410,6 +421,16 @@ def collect_sources(
                             stats["failures"].append({"url": url, "reason": reason, "depth": depth})
                         target.unlink(missing_ok=True)
                         log(f"   [SKIP] {url[:110]} — {reason}")
+
+        # Network completion order must never decide which includes are visited
+        # first. Without this stable ordering, a global source limit can make
+        # identical builds choose different children depending on timing.
+        discovered: dict[str, int] = {}
+        for url, depth in discovered_children:
+            key = canonical_url(url)
+            if key not in discovered or depth < discovered[key]:
+                discovered[key] = depth
+        next_batch = sorted(discovered.items(), key=lambda item: (item[1], item[0]))
 
         pending: list[tuple[str, int]] = batch[wave_start:]
         pending.extend(deferred_by_source_limit)
