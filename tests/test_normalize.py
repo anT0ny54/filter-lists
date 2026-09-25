@@ -49,7 +49,25 @@ class NormalizeTests(unittest.TestCase):
         self.assertEqual(rejection_reason(rule), "extended-css-selector-requires-#?#")
 
     def test_cosmetic_domains_are_sorted_and_deduplicated(self):
-        self.assertEqual(normalize_rule("B.com,a.com,B.com##.ad"), "a.com,B.com##.ad")
+        self.assertEqual(normalize_rule("B.COM,a.com,b.com##.ad"), "a.com,b.com##.ad")
+
+    def test_duplicate_option_names_with_different_values_are_rejected(self):
+        self.assertIsNone(normalize_rule("||example.com^$domain=a.com,domain=b.com"))
+        self.assertEqual(
+            rejection_reason("||example.com^$domain=a.com,domain=b.com"),
+            "duplicate-option",
+        )
+
+    def test_duplicate_option_name_with_inverse_modifier_is_rejected(self):
+        rule = "||example.com^$third-party,~third-party"
+        self.assertIsNone(normalize_rule(rule))
+        self.assertEqual(rejection_reason(rule), "duplicate-option")
+
+    def test_domain_option_is_canonicalized_case_insensitively(self):
+        self.assertEqual(
+            normalize_rule("||example.com^$domain=B.COM|a.com"),
+            "||example.com^$domain=b.com|a.com",
+        )
 
     def test_strict_network_grammar_rejects_interior_pipe(self):
         self.assertIsNone(normalize_rule("||example.com|/ads"))

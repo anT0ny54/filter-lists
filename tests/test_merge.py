@@ -24,7 +24,7 @@ class ABPStrictTests(unittest.TestCase):
         self.assertEqual(merge.normalize_rule(rule), "@@||Example.COM^$domain=example.com|~ads.example.com,script")
 
     def test_cosmetic_exception_is_preserved(self):
-        self.assertEqual(merge.normalize_rule("Example.COM,foo.com#@#.ad-banner"), "Example.COM,foo.com#@#.ad-banner")
+        self.assertEqual(merge.normalize_rule("Example.COM,foo.com#@#.ad-banner"), "example.com,foo.com#@#.ad-banner")
 
     def test_extended_css_is_preserved(self):
         rule = "example.com#?#div:-abp-has(.ad)"

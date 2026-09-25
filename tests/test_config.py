@@ -4,7 +4,7 @@ import sys
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from config import load_config
+from config import load_config, valid_url
 from unittest.mock import patch
 import tempfile
 
@@ -93,6 +93,81 @@ anomaly_detection:
                  patch.object(config_module, "POLICY_FILE", policy_file):
                 with self.assertRaisesRegex(ValueError, "cannot be required and disabled"):
                     config_module.load_config()
+
+    def test_policy_limits_require_real_integers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source_file = root / "sources.yaml"
+            policy_file = root / "policies.yaml"
+            source_file.write_text("""sources:
+  - name: source
+    url: https://example.com/list.txt
+    enabled: true
+""", encoding="utf-8")
+            policy_file.write_text("""limits:
+  max_download_bytes: 1.5
+source_health: {}
+history: {}
+anomaly_detection:
+  enabled: false
+""", encoding="utf-8")
+            import config as config_module
+            with patch.object(config_module, "SOURCE_REGISTRY", source_file), \
+                 patch.object(config_module, "POLICY_FILE", policy_file):
+                with self.assertRaisesRegex(ValueError, "max_download_bytes must be an integer"):
+                    config_module.load_config()
+
+    def test_policy_ratios_require_real_numbers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source_file = root / "sources.yaml"
+            policy_file = root / "policies.yaml"
+            source_file.write_text("""sources:
+  - name: source
+    url: https://example.com/list.txt
+    enabled: true
+""", encoding="utf-8")
+            policy_file.write_text("""limits: {}
+source_health:
+  minimum_success_ratio: "0.80"
+history: {}
+anomaly_detection:
+  enabled: false
+""", encoding="utf-8")
+            import config as config_module
+            with patch.object(config_module, "SOURCE_REGISTRY", source_file), \
+                 patch.object(config_module, "POLICY_FILE", policy_file):
+                with self.assertRaisesRegex(ValueError, "minimum_success_ratio must be a number"):
+                    config_module.load_config()
+
+    def test_policy_booleans_require_real_yaml_booleans(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source_file = root / "sources.yaml"
+            policy_file = root / "policies.yaml"
+            source_file.write_text("""sources:
+  - name: source
+    url: https://example.com/list.txt
+    enabled: true
+""", encoding="utf-8")
+            policy_file.write_text("""limits: {}
+source_health:
+  fail_if_zero_sources: "false"
+history: {}
+anomaly_detection:
+  enabled: false
+""", encoding="utf-8")
+            import config as config_module
+            with patch.object(config_module, "SOURCE_REGISTRY", source_file), \
+                 patch.object(config_module, "POLICY_FILE", policy_file):
+                with self.assertRaisesRegex(ValueError, "source_health.fail_if_zero_sources must be a boolean"):
+                    config_module.load_config()
+
+    def test_urls_reject_credentials_and_malformed_ports(self):
+        self.assertFalse(valid_url("https://user:secret@example.com/list.txt"))
+        self.assertFalse(valid_url("https://example.com:not-a-port/list.txt"))
+        self.assertFalse(valid_url("https://example.com:/list.txt"))
+        self.assertTrue(valid_url("https://example.com:443/list.txt"))
 
 
 if __name__ == "__main__":

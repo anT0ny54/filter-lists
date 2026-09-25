@@ -212,6 +212,81 @@ class FetchTests(unittest.TestCase):
         self.assertTrue(stats["source_limit_reached"])
 
 
+class FetchSchedulingTests(unittest.TestCase):
+    def test_include_order_is_deterministic_under_source_limit(self):
+        def run_with_delay(root_a_delay, root_z_delay):
+            with tempfile.TemporaryDirectory() as tmp:
+                tmp_path = Path(tmp)
+
+                def fake_download(url, output, timeout, max_download_bytes):
+                    if url.endswith("/root-a"):
+                        time.sleep(root_a_delay)
+                        content = "!#include https://example.com/a-child\n||root-a.example^\n"
+                    elif url.endswith("/root-z"):
+                        time.sleep(root_z_delay)
+                        content = "!#include https://example.com/z-child\n||root-z.example^\n"
+                    elif url.endswith("/a-child"):
+                        content = "||a-child.example^\n! padding for validation\n"
+                    else:
+                        content = "||z-child.example^\n! padding for validation\n"
+                    output.write_text(content, encoding="utf-8")
+                    return True, ""
+
+                with patch.object(fetch, "download", side_effect=fake_download):
+                    files, stats = collect_sources(
+                        ["https://example.com/root-z", "https://example.com/root-a"],
+                        tmp_path,
+                        time.monotonic(),
+                        2,
+                        lambda _: None,
+                        total_timeout=10,
+                        max_include_depth=1,
+                        max_download_bytes=1024,
+                        max_total_download_bytes=4096,
+                        max_total_sources=3,
+                    )
+
+                results = {item["url"]: item for item in stats["results"]}
+                return files, results, stats
+
+        _, first, first_stats = run_with_delay(0.03, 0.001)
+        _, second, second_stats = run_with_delay(0.001, 0.03)
+
+        self.assertEqual(set(first), set(second))
+        self.assertEqual(first["https://example.com/a-child"]["status"], "ok")
+        self.assertEqual(first["https://example.com/z-child"]["reason"], "source-limit")
+        self.assertEqual(second["https://example.com/a-child"]["status"], "ok")
+        self.assertEqual(second["https://example.com/z-child"]["reason"], "source-limit")
+        self.assertEqual(first_stats["visited"], second_stats["visited"])
+
+    def test_unattempted_duplicate_include_is_reported_once(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+
+            def fake_download(url, output, timeout, max_download_bytes):
+                output.write_text("!#include https://example.com/shared-child\n||root.example^\n", encoding="utf-8")
+                return True, ""
+
+            with patch.object(fetch, "download", side_effect=fake_download):
+                _, stats = collect_sources(
+                    ["https://example.com/root-a", "https://example.com/root-b"],
+                    tmp_path,
+                    time.monotonic(),
+                    2,
+                    lambda _: None,
+                    total_timeout=10,
+                    max_include_depth=1,
+                    max_download_bytes=1024,
+                    max_total_download_bytes=4096,
+                    max_total_sources=2,
+                )
+
+        child_results = [x for x in stats["results"] if x["url"] == "https://example.com/shared-child"]
+        self.assertEqual(len(child_results), 1)
+        self.assertEqual(child_results[0]["reason"], "source-limit")
+
+
+
 class FetchBudgetWaveTests(unittest.TestCase):
     setUpClass = FetchTests.setUpClass
     tearDownClass = FetchTests.tearDownClass
