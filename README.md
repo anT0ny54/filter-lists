@@ -135,7 +135,7 @@ Requirements:
 Then:
 
 ```bash
-./scripts/merge.sh
+bash scripts/merge.sh
 python3 scripts/validate.py filters.txt
 python3 -m unittest discover -s tests -p 'test_*.py' -v
 cat reports/latest.json
