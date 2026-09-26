@@ -20,7 +20,7 @@
 
 ## Per-source fields
 
-A source result contains URL, depth, status, bytes, SHA-256 content hash, source metadata (name/category/priority/required), rule counts, rejection rate, and rejection reasons when available.
+A source result contains URL, depth, status, bytes, SHA-256 content hash, source metadata (name/category/priority/required), rule counts, rejection rate, and rejection reasons when available. A source with `status: "failed"` additionally carries a `reason` field describing the fetch/validation failure (for example `timeout`, `html-or-error-page`, or `source-limit`).
 
 ## Reproducibility
 
