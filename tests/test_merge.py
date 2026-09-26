@@ -101,6 +101,7 @@ class MergeMainE2ETests(unittest.TestCase):
             max_total_sources=10,
             total_timeout_seconds=10,
             anomaly_detection={"enabled": False, "fail_on_warning": False},
+            history_retention=10,
         )
 
     def tearDown(self):
@@ -140,6 +141,7 @@ class MergeMainE2ETests(unittest.TestCase):
                     max_total_sources=10,
                     total_timeout_seconds=30,
                     anomaly_detection={"enabled": False, "fail_on_warning": False},
+                    history_retention=10,
                 )
                 (merge.ROOT / "sources.yaml").write_text(
                     "sources:\n  - name: local-fixture\n    url: " + source_url + "\n    category: test\n    priority: 1\n    required: true\n",
