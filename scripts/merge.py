@@ -207,7 +207,7 @@ def main() -> int:
             REPORT.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             log("[ERROR] Anomaly policy rejected this build")
             return 1
-        retention = int(getattr(config, "history_retention", 10))
+        retention = config.history_retention
     archive_successful_report(build_id, retention=retention)
     return 0
 
