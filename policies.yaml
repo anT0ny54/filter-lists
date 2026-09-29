@@ -1,10 +1,12 @@
-# Filter-Lists v7.5.2 compatibility policy.
+# Filter-Lists v7.5.3 compatibility policy.
+# Output is consumable by Adblock Plus, uBlock Origin and AdGuard; see
+# docs/COMPATIBILITY.md. Unknown top-level keys are rejected at load time.
+#
+# `version` is the schema revision of this file and `profile` selects the
+# syntax profile. Both are validated by scripts/config.py: a mismatch fails
+# the build instead of being silently ignored.
 version: 3
 profile: strict-abp
-compatibility:
-  - Adblock Plus
-  - uBlock Origin
-  - AdGuard
 rules:
   allow_network_filters: true
   allow_abp_cosmetic: true

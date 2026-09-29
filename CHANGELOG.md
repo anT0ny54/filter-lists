@@ -8,55 +8,44 @@ release. See `docs/SYNTAX-POLICY.md`, `docs/REPORT-SCHEMA.md`, and
 `docs/COMPATIBILITY.md` for the detailed, currently-in-force contracts that
 the points below summarize.
 
-## v7.5.2 — current
+## v7.5.3 — current
 
-### Configuration & provenance
-- Policy limits (`max_rule_length`, `max_include_depth`, `max_download_bytes`,
-  `max_total_download_bytes`, `max_total_sources`, `total_timeout_seconds`)
-  are loaded once from `policies.yaml`; no script keeps an independent copy.
-- `sources.yaml` is the single authoritative source registry; `sources.txt`
-  is a generated URL-only compatibility mirror and must not be edited by
-  hand.
-- Every build publishes a deterministic `Build-ID`, a source-manifest
-  SHA-256, and a policy SHA-256 for reproducibility and auditing.
+### Fixed
+- `reject_ubo_procedural` only caught `+js(`; roughly 6,400 uBO/AdGuard-only
+  cosmetic rules (`:style()`, `:upward()`, `:remove()`, `:matches-path()`,
+  `:matches-css()`, `:xpath()`, ...) were leaking into the "strict ABP" list.
+  They are now rejected, matching `docs/SYNTAX-POLICY.md`.
+- AdGuard `#%#`, `#@%#`, `#@$#`, `#$?#`, `#@$?#` rules were classified as
+  network filters and could be emitted as bogus rules; they are now rejected
+  as `engine-specific-syntax`. Hosts-style `#comment` lines are rejected as
+  `hash-comment`.
+- A build rejected by the anomaly policy no longer overwrites `filters.txt`;
+  output is staged and only published after the anomaly check passes.
+- The global download budget is now enforced in deterministic submission order
+  against the running total (it previously used a stale total in completion
+  order, so parallel downloads could overshoot it).
+- Anomaly detection ignores previously *failed* fetches as a baseline, removing
+  false `bytes-change` warnings when a source recovered.
+- A UTF-8 BOM followed by whitespace is now stripped correctly.
+- `update.yml` no longer hard-codes the builder version/schema; it shares a
+  concurrency group with `Keep-Alive.yml` (their crons collided on the 1st and
+  15th) and no longer dumps the full report JSON into the log.
+- `benchmark.py` resolves its default input relative to the repo, and
+  `differential.py` enforces a per-fixture timeout.
 
-### Fetching & safety
-- Fetch targets are resolved and validated as globally-routable addresses
-  before curl connects (SSRF protection), with the resolved address pinned
-  via `--resolve` so DNS cannot change between validation and connection.
-- Redirects are followed one hop at a time, each hop re-validated, up to a
-  hard redirect limit.
-- Downloads are processed in budget-safe waves so the global byte budget
-  can never be oversubscribed; sources still waiting for a wave are queued,
-  not treated as failed, unless a hard deadline/budget/source-limit cutoff
-  prevents them from ever being attempted.
-- `!#include` traversal is bounded by both a per-branch depth limit and a
-  global visited-source limit to prevent include-graph explosions.
+### Policy file
+- `policies.yaml` keys `version` and `profile` are now validated (a mismatch
+  fails the build) instead of being ignored, and unknown top-level keys are
+  rejected. The never-read `compatibility` list was removed (documented in
+  `docs/COMPATIBILITY.md`).
+- The `minimum_success_ratio` fallback is now 0.80 (was 0.50), matching the
+  shipped policy, via a single `DEFAULT_MINIMUM_SUCCESS_RATIO` constant.
 
-### Normalization & policy
-- Strict Adblock Plus-compatible grammar: rejects uBO procedural filters,
-  the uBO-only `#?@#` exception form, snippet injection (`#$#`),
-  hosts-file syntax, HTML/error pages, and unknown or duplicate options.
-- Canonicalization is deterministic and idempotent; options are
-  lower-cased and sorted, and cosmetic domain lists are deduplicated and
-  sorted.
+### Cleanup
+- Removed dead code (`version_ok`, unreachable `#?@#` branch, redundant
+  `size <= 0` / `not raw_options` / CR-LF checks, unused `limits` re-parse),
+  the unused `pytest` requirement, and the no-op benchmark/differential steps
+  from the publishing workflow.
+- `include_urls` skips the regex on lines without `!#`; `validate.py` no longer
+  keeps every rule in memory to check ordering.
 
-### Health, reporting & anomaly detection
-- Source health is computed from root sources only; nested `!#include`
-  sources are reported separately and never inflate the health ratio.
-- Required-source failures, global timeouts, and source-limit/budget
-  exhaustion each independently fail the build rather than publishing a
-  partial list.
-- `reports/latest.json` (schema 5) records per-source diagnostics, a
-  rolling source-reputation score, rejection-reason breakdowns, and
-  anomaly comparisons against the previous successful report.
-- Successful reports are archived under `reports/history/`, pruned to the
-  configured retention by `generated_at` rather than by filename.
-
-### Testing
-- Regression, property/fuzz (5,000 deterministic iterations per property),
-  integration, and curated real-world corpus tests cover parsing,
-  normalization, fetch scheduling/security, reporting, and reliability.
-- An optional differential-engine harness (`scripts/differential.py`) and a
-  dependency-free benchmark (`scripts/benchmark.py`) are available but not
-  required for a build.
