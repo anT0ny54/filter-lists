@@ -18,6 +18,7 @@ INCLUDE_TIMEOUT = 60
 CURL_RETRIES = 5
 MAX_REDIRECTS = 5
 REDIRECT_STATUSES = {301, 302, 303, 307, 308}
+INCLUDE_RE = re.compile(r"^\s*!#include\s+(.+?)\s*$", re.I)
 
 
 def _public_address_for_url(url: str) -> tuple[str | None, str]:
@@ -222,7 +223,7 @@ def validate_download(
             for chunk in iter(lambda: handle.read(1024 * 1024), b""):
                 if b"\x00" in chunk:
                     return False, "binary-data"
-        if size <= 0 or not sample.strip():
+        if not sample.strip():
             return False, "empty"
         return True, ""
     except OSError as exc:
@@ -236,8 +237,12 @@ def include_urls(path: Path, base_url: str) -> list[str]:
         # 50 MiB source plus all of its split-line objects at once.
         with path.open(encoding="utf-8", errors="replace") as source:
             for raw in source:
+                # Cheap substring gate: nearly every line in a 50 MiB list is
+                # not an include, so skip the regex for all of those.
+                if "!#" not in raw:
+                    continue
                 raw = raw.rstrip("\r\n")
-                match = re.match(r"^\s*!#include\s+(.+?)\s*$", raw, re.I)
+                match = INCLUDE_RE.match(raw)
                 if not match:
                     continue
                 child = urljoin(base_url, match.group(1).strip())
@@ -351,7 +356,6 @@ def collect_sources(
             break
 
         log(f">> Download batch: {len(batch)} URL(s), workers={parallelism}")
-        next_batch: list[tuple[str, int]] = []
         discovered_children: list[tuple[str, int]] = []
 
         # Schedule by worker capacity and the per-source byte cap. The accepted
@@ -399,10 +403,6 @@ def collect_sources(
                     if ok:
                         ok, validation_error = validate_download(target, wave_limit)
                         error = validation_error or error
-                    if ok and stats["total_download_bytes"] + size > max_total_download_bytes:
-                        ok = False
-                        error = "global-download-budget-exceeded"
-                        stats["budget_exhausted"] = True
                     ordered_outcomes[submission_index] = (url, depth, target, ok, error, size)
 
                 # Network completion order must decide neither report order nor
@@ -412,6 +412,16 @@ def collect_sources(
                     if outcome is None:
                         raise RuntimeError("internal error: missing download outcome")
                     url, depth, target, ok, error, size = outcome
+
+                    # Enforce the global byte budget here, in deterministic
+                    # submission order, against the *running* total. Checking it
+                    # in completion order used a stale total, so parallel
+                    # downloads could jointly overshoot the budget and the
+                    # rejected source depended on network timing.
+                    if ok and stats["total_download_bytes"] + size > max_total_download_bytes:
+                        ok = False
+                        error = "global-download-budget-exceeded"
+                        stats["budget_exhausted"] = True
 
                     if ok:
                         files.append(target)
@@ -431,7 +441,6 @@ def collect_sources(
                         if depth < max_include_depth:
                             children = include_urls(target, url)
                             stats["included_references"] += len(children)
-                            stats["included_requested"] = stats["included_references"]
                             discovered_children.extend((child, depth + 1) for child in children)
                     else:
                         stats["failed"] += 1
@@ -473,7 +482,7 @@ def collect_sources(
             record_unattempted(pending, "global-download-budget-exhausted")
             current = []
             break
-        if deferred_by_source_limit or len(visited) >= max_total_sources and next_batch:
+        if deferred_by_source_limit or (len(visited) >= max_total_sources and next_batch):
             stats["source_limit_reached"] = True
             record_unattempted(pending, "source-limit")
             current = []
@@ -482,6 +491,7 @@ def collect_sources(
         current = next_batch
 
     stats["visited"] = len(visited)
+    stats["included_requested"] = stats["included_references"]
     # `requested` is the complete success+failure accounting, including
     # queued sources that could not be attempted because of a global limit.
     stats["requested"] = stats["successful"] + stats["failed"]

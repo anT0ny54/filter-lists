@@ -9,6 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests" / "corpus"
+ENGINE_TIMEOUT = 300  # seconds per fixture; a hung engine must not stall CI forever
 
 def main() -> int:
     command = os.environ.get("FILTER_ENGINE_CMD")
@@ -22,7 +23,12 @@ def main() -> int:
     failures = 0
     for fixture in fixtures:
         rendered = command.replace("{input}", shlex.quote(str(fixture)))
-        proc = subprocess.run(rendered, shell=True, text=True, capture_output=True)
+        try:
+            proc = subprocess.run(rendered, shell=True, text=True, capture_output=True, timeout=ENGINE_TIMEOUT)
+        except subprocess.TimeoutExpired:
+            failures += 1
+            print(f"[FAIL] {fixture.name}: engine timed out after {ENGINE_TIMEOUT}s")
+            continue
         if proc.returncode == 0:
             print(f"[OK] {fixture.name}")
         else:

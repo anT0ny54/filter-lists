@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 from config import load_policy_limits, load_rule_policy
-from parser import classify
+from parser import COSMETIC_MARKERS, classify
 from policy import (
     INVERSE_OPTIONS, REWRITE_RESOURCES, SIMPLE_OPTIONS, TYPE_OPTIONS,
     VALUE_OPTIONS,
@@ -28,6 +28,15 @@ DOMAIN_RE = re.compile(
     r"[A-Za-z]{2,63}$"
 )
 SITEKEY_RE = re.compile(r"^[A-Za-z0-9+/._-]+={0,2}$")
+# uBlock Origin / AdGuard procedural and style-injection operators. They are not
+# ABP syntax, so `reject_ubo_procedural` must cover them and not just `+js(`.
+UBO_PROCEDURAL_RE = re.compile(
+    r"\+js\(|:(?:style|remove|xpath|upward|nth-ancestor|matches-css(?:-before|-after)?"
+    r"|matches-path|matches-media|matches-attr|matches-property|min-text-length"
+    r"|watch-attr|others|remove-attr|remove-class)\(",
+    re.I,
+)
+ALLOWED_COSMETIC_SEPARATORS = frozenset({"##", "#@#", "#?#", "#?@#"})
 
 
 def valid_regex_filter(pattern: str) -> bool:
@@ -59,8 +68,6 @@ def valid_regex_filter(pattern: str) -> bool:
 def valid_network_pattern(pattern: str) -> bool:
     """Conservative ABP network-filter grammar gate."""
     if not pattern or NETWORK_FORBIDDEN_RE.search(pattern):
-        return False
-    if any(c in pattern for c in "\r\n"):
         return False
     if pattern.startswith("/"):
         return valid_regex_filter(pattern)
@@ -115,13 +122,12 @@ def split_options(rule: str) -> tuple[str, list[str]]:
     option_text = rule[pos + 1:]
     if not option_text:
         return rule, []
-    raw_options = option_text.split(",")
+    options = option_text.split(",")
     # Whitespace around option tokens is not part of the canonical ABP option
     # grammar. CSP values may contain spaces, so whitespace checks are applied
     # to token boundaries here and to option names later.
-    if not raw_options or any(not x or x != x.strip() for x in raw_options):
+    if any(not x or x != x.strip() for x in options):
         return rule, []
-    options = raw_options
     return rule[:pos], options
 
 
@@ -225,9 +231,8 @@ def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> 
 
 def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) -> str | None:
     policy = load_rule_policy() if rule_policy is None else rule_policy
-    markers = ("#?#", "#?@#", "#@#", "#$#", "##")
     match = None
-    for sep in markers:
+    for sep in COSMETIC_MARKERS:
         candidate = rule.find(sep)
         if candidate >= 0 and (match is None or candidate < match[0]):
             match = (candidate, sep)
@@ -236,7 +241,7 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
     pos, separator = match
     domains = rule[:pos].strip()
     body = rule[pos + len(separator):].strip()
-    if separator == "#$#":
+    if separator not in ALLOWED_COSMETIC_SEPARATORS:
         return None
     if separator == "#?#" and not policy["allow_extended_css"]:
         return None
@@ -257,13 +262,13 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
     # only in #?# extended-CSS rules; it is not a uBO-only construct.
     if ":has-text(" in body_lower and separator != "#?#":
         return None
-    if "+js(" in body_lower and policy["reject_ubo_procedural"]:
+    if policy["reject_ubo_procedural"] and UBO_PROCEDURAL_RE.search(body):
         return None
     return f"{domains}{separator}{body}"
 
 
 def normalize_rule(raw: str, *, max_rule_length: int | None = None) -> str | None:
-    line = raw.strip().lstrip("\ufeff")
+    line = raw.lstrip("\ufeff").strip()
     limit = MAX_RULE_LENGTH if max_rule_length is None else max_rule_length
     if not line or len(line) > limit:
         return None
@@ -280,10 +285,8 @@ def normalize_rule(raw: str, *, max_rule_length: int | None = None) -> str | Non
         return None
     if classification.kind == "cosmetic" and not policy["allow_abp_cosmetic"]:
         return None
-    if any(sep in line for sep in ("#?#", "#?@#", "#@#", "#$#", "##")):
+    if classification.kind == "cosmetic":
         return normalize_cosmetic(line, policy)
-    if "#?@#" in line:
-        return None
     # A terminal, unescaped `$` on a normal network filter is an empty
     # option section, not a valid pattern. Regex filters are handled by
     # normalize_network/split_options and may legitimately contain `$`.
@@ -293,7 +296,7 @@ def normalize_rule(raw: str, *, max_rule_length: int | None = None) -> str | Non
 
 
 def rejection_reason(raw: str, *, max_rule_length: int | None = None) -> str:
-    line = raw.strip().lstrip("\ufeff")
+    line = raw.lstrip("\ufeff").strip()
     if not line:
         return "blank"
     policy = load_rule_policy()
@@ -317,9 +320,12 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None) -> str:
         return "extended-css-disabled"
     if "#?@#" in line and policy["reject_ubo_extended_exceptions"]:
         return "ubo-only-syntax"
-    if "+js(" in line.lower() and policy["reject_ubo_procedural"]:
+    if policy["reject_ubo_procedural"] and UBO_PROCEDURAL_RE.search(line):
         return "ubo-only-syntax"
     if c.kind == "cosmetic":
+        engine_only = [sep for sep in COSMETIC_MARKERS if sep not in ALLOWED_COSMETIC_SEPARATORS and sep in line]
+        if engine_only:
+            return "engine-specific-syntax"
         if "#?#" in line:
             cosmetic_match = re.search(r"#\?#", line)
             if cosmetic_match and not line[:cosmetic_match.start()].strip():
@@ -328,7 +334,7 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None) -> str:
             return "extended-css-selector-requires-#?#"
         return "invalid-cosmetic-rule"
     if "$" in line:
-        pattern, options = split_options(line)
+        _, options = split_options(line)
         if options:
             names = []
             for option in options:

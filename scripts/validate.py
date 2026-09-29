@@ -31,13 +31,12 @@ def main() -> int:
         return 1
 
     seen: set[str] = set()
-    canonical_rules: list[str] = []
+    previous_key: tuple[str, str] | None = None
     errors: list[str] = []
     declared_total = None
     declared_build_id = None
     declared_source_manifest = None
     version_seen = False
-    version_ok = False
 
     def _numbered_lines():
         with path.open(encoding="utf-8", errors="strict") as handle:
@@ -56,8 +55,7 @@ def main() -> int:
             continue
         if raw.startswith("! Version:"):
             version_seen = True
-            version_ok = bool(VERSION_RE.match(raw))
-            if not version_ok:
+            if not VERSION_RE.match(raw):
                 errors.append(f"[VERSION] line {number}: invalid version")
         if not raw or raw.lstrip().startswith("!"):
             continue
@@ -69,12 +67,11 @@ def main() -> int:
         if normalized in seen:
             errors.append(f"[DUPLICATE] line {number}: {raw[:180]}")
         seen.add(normalized)
-        canonical_rules.append(normalized)
-        if len(canonical_rules) > 1:
-            previous_key = (canonical_rules[-2].casefold(), canonical_rules[-2])
-            current_key = (canonical_rules[-1].casefold(), canonical_rules[-1])
-            if current_key < previous_key:
-                errors.append(f"[UNSORTED] line {number}: {raw[:180]}")
+        # Track only the previous sort key instead of retaining every rule.
+        current_key = (normalized.casefold(), normalized)
+        if previous_key is not None and current_key < previous_key:
+            errors.append(f"[UNSORTED] line {number}: {raw[:180]}")
+        previous_key = current_key
         if normalized != raw:
             errors.append(f"[NONCANONICAL] line {number}: {raw[:180]}")
 

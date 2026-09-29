@@ -9,7 +9,13 @@ COMMENT_RE = re.compile(r"^\s*!")
 DIRECTIVE_RE = re.compile(r"^\s*!#(?:if|else|endif|include|safari|end)\b", re.I)
 HOSTS_RE = re.compile(r"^(?:0\.0\.0\.0|127\.0\.0\.1|::1)(?:\s+|$)")
 HTML_RE = re.compile(r"^\s*(?:<!doctype\b|<html\b|<head\b|<body\b)", re.I)
-COSMETIC_MARKERS = ("#?#", "#@#", "#$#", "##", "#?@#")
+# Includes engine-specific separators (AdGuard `#%#`/`#$?#`, `#@$#`, ...) so they
+# are classified as cosmetic and then rejected by normalization, instead of
+# leaking through as bogus network filters.
+COSMETIC_MARKERS = (
+    "#?#", "#@#", "#$#", "##", "#?@#",
+    "#%#", "#@%#", "#@$#", "#$?#", "#@$?#",
+)
 
 
 @dataclass(frozen=True)
@@ -19,7 +25,7 @@ class LineClassification:
 
 
 def classify(line: str) -> LineClassification:
-    value = line.strip().lstrip("\ufeff")
+    value = line.lstrip("\ufeff").strip()
     if not value:
         return LineClassification("blank")
     # Directives (`!#include`, `!#if`, ...) start with the same `!` prefix as
@@ -35,4 +41,8 @@ def classify(line: str) -> LineClassification:
         return LineClassification("invalid", "html-or-error-page")
     if any(marker in value for marker in COSMETIC_MARKERS):
         return LineClassification("cosmetic")
+    # A leading single `#` is a hosts-style comment (e.g. `#domain-note`), not
+    # an ABP network pattern; without this it slipped through as a "rule".
+    if value.startswith("#"):
+        return LineClassification("invalid", "hash-comment")
     return LineClassification("network")

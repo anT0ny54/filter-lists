@@ -27,6 +27,7 @@ from fetch import collect_sources  # noqa: E402
 from report import analyze_files, write_report  # noqa: E402
 from normalize import normalize_rule  # noqa: E402  (re-exported for tests/tools that import merge.normalize_rule)
 from policy import PROFILE_DESCRIPTION  # noqa: E402
+from health import _history_reports  # noqa: E402
 
 
 _RULE_SORT_KEY = lambda x: (x.casefold(), x)
@@ -46,18 +47,8 @@ def load_previous_report() -> dict | None:
             pass
     # Build IDs are hashes, so filename order is not chronological. Use the
     # report timestamp when selecting the newest successful baseline.
-    history = []
-    for path in HISTORY_DIR.glob("*.json"):
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-            if data.get("status", "success") == "success":
-                history.append((str(data.get("generated_at", "")), path, data))
-        except (OSError, ValueError):
-            continue
-    history.sort(key=lambda item: item[0], reverse=True)
-    for _, _, data in history:
-        return data
-    return None
+    newest = _history_reports(HISTORY_DIR, 1)
+    return newest[0] if newest else None
 
 
 def archive_successful_report(build_id: str, *, retention: int = 10) -> None:
@@ -108,7 +99,12 @@ def sync_legacy_sources(config) -> None:
         SOURCES_TXT.write_text(text, encoding="utf-8", newline="\n")
 
 
-def write_output(final_rules: list[str], build_id: str, *, manifest_sha256: str, source_count: int) -> None:
+def stage_output(final_rules: list[str], build_id: str, *, manifest_sha256: str, source_count: int) -> Path:
+    """Write the list to a temp file next to OUTPUT; nothing is published yet.
+
+    Publishing is a separate step (`commit_output`) so that a build rejected by
+    the anomaly policy can never clobber the last good filters.txt.
+    """
     now = datetime.now(timezone.utc)
     header = [
         "! Title: Combined Adblock Plus Filter List",
@@ -134,11 +130,20 @@ def write_output(final_rules: list[str], build_id: str, *, manifest_sha256: str,
         with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as output:
             output.write("\n".join(header) + "\n")
             output.write("\n".join(final_rules) + "\n")
-        os.replace(temporary, OUTPUT)
     except Exception:
         Path(temporary).unlink(missing_ok=True)
         raise
     log(f">> Unique strict ABP rules: {len(final_rules)}")
+    return Path(temporary)
+
+
+def commit_output(staged: Path) -> None:
+    os.replace(staged, OUTPUT)
+
+
+def write_output(final_rules: list[str], build_id: str, *, manifest_sha256: str, source_count: int) -> None:
+    """Stage and immediately publish (kept for callers that do not need gating)."""
+    commit_output(stage_output(final_rules, build_id, manifest_sha256=manifest_sha256, source_count=source_count))
 
 
 def main() -> int:
@@ -163,6 +168,7 @@ def main() -> int:
     if not source_urls:
         log(">> No enabled source URLs; building custom rules only")
     log(f">> Found {len(source_urls)} enabled source URLs")
+    fingerprint = config_fingerprint(config)
     with tempfile.TemporaryDirectory(prefix="filter-lists-") as temp_dir:
         files, source_stats = collect_sources(source_urls, Path(temp_dir), started, WORKERS, log, total_timeout=config.total_timeout_seconds, max_include_depth=config.max_include_depth, max_download_bytes=config.max_download_bytes, max_total_download_bytes=config.max_total_download_bytes, max_total_sources=config.max_total_sources)
         source_stats["required"] = [s.url for s in config.sources if s.required]
@@ -197,10 +203,12 @@ def main() -> int:
                 log(f"[ERROR] Root source failed: {item.get('url')} — {item.get('reason', 'unknown error')}")
             if source_stats.get("timed_out"):
                 log("[ERROR] Global fetch deadline was reached before all queued sources completed")
+            if source_stats.get("budget_exhausted"):
+                log("[ERROR] Global download budget was exhausted before all queued sources completed")
             if source_stats.get("source_limit_reached"):
                 log("[ERROR] Global source traversal limit was reached before all queued sources completed")
             stats = {"input_lines": 0, "accepted_lines": 0, "rejected_lines": 0, "duplicate_lines": 0, "unique_rules": 0, "rejection_reasons": {}}
-            write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=config_fingerprint(config), previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="failed")
+            write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=fingerprint, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="failed")
             return 1
         # Reuse the per-source digest fetch.collect_sources already computed
         # instead of hashing every downloaded file a second time in analyze_files.
@@ -217,15 +225,19 @@ def main() -> int:
                 item.update({k: v for k, v in detail.items() if k != "path"})
         source_stats["content_hash_algorithm"] = "sha256"
         final_rules = sorted(rules, key=_RULE_SORT_KEY)
-        build_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(final_rules)).encode()).hexdigest()
-        write_output(final_rules, build_id, manifest_sha256=provenance["source_manifest_sha256"], source_count=len(source_urls))
+        build_id = hashlib.sha256((fingerprint + "\n" + "\n".join(final_rules)).encode()).hexdigest()
+        staged = stage_output(final_rules, build_id, manifest_sha256=provenance["source_manifest_sha256"], source_count=len(source_urls))
         write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="success")
         data = json.loads(REPORT.read_text(encoding="utf-8"))
         if data.get("anomalies", {}).get("enforced_failure", False):
+            staged.unlink(missing_ok=True)  # keep the previous good filters.txt intact
             data["status"] = "failed"
-            REPORT.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            tmp_report = REPORT.with_suffix(REPORT.suffix + ".tmp")
+            tmp_report.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            tmp_report.replace(REPORT)
             log("[ERROR] Anomaly policy rejected this build")
             return 1
+        commit_output(staged)
         retention = config.history_retention
     archive_successful_report(build_id, retention=retention)
     return 0

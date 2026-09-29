@@ -11,6 +11,8 @@ from urllib.parse import urlsplit, urlunsplit
 
 import yaml
 
+from policy import PROFILE_NAME
+
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_REGISTRY = ROOT / "sources.yaml"
 POLICY_FILE = ROOT / "policies.yaml"
@@ -20,7 +22,18 @@ CUSTOM_RULES = ROOT / "custom-rules.txt"
 # validate.py, and fetch.py's outbound User-Agent all import this instead of
 # each keeping an independent copy, which previously let the string drift
 # out of sync between modules on a version bump.
-BUILDER_VERSION = "7.5.2"
+BUILDER_VERSION = "7.5.3"
+
+# Schema revision of policies.yaml itself (its `version:` key).
+POLICY_SCHEMA_VERSION = 3
+# Fallback used when policies.yaml omits source_health.minimum_success_ratio.
+# Kept equal to the shipped policies.yaml value so that deleting the key does
+# not silently loosen the health gate.
+DEFAULT_MINIMUM_SUCCESS_RATIO = 0.80
+POLICY_TOP_LEVEL_KEYS = frozenset({
+    "version", "profile", "rules", "limits", "history",
+    "source_health", "anomaly_detection",
+})
 
 
 def _strict_bool(value, field: str) -> bool:
@@ -152,6 +165,19 @@ def _load_policy() -> dict:
     data = yaml.safe_load(POLICY_FILE.read_text(encoding="utf-8")) or {}
     if not isinstance(data, dict):
         raise ValueError("policies.yaml: top level must be an object")
+    # Reject unknown top-level keys so a typo (or a stale, never-read key)
+    # cannot sit in the file looking like it has an effect.
+    unknown = sorted(set(data) - POLICY_TOP_LEVEL_KEYS, key=str)
+    if unknown:
+        raise ValueError(f"policies.yaml: unknown top-level keys: {', '.join(map(str, unknown))}")
+    if "version" in data and data["version"] != POLICY_SCHEMA_VERSION:
+        raise ValueError(
+            f"policies.yaml: unsupported version {data['version']!r} (expected {POLICY_SCHEMA_VERSION})"
+        )
+    if "profile" in data and data["profile"] != PROFILE_NAME:
+        raise ValueError(
+            f"policies.yaml: unsupported profile {data['profile']!r} (this builder implements {PROFILE_NAME!r})"
+        )
     return data
 
 
@@ -226,13 +252,10 @@ def load_config() -> BuildConfig:
     health = policy.get("source_health", {})
     if not isinstance(health, dict):
         raise ValueError("policies.yaml: source_health must be an object")
-    ratio = _strict_float(health.get("minimum_success_ratio", 0.50), "policies.yaml: minimum_success_ratio")
+    ratio = _strict_float(health.get("minimum_success_ratio", DEFAULT_MINIMUM_SUCCESS_RATIO), "policies.yaml: minimum_success_ratio")
     if not 0 <= ratio <= 1:
         raise ValueError("policies.yaml: minimum_success_ratio must be between 0 and 1")
 
-    limits = policy.get("limits", {})
-    if not isinstance(limits, dict):
-        raise ValueError("policies.yaml: limits must be an object")
     max_rule_length, max_include_depth, max_download_bytes, max_total_download_bytes, max_total_sources, total_timeout = _policy_limits(policy)
     history = policy.get("history", {})
     if not isinstance(history, dict):

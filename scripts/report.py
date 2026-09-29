@@ -66,7 +66,10 @@ def detect_anomalies(current_results: list[dict], previous_report: dict | None, 
     if not result["enabled"] or not previous_report or previous_report.get("status", "success") != "success":
         return result
     previous = previous_report.get("sources", {}).get("results", [])
-    previous_by_url = {item.get("url"): item for item in previous if item.get("url")}
+    # Only successful previous fetches are a meaningful baseline. A previously
+    # failed source has 0 bytes/lines, which made every recovery look like a
+    # 100% "bytes-change" anomaly.
+    previous_by_url = {item.get("url"): item for item in previous if item.get("url") and item.get("status") == "ok"}
     result["baseline"] = previous_report.get("build_id") or "previous-report"
     min_lines = int(policy.get("min_lines", 100)); max_bytes = float(policy.get("max_bytes_change_ratio", 0.75)); max_rules = float(policy.get("max_rule_count_change_ratio", 0.75)); max_rejection = float(policy.get("max_rejection_rate_change", 0.25))
     for current in current_results:

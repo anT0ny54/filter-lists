@@ -8,8 +8,11 @@ import time
 from pathlib import Path
 import sys
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from normalize import normalize_rule
+SCRIPT_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPT_DIR))
+from normalize import normalize_rule  # noqa: E402
+
+DEFAULT_INPUT = SCRIPT_DIR.parent / "tests" / "fixtures" / "sample-filter.txt"
 
 
 def run(lines: list[str], repeats: int) -> tuple[float, int]:
@@ -25,7 +28,7 @@ def run(lines: list[str], repeats: int) -> tuple[float, int]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=Path, default=Path("tests/fixtures/sample-filter.txt"))
+    parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
     parser.add_argument("--repeats", type=int, default=5)
     args = parser.parse_args()
     lines = args.input.read_text(encoding="utf-8").splitlines()
