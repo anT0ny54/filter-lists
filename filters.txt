@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.5.3-9891537d792f
-! Last updated: 2026-09-29 05:03:25 UTC
+! Version: v7.5.3-5ea3b67fa0fa
+! Last updated: 2026-09-29 05:19:20 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 9891537d792f223371909fb9a30f7aeee1f968ece54656d212b404be65accd63
+! Build-ID: 5ea3b67fa0fafcf9e3299fe4cd1d705c7118ef80a8b2296426f9239fe420f203
 ! Source manifest SHA-256: 2f87bc9b88421e1b431098c5f33387602c6c38286e2533c1890c26ec59fcfd77
 ! Root sources: 33
-! Total rules: 163884
+! Total rules: 163886
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: ABP external-list-safe core syntax; engine-specific uBO/AdGuard-only features are excluded.
@@ -84026,7 +84026,6 @@ thesun.co.uk##.widget-height
 thesun.co.uk##.wp-block-nypost-editor-newsletter
 thesun.co.uk##div.module--1-billboard:has(> div.advert-wrapper)
 thesundevils.com##.static-header__ads
-thetab.com##.custom-box-desktop
 thetaiwantimes.com##.post-sidebar-shares
 thetechrim.com##.single-post-action
 thethao1.mannhan24.pro###hots-btn
@@ -120022,6 +120021,7 @@ zzzyk.com###Tinfo
 ||gulioamsivgik.site^
 ||gullahfulvid.cfd^
 ||gullahsedgingtwilt.cfd^
+||gulliedolor.cfd^
 ||gulliesbaalism.cfd^
 ||gullsupbank.cfd^
 ||gulpedcountwhipped.com^
@@ -159815,6 +159815,7 @@ zzzyk.com###Tinfo
 ||xhlxlywwbm.com^
 ||xhmeoqeoeurjk.store^
 ||xhmewlkjkvump.online^
+||xhmigokzqygkk.space^
 ||xhmyevcqcasdf.site^
 ||xhnouqnhyhohr.online^
 ||xhnqhtqrnhurx.site^
@@ -162884,6 +162885,7 @@ zzzyk.com###Tinfo
 ||zmaehtvocezof.space^
 ||zmahxlcxkasov.website^
 ||zmamhuakbbu.com^
+||zmblesusfxzxe.site^
 ||zmbulblwjgxfe.space^
 ||zmcotfbwooimx.space^
 ||zmdesf.cn^
