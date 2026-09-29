@@ -28,4 +28,4 @@ A source result contains URL, depth, status, bytes, SHA-256 content hash, source
 
 ## Historical retention
 
-Successful builds are copied to `reports/history/` using the full deterministic build ID (`build-<build_id>.json`), so identical builds are archived only once. Retention is chronological by `generated_at` and defaults to 10 reports; older successful reports are deleted automatically. A failed run updates `latest.json` for diagnostics but is never treated as a successful historical baseline.
+Successful builds are copied to `reports/history/` as `build-<build_id>-<generated_at>-<report_digest>.json`. The deterministic build ID identifies equivalent configuration/output, while `generated_at` preserves repeated successful runs. Retention is chronological by `generated_at` and defaults to 10 reports; older successful reports are deleted automatically. A failed run updates `latest.json` for diagnostics but is never treated as a successful historical baseline.
