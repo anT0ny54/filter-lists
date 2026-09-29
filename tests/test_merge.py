@@ -212,18 +212,24 @@ class MergeMainE2ETests(unittest.TestCase):
 
         kept = sorted(p.name for p in merge.HISTORY_DIR.glob("*.json"))
         self.assertEqual(len(kept), 10)
-        self.assertIn("build-new-build.json", kept)
+        self.assertTrue(any(name.startswith("build-new-build-") for name in kept))
         self.assertNotIn("build-old-0.json", kept)
         self.assertNotIn("build-old-1.json", kept)
 
     def test_main_success_writes_output_report_and_history(self):
         self.assertEqual(self._run(), 0)
         self.assertTrue(merge.OUTPUT.is_file())
-        self.assertIn("! Profile: Strict Adblock Plus-compatible syntax;", merge.OUTPUT.read_text(encoding="utf-8"))
+        self.assertIn(
+            "! Profile: ABP external-list-safe core syntax;",
+            merge.OUTPUT.read_text(encoding="utf-8"),
+        )
         report = json.loads(merge.REPORT.read_text(encoding="utf-8"))
         self.assertEqual(report["status"], "success")
         self.assertEqual(report["profile"], "strict-abp")
-        self.assertTrue((merge.HISTORY_DIR / f"build-{report['build_id']}.json").is_file())
+        self.assertTrue(any(
+            path.name.startswith(f"build-{report['build_id']}-")
+            for path in merge.HISTORY_DIR.glob("*.json")
+        ))
 
     def test_main_source_health_failure_does_not_publish_output(self):
         failed = {"root_requested": 1, "root_successful": 0, "results": [{"url": self.config.sources[0].url, "status": "failed", "depth": 0, "path": "/fixture.txt", "reason": "HTTP 500"}], "failures": [{"url": self.config.sources[0].url, "depth": 0, "reason": "HTTP 500"}], "source_limit_reached": False, "timed_out": False}
