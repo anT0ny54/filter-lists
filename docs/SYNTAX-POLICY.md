@@ -17,6 +17,8 @@ Filter-Lists emits a **strict ABP-compatible** subset intended to be safe for ex
 ### Rejected
 
 - uBlock Origin procedural filters such as `##+js(...)`.
+- uBO/AdGuard procedural and style operators in cosmetic rules (`:style()`, `:remove()`, `:upward()`, `:xpath()`, `:matches-css()`, `:matches-path()`, ...).
+- AdGuard-only cosmetic separators (`#%#`, `#@%#`, `#@$#`, `#$?#`, `#@$?#`) and hosts-style `#comment` lines.
 - The uBO-only extended-CSS exception form `#?@#`.
 - Snippet-injection filters (`#$#`).
 - AdGuard/uBO-only options not present in the policy allow-list.
