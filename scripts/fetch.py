@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 
-from config import BUILDER_VERSION, canonical_url, sha256_file, valid_url
+from config import BUILDER_VERSION, canonical_url, load_rule_policy, sha256_file, valid_url
 
 DOWNLOAD_TIMEOUT = 90
 INCLUDE_TIMEOUT = 60
@@ -195,7 +195,12 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
         headers.unlink(missing_ok=True)
 
 
-def validate_download(path: Path, max_bytes: int) -> tuple[bool, str]:
+def validate_download(
+    path: Path,
+    max_bytes: int,
+    *,
+    reject_html_error_pages: bool | None = None,
+) -> tuple[bool, str]:
     try:
         size = path.stat().st_size
         if size < 20:
@@ -203,12 +208,20 @@ def validate_download(path: Path, max_bytes: int) -> tuple[bool, str]:
         if size > max_bytes:
             return False, "too-large"
         with path.open("rb") as handle:
-            data = handle.read(65536)
-        if b"\x00" in data:
-            return False, "binary-data"
-        sample = data.decode("utf-8", errors="ignore")
-        if re.search(r"^\s*(?:<!doctype|<html|<head|HTTP/[0-9.]\s+[45]\d\d)", sample, re.I | re.M):
-            return False, "html-or-error-page"
+            sample = handle.read(65536)
+            if b"\x00" in sample:
+                return False, "binary-data"
+            if reject_html_error_pages is None:
+                reject_html_error_pages = load_rule_policy()["reject_html_error_pages"]
+            if reject_html_error_pages and re.search(
+                r"^\s*(?:<!doctype|<html|<head|HTTP/[0-9.]\s+[45]\d\d)",
+                sample.decode("utf-8", errors="ignore"),
+                re.I | re.M,
+            ):
+                return False, "html-or-error-page"
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                if b"\x00" in chunk:
+                    return False, "binary-data"
         if size <= 0 or not sample.strip():
             return False, "empty"
         return True, ""
@@ -263,13 +276,14 @@ def collect_sources(
     parallelism = max(1, min(int(workers), max_parallel_by_budget))
 
     stats = {
-        "requested": len(source_urls),
+        "requested": 0,
         "root_requested": len(source_urls),
         "successful": 0,
         "root_successful": 0,
         "failed": 0,
         "root_failed": 0,
         "included_requested": 0,
+        "included_references": 0,
         "total_download_bytes": 0,
         "max_total_download_bytes": max_total_download_bytes,
         "max_total_sources": max_total_sources,
@@ -340,8 +354,10 @@ def collect_sources(
         next_batch: list[tuple[str, int]] = []
         discovered_children: list[tuple[str, int]] = []
 
-        # Process the batch in budget-safe waves. Each wave reserves the
-        # maximum possible bytes for every submitted source.
+        # Schedule by worker capacity and the per-source byte cap. The accepted
+        # global byte total is enforced after each completed download. This keeps
+        # many small sources from being serialized just because the remaining
+        # budget is below one source's worst-case allocation.
         wave_start = 0
         while wave_start < len(batch):
             if time.monotonic() >= deadline:
@@ -353,25 +369,27 @@ def collect_sources(
                 stats["budget_exhausted"] = True
                 break
 
-            wave_limit = min(per_source_limit, remaining_budget)
-            available_slots = max(1, remaining_budget // wave_limit)
-            wave_size = min(parallelism, available_slots, len(batch) - wave_start)
+            wave_limit = per_source_limit
+            wave_size = min(parallelism, len(batch) - wave_start)
             wave = batch[wave_start:wave_start + wave_size]
             wave_start += wave_size
 
             with concurrent.futures.ThreadPoolExecutor(max_workers=len(wave)) as pool:
                 futures = {}
-                for url, depth in wave:
+                ordered_outcomes: list[
+                    tuple[str, int, Path, bool, str, int] | None
+                ] = [None] * len(wave)
+                for submission_index, (url, depth) in enumerate(wave):
                     target = tmp / f"source-{sequence:06d}.txt"
                     sequence += 1
                     remaining = max(1, int(deadline - time.monotonic()))
                     timeout = min(INCLUDE_TIMEOUT if depth else DOWNLOAD_TIMEOUT, remaining)
                     futures[pool.submit(download, url, target, timeout, wave_limit)] = (
-                        url, depth, target, wave_limit
+                        submission_index, url, depth, target, wave_limit
                     )
 
                 for future in concurrent.futures.as_completed(futures):
-                    url, depth, target, wave_limit = futures[future]
+                    submission_index, url, depth, target, wave_limit = futures[future]
                     try:
                         ok, error = future.result()
                     except Exception as exc:
@@ -384,6 +402,16 @@ def collect_sources(
                     if ok and stats["total_download_bytes"] + size > max_total_download_bytes:
                         ok = False
                         error = "global-download-budget-exceeded"
+                        stats["budget_exhausted"] = True
+                    ordered_outcomes[submission_index] = (url, depth, target, ok, error, size)
+
+                # Network completion order must decide neither report order nor
+                # output-file order. Process outcomes in deterministic submission
+                # order even when downloads finish in the opposite order.
+                for outcome in ordered_outcomes:
+                    if outcome is None:
+                        raise RuntimeError("internal error: missing download outcome")
+                    url, depth, target, ok, error, size = outcome
 
                     if ok:
                         files.append(target)
@@ -402,7 +430,8 @@ def collect_sources(
                         log(f"   [OK] {url[:110]}")
                         if depth < max_include_depth:
                             children = include_urls(target, url)
-                            stats["included_requested"] += len(children)
+                            stats["included_references"] += len(children)
+                            stats["included_requested"] = stats["included_references"]
                             discovered_children.extend((child, depth + 1) for child in children)
                     else:
                         stats["failed"] += 1
@@ -453,7 +482,9 @@ def collect_sources(
         current = next_batch
 
     stats["visited"] = len(visited)
-    stats["requested"] = len(visited)
+    # `requested` is the complete success+failure accounting, including
+    # queued sources that could not be attempted because of a global limit.
+    stats["requested"] = stats["successful"] + stats["failed"]
     stats["included_successful"] = stats["successful"] - stats["root_successful"]
     stats["included_failed"] = stats["failed"] - stats["root_failed"]
     return files, stats

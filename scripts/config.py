@@ -45,9 +45,25 @@ def _strict_float(value, field: str) -> float:
 
 
 def canonical_url(url: str) -> str:
-    """Canonicalize URL identity for source de-duplication and include traversal."""
+    """Canonicalize URL identity for source de-duplication and include traversal.
+
+    Default ports are removed so `https://example.com/a` and
+    `https://example.com:443/a` have one canonical identity. Hostname and
+    scheme case are normalized without retaining credentials or fragments.
+    """
     p = urlsplit(url.strip())
-    return urlunsplit((p.scheme.lower(), p.netloc.lower(), p.path or "/", p.query, ""))
+    scheme = p.scheme.lower()
+    hostname = p.hostname.lower() if p.hostname else ""
+    try:
+        port = p.port
+    except ValueError:
+        port = None
+    if ":" in hostname:
+        hostname = f"[{hostname}]"
+    if port == {"http": 80, "https": 443}.get(scheme):
+        port = None
+    netloc = hostname if port is None else f"{hostname}:{port}"
+    return urlunsplit((scheme, netloc, p.path or "/", p.query, ""))
 
 
 def valid_url(url: str) -> bool:
@@ -102,6 +118,34 @@ def _positive_int(value: object, name: str) -> int:
     return result
 
 
+def _policy_limits(policy: dict) -> tuple[int, int, int, int, int, int]:
+    limits = policy.get("limits", {})
+    if not isinstance(limits, dict):
+        raise ValueError("policies.yaml: limits must be an object")
+    return (
+        _positive_int(limits.get("max_rule_length", 100_000), "max_rule_length"),
+        _positive_int(limits.get("max_include_depth", 5), "max_include_depth"),
+        _positive_int(limits.get("max_download_bytes", 50 * 1024 * 1024), "max_download_bytes"),
+        _positive_int(limits.get("max_total_download_bytes", 500 * 1024 * 1024), "max_total_download_bytes"),
+        _positive_int(limits.get("max_total_sources", 500), "max_total_sources"),
+        _positive_int(limits.get("total_timeout_seconds", 1800), "total_timeout_seconds"),
+    )
+
+
+RULE_POLICY_DEFAULTS = {
+    "allow_network_filters": True,
+    "allow_abp_cosmetic": True,
+    "allow_extended_css": True,
+    "reject_ubo_procedural": True,
+    "reject_ubo_extended_exceptions": True,
+    "reject_hosts_format": True,
+    "reject_html_error_pages": True,
+    "reject_unknown_options": True,
+    "reject_duplicate_options": True,
+    "require_domain_for_rewrite": True,
+}
+
+
 def _load_policy() -> dict:
     if not POLICY_FILE.is_file():
         raise FileNotFoundError(f"Missing policy file: {POLICY_FILE}")
@@ -114,18 +158,23 @@ def _load_policy() -> dict:
 @lru_cache(maxsize=1)
 def load_policy_limits() -> tuple[int, int, int, int, int, int]:
     """Return policy limits in one cached, single-source-of-truth tuple."""
+    return _policy_limits(_load_policy())
+
+
+@lru_cache(maxsize=1)
+def load_rule_policy() -> dict[str, bool]:
+    """Load rule-processing switches that control normalization."""
     policy = _load_policy()
-    limits = policy.get("limits", {})
-    if not isinstance(limits, dict):
-        raise ValueError("policies.yaml: limits must be an object")
-    return (
-        _positive_int(limits.get("max_rule_length", 100_000), "max_rule_length"),
-        _positive_int(limits.get("max_include_depth", 5), "max_include_depth"),
-        _positive_int(limits.get("max_download_bytes", 50 * 1024 * 1024), "max_download_bytes"),
-        _positive_int(limits.get("max_total_download_bytes", 500 * 1024 * 1024), "max_total_download_bytes"),
-        _positive_int(limits.get("max_total_sources", 500), "max_total_sources"),
-        _positive_int(limits.get("total_timeout_seconds", 1800), "total_timeout_seconds"),
-    )
+    rules = policy.get("rules", {})
+    if not isinstance(rules, dict):
+        raise ValueError("policies.yaml: rules must be an object")
+    unknown = sorted(set(rules) - set(RULE_POLICY_DEFAULTS))
+    if unknown:
+        raise ValueError(f"policies.yaml: unknown rule policies: {', '.join(unknown)}")
+    return {
+        key: _strict_bool(rules.get(key, default), f"policies.yaml: rules.{key}")
+        for key, default in RULE_POLICY_DEFAULTS.items()
+    }
 
 
 def load_config() -> BuildConfig:
@@ -141,6 +190,7 @@ def load_config() -> BuildConfig:
 
     sources: list[Source] = []
     seen: set[str] = set()
+    seen_names: set[str] = set()
     for index, item in enumerate(raw_sources):
         if not isinstance(item, dict):
             raise ValueError(f"sources.yaml: source #{index + 1} is not an object")
@@ -151,6 +201,10 @@ def load_config() -> BuildConfig:
         url = canonical_url(url)
         if url in seen:
             raise ValueError(f"sources.yaml: duplicate canonical URL: {url}")
+        name_key = name.casefold()
+        if name_key in seen_names:
+            raise ValueError(f"sources.yaml: duplicate source name: {name}")
+        seen_names.add(name_key)
         seen.add(url)
         enabled = _strict_bool(item.get("enabled", True), f"sources.yaml: source #{index + 1}.enabled")
         priority = _strict_int(item.get("priority", 999999), f"sources.yaml: source #{index + 1}.priority")
@@ -179,12 +233,7 @@ def load_config() -> BuildConfig:
     limits = policy.get("limits", {})
     if not isinstance(limits, dict):
         raise ValueError("policies.yaml: limits must be an object")
-    max_rule_length = _positive_int(limits.get("max_rule_length", 100_000), "max_rule_length")
-    max_include_depth = _positive_int(limits.get("max_include_depth", 5), "max_include_depth")
-    max_download_bytes = _positive_int(limits.get("max_download_bytes", 50 * 1024 * 1024), "max_download_bytes")
-    max_total_download_bytes = _positive_int(limits.get("max_total_download_bytes", 500 * 1024 * 1024), "max_total_download_bytes")
-    max_total_sources = _positive_int(limits.get("max_total_sources", 500), "max_total_sources")
-    total_timeout = _positive_int(limits.get("total_timeout_seconds", 1800), "total_timeout_seconds")
+    max_rule_length, max_include_depth, max_download_bytes, max_total_download_bytes, max_total_sources, total_timeout = _policy_limits(policy)
     history = policy.get("history", {})
     if not isinstance(history, dict):
         raise ValueError("policies.yaml: history must be an object")

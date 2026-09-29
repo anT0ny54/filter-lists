@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -25,6 +26,7 @@ from config import BUILDER_VERSION, config_fingerprint, load_config, source_mani
 from fetch import collect_sources  # noqa: E402
 from report import analyze_files, write_report  # noqa: E402
 from normalize import normalize_rule  # noqa: E402  (re-exported for tests/tools that import merge.normalize_rule)
+from policy import PROFILE_DESCRIPTION  # noqa: E402
 
 
 _RULE_SORT_KEY = lambda x: (x.casefold(), x)
@@ -66,7 +68,15 @@ def archive_successful_report(build_id: str, *, retention: int = 10) -> None:
         raise ValueError("history retention must be >= 1")
     HISTORY_DIR.mkdir(parents=True, exist_ok=True)
 
-    target = HISTORY_DIR / f"build-{build_id}.json"
+    data = json.loads(REPORT.read_text(encoding="utf-8"))
+    generated_at = str(data.get("generated_at", ""))
+    timestamp_slug = re.sub(r"[^0-9A-Za-z]+", "-", generated_at).strip("-")[:48] or "unknown-time"
+    report_digest = hashlib.sha256(REPORT.read_bytes()).hexdigest()[:12]
+
+    # Build IDs are deterministic configuration/output identities, while
+    # generated_at distinguishes repeated successful runs. Include both so a
+    # later report with the same Build-ID is not silently lost.
+    target = HISTORY_DIR / f"build-{build_id}-{timestamp_slug}-{report_digest}.json"
     if not target.exists():
         shutil.copy2(REPORT, target)
 
@@ -113,7 +123,7 @@ def write_output(final_rules: list[str], build_id: str, *, manifest_sha256: str,
         f"! Total rules: {len(final_rules)}",
         "!",
         "! Format: Strict Adblock Plus-compatible syntax",
-        "! Profile: Strict Adblock Plus-compatible syntax; uBlock/AdGuard-only rules are excluded.",
+        f"! Profile: {PROFILE_DESCRIPTION}",
         "! Diagnostics: per-source hashes/statistics and anomaly detection are recorded in reports/latest.json.",
         "! Auto-generated. Do not edit directly.",
         "! Edit sources.yaml and rebuild.",
@@ -147,9 +157,11 @@ def main() -> int:
     # Revalidating and recanonicalizing here only adds work and another place
     # where source-selection logic could drift from configuration semantics.
     source_urls = [s.url for s in config.sources]
-    if not source_urls:
+    if not source_urls and config.fail_if_zero_sources:
         log("[ERROR] No enabled source URLs found")
         return 1
+    if not source_urls:
+        log(">> No enabled source URLs; building custom rules only")
     log(f">> Found {len(source_urls)} enabled source URLs")
     with tempfile.TemporaryDirectory(prefix="filter-lists-") as temp_dir:
         files, source_stats = collect_sources(source_urls, Path(temp_dir), started, WORKERS, log, total_timeout=config.total_timeout_seconds, max_include_depth=config.max_include_depth, max_download_bytes=config.max_download_bytes, max_total_download_bytes=config.max_total_download_bytes, max_total_sources=config.max_total_sources)
@@ -161,9 +173,16 @@ def main() -> int:
         source_stats["success_ratio"] = round(source_stats["root_successful"] / source_stats["root_requested"], 4) if source_stats["root_requested"] else 0.0
         source_stats["health_basis"] = "root sources only; nested !#include sources are reported separately"
         source_stats["health_threshold"] = config.minimum_success_ratio
+        zero_source_failure = (
+            config.fail_if_zero_sources and source_stats["root_requested"] == 0
+        )
+        success_ratio_failure = (
+            source_stats["root_requested"] > 0
+            and source_stats["success_ratio"] < config.minimum_success_ratio
+        )
         unhealthy = (
-            (config.fail_if_zero_sources and source_stats["root_successful"] == 0)
-            or source_stats["success_ratio"] < config.minimum_success_ratio
+            zero_source_failure
+            or success_ratio_failure
             or bool(source_stats["required_failed"])
             or source_stats.get("source_limit_reached")
             or source_stats.get("timed_out")

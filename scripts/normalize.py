@@ -7,7 +7,7 @@ behavior change covered by regression tests before changing this module.
 from __future__ import annotations
 
 import re
-from config import load_policy_limits
+from config import load_policy_limits, load_rule_policy
 from parser import classify
 from policy import (
     INVERSE_OPTIONS, REWRITE_RESOURCES, SIMPLE_OPTIONS, TYPE_OPTIONS,
@@ -143,7 +143,12 @@ def valid_rewrite(value: str) -> bool:
     return value.startswith("abp-resource:") and value.removeprefix("abp-resource:") in REWRITE_RESOURCES
 
 
-def valid_option(option: str, is_exception: bool) -> bool:
+def valid_option(
+    option: str,
+    is_exception: bool,
+    rule_policy: dict[str, bool] | None = None,
+) -> bool:
+    policy = load_rule_policy() if rule_policy is None else rule_policy
     if not option or CONTROL_RE.search(option):
         return False
     if "=" not in option:
@@ -154,13 +159,15 @@ def valid_option(option: str, is_exception: bool) -> bool:
             if low in {"~document", "~elemhide"} and not is_exception:
                 return False
             return True
-        return False
+        return not policy["reject_unknown_options"]
     name, value = option.split("=", 1)
     if not name or name != name.strip() or any(char.isspace() for char in name):
         return False
     name = name.lower()
-    if name not in VALUE_OPTIONS or not value:
+    if not value:
         return False
+    if name not in VALUE_OPTIONS:
+        return not policy["reject_unknown_options"]
     if name == "domain":
         return valid_domain_list(value)
     if name == "sitekey":
@@ -172,7 +179,8 @@ def valid_option(option: str, is_exception: bool) -> bool:
     return False
 
 
-def normalize_network(rule: str) -> str | None:
+def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> str | None:
+    policy = load_rule_policy() if rule_policy is None else rule_policy
     is_exception = rule.startswith("@@")
     pattern, options = split_options(rule.strip())
     if not pattern:
@@ -186,7 +194,7 @@ def normalize_network(rule: str) -> str | None:
         return pattern
     normalized: list[str] = []
     for option in options:
-        if not valid_option(option, is_exception):
+        if not valid_option(option, is_exception, policy):
             return None
         if "=" in option:
             name, value = option.split("=", 1)
@@ -201,20 +209,23 @@ def normalize_network(rule: str) -> str | None:
     # `foo` and `~foo` are opposite forms of the same option name and cannot
     # be combined. Keep this canonical name check aligned with rejection_reason().
     option_names = [option.split("=", 1)[0].lstrip("~").lower() for option in normalized]
-    if len(option_names) != len(set(option_names)):
+    if policy["reject_duplicate_options"] and len(option_names) != len(set(option_names)):
         return None
     if any(x.startswith("rewrite=") for x in normalized):
         if "third-party" in normalized or "~third-party" in normalized:
             return None
         if not (pattern_body == "*" or pattern_body.startswith("||")):
             return None
-        if not any(x.startswith("domain=") for x in normalized):
+        if policy["require_domain_for_rewrite"] and not any(
+            x.startswith("domain=") for x in normalized
+        ):
             return None
     return ("@@" if is_exception else "") + pattern_body + "$" + ",".join(sorted(normalized, key=str.casefold))
 
 
-def normalize_cosmetic(rule: str) -> str | None:
-    markers = ("#?#", "#@#", "#$#", "##")
+def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) -> str | None:
+    policy = load_rule_policy() if rule_policy is None else rule_policy
+    markers = ("#?#", "#?@#", "#@#", "#$#", "##")
     match = None
     for sep in markers:
         candidate = rule.find(sep)
@@ -226,6 +237,10 @@ def normalize_cosmetic(rule: str) -> str | None:
     domains = rule[:pos].strip()
     body = rule[pos + len(separator):].strip()
     if separator == "#$#":
+        return None
+    if separator == "#?#" and not policy["allow_extended_css"]:
+        return None
+    if separator == "#?@#" and policy["reject_ubo_extended_exceptions"]:
         return None
     if not body or CONTROL_RE.search(body):
         return None
@@ -242,7 +257,7 @@ def normalize_cosmetic(rule: str) -> str | None:
     # only in #?# extended-CSS rules; it is not a uBO-only construct.
     if ":has-text(" in body_lower and separator != "#?#":
         return None
-    if "+js(" in body_lower:
+    if "+js(" in body_lower and policy["reject_ubo_procedural"]:
         return None
     return f"{domains}{separator}{body}"
 
@@ -252,11 +267,21 @@ def normalize_rule(raw: str, *, max_rule_length: int | None = None) -> str | Non
     limit = MAX_RULE_LENGTH if max_rule_length is None else max_rule_length
     if not line or len(line) > limit:
         return None
+    policy = load_rule_policy()
     classification = classify(line)
+    if classification.kind == "invalid":
+        if classification.reason == "hosts-format" and not policy["reject_hosts_format"]:
+            return line
+        if classification.reason == "html-or-error-page" and not policy["reject_html_error_pages"]:
+            return line
     if classification.kind in {"comment", "directive", "blank", "invalid"}:
         return None
-    if any(sep in line for sep in ("#?#", "#@#", "#$#", "##")):
-        return normalize_cosmetic(line)
+    if classification.kind == "network" and not policy["allow_network_filters"]:
+        return None
+    if classification.kind == "cosmetic" and not policy["allow_abp_cosmetic"]:
+        return None
+    if any(sep in line for sep in ("#?#", "#?@#", "#@#", "#$#", "##")):
+        return normalize_cosmetic(line, policy)
     if "#?@#" in line:
         return None
     # A terminal, unescaped `$` on a normal network filter is an empty
@@ -264,14 +289,19 @@ def normalize_rule(raw: str, *, max_rule_length: int | None = None) -> str | Non
     # normalize_network/split_options and may legitimately contain `$`.
     if line.endswith("$") and not line.startswith(("/", "@@/")):
         return None
-    return normalize_network(line)
+    return normalize_network(line, policy)
 
 
 def rejection_reason(raw: str, *, max_rule_length: int | None = None) -> str:
     line = raw.strip().lstrip("\ufeff")
     if not line:
         return "blank"
+    policy = load_rule_policy()
     c = classify(line)
+    if c.reason == "hosts-format" and not policy["reject_hosts_format"]:
+        return "hosts-format-allowed"
+    if c.reason == "html-or-error-page" and not policy["reject_html_error_pages"]:
+        return "html-or-error-page-allowed"
     if c.reason:
         return c.reason
     if c.kind in {"comment", "directive"}:
@@ -279,7 +309,15 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None) -> str:
     limit = MAX_RULE_LENGTH if max_rule_length is None else max_rule_length
     if len(line) > limit:
         return "rule-too-long"
-    if "#?@#" in line or "+js(" in line.lower():
+    if c.kind == "network" and not policy["allow_network_filters"]:
+        return "network-filters-disabled"
+    if c.kind == "cosmetic" and not policy["allow_abp_cosmetic"]:
+        return "cosmetic-filters-disabled"
+    if "#?#" in line and not policy["allow_extended_css"]:
+        return "extended-css-disabled"
+    if "#?@#" in line and policy["reject_ubo_extended_exceptions"]:
+        return "ubo-only-syntax"
+    if "+js(" in line.lower() and policy["reject_ubo_procedural"]:
         return "ubo-only-syntax"
     if c.kind == "cosmetic":
         if "#?#" in line:
@@ -298,13 +336,23 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None) -> str:
                 if name.startswith("~"):
                     name = name[1:]
                 names.append(name)
-                if "=" in option and name not in VALUE_OPTIONS:
+                if (
+                    "=" in option
+                    and name not in VALUE_OPTIONS
+                    and policy["reject_unknown_options"]
+                ):
                     return "unknown-option"
-                if "=" not in option and name not in TYPE_OPTIONS and name not in INVERSE_OPTIONS and name not in SIMPLE_OPTIONS:
+                if (
+                    "=" not in option
+                    and name not in TYPE_OPTIONS
+                    and name not in INVERSE_OPTIONS
+                    and name not in SIMPLE_OPTIONS
+                    and policy["reject_unknown_options"]
+                ):
                     return "unknown-option"
-                if not valid_option(option, line.startswith("@@")):
+                if not valid_option(option, line.startswith("@@"), policy):
                     return "invalid-option-value" if "=" in option else "context-invalid-option"
-            if len(names) != len(set(names)):
+            if policy["reject_duplicate_options"] and len(names) != len(set(names)):
                 return "duplicate-option"
         if normalize_network(line) is None:
             return "invalid-option-or-network-rule"
