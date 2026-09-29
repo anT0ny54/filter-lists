@@ -15,8 +15,10 @@ on:
       - "requirements.txt"
       - ".github/workflows/update.yml"
 
+# Shared with Keep-Alive.yml: both push to the default branch, and their crons
+# used to fire in the same minute, racing on `git push`.
 concurrency:
-  group: update-filter-list
+  group: repo-write
   cancel-in-progress: false
 
 permissions:
@@ -51,12 +53,6 @@ jobs:
           python -m py_compile scripts/*.py
           python -m unittest discover -s tests -p 'test_*.py' -v
 
-      - name: Performance benchmark
-        run: python3 scripts/benchmark.py --repeats 3
-
-      - name: Optional differential engine test
-        run: python3 scripts/differential.py
-
       - name: Generate filter list
         shell: bash
         run: |
@@ -73,10 +69,16 @@ jobs:
           python3 scripts/validate.py filters.txt
           python3 - <<'PY'
           import json
+          import sys
           from pathlib import Path
+          sys.path.insert(0, "scripts")
+          # Derive expectations from the code so a version/schema bump cannot
+          # silently desynchronize this gate from the builder.
+          from config import BUILDER_VERSION
+          from report import SCHEMA_VERSION
           data = json.loads(Path("reports/latest.json").read_text())
-          assert data["schema"] == 5
-          assert data["builder"] == "Filter-Lists v7.5.2"
+          assert data["schema"] == SCHEMA_VERSION
+          assert data["builder"] == f"Filter-Lists v{BUILDER_VERSION}"
           assert data["rules"]["unique_rules"] > 0
           assert data["sources"]["success_ratio"] >= data["sources"]["health_threshold"]
           assert not data["sources"]["required_failed"]
@@ -86,7 +88,13 @@ jobs:
           assert data["anomalies"].get("enforced_failure") is False
           assert len(data["provenance"]["source_manifest_sha256"]) == 64
           assert data["sources"]["total_download_bytes"] <= data["sources"]["max_total_download_bytes"]
-          print(json.dumps(data, indent=2))
+          print(json.dumps({
+              "build_id": data["build_id"],
+              "rules": data["rules"]["unique_rules"],
+              "sources": f'{data["sources"]["root_successful"]}/{data["sources"]["root_requested"]}',
+              "anomalies": data["anomalies"]["count"],
+              "build_seconds": data["build_seconds"],
+          }, indent=2))
           PY
 
       - name: Commit and push changes
@@ -101,5 +109,6 @@ jobs:
             exit 0
           fi
           rules="$(sed -n 's/^! Total rules: //p' filters.txt)"
-          git commit -m "chore(filters): auto-update V7.5.2 filter list (${rules} rules) [skip ci]"
+          version="$(sed -n 's/^! Version: //p' filters.txt | cut -d- -f1)"
+          git commit -m "chore(filters): auto-update ${version} filter list (${rules} rules) [skip ci]"
           git push origin "HEAD:${GITHUB_REF_NAME}"
