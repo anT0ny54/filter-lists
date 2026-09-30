@@ -1,10 +1,10 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.5.4-679c233015f0
-! Last updated: 2026-09-30 01:34:00 UTC
+! Version: v7.5.4-2d5335d0f3cc
+! Last updated: 2026-09-30 01:34:52 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 679c233015f044befc7676866a0290c865a5177be5c712eaded230a2829dc2c5
+! Build-ID: 2d5335d0f3ccd816800951a9540a413ae118cab2bd614fa6b463516cb0577c49
 ! Source manifest SHA-256: 2f87bc9b88421e1b431098c5f33387602c6c38286e2533c1890c26ec59fcfd77
 ! Root sources: 33
 ! Total rules: 168112

@@ -1,17 +1,17 @@
 {
   "schema": 5,
   "status": "success",
-  "generated_at": "2026-09-30T01:34:00.332597+00:00",
+  "generated_at": "2026-09-30T01:34:52.169802+00:00",
   "builder": "Filter-Lists v7.5.4",
   "profile": "strict-abp",
-  "build_id": "679c233015f044befc7676866a0290c865a5177be5c712eaded230a2829dc2c5",
+  "build_id": "2d5335d0f3ccd816800951a9540a413ae118cab2bd614fa6b463516cb0577c49",
   "source_count": 33,
   "provenance": {
     "source_manifest_sha256": "2f87bc9b88421e1b431098c5f33387602c6c38286e2533c1890c26ec59fcfd77",
     "source_registry": "sources.yaml",
-    "source_registry_sha256": "8362f45004bf6d57a56f4df54d8c2d6149c5e24622932ab504797fcbdae466f2",
+    "source_registry_sha256": "cfeb6d46a0d2f56db661f2a2831fbb4b2e830073324efc6fd3fdf12acf4fe574",
     "builder": "Filter-Lists v7.5.4",
-    "policy_sha256": "6ed3611cfa27fd6b4d467f0c811fbd2b3b47f1379c595929919d753414ba368d"
+    "policy_sha256": "c77366ec048306b4b86c0fd175d30f8c76cf99f9fe53d107f446f604fc8b9123"
   },
   "sources": {
     "requested": 33,
@@ -1139,7 +1139,7 @@
   },
   "anomalies": {
     "enabled": true,
-    "baseline": "d7fcc559eaf39e02b1dd03e0273e0742ab71941fcd67865549c647d024e3f877",
+    "baseline": "679c233015f044befc7676866a0290c865a5177be5c712eaded230a2829dc2c5",
     "count": 0,
     "critical_count": 0,
     "warning_count": 0,
@@ -1147,5 +1147,5 @@
     "fail_on_warning": false,
     "enforced_failure": false
   },
-  "build_seconds": 24.629
+  "build_seconds": 18.831
 }
