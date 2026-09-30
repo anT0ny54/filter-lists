@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.5.4-07f762562fd3
-! Last updated: 2026-09-30 14:31:36 UTC
+! Version: v7.5.4-87d8706e9ac5
+! Last updated: 2026-09-30 15:23:54 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 07f762562fd33dfe79a85ab5e98e738d800cc5b557be87751f1bf2e5fffb85f0
+! Build-ID: 87d8706e9ac55838c486eee0119215edf0cd471f8530f386944d8985038c81f7
 ! Source manifest SHA-256: 2f87bc9b88421e1b431098c5f33387602c6c38286e2533c1890c26ec59fcfd77
 ! Root sources: 33
-! Total rules: 168326
+! Total rules: 168345
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -37259,18 +37259,18 @@ bunshun.jp,news18.com###twitter-share-btn
 bunte.de##.bfa-ad-slot
 bunte.de##[class^="Ad-Slot"]
 bunte.de,focus.de##div[id*="AdSlot"]
-buomtv.rest##._1vguhxv.cosll6e._3yp41v.row-3.lgy>._1lbf8q9
-buomtv.rest##._1vguhxv.cwzsl22.czdj0j5.c1skg1w3.c1q1n9rc.c1f8a55r.c2wbcgy.c1qs0lzc.cq980mc.cosll6e.cjq7bud.c10dklm2.c1xtmnwt.dlnefd1
-buomtv.rest##._9xtpcl.c1mnguco.c9pdtme.c1q1n9rc.c1f8a55r.c2wbcgy.c1qs0lzc.cq980mc.cosll6e.cxngf0m.c199xq07.c1xtmnwt
-buomtv.rest##._9xtpcl.c4je67d.c1qs0lzc.c1hrlkpu.cc2icwl.c1i0iccj.cfd18df
-buomtv.rest##._9xtpcl.cxwrp3i.c1skg1w3.cxngf0m.c199xq07.c10dklm2.c1xtmnwt.cvk29a4.w-\[300px\]
-buomtv.rest##._9xtpcl.e1e6v8dt
-buomtv.rest##.blbew80
-buomtv.rest##.llnefd1
-buomtv.rest##.lpp0nsn
-buomtv.rest##.luq51lg.a13wihj
-buomtv.rest##.pointer-events-auto.block
-buomtv.rest##.zbgpvb19.zbgpvb16.zbgpvbj.zbgpvbh.zbgpvbg.zbgpvbf.zbgpvbe.zbgpvb1
+buomtv.diy##._1vguhxv.cosll6e._3yp41v.row-3.lgy>._1lbf8q9
+buomtv.diy##._1vguhxv.cwzsl22.czdj0j5.c1skg1w3.c1q1n9rc.c1f8a55r.c2wbcgy.c1qs0lzc.cq980mc.cosll6e.cjq7bud.c10dklm2.c1xtmnwt.dlnefd1
+buomtv.diy##._9xtpcl.c1mnguco.c9pdtme.c1q1n9rc.c1f8a55r.c2wbcgy.c1qs0lzc.cq980mc.cosll6e.cxngf0m.c199xq07.c1xtmnwt
+buomtv.diy##._9xtpcl.c4je67d.c1qs0lzc.c1hrlkpu.cc2icwl.c1i0iccj.cfd18df
+buomtv.diy##._9xtpcl.cxwrp3i.c1skg1w3.cxngf0m.c199xq07.c10dklm2.c1xtmnwt.cvk29a4.w-\[300px\]
+buomtv.diy##._9xtpcl.e1e6v8dt
+buomtv.diy##.blbew80
+buomtv.diy##.llnefd1
+buomtv.diy##.lpp0nsn
+buomtv.diy##.luq51lg.a13wihj
+buomtv.diy##.pointer-events-auto.block
+buomtv.diy##.zbgpvb19.zbgpvb16.zbgpvbj.zbgpvbh.zbgpvbg.zbgpvbf.zbgpvbe.zbgpvb1
 buondua.com##.main-body > div > div[class]:not([class^="item"]):not([class^="article"]):contains(/^Sponsored ads$/)
 buondua.com##.pagination + br + div[class]
 buondua.com##div[class*="article"] > div:not([class]) > div[class]:contains(/^Sponsored ads$/)
@@ -39215,6 +39215,8 @@ choosar.gigafile.nu##.wrap_pr_300_sky
 choosefi.com##[data-block-type="credit-card-top-offers"]
 chophim.app##.p-4.bg-black\/65.justify-center.items-center.flex.z-\[90\].inset-0.fixed
 chophim.app##.pointer-events-none.justify-center.flex.z-\[80\].bottom-0.inset-x-0.fixed
+chophim.fun##.p-4.bg-black\/65.justify-center.items-center.flex.z-\[90\].inset-0.fixed
+chophim.fun##.pointer-events-none.justify-center.flex.z-\[80\].bottom-0.inset-x-0.fixed
 chophimviet.top###scriptDiv:has(.adsbygoogle)
 chordify.net##button:has(> span > span > i.icon-share)
 chordu.com##div[class*="ads_ad_background"]
@@ -101406,6 +101408,7 @@ zzzyk.com###Tinfo
 ||aeratorsluicyarcking.cfd^
 ||aerifyspiky.com^
 ||aerionvel.com^
+||aerobessurrah.com^
 ||aeroinsta.com.tr/code/js/0.js
 ||aerolla.net/0.js
 ||aeromods.app/assets/js/plugins/0.js
@@ -107969,7 +107972,7 @@ zzzyk.com###Tinfo
 ||bunth.net^
 ||bunyorogoyishescalin.qpon^
 ||buojbmprywppy.site^
-||buomtv.rest/palivn/ad/$image,~third-party
+||buomtv.diy/palivn/ad/$image,~third-party
 ||buoyinglignum.cfd^
 ||bup.bankofamerica.com^
 ||bupatp.com^
@@ -119133,6 +119136,7 @@ zzzyk.com###Tinfo
 ||extxp6lb9rmmz9ptoltmmovzjn4nv3g91f.cfd^
 ||exucn.com^
 ||exudepatcher.com^
+||exudingtrocar.qpon^
 ||exulsbmitdvzd.online^
 ||exuurzoqmvwnh.space^
 ||exwz.cn^
@@ -121665,6 +121669,7 @@ zzzyk.com###Tinfo
 ||fwbntw.com^
 ||fwcdn2.com^$third-party
 ||fwcdn3.com^$third-party
+||fwcqjspysnncn.site^
 ||fwcumtzoiwoyl.site^
 ||fwcvdfgoeayyo.site^
 ||fwdcdn.com/img/commercial/$domain=ukr.net
@@ -127600,6 +127605,7 @@ zzzyk.com###Tinfo
 ||imghost.top/kita/
 ||imghst-de.com^
 ||imgjiajiao.cn/jiajiao/js/lxonline.js
+||imgkcdn.com^$third-party
 ||imgkdetaddxre.space^
 ||imglnkd.com^
 ||imglnke.com^
@@ -129822,6 +129828,7 @@ zzzyk.com###Tinfo
 ||jmhfw.com/index.php?/ajax/get_adv/
 ||jmhkdmwemnkgq.website^
 ||jmhrmhgjkdgvd.store^
+||jmhxjywrpeegd.site^
 ||jmkladoihjrsa.space^
 ||jmmdhfawpaefv.site^
 ||jmnlsiquhikir.site^
@@ -130306,6 +130313,7 @@ zzzyk.com###Tinfo
 ||jsoon.digitiminimi.com^$third-party
 ||jsotpyjprlcaz.website^
 ||jspyxhyrpgiai.site^
+||jsqcxpvxnwdzs.space^
 ||jsrcxfoeheaki.com^
 ||jsrdn.com/creatives/
 ||jsrdn.com/s/cs.js
@@ -131618,6 +131626,7 @@ zzzyk.com###Tinfo
 ||knampkoltuduq.space^
 ||knapperstaumer.cfd^
 ||knarkroughly.qpon^
+||knattewanhorn.qpon^
 ||kncmcedprghia.space^
 ||kncturaxqdqog.online^
 ||knddnkopoqgpg.site^
@@ -148405,6 +148414,7 @@ zzzyk.com###Tinfo
 ||robeheadlong.com^
 ||robervenous.shop^
 ||robesadvertisement.com^
+||robhahalands.com^
 ||robin-flow.com^
 ||robinbob.in/images/promo_
 ||roblox.com/_/_/1px.gif
@@ -152377,6 +152387,7 @@ zzzyk.com###Tinfo
 ||soladelapse.qpon^
 ||solads.media^$third-party
 ||solanosawmont.cyou^
+||solanrenegueacies.cyou^
 ||solarad.net^
 ||solaranalytics.org^
 ||solarcyclonesky.com^
@@ -155586,6 +155597,7 @@ zzzyk.com###Tinfo
 ||tfqzimwubggu.com^
 ||tfrkbyualptil.online^
 ||tftfbezn.com^
+||tfuxcxvzsuglw.online^
 ||tfwjtrkuueobz.online^
 ||tfwqnjpieinla.website^
 ||tfxipmcetrqiu.website^
@@ -159008,6 +159020,7 @@ zzzyk.com###Tinfo
 ||unskilledaccompanimentcircumstances.com^
 ||unslylywines.shop^
 ||unsmugkodogupassir.qpon^
+||unsnarlsikkim.com^
 ||unsnugdioritekinks.qpon^
 ||unsoggydipodelocker.cyou^
 ||unsorebox.qpon^
@@ -160201,6 +160214,7 @@ zzzyk.com###Tinfo
 ||veryansintv.com/wp-content/uploads/2025/01/o4yrakp.png
 ||verygoodminigames.com^
 ||veselchaga.link^
+||veselchaga.link^$third-party
 ||veskitnerved.com^
 ||vespoidpeching.cfd^
 ||vespymedia.com^
@@ -160515,6 +160529,7 @@ zzzyk.com###Tinfo
 ||viicmkru.com^
 ||viiczfvm.com^
 ||viidsyej.com^
+||viieqcjw.com^$third-party
 ||viifcktm.com^
 ||viifwjox.com^
 ||viigoecc.com^
@@ -162379,6 +162394,7 @@ zzzyk.com###Tinfo
 ||wgerhfypjlycg.site^
 ||wgexsktozbmrx.online^
 ||wgfqayocqadzp.space^
+||wgfuxnhekwldv.website^
 ||wggmcqucgyggh.site^
 ||wghkllhhoraeb.space^
 ||wghoubdaxpsik.site^
@@ -163394,6 +163410,7 @@ zzzyk.com###Tinfo
 ||wqhsibprqqvgr.website^
 ||wqjregsni.net^
 ||wqkptgmrlkkel.online^
+||wqlbyrlaybip.com^
 ||wqldvxtfwamtu.online^
 ||wqmzwffcyubkd.site^
 ||wqoruynunigia.website^
@@ -164945,6 +164962,7 @@ zzzyk.com###Tinfo
 ||xskmpyxchvanm.site^
 ||xslbuoadsfsrf.space^
 ||xslca.cc/js/pf.js
+||xslufrpwherns.website^
 ||xsmaiqewozddc.space^
 ||xsmeqhlcpsiyk.space^
 ||xsmnkwolsmvjim.com^
@@ -165373,6 +165391,7 @@ zzzyk.com###Tinfo
 ||yahoo.net/pixel.gif
 ||yahoolock.com^
 ||yahvehpetaled.cfd^
+||yahxcarxmnp.com^
 ||yahzsa6o2o.com^
 ||yajwwgdogebga.space^
 ||yakalais.cfd^
