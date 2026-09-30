@@ -16,7 +16,7 @@ from normalize import normalize_rule  # noqa: E402
 TOTAL_RE = re.compile(r"^! Total rules: ([0-9]+)$")
 BUILD_RE = re.compile(r"^! Build-ID: ([0-9a-f]{64})$")
 SOURCE_MANIFEST_RE = re.compile(r"^! Source manifest SHA-256: ([0-9a-f]{64})$")
-VERSION_RE = re.compile(r"^! Version: v" + re.escape(BUILDER_VERSION) + r"-[0-9a-f]{12}$")
+VERSION_RE = re.compile(r"^! Version: v" + re.escape(BUILDER_VERSION) + r"-([0-9a-f]{12})$")
 
 
 def main() -> int:
@@ -37,43 +37,52 @@ def main() -> int:
     declared_build_id = None
     declared_source_manifest = None
     version_seen = False
+    version_hash = None
 
     def _numbered_lines():
         with path.open(encoding="utf-8", errors="strict") as handle:
             for number, raw in enumerate(handle, 1):
                 yield number, raw.rstrip("\r\n")
 
-    for number, raw in _numbered_lines():
-        if m := TOTAL_RE.match(raw):
-            declared_total = int(m.group(1))
-            continue
-        if m := BUILD_RE.match(raw):
-            declared_build_id = m.group(1)
-            continue
-        if m := SOURCE_MANIFEST_RE.match(raw):
-            declared_source_manifest = m.group(1)
-            continue
-        if raw.startswith("! Version:"):
-            version_seen = True
-            if not VERSION_RE.match(raw):
-                errors.append(f"[VERSION] line {number}: invalid version")
-        if not raw or raw.lstrip().startswith("!"):
-            continue
+    try:
+        for number, raw in _numbered_lines():
+            if m := TOTAL_RE.match(raw):
+                declared_total = int(m.group(1))
+                continue
+            if m := BUILD_RE.match(raw):
+                declared_build_id = m.group(1)
+                continue
+            if m := SOURCE_MANIFEST_RE.match(raw):
+                declared_source_manifest = m.group(1)
+                continue
+            if raw.startswith("! Version:"):
+                version_seen = True
+                if m := VERSION_RE.match(raw):
+                    version_hash = m.group(1)
+                else:
+                    errors.append(f"[VERSION] line {number}: invalid version")
+            if not raw or raw.lstrip().startswith("!"):
+                continue
 
-        normalized = normalize_rule(raw, max_rule_length=config.max_rule_length)
-        if normalized is None:
-            errors.append(f"[INVALID] line {number}: {raw[:180]}")
-            continue
-        if normalized in seen:
-            errors.append(f"[DUPLICATE] line {number}: {raw[:180]}")
-        seen.add(normalized)
-        # Track only the previous sort key instead of retaining every rule.
-        current_key = (normalized.casefold(), normalized)
-        if previous_key is not None and current_key < previous_key:
-            errors.append(f"[UNSORTED] line {number}: {raw[:180]}")
-        previous_key = current_key
-        if normalized != raw:
-            errors.append(f"[NONCANONICAL] line {number}: {raw[:180]}")
+            normalized = normalize_rule(raw, max_rule_length=config.max_rule_length)
+            if normalized is None:
+                errors.append(f"[INVALID] line {number}: {raw[:180]}")
+                continue
+            if normalized in seen:
+                errors.append(f"[DUPLICATE] line {number}: {raw[:180]}")
+            seen.add(normalized)
+            # Track only the previous sort key instead of retaining every rule.
+            current_key = (normalized.casefold(), normalized)
+            if previous_key is not None and current_key < previous_key:
+                errors.append(f"[UNSORTED] line {number}: {raw[:180]}")
+            previous_key = current_key
+            if normalized != raw:
+                errors.append(f"[NONCANONICAL] line {number}: {raw[:180]}")
+    except UnicodeDecodeError as exc:
+        # errors="strict" is deliberate (a filter list must be valid UTF-8),
+        # but it must be reported like every other validation failure rather
+        # than crashing with a traceback.
+        errors.append(f"[ENCODING] not valid UTF-8: {exc.reason} at byte {exc.start}")
 
     if declared_total != len(seen):
         errors.append(f"[COUNT] declared {declared_total}, found {len(seen)} unique rules")
@@ -90,6 +99,8 @@ def main() -> int:
             errors.append("[PROVENANCE] source manifest hash does not match sources.yaml")
     if not version_seen:
         errors.append("[VERSION] missing")
+    elif version_hash and declared_build_id and not declared_build_id.startswith(version_hash):
+        errors.append("[VERSION] hash suffix does not match Build-ID")
 
     for error in errors[:100]:
         print(error)

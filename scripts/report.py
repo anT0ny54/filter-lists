@@ -62,7 +62,11 @@ def _ratio_change(current: float, previous: float) -> float:
 
 
 def detect_anomalies(current_results: list[dict], previous_report: dict | None, policy: dict) -> dict:
-    result = {"enabled": bool(policy.get("enabled", True)), "baseline": "none", "count": 0, "critical_count": 0, "warning_count": 0, "items": []}
+    # `fail_on_warning` / `enforced_failure` are present on every return path.
+    # Previously they were only set once a baseline existed, so the very first
+    # build (or anomaly_detection.enabled: false) produced a report without
+    # `enforced_failure` and the publish workflow's `is False` assertion failed.
+    result = {"enabled": bool(policy.get("enabled", True)), "baseline": "none", "count": 0, "critical_count": 0, "warning_count": 0, "items": [], "fail_on_warning": bool(policy.get("fail_on_warning", False)), "enforced_failure": False}
     if not result["enabled"] or not previous_report or previous_report.get("status", "success") != "success":
         return result
     previous = previous_report.get("sources", {}).get("results", [])
@@ -90,7 +94,6 @@ def detect_anomalies(current_results: list[dict], previous_report: dict | None, 
             severity = "critical" if (current_rules == 0 or current_lines == 0) else "warning"
             result["items"].append({"url": current.get("url"), "severity": severity, "reasons": reasons, "changes": changes, "previous": {"bytes": old_bytes, "input_lines": old_lines, "unique_rules": old_rules, "rejection_rate": old_rejection, "sha256": old.get("sha256")}, "current": {"bytes": current_bytes, "input_lines": current_lines, "unique_rules": current_rules, "rejection_rate": current_rejection, "sha256": current.get("sha256")}})
     result["count"] = len(result["items"]); result["critical_count"] = sum(x["severity"] == "critical" for x in result["items"]); result["warning_count"] = result["count"] - result["critical_count"]
-    result["fail_on_warning"] = bool(policy.get("fail_on_warning", False))
     result["enforced_failure"] = result["critical_count"] > 0 or (result["fail_on_warning"] and result["warning_count"] > 0)
     return result
 

@@ -15,17 +15,16 @@ from policy import (
 )
 
 MAX_RULE_LENGTH = load_policy_limits()[0]
-# Shared control-character gate. Same pattern is reused under a second name
-# below (NETWORK_FORBIDDEN_RE) purely so call sites read as domain-specific;
-# keep both names pointed at one compiled pattern instead of two copies.
+# Shared control-character gate (network patterns, options, cosmetic bodies).
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
-NETWORK_FORBIDDEN_RE = CONTROL_RE
 # Regex filters may contain ordinary whitespace, but raw control characters
 # (including TAB) are never valid in the ABP regex payload.
 REGEX_CONTROL_RE = re.compile(r"[\x00-\x1f\x7f-\x9f]")
+# The TLD may be alphabetic or an IDN A-label (`xn--p1ai`); the latter was
+# previously rejected, silently dropping rules for internationalized TLDs.
 DOMAIN_RE = re.compile(
     r"^~?(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+"
-    r"[A-Za-z]{2,63}$"
+    r"(?:[A-Za-z]{2,63}|xn--[A-Za-z0-9-]{1,59}[A-Za-z0-9])$"
 )
 SITEKEY_RE = re.compile(r"^[A-Za-z0-9+/._-]+={0,2}$")
 # uBlock Origin / AdGuard procedural and style-injection operators. They are not
@@ -67,10 +66,18 @@ def valid_regex_filter(pattern: str) -> bool:
 
 def valid_network_pattern(pattern: str) -> bool:
     """Conservative ABP network-filter grammar gate."""
-    if not pattern or NETWORK_FORBIDDEN_RE.search(pattern):
+    if not pattern or CONTROL_RE.search(pattern):
         return False
+    # ABP treats a filter as a regular expression only when it both starts and
+    # ends with `/`. A leading `/` alone is an ordinary path pattern such as
+    # `/ads/banner.gif` or `/adframe.`; those were previously run through the
+    # regex-envelope check and wrongly rejected. A lone `/` is too broad to be
+    # a meaningful rule and stays rejected.
     if pattern.startswith("/"):
-        return valid_regex_filter(pattern)
+        if pattern.endswith("/"):
+            return valid_regex_filter(pattern)
+        if pattern == "/":
+            return False
     if any(c.isspace() for c in pattern):
         return False
     # ABP allows an unescaped `|` only as a start/end anchor (`|` or `||` at
@@ -180,9 +187,7 @@ def valid_option(
         return valid_sitekeys(value)
     if name == "csp":
         return valid_csp(value)
-    if name == "rewrite":
-        return valid_rewrite(value)
-    return False
+    return valid_rewrite(value)  # name == "rewrite"
 
 
 def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> str | None:

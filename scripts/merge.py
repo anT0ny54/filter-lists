@@ -130,6 +130,9 @@ def stage_output(final_rules: list[str], build_id: str, *, manifest_sha256: str,
         with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as output:
             output.write("\n".join(header) + "\n")
             output.write("\n".join(final_rules) + "\n")
+        # mkstemp creates the file 0600; a published list must be world-readable
+        # (it is served as a static file), like any file written by open().
+        os.chmod(temporary, 0o644)
     except Exception:
         Path(temporary).unlink(missing_ok=True)
         raise
@@ -139,11 +142,6 @@ def stage_output(final_rules: list[str], build_id: str, *, manifest_sha256: str,
 
 def commit_output(staged: Path) -> None:
     os.replace(staged, OUTPUT)
-
-
-def write_output(final_rules: list[str], build_id: str, *, manifest_sha256: str, source_count: int) -> None:
-    """Stage and immediately publish (kept for callers that do not need gating)."""
-    commit_output(stage_output(final_rules, build_id, manifest_sha256=manifest_sha256, source_count=source_count))
 
 
 def main() -> int:

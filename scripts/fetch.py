@@ -19,6 +19,13 @@ CURL_RETRIES = 5
 MAX_REDIRECTS = 5
 REDIRECT_STATUSES = {301, 302, 303, 307, 308}
 INCLUDE_RE = re.compile(r"^\s*!#include\s+(.+?)\s*$", re.I)
+# `\b` keeps `<header`/`<htmlfoo` from matching. The status-line branch needs
+# `[0-9.]+`: with a single-character class `HTTP/1.1 404` never matched, so only
+# HTTP/2-style error bodies were detected.
+HTML_ERROR_PAGE_RE = re.compile(
+    r"^\s*(?:<!doctype\b|<html\b|<head\b|HTTP/[0-9.]+\s+[45]\d\d)",
+    re.I | re.M,
+)
 
 
 def _public_address_for_url(url: str) -> tuple[str | None, str]:
@@ -214,17 +221,15 @@ def validate_download(
                 return False, "binary-data"
             if reject_html_error_pages is None:
                 reject_html_error_pages = load_rule_policy()["reject_html_error_pages"]
-            if reject_html_error_pages and re.search(
-                r"^\s*(?:<!doctype|<html|<head|HTTP/[0-9.]\s+[45]\d\d)",
-                sample.decode("utf-8", errors="ignore"),
-                re.I | re.M,
+            if reject_html_error_pages and HTML_ERROR_PAGE_RE.search(
+                sample.decode("utf-8", errors="ignore")
             ):
                 return False, "html-or-error-page"
+            if not sample.strip():
+                return False, "empty"
             for chunk in iter(lambda: handle.read(1024 * 1024), b""):
                 if b"\x00" in chunk:
                     return False, "binary-data"
-        if not sample.strip():
-            return False, "empty"
         return True, ""
     except OSError as exc:
         return False, str(exc)

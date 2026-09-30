@@ -5,7 +5,6 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-COMMENT_RE = re.compile(r"^\s*!")
 DIRECTIVE_RE = re.compile(r"^\s*!#(?:if|else|endif|include|safari|end)\b", re.I)
 HOSTS_RE = re.compile(r"^(?:0\.0\.0\.0|127\.0\.0\.1|::1)(?:\s+|$)")
 HTML_RE = re.compile(r"^\s*(?:<!doctype\b|<html\b|<head\b|<body\b)", re.I)
@@ -30,10 +29,12 @@ def classify(line: str) -> LineClassification:
         return LineClassification("blank")
     # Directives (`!#include`, `!#if`, ...) start with the same `!` prefix as
     # comments, so the directive check must run first or it is unreachable
-    # and every directive line is silently misreported as a comment.
-    if DIRECTIVE_RE.match(value):
-        return LineClassification("directive")
-    if COMMENT_RE.match(value):
+    # and every directive line is silently misreported as a comment. The value
+    # is already stripped, so only a leading `!#` can be a directive; comments
+    # (the most common non-rule line) skip the regex entirely.
+    if value[0] == "!":
+        if value.startswith("!#") and DIRECTIVE_RE.match(value):
+            return LineClassification("directive")
         return LineClassification("comment")
     if HOSTS_RE.match(value):
         return LineClassification("invalid", "hosts-format")

@@ -22,7 +22,7 @@ CUSTOM_RULES = ROOT / "custom-rules.txt"
 # validate.py, and fetch.py's outbound User-Agent all import this instead of
 # each keeping an independent copy, which previously let the string drift
 # out of sync between modules on a version bump.
-BUILDER_VERSION = "7.5.3"
+BUILDER_VERSION = "7.5.4"
 
 # Schema revision of policies.yaml itself (its `version:` key).
 POLICY_SCHEMA_VERSION = 3
@@ -34,6 +34,29 @@ POLICY_TOP_LEVEL_KEYS = frozenset({
     "version", "profile", "rules", "limits", "history",
     "source_health", "anomaly_detection",
 })
+# Allowed keys inside each policies.yaml section. Unknown keys are rejected so
+# a typo such as `max_bytes_change_ration` cannot silently fall back to the
+# default and loosen a gate. (`rules` has its own table, RULE_POLICY_DEFAULTS.)
+POLICY_SECTION_KEYS = {
+    "limits": frozenset({
+        "max_rule_length", "max_include_depth", "max_download_bytes",
+        "max_total_download_bytes", "max_total_sources", "total_timeout_seconds",
+    }),
+    "history": frozenset({"retention"}),
+    "source_health": frozenset({"minimum_success_ratio", "fail_if_zero_sources"}),
+    "anomaly_detection": frozenset({
+        "enabled", "max_bytes_change_ratio", "max_rule_count_change_ratio",
+        "max_rejection_rate_change", "min_lines", "fail_on_warning",
+    }),
+}
+SOURCES_TOP_LEVEL_KEYS = frozenset({"version", "sources"})
+SOURCE_ITEM_KEYS = frozenset({"name", "url", "category", "enabled", "priority", "required"})
+
+
+def _reject_unknown_keys(section: dict, allowed: frozenset, label: str) -> None:
+    unknown = sorted(set(section) - allowed, key=str)
+    if unknown:
+        raise ValueError(f"{label}: unknown keys: {', '.join(map(str, unknown))}")
 
 
 def _strict_bool(value, field: str) -> bool:
@@ -135,6 +158,7 @@ def _policy_limits(policy: dict) -> tuple[int, int, int, int, int, int]:
     limits = policy.get("limits", {})
     if not isinstance(limits, dict):
         raise ValueError("policies.yaml: limits must be an object")
+    _reject_unknown_keys(limits, POLICY_SECTION_KEYS["limits"], "policies.yaml: limits")
     return (
         _positive_int(limits.get("max_rule_length", 100_000), "max_rule_length"),
         _positive_int(limits.get("max_include_depth", 5), "max_include_depth"),
@@ -210,6 +234,7 @@ def load_config() -> BuildConfig:
     source_data = yaml.safe_load(SOURCE_REGISTRY.read_text(encoding="utf-8")) or {}
     if not isinstance(source_data, dict):
         raise ValueError("sources.yaml: top level must be an object")
+    _reject_unknown_keys(source_data, SOURCES_TOP_LEVEL_KEYS, "sources.yaml")
     raw_sources = source_data.get("sources")
     if not isinstance(raw_sources, list):
         raise ValueError("sources.yaml: 'sources' must be a list")
@@ -220,6 +245,9 @@ def load_config() -> BuildConfig:
     for index, item in enumerate(raw_sources):
         if not isinstance(item, dict):
             raise ValueError(f"sources.yaml: source #{index + 1} is not an object")
+        # A misspelled `required`/`enabled` would otherwise be ignored and
+        # silently turn a health gate off.
+        _reject_unknown_keys(item, SOURCE_ITEM_KEYS, f"sources.yaml: source #{index + 1}")
         name = str(item.get("name", "")).strip()
         url = str(item.get("url", "")).strip()
         if not name or not valid_url(url):
@@ -252,6 +280,7 @@ def load_config() -> BuildConfig:
     health = policy.get("source_health", {})
     if not isinstance(health, dict):
         raise ValueError("policies.yaml: source_health must be an object")
+    _reject_unknown_keys(health, POLICY_SECTION_KEYS["source_health"], "policies.yaml: source_health")
     ratio = _strict_float(health.get("minimum_success_ratio", DEFAULT_MINIMUM_SUCCESS_RATIO), "policies.yaml: minimum_success_ratio")
     if not 0 <= ratio <= 1:
         raise ValueError("policies.yaml: minimum_success_ratio must be between 0 and 1")
@@ -260,11 +289,13 @@ def load_config() -> BuildConfig:
     history = policy.get("history", {})
     if not isinstance(history, dict):
         raise ValueError("policies.yaml: history must be an object")
+    _reject_unknown_keys(history, POLICY_SECTION_KEYS["history"], "policies.yaml: history")
     history_retention = _positive_int(history.get("retention", 10), "history.retention")
 
     anomaly = policy.get("anomaly_detection", {})
     if not isinstance(anomaly, dict):
         raise ValueError("policies.yaml: anomaly_detection must be an object")
+    _reject_unknown_keys(anomaly, POLICY_SECTION_KEYS["anomaly_detection"], "policies.yaml: anomaly_detection")
     anomaly_enabled = _strict_bool(anomaly.get("enabled", True), "policies.yaml: anomaly_detection.enabled")
     byte_change = _strict_float(anomaly.get("max_bytes_change_ratio", 0.75), "policies.yaml: max_bytes_change_ratio")
     rule_change = _strict_float(anomaly.get("max_rule_count_change_ratio", 0.75), "policies.yaml: max_rule_count_change_ratio")
