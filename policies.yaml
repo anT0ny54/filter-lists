@@ -18,6 +18,11 @@ rules:
   reject_unknown_options: true
   reject_duplicate_options: true
   require_domain_for_rewrite: true
+  allow_abp_header: true
+  allow_abp_addheader: true
+  allow_abp_snippets: true
+  allow_abp_inline_styles: true
+  allow_abp_remove_action: true
 limits:
   max_rule_length: 100000
   max_include_depth: 5
