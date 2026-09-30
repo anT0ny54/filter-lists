@@ -2,52 +2,69 @@
 
 ## Profile
 
-Filter-Lists emits a **strict ABP-compatible** subset intended to be safe for external-list consumers. The compiler deliberately rejects engine-specific syntax instead of silently passing it through.
+Filter-Lists emits **strict Adblock Plus syntax**, including the current ABP network and content features documented by Adblock Plus. Engine-specific uBlock Origin and AdGuard extensions remain rejected.
 
-### Accepted
+The implementation covers the current ABP filter language documented by ABP, including header matching, header injection, snippets, extended CSS, inline CSS styles, and the remove action.
 
-- ABP network filters and exception filters (`@@`).
-- ABP anchors, separators, and regular-expression filters. A filter is a regex only if it both starts and ends with `/`; a leading `/` alone is an ordinary path pattern (`/ads/banner.gif`). A lone `/` is rejected.
-- Domains in `domain=` and cosmetic prefixes may use an alphabetic or punycode (`xn--`) TLD.
-- Supported ABP request-type and context options.
-- `domain=`, `sitekey=`, `csp=`, and the allow-listed `rewrite=` resources.
-- ABP element hiding (`##`), its ABP exception form (`#@#`), and supported extended CSS (`#?#`) with a required domain scope.
-- Comments and directives are consumed as metadata/input and are not emitted as rules.
-- In `#?#` extended CSS, the ABP-documented `:has-text()` alias is accepted; on ordinary `##` selectors it is rejected because extended selectors require `#?#`.
+### Accepted network features
+
+- Network blocking and exception filters (`@@`).
+- ABP request types: `script`, `image`, `stylesheet`, `object`, `xmlhttprequest`, `subdocument`, `ping`, `websocket`, `webrtc`, `document`, `elemhide`, `generichide`, `genericblock`, `popup`, `font`, `media`, and `other`.
+- ABP inverse types supported by the documented grammar, including `~document`, `~elemhide`, and `~other`.
+- `third-party` / `~third-party` and `match-case`.
+- `domain=`, `sitekey=`, `csp=`, and ABP `rewrite=` resources.
+- ABP `header=` response-header matching, with strict header-name/content validation.
+- ABP `addheader=` request/response header injection, including its `document` targeting exception.
+- ABP regular-expression filters, anchors, separators, and canonicalization.
+
+ABP documents `document`, `elemhide`, `generichide`, and `genericblock` as exception-only in ordinary filters. The `addheader` feature is the narrow documented exception that can combine with `document` while remaining a blocking rule.
+
+### Accepted content features
+
+- Element hiding: `##`.
+- Element hiding exceptions: `#@#`.
+- Extended CSS: `#?#`, including ABP `:-abp-has()`, `:-abp-contains()` / `:has-text()`, `:-abp-properties()`, `:not()`, and `:xpath()`.
+- ABP snippets: `#$#`, with a required domain scope.
+- ABP inline CSS declarations on `##` / `#?#` selectors, restricted to ABP's documented safe property/value grammar.
+- ABP `remove: true;` action.
+
+ABP documents snippets as JavaScript snippet commands and restricts them to custom filters or vetted ABP lists for security. The syntax is therefore implemented, while the project should only enable snippet/header/addheader features for sources that are trusted for those ABP security-sensitive features.
 
 ### Rejected
 
 - uBlock Origin procedural filters such as `##+js(...)`.
-- uBO/AdGuard procedural and style operators in cosmetic rules (`:style()`, `:remove()`, `:upward()`, `:xpath()`, `:matches-css()`, `:matches-path()`, ...).
-- AdGuard-only cosmetic separators (`#%#`, `#@%#`, `#@$#`, `#$?#`, `#@$?#`) and hosts-style `#comment` lines.
-- The uBO-only extended-CSS exception form `#?@#`.
-- Snippet-injection filters (`#$#`).
-- AdGuard/uBO-only options not present in the policy allow-list.
-- Duplicate or malformed options.
+- uBO-only procedural/style operators such as `:style()`, `:remove()`, `:upward()`, and `:matches-css()`.
+- AdGuard-only cosmetic separators (`#%#`, `#@%#`, `#@$#`, `#$?#`, `#@$?#`).
+- uBO-only extended-CSS exception form `#?@#`.
+- Non-ABP network options such as uBO `removeparam`, redirect/scriptlet options, and unknown options.
 - Hosts-file lines (`0.0.0.0 host`).
 - HTML/error pages masquerading as lists.
-- Control characters, whitespace in network patterns, malformed regex envelopes, and over-limit rules.
-- `rewrite=` unless its resource is allow-listed and the rule has the required domain-compatible form.
+- Duplicate or malformed options, invalid header values, unsafe inline-style values, control characters, malformed regex envelopes, and over-limit rules.
 
-## Canonicalization contract
+### Canonicalization contract
 
 Normalization is deterministic and idempotent: `normalize_rule(normalize_rule(x)) == normalize_rule(x)` for accepted rules. Options are normalized to lowercase and sorted; cosmetic domain lists are deduplicated and deterministically sorted.
 
-## Compatibility matrix
+### Compatibility matrix
 
 | Feature | Filter-Lists strict ABP | Adblock Plus | uBlock Origin | AdGuard |
 |---|:---:|:---:|:---:|:---:|
 | Network filters | Yes | Yes | Yes | Yes |
 | Exception filters | Yes | Yes | Yes | Yes |
-| ABP options | Allow-list only | Yes | Yes | Yes |
+| ABP network options | Yes | Yes | Yes | Yes |
+| `header=` | Yes | Yes | Partial/Firefox | Varies |
+| `addheader=` | Yes | Yes | Varies | Varies |
 | Element hiding | Yes | Yes | Yes | Yes |
-| ABP extended CSS | Yes | Yes | Yes | Yes |
+| ABP extended CSS | Yes | Yes | Partial/compatible subsets | Partial/compatible subsets |
+| ABP snippets | Yes, policy-gated | Yes | No/varies | No/varies |
+| ABP inline styles | Yes | Yes | Varies | Varies |
+| ABP `remove: true` | Yes | Yes | Varies | Varies |
 | uBO procedural `+js` | No | No | Yes | Partial/varies |
-| Engine-specific extensions | No | Varies | Yes | Yes |
+| AdGuard-only extensions | No | Varies | Varies | Yes |
 | Hosts-file syntax | No | No | No | Varies |
 
-The matrix describes the compiler's emission policy, not a claim that every downstream engine implements every feature identically.
+The matrix describes the compiler's syntax/emission policy, not identical runtime behavior in every browser or engine.
 
-## Compatibility rule of thumb
+### Compatibility rule
 
-When upstream syntax is ambiguous, the compiler should **reject rather than guess**. This protects reproducibility and avoids emitting a rule whose behavior depends on a downstream engine extension.
+When upstream syntax is ambiguous, the compiler should **reject rather than guess**. For a documented ABP feature, implement its grammar and its context/security restrictions rather than accepting a looser approximation.
