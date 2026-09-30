@@ -2,7 +2,7 @@
 
 **A compatibility-first, deterministic filter-list compiler** that fetches trusted sources, resolves bounded `!#include` graphs, canonicalizes rules, applies a strict ABP-compatible policy, validates the generated list, and publishes reproducible build metadata.
 
-Current builder version: **7.5.3**. See [CHANGELOG.md](CHANGELOG.md) for the full release history.
+Current builder version: **7.5.4**. See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 
 ## ✨ Why use this project?
 
