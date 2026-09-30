@@ -170,7 +170,7 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="filter-lists-") as temp_dir:
         files, source_stats = collect_sources(source_urls, Path(temp_dir), started, WORKERS, log, total_timeout=config.total_timeout_seconds, max_include_depth=config.max_include_depth, max_download_bytes=config.max_download_bytes, max_total_download_bytes=config.max_total_download_bytes, max_total_sources=config.max_total_sources)
         source_stats["required"] = [s.url for s in config.sources if s.required]
-        source_metadata = {s.url: {"name": s.name, "category": s.category, "priority": s.priority, "required": s.required} for s in config.sources}
+        source_metadata = {s.url: {"name": s.name, "category": s.category, "priority": s.priority, "required": s.required, "trusted_abp_features": getattr(s, "trusted_abp_features", False)} for s in config.sources}
         provenance = {"source_manifest_sha256": source_manifest_sha256(config), "source_registry": "sources.yaml", "source_registry_sha256": hashlib.sha256((ROOT / "sources.yaml").read_bytes()).hexdigest(), "builder": f"Filter-Lists v{BUILDER_VERSION}", "policy_sha256": hashlib.sha256((ROOT / "policies.yaml").read_bytes()).hexdigest()}
         failed_root_urls = {x["url"] for x in source_stats.get("results", []) if x.get("status") == "failed" and x.get("depth") == 0}
         source_stats["required_failed"] = [u for u in source_stats["required"] if u in failed_root_urls]
@@ -215,7 +215,9 @@ def main() -> int:
             for item in source_stats.get("results", [])
             if item.get("status") == "ok" and item.get("path") and item.get("sha256")
         }
-        rules, rule_stats = analyze_files(files, CUSTOM_RULES, max_rule_length=config.max_rule_length, known_hashes=known_hashes)
+        trusted_urls = {s.url for s in config.sources if getattr(s, "trusted_abp_features", False)}
+        trusted_paths = {Path(item["path"]) for item in source_stats.get("results", []) if item.get("status") == "ok" and item.get("path") and item.get("url") in trusted_urls}
+        rules, rule_stats = analyze_files(files, CUSTOM_RULES, max_rule_length=config.max_rule_length, known_hashes=known_hashes, trusted_paths=trusted_paths)
         by_path = {item.get("path"): item for item in rule_stats.get("per_file", [])}
         for item in source_stats.get("results", []):
             detail = by_path.get(item.get("path"))

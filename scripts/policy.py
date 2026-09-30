@@ -21,7 +21,7 @@ INVERSE_OPTIONS = {f"~{x}" for x in TYPE_OPTIONS if x not in NO_INVERSE_OPTIONS}
 # match-case is a standalone modifier, not a resource type, so it belongs
 # only in SIMPLE_OPTIONS (it was previously duplicated into TYPE_OPTIONS too).
 SIMPLE_OPTIONS = {"third-party", "~third-party", "match-case"}
-VALUE_OPTIONS = {"domain", "sitekey", "csp", "rewrite"}
+VALUE_OPTIONS = {"domain", "sitekey", "csp", "rewrite", "header", "addheader"}
 REWRITE_RESOURCES = {
     "blank-text", "blank-css", "blank-js", "blank-html",
     "blank-mp3", "blank-mp4", "1x1-transparent-gif",
@@ -30,6 +30,7 @@ REWRITE_RESOURCES = {
 
 PROFILE_NAME = "strict-abp"
 PROFILE_DESCRIPTION = (
-    "ABP external-list-safe core syntax; engine-specific uBO/AdGuard-only "
-    "features are excluded."
+    "Strict Adblock Plus syntax, including current ABP network, content, "
+    "header, addheader, snippet, extended-CSS, inline-style, and remove "
+    "features; uBO/AdGuard-only syntax remains excluded."
 )

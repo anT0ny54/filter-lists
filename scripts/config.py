@@ -50,7 +50,7 @@ POLICY_SECTION_KEYS = {
     }),
 }
 SOURCES_TOP_LEVEL_KEYS = frozenset({"version", "sources"})
-SOURCE_ITEM_KEYS = frozenset({"name", "url", "category", "enabled", "priority", "required"})
+SOURCE_ITEM_KEYS = frozenset({"name", "url", "category", "enabled", "priority", "required", "trusted_abp_features"})
 
 
 def _reject_unknown_keys(section: dict, allowed: frozenset, label: str) -> None:
@@ -130,6 +130,7 @@ class Source:
     enabled: bool = True
     priority: int = 999999
     required: bool = False
+    trusted_abp_features: bool = False
 
 
 @dataclass(frozen=True)
@@ -180,6 +181,11 @@ RULE_POLICY_DEFAULTS = {
     "reject_unknown_options": True,
     "reject_duplicate_options": True,
     "require_domain_for_rewrite": True,
+    "allow_abp_header": True,
+    "allow_abp_addheader": True,
+    "allow_abp_snippets": True,
+    "allow_abp_inline_styles": True,
+    "allow_abp_remove_action": True,
 }
 
 

@@ -16,12 +16,13 @@ from policy import PROFILE_NAME
 SCHEMA_VERSION = 5
 
 
-def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_rule_length: int | None = None, known_hashes: dict[Path, str] | None = None) -> tuple[set[str], dict]:
+def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_rule_length: int | None = None, known_hashes: dict[Path, str] | None = None, trusted_paths: set[Path] | None = None) -> tuple[set[str], dict]:
     rules: set[str] = set()
     accepted = rejected = duplicates = input_lines = 0
     reasons: Counter[str] = Counter()
     per_file: list[dict[str, Any]] = []
     known_hashes = known_hashes or {}
+    trusted_paths = trusted_paths or set()
     paths = sorted(files, key=lambda p: str(p))
     if custom_rules and custom_rules.exists():
         paths.append(custom_rules)
@@ -33,10 +34,10 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
             with path.open(encoding="utf-8", errors="replace") as source:
                 for raw in source:
                     local_lines += 1; input_lines += 1
-                    rule = normalize_rule(raw.rstrip("\r\n"), max_rule_length=max_rule_length)
+                    rule = normalize_rule(raw.rstrip("\r\n"), max_rule_length=max_rule_length, trusted_abp_features=(path in trusted_paths or path == custom_rules))
                     if rule is None:
                         rejected += 1; local_rejected += 1
-                        reason = rejection_reason(raw, max_rule_length=max_rule_length)
+                        reason = rejection_reason(raw, max_rule_length=max_rule_length, trusted_abp_features=(path in trusted_paths or path == custom_rules))
                         reasons[reason] += 1; local_reasons[reason] += 1
                     else:
                         accepted += 1; local_accepted += 1; local_rules.add(rule)

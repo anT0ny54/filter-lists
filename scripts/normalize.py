@@ -30,12 +30,27 @@ SITEKEY_RE = re.compile(r"^[A-Za-z0-9+/._-]+={0,2}$")
 # uBlock Origin / AdGuard procedural and style-injection operators. They are not
 # ABP syntax, so `reject_ubo_procedural` must cover them and not just `+js(`.
 UBO_PROCEDURAL_RE = re.compile(
-    r"\+js\(|:(?:style|remove|xpath|upward|nth-ancestor|matches-css(?:-before|-after)?"
+    r"\+js\(|:(?:style|remove|upward|nth-ancestor|matches-css(?:-before|-after)?"
     r"|matches-path|matches-media|matches-attr|matches-property|min-text-length"
     r"|watch-attr|others|remove-attr|remove-class)\(",
     re.I,
 )
-ALLOWED_COSMETIC_SEPARATORS = frozenset({"##", "#@#", "#?#", "#?@#"})
+ALLOWED_COSMETIC_SEPARATORS = frozenset({"##", "#@#", "#?#", "#$#"})
+
+ABP_HEADER_NAME_RE = re.compile(r"^[!#$%&'*+.^_`|~0-9A-Za-z-]+$")
+ABP_ADDHEADER_NAME_RE = re.compile(r"^(?:x-[!#$%&'*+.^_`|~0-9A-Za-z-]+|set-cookie)$", re.I)
+ABP_PRINTABLE_ASCII_RE = re.compile(r"^[\x20-\x7e]*$")
+ABP_CSS_VALUE_RE = re.compile(
+    r"^(?:#[0-9a-f]{3,8}|[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?"
+    r"(?:cm|mm|q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|"
+    r"svw|svh|lvw|lvh|dvw|dvh|%|fr)?|inherit|initial|none|revert|revert-layer|"
+    r"unset|currentcolor|absolute|all|auto|block|both|clip|collapse|contain|"
+    r"dashed|default|dotted|double|element|fit-content|fixed|flex|flow-root|"
+    r"flow|grid|groove|hidden|inline-block|inline-flex|inline-grid|inline-table|"
+    r"inline|inset|left|list-item|max-content|min-content|outset|pointer|relative|"
+    r"ridge|right|ruby|scroll|solid|static|sticky|table-row|table|text|thin|"
+    r"transparent|true|visible)$", re.I
+)
 
 
 def valid_regex_filter(pattern: str) -> bool:
@@ -156,6 +171,74 @@ def valid_rewrite(value: str) -> bool:
     return value.startswith("abp-resource:") and value.removeprefix("abp-resource:") in REWRITE_RESOURCES
 
 
+def valid_header(value: str) -> bool:
+    if not value or CONTROL_RE.search(value):
+        return False
+    if "=" in value:
+        name, content = value.split("=", 1)
+    else:
+        name, content = value, ""
+    if not ABP_HEADER_NAME_RE.fullmatch(name):
+        return False
+    if content.startswith("/") and content.endswith("/") and len(content) > 1:
+        # ABP reserves regex header-content syntax for future use.
+        return False
+    # A literal comma must be represented by ABP's \x2c escape.
+    if "," in content:
+        return False
+    return not any(ord(ch) < 0x20 or ord(ch) > 0x7e for ch in content)
+
+
+def valid_addheader(value: str) -> bool:
+    parts = value.split(":", 2)
+    if len(parts) == 2:
+        header, content = parts
+        kind = "response"
+    elif len(parts) == 3:
+        kind, header, content = parts
+    else:
+        return False
+    if kind not in {"request", "response"} or not ABP_ADDHEADER_NAME_RE.fullmatch(header):
+        return False
+    if not ABP_PRINTABLE_ASCII_RE.fullmatch(content):
+        return False
+    return True
+
+
+def valid_inline_style(body: str) -> bool:
+    # ABP inline styles are a selector followed by a single declaration block.
+    # The property/value grammar is intentionally security-restricted to ABP's
+    # documented allowlist; custom properties and arbitrary CSS are rejected.
+    if "{" not in body or not body.endswith("}"):
+        return False
+    selector, declarations = body.rsplit("{", 1)
+    if not selector.strip() or not declarations[:-1].strip():
+        return False
+    declarations = declarations[:-1].strip()
+    for declaration in declarations.split(";"):
+        declaration = declaration.strip()
+        if not declaration:
+            continue
+        if ":" not in declaration:
+            return False
+        name, value = declaration.split(":", 1)
+        name = name.strip()
+        value = value.strip()
+        if not name or name.startswith("--") or not re.fullmatch(r"[A-Za-z_-][A-Za-z0-9_-]*", name):
+            return False
+        if name.lower() == "remove":
+            if value.lower() != "true":
+                return False
+            continue
+        if not ABP_CSS_VALUE_RE.fullmatch(value):
+            return False
+    return True
+
+
+def has_inline_style(body: str) -> bool:
+    return "{" in body and body.rstrip().endswith("}")
+
+
 def valid_option(
     option: str,
     is_exception: bool,
@@ -169,8 +252,6 @@ def valid_option(
         if low in TYPE_OPTIONS or low in INVERSE_OPTIONS or low in SIMPLE_OPTIONS:
             if low in {"document", "elemhide", "generichide", "genericblock"} and not is_exception:
                 return False
-            if low in {"~document", "~elemhide"} and not is_exception:
-                return False
             return True
         return not policy["reject_unknown_options"]
     name, value = option.split("=", 1)
@@ -178,6 +259,14 @@ def valid_option(
         return False
     name = name.lower()
     if not value:
+        return False
+    if name == "addheader" and is_exception:
+        return False
+    if name == "header" and is_exception:
+        return False
+    if name == "header" and not policy["allow_abp_header"]:
+        return False
+    if name == "addheader" and not policy["allow_abp_addheader"]:
         return False
     if name not in VALUE_OPTIONS:
         return not policy["reject_unknown_options"]
@@ -187,7 +276,13 @@ def valid_option(
         return valid_sitekeys(value)
     if name == "csp":
         return valid_csp(value)
-    return valid_rewrite(value)  # name == "rewrite"
+    if name == "rewrite":
+        return valid_rewrite(value)
+    if name == "header":
+        return valid_header(value)
+    if name == "addheader":
+        return valid_addheader(value)
+    return False
 
 
 def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> str | None:
@@ -204,8 +299,17 @@ def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> 
     if not options:
         return pattern
     normalized: list[str] = []
+    has_addheader = any(option.split("=", 1)[0].casefold() == "addheader" for option in options)
     for option in options:
-        if not valid_option(option, is_exception, policy):
+        option_name = option.split("=", 1)[0].casefold()
+        # ABP explicitly permits $addheader rules to target top-level
+        # documents with the `document` type even though ordinary `$document`
+        # is exception-only. This is a narrow, documented exception to the
+        # normal context rule.
+        option_valid = (
+            option_name == "document" and has_addheader and not is_exception
+        ) or valid_option(option, is_exception, policy)
+        if not option_valid:
             return None
         if "=" in option:
             name, value = option.split("=", 1)
@@ -246,14 +350,26 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
     pos, separator = match
     domains = rule[:pos].strip()
     body = rule[pos + len(separator):].strip()
-    if separator not in ALLOWED_COSMETIC_SEPARATORS:
+    allowed_separators = ALLOWED_COSMETIC_SEPARATORS
+    if separator == "#?@#" and not policy["reject_ubo_extended_exceptions"]:
+        allowed_separators = allowed_separators | {"#?@#"}
+    if separator not in allowed_separators:
         return None
     if separator == "#?#" and not policy["allow_extended_css"]:
         return None
     if separator == "#?@#" and policy["reject_ubo_extended_exceptions"]:
         return None
+    if separator == "#$#":
+        if not policy["allow_abp_snippets"] or not domains:
+            return None
     if not body or CONTROL_RE.search(body):
         return None
+    if has_inline_style(body):
+        if not policy["allow_abp_inline_styles"] or not valid_inline_style(body):
+            return None
+    if "{remove:" in body.replace(" ", "").lower() or "{remove :" in body.replace(" ", "").lower():
+        if not policy["allow_abp_remove_action"]:
+            return None
     if domains:
         items = [x.strip().lower() for x in domains.split(",")]
         if any(not x or not DOMAIN_RE.fullmatch(x) for x in items):
@@ -269,15 +385,20 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
         return None
     if policy["reject_ubo_procedural"] and UBO_PROCEDURAL_RE.search(body):
         return None
+    # :xpath() is an ABP extended-CSS selector (3.13+), not uBO syntax.
+    if separator != "#?#" and re.search(r":xpath\(", body, re.I):
+        return None
     return f"{domains}{separator}{body}"
 
 
-def normalize_rule(raw: str, *, max_rule_length: int | None = None) -> str | None:
+def normalize_rule(raw: str, *, max_rule_length: int | None = None, trusted_abp_features: bool = True) -> str | None:
     line = raw.lstrip("\ufeff").strip()
     limit = MAX_RULE_LENGTH if max_rule_length is None else max_rule_length
     if not line or len(line) > limit:
         return None
     policy = load_rule_policy()
+    if not trusted_abp_features and ("#$#" in line or re.search(r"\$(?:header|addheader)=", line, re.I)):
+        return None
     classification = classify(line)
     if classification.kind == "invalid":
         if classification.reason == "hosts-format" and not policy["reject_hosts_format"]:
@@ -300,11 +421,13 @@ def normalize_rule(raw: str, *, max_rule_length: int | None = None) -> str | Non
     return normalize_network(line, policy)
 
 
-def rejection_reason(raw: str, *, max_rule_length: int | None = None) -> str:
+def rejection_reason(raw: str, *, max_rule_length: int | None = None, trusted_abp_features: bool = True) -> str:
     line = raw.lstrip("\ufeff").strip()
     if not line:
         return "blank"
     policy = load_rule_policy()
+    if not trusted_abp_features and ("#$#" in line or re.search(r"\$(?:header|addheader)=", line, re.I)):
+        return "abp-security-restricted-feature"
     c = classify(line)
     if c.reason == "hosts-format" and not policy["reject_hosts_format"]:
         return "hosts-format-allowed"
@@ -331,11 +454,19 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None) -> str:
         engine_only = [sep for sep in COSMETIC_MARKERS if sep not in ALLOWED_COSMETIC_SEPARATORS and sep in line]
         if engine_only:
             return "engine-specific-syntax"
+        if "#$#" in line:
+            snippet_match = re.search(r"#\$#", line)
+            if snippet_match and not line[:snippet_match.start()].strip():
+                return "snippet-domain-required"
+            if not policy["allow_abp_snippets"]:
+                return "abp-snippets-disabled"
         if "#?#" in line:
             cosmetic_match = re.search(r"#\?#", line)
             if cosmetic_match and not line[:cosmetic_match.start()].strip():
                 return "extended-css-domain-required"
         if ":has-text(" in line.lower() and "#?#" not in line:
+            return "extended-css-selector-requires-#?#"
+        if re.search(r":xpath\(", line, re.I) and "#?#" not in line:
             return "extended-css-selector-requires-#?#"
         return "invalid-cosmetic-rule"
     if "$" in line:
