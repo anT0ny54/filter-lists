@@ -35,6 +35,16 @@ class ReliabilityTests(unittest.TestCase):
         self.assertTrue(result["enforced_failure"])
 
 
+    def test_enforced_failure_key_present_without_baseline_or_when_disabled(self):
+        # update.yml asserts `enforced_failure is False`; it must exist even on
+        # the first build (no baseline) and when detection is disabled.
+        for policy in ({"enabled": True}, {"enabled": False}):
+            for previous in (None, {"status": "failed"}):
+                with self.subTest(policy=policy, previous=previous):
+                    result = detect_anomalies([], previous, policy)
+                    self.assertIs(result["enforced_failure"], False)
+                    self.assertIs(result["fail_on_warning"], False)
+
     def test_report_source_results_are_stably_ordered(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "latest.json"

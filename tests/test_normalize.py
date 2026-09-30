@@ -77,7 +77,28 @@ class NormalizeTests(unittest.TestCase):
 
     def test_regex_envelope_is_validated_without_python_regex_semantics(self):
         self.assertIsNotNone(normalize_rule(r"/foo\$bar/"))
-        self.assertIsNone(normalize_rule(r"/unterminated"))
+        # Starts *and* ends with `/` but the closing slash is escaped, so the
+        # regex envelope is malformed.
+        self.assertIsNone(normalize_rule(r"/unterminated\/"))
+        self.assertIsNone(normalize_rule("//"))
+
+    def test_leading_slash_without_closing_slash_is_a_path_pattern(self):
+        # ABP only treats a filter as a regex when it both starts and ends
+        # with `/`; `/ads/banner.gif` is an ordinary (very common) pattern.
+        for rule in ("/unterminated", "/ads/banner.gif", "/adframe.", "/banner/*/img^", "@@/ads/banner.gif"):
+            with self.subTest(rule=rule):
+                self.assertEqual(normalize_rule(rule), rule)
+        self.assertEqual(normalize_rule("/ads/*$image,domain=a.com"), "/ads/*$domain=a.com,image")
+        # A lone slash would match nearly every URL and stays rejected.
+        self.assertIsNone(normalize_rule("/"))
+
+    def test_idn_punycode_tld_is_accepted_in_domains(self):
+        self.assertEqual(normalize_rule("example.xn--p1ai##.ad"), "example.xn--p1ai##.ad")
+        self.assertEqual(
+            normalize_rule("||x.com^$domain=a.xn--p1ai|b.com"),
+            "||x.com^$domain=a.xn--p1ai|b.com",
+        )
+        self.assertIsNone(normalize_rule("example.xn--##.ad"))
 
     def test_regex_payload_may_contain_whitespace(self):
         self.assertEqual(normalize_rule(r"/foo bar/"), r"/foo bar/")
