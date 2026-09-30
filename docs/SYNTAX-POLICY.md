@@ -7,7 +7,8 @@ Filter-Lists emits a **strict ABP-compatible** subset intended to be safe for ex
 ### Accepted
 
 - ABP network filters and exception filters (`@@`).
-- ABP anchors, separators, and regular-expression filters.
+- ABP anchors, separators, and regular-expression filters. A filter is a regex only if it both starts and ends with `/`; a leading `/` alone is an ordinary path pattern (`/ads/banner.gif`). A lone `/` is rejected.
+- Domains in `domain=` and cosmetic prefixes may use an alphabetic or punycode (`xn--`) TLD.
 - Supported ABP request-type and context options.
 - `domain=`, `sitekey=`, `csp=`, and the allow-listed `rewrite=` resources.
 - ABP element hiding (`##`), its ABP exception form (`#@#`), and supported extended CSS (`#?#`) with a required domain scope.
