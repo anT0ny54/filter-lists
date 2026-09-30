@@ -51,6 +51,23 @@ class NormalizeTests(unittest.TestCase):
     def test_cosmetic_domains_are_sorted_and_deduplicated(self):
         self.assertEqual(normalize_rule("B.COM,a.com,b.com##.ad"), "a.com,b.com##.ad")
 
+    def test_inverse_document_and_elemhide_are_valid_abp_options(self):
+        for rule in (
+            "||example.com^$~document",
+            "||example.com^$~elemhide",
+            "@@||example.com^$~document",
+            "@@||example.com^$~elemhide",
+        ):
+            with self.subTest(rule=rule):
+                self.assertEqual(normalize_rule(rule), rule)
+
+    def test_exception_only_options_remain_rejected_on_blocking_rules(self):
+        for option in ("document", "elemhide", "generichide", "genericblock"):
+            rule = f"||example.com^${option}"
+            with self.subTest(rule=rule):
+                self.assertIsNone(normalize_rule(rule))
+                self.assertEqual(rejection_reason(rule), "context-invalid-option")
+
     def test_duplicate_option_names_with_different_values_are_rejected(self):
         self.assertIsNone(normalize_rule("||example.com^$domain=a.com,domain=b.com"))
         self.assertEqual(

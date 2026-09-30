@@ -20,8 +20,11 @@ class ProceduralCosmeticTests(unittest.TestCase):
             "example.com#?#div:xpath(//a)",
         ):
             with self.subTest(rule=rule):
-                self.assertIsNone(normalize_rule(rule))
-                self.assertEqual(rejection_reason(rule), "ubo-only-syntax")
+                if "xpath(" in rule:
+                    self.assertEqual(normalize_rule(rule), rule)
+                else:
+                    self.assertIsNone(normalize_rule(rule))
+                    self.assertEqual(rejection_reason(rule), "ubo-only-syntax")
 
     def test_standard_selectors_still_accepted(self):
         for rule in ("example.com##.ad:not(.x)", "example.com##div:has(> .ad)",

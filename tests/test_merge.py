@@ -36,6 +36,46 @@ class ABPStrictTests(unittest.TestCase):
     def test_ubo_snippet_is_rejected(self):
         self.assertIsNone(merge.normalize_rule("example.com##+js(set-constant, foo, true)"))
 
+    def test_current_abp_features_are_preserved(self):
+        rules = (
+            "example.com#$#abort-on-property-read foo.bar",
+            "example.com##.banner { margin-bottom: 0 }",
+            "example.com##.banner { remove: true; }",
+            "example.com#?#div:xpath(//a)",
+            "||example.com^$header=x-test=blocked",
+            "||example.com^$addheader=response:x-test:enabled",
+            "||example.com^$addheader=request:x-test:enabled,document",
+            "||example.com^$~document",
+            "||example.com^$~elemhide",
+        )
+        for rule in rules:
+            with self.subTest(rule=rule):
+                self.assertEqual(merge.normalize_rule(rule), rule)
+
+    def test_security_restricted_abp_features_require_trust_in_external_lists(self):
+        import report
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "external.txt"
+            path.write_text("example.com#$#abort-on-property-read foo.bar\n||example.com^$header=x-test=foo\n", encoding="utf-8")
+            rules, stats = report.analyze_files([path], trusted_paths=set())
+            self.assertEqual(rules, set())
+            self.assertEqual(stats["rejection_reasons"]["abp-security-restricted-feature"], 2)
+
+    def test_custom_rules_can_use_security_restricted_abp_features(self):
+        import report
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "custom-rules.txt"
+            path.write_text("example.com#$#abort-on-property-read foo.bar\n||example.com^$header=x-test=foo\n", encoding="utf-8")
+            rules, stats = report.analyze_files([], path)
+            self.assertEqual(len(rules), 2)
+            self.assertEqual(stats["rejected_lines"], 0)
+
+    def test_abp_header_and_addheader_context_rules(self):
+        self.assertIsNone(merge.normalize_rule("@@||example.com^$header=x-test=blocked"))
+        self.assertIsNone(merge.normalize_rule("@@||example.com^$addheader=response:x-test:enabled"))
+        self.assertEqual(merge.normalize_rule("||example.com^$addheader=x-test:enabled"), "||example.com^$addheader=x-test:enabled")
+        self.assertIsNone(merge.normalize_rule("||example.com^$addheader=response:authorization:secret"))
+
     def test_regex_with_dollar_is_preserved(self):
         for rule in (r"/foo\$bar/", r"/foo$/", r"/foo$/$match-case"):
             self.assertEqual(merge.normalize_rule(rule), rule)
@@ -220,7 +260,7 @@ class MergeMainE2ETests(unittest.TestCase):
         self.assertEqual(self._run(), 0)
         self.assertTrue(merge.OUTPUT.is_file())
         self.assertIn(
-            "! Profile: ABP external-list-safe core syntax;",
+            "! Profile: Strict Adblock Plus syntax,",
             merge.OUTPUT.read_text(encoding="utf-8"),
         )
         report = json.loads(merge.REPORT.read_text(encoding="utf-8"))

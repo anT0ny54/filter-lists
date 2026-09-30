@@ -70,6 +70,7 @@ anomaly_detection:
         cfg = load_config()
         self.assertTrue(all(isinstance(s.enabled, bool) for s in cfg.sources))
         self.assertTrue(all(isinstance(s.required, bool) for s in cfg.sources))
+        self.assertTrue(all(isinstance(s.trusted_abp_features, bool) for s in cfg.sources))
 
     def test_required_source_cannot_be_disabled(self):
         with tempfile.TemporaryDirectory() as tmp:
