@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.5.4-d045f1e7f1b8
-! Last updated: 2026-09-30 14:21:00 UTC
+! Version: v7.5.4-07f762562fd3
+! Last updated: 2026-09-30 14:31:36 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: d045f1e7f1b8a6efd023f6c51338a1ace2aedfb5342289ab825d63c07c9b5577
+! Build-ID: 07f762562fd33dfe79a85ab5e98e738d800cc5b557be87751f1bf2e5fffb85f0
 ! Source manifest SHA-256: 2f87bc9b88421e1b431098c5f33387602c6c38286e2533c1890c26ec59fcfd77
 ! Root sources: 33
-! Total rules: 168325
+! Total rules: 168326
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -80767,6 +80767,7 @@ routenet.nl##div[style*="width:730px; height:90px;"]
 routeyou.com##.avsgWrapper-largeRectangleDesktop.avsgLoading
 routinehub.co###ethad
 routinehub.co##.actions div.qr-code
+routinehub.co##.rh-ad-slot
 rover.com##.global-announcement-bar
 rover.com##div[edge-id="app-install-banner"]
 roweroweporady.pl#@#.ad_container
