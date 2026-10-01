@@ -142,6 +142,15 @@ To disable a source:
 enabled: false
 ```
 
+ABP security-sensitive features (`#$#` snippets, `header=`, `addheader=`) are rejected from every
+source by default. To allow them for a source you trust, opt in per source:
+
+```yaml
+trusted_abp_features: true
+```
+
+`custom-rules.txt` is always trusted. The flag must be a real YAML boolean.
+
 Do not edit `filters.txt` or `sources.txt` directly; they are generated artifacts.
 
 ## 🔧 Local build
