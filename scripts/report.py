@@ -30,20 +30,24 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
         local_rules: set[str] = set()
         local_reasons: Counter[str] = Counter()
         local_accepted = local_rejected = local_duplicates = local_lines = 0
+        # Constant for the whole file; previously re-evaluated (twice) per line.
+        trusted = path in trusted_paths or path == custom_rules
         try:
             with path.open(encoding="utf-8", errors="replace") as source:
                 for raw in source:
                     local_lines += 1; input_lines += 1
-                    rule = normalize_rule(raw.rstrip("\r\n"), max_rule_length=max_rule_length, trusted_abp_features=(path in trusted_paths or path == custom_rules))
+                    rule = normalize_rule(raw.rstrip("\r\n"), max_rule_length=max_rule_length, trusted_abp_features=trusted)
                     if rule is None:
                         rejected += 1; local_rejected += 1
-                        reason = rejection_reason(raw, max_rule_length=max_rule_length, trusted_abp_features=(path in trusted_paths or path == custom_rules))
+                        reason = rejection_reason(raw, max_rule_length=max_rule_length, trusted_abp_features=trusted)
                         reasons[reason] += 1; local_reasons[reason] += 1
                     else:
                         accepted += 1; local_accepted += 1; local_rules.add(rule)
-                        if rule in rules:
-                            duplicates += 1; local_duplicates += 1
+                        # One hash lookup instead of `in` followed by `add`.
+                        before = len(rules)
                         rules.add(rule)
+                        if len(rules) == before:
+                            duplicates += 1; local_duplicates += 1
             # Downloaded sources are already hashed once during fetch (see
             # fetch.collect_sources). Reuse that digest instead of re-reading
             # and re-hashing the same file a second time here; only files

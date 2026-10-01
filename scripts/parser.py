@@ -15,6 +15,10 @@ COSMETIC_MARKERS = (
     "#?#", "#@#", "#$#", "##", "#?@#",
     "#%#", "#@%#", "#@$#", "#$?#", "#@$?#",
 )
+# One compiled alternation replaces ten `in` scans per line. No marker is a
+# prefix of another at the same position (they diverge at the 2nd/3rd char),
+# so alternation order cannot change which marker matches first.
+COSMETIC_RE = re.compile("|".join(re.escape(marker) for marker in COSMETIC_MARKERS))
 
 
 @dataclass(frozen=True)
@@ -40,7 +44,7 @@ def classify(line: str) -> LineClassification:
         return LineClassification("invalid", "hosts-format")
     if HTML_RE.match(value):
         return LineClassification("invalid", "html-or-error-page")
-    if any(marker in value for marker in COSMETIC_MARKERS):
+    if "#" in value and COSMETIC_RE.search(value):
         return LineClassification("cosmetic")
     # A leading single `#` is a hosts-style comment (e.g. `#domain-note`), not
     # an ABP network pattern; without this it slipped through as a "rule".

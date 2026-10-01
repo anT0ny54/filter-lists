@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 from config import load_policy_limits, load_rule_policy
-from parser import COSMETIC_MARKERS, classify
+from parser import COSMETIC_MARKERS, COSMETIC_RE, classify
 from policy import (
     INVERSE_OPTIONS, REWRITE_RESOURCES, SIMPLE_OPTIONS, TYPE_OPTIONS,
     VALUE_OPTIONS,
@@ -36,6 +36,17 @@ UBO_PROCEDURAL_RE = re.compile(
     re.I,
 )
 ALLOWED_COSMETIC_SEPARATORS = frozenset({"##", "#@#", "#?#", "#$#"})
+# Precompiled: these run once per input line (hundreds of thousands per build).
+WHITESPACE_RE = re.compile(r"\s")
+XPATH_RE = re.compile(r":xpath\(", re.I)
+CSS_PROPERTY_RE = re.compile(r"[A-Za-z_-][A-Za-z0-9_-]*")
+# ABP option-list grammar, used only to locate the option section of a rule
+# that starts with a regex body (see split_options).
+OPTION_LIST_RE = re.compile(r"^~?[A-Za-z0-9_-]+(?:=[^,]*)?(?:,~?[A-Za-z0-9_-]+(?:=[^,]*)?)*$")
+# Options that ABP restricts to custom filters or vetted lists. They are only
+# honoured for sources marked `trusted_abp_features: true`.
+RESTRICTED_OPTIONS = frozenset({"header", "addheader"})
+RESTRICTED_RAW_RE = re.compile(r"\$(?:header|addheader)=", re.I)
 
 ABP_HEADER_NAME_RE = re.compile(r"^[!#$%&'*+.^_`|~0-9A-Za-z-]+$")
 ABP_ADDHEADER_NAME_RE = re.compile(r"^(?:x-[!#$%&'*+.^_`|~0-9A-Za-z-]+|set-cookie)$", re.I)
@@ -93,7 +104,7 @@ def valid_network_pattern(pattern: str) -> bool:
             return valid_regex_filter(pattern)
         if pattern == "/":
             return False
-    if any(c.isspace() for c in pattern):
+    if WHITESPACE_RE.search(pattern):
         return False
     # ABP allows an unescaped `|` only as a start/end anchor (`|` or `||` at
     # the beginning, `|` at the end). Escaped pipes are literal pattern data.
@@ -121,6 +132,30 @@ def valid_network_pattern(pattern: str) -> bool:
     return True
 
 
+def _option_split_inside_trailing_slash(rule: str, candidates: list[int], pattern_start: int) -> int | None:
+    for candidate in reversed(candidates):
+        if candidate <= pattern_start:
+            continue
+        if valid_regex_filter(rule[pattern_start:candidate]) and OPTION_LIST_RE.match(rule[candidate + 1:]):
+            return candidate
+    return None
+
+
+def uses_restricted_abp_feature(line: str) -> bool:
+    """True if `line` needs a source trusted for ABP security-sensitive features.
+
+    The previous check only matched `$header=` / `$addheader=` as the *first*
+    option, so `||x^$script,header=...` slipped through untrusted sources.
+    Options are now located with the real option parser.
+    """
+    if "#$#" in line or RESTRICTED_RAW_RE.search(line):
+        return True
+    if "$" not in line or classify(line).kind != "network":
+        return False
+    _, options = split_options(line)
+    return any(option.split("=", 1)[0].casefold() in RESTRICTED_OPTIONS for option in options)
+
+
 def split_options(rule: str) -> tuple[str, list[str]]:
     if "$" not in rule:
         return rule, []
@@ -136,11 +171,18 @@ def split_options(rule: str) -> tuple[str, list[str]]:
     if not positions:
         return rule, []
     pattern_start = 2 if rule.startswith("@@/") else 0
+    pos = positions[-1]
     if rule.startswith("/", pattern_start):
         last_slash = rule.rfind("/")
-        if last_slash > positions[-1]:
-            return rule, []
-    pos = positions[-1]
+        if last_slash > pos:
+            # The final `$` sits inside a trailing `/.../`. That is normally a
+            # regex body (`/foo$/`), but an option value may itself end in `/`
+            # (`/re/$script,header=etag:/^W\\/x$/`). Treating that as one big
+            # regex skipped all option validation, so look for an earlier `$`
+            # that closes a valid regex envelope and opens a valid option list.
+            pos = _option_split_inside_trailing_slash(rule, positions[:-1], pattern_start)
+            if pos is None:
+                return rule, []
     option_text = rule[pos + 1:]
     if not option_text:
         return rule, []
@@ -224,7 +266,7 @@ def valid_inline_style(body: str) -> bool:
         name, value = declaration.split(":", 1)
         name = name.strip()
         value = value.strip()
-        if not name or name.startswith("--") or not re.fullmatch(r"[A-Za-z_-][A-Za-z0-9_-]*", name):
+        if not name or name.startswith("--") or not CSS_PROPERTY_RE.fullmatch(name):
             return False
         if name.lower() == "remove":
             if value.lower() != "true":
@@ -340,14 +382,10 @@ def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> 
 
 def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) -> str | None:
     policy = load_rule_policy() if rule_policy is None else rule_policy
-    match = None
-    for sep in COSMETIC_MARKERS:
-        candidate = rule.find(sep)
-        if candidate >= 0 and (match is None or candidate < match[0]):
-            match = (candidate, sep)
+    match = COSMETIC_RE.search(rule)
     if match is None:
         return None
-    pos, separator = match
+    pos, separator = match.start(), match.group()
     domains = rule[:pos].strip()
     body = rule[pos + len(separator):].strip()
     allowed_separators = ALLOWED_COSMETIC_SEPARATORS
@@ -357,8 +395,6 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
         return None
     if separator == "#?#" and not policy["allow_extended_css"]:
         return None
-    if separator == "#?@#" and policy["reject_ubo_extended_exceptions"]:
-        return None
     if separator == "#$#":
         if not policy["allow_abp_snippets"] or not domains:
             return None
@@ -367,7 +403,8 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
     if has_inline_style(body):
         if not policy["allow_abp_inline_styles"] or not valid_inline_style(body):
             return None
-    if "{remove:" in body.replace(" ", "").lower() or "{remove :" in body.replace(" ", "").lower():
+    # (spaces are removed first, so a separate "{remove :" test was unreachable)
+    if "{" in body and "{remove:" in body.replace(" ", "").lower():
         if not policy["allow_abp_remove_action"]:
             return None
     if domains:
@@ -386,7 +423,7 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
     if policy["reject_ubo_procedural"] and UBO_PROCEDURAL_RE.search(body):
         return None
     # :xpath() is an ABP extended-CSS selector (3.13+), not uBO syntax.
-    if separator != "#?#" and re.search(r":xpath\(", body, re.I):
+    if separator != "#?#" and XPATH_RE.search(body):
         return None
     return f"{domains}{separator}{body}"
 
@@ -397,7 +434,7 @@ def normalize_rule(raw: str, *, max_rule_length: int | None = None, trusted_abp_
     if not line or len(line) > limit:
         return None
     policy = load_rule_policy()
-    if not trusted_abp_features and ("#$#" in line or re.search(r"\$(?:header|addheader)=", line, re.I)):
+    if not trusted_abp_features and uses_restricted_abp_feature(line):
         return None
     classification = classify(line)
     if classification.kind == "invalid":
@@ -426,7 +463,7 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None, trusted_ab
     if not line:
         return "blank"
     policy = load_rule_policy()
-    if not trusted_abp_features and ("#$#" in line or re.search(r"\$(?:header|addheader)=", line, re.I)):
+    if not trusted_abp_features and uses_restricted_abp_feature(line):
         return "abp-security-restricted-feature"
     c = classify(line)
     if c.reason == "hosts-format" and not policy["reject_hosts_format"]:
@@ -466,7 +503,7 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None, trusted_ab
                 return "extended-css-domain-required"
         if ":has-text(" in line.lower() and "#?#" not in line:
             return "extended-css-selector-requires-#?#"
-        if re.search(r":xpath\(", line, re.I) and "#?#" not in line:
+        if XPATH_RE.search(line) and "#?#" not in line:
             return "extended-css-selector-requires-#?#"
         return "invalid-cosmetic-rule"
     if "$" in line:

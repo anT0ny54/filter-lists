@@ -269,6 +269,10 @@ def load_config() -> BuildConfig:
         enabled = _strict_bool(item.get("enabled", True), f"sources.yaml: source #{index + 1}.enabled")
         priority = _strict_int(item.get("priority", 999999), f"sources.yaml: source #{index + 1}.priority")
         required = _strict_bool(item.get("required", False), f"sources.yaml: source #{index + 1}.required")
+        trusted = _strict_bool(
+            item.get("trusted_abp_features", False),
+            f"sources.yaml: source #{index + 1}.trusted_abp_features",
+        )
         if required and not enabled:
             raise ValueError(f"sources.yaml: source #{index + 1} cannot be required and disabled")
         sources.append(Source(
@@ -278,6 +282,7 @@ def load_config() -> BuildConfig:
             enabled=enabled,
             priority=priority,
             required=required,
+            trusted_abp_features=trusted,
         ))
 
     sources.sort(key=lambda s: (s.priority, s.name.casefold(), s.name, s.url))
