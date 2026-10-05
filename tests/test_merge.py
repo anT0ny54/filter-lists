@@ -16,25 +16,26 @@ spec = importlib.util.spec_from_file_location("merge", SCRIPT)
 merge = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(merge)
 fetch = importlib.import_module("fetch")
+from normalize import normalize_rule  # noqa: E402
 
 
 class ABPStrictTests(unittest.TestCase):
     def test_network_exception_is_preserved(self):
         rule = "@@||Example.COM^$SCRIPT,domain=example.com|~ads.example.com"
-        self.assertEqual(merge.normalize_rule(rule), "@@||Example.COM^$domain=example.com|~ads.example.com,script")
+        self.assertEqual(normalize_rule(rule), "@@||Example.COM^$domain=example.com|~ads.example.com,script")
 
     def test_cosmetic_exception_is_preserved(self):
-        self.assertEqual(merge.normalize_rule("Example.COM,foo.com#@#.ad-banner"), "example.com,foo.com#@#.ad-banner")
+        self.assertEqual(normalize_rule("Example.COM,foo.com#@#.ad-banner"), "example.com,foo.com#@#.ad-banner")
 
     def test_extended_css_is_preserved(self):
         rule = "example.com#?#div:-abp-has(.ad)"
-        self.assertEqual(merge.normalize_rule(rule), rule)
+        self.assertEqual(normalize_rule(rule), rule)
 
     def test_ubo_extended_exception_is_rejected(self):
-        self.assertIsNone(merge.normalize_rule("example.com#?@#.ad"))
+        self.assertIsNone(normalize_rule("example.com#?@#.ad"))
 
     def test_ubo_snippet_is_rejected(self):
-        self.assertIsNone(merge.normalize_rule("example.com##+js(set-constant, foo, true)"))
+        self.assertIsNone(normalize_rule("example.com##+js(set-constant, foo, true)"))
 
     def test_current_abp_features_are_preserved(self):
         rules = (
@@ -50,7 +51,7 @@ class ABPStrictTests(unittest.TestCase):
         )
         for rule in rules:
             with self.subTest(rule=rule):
-                self.assertEqual(merge.normalize_rule(rule), rule)
+                self.assertEqual(normalize_rule(rule), rule)
 
     def test_security_restricted_abp_features_require_trust_in_external_lists(self):
         import report
@@ -71,39 +72,39 @@ class ABPStrictTests(unittest.TestCase):
             self.assertEqual(stats["rejected_lines"], 0)
 
     def test_abp_header_and_addheader_context_rules(self):
-        self.assertIsNone(merge.normalize_rule("@@||example.com^$header=x-test=blocked"))
-        self.assertIsNone(merge.normalize_rule("@@||example.com^$addheader=response:x-test:enabled"))
-        self.assertEqual(merge.normalize_rule("||example.com^$addheader=x-test:enabled"), "||example.com^$addheader=x-test:enabled")
-        self.assertIsNone(merge.normalize_rule("||example.com^$addheader=response:authorization:secret"))
+        self.assertIsNone(normalize_rule("@@||example.com^$header=x-test=blocked"))
+        self.assertIsNone(normalize_rule("@@||example.com^$addheader=response:x-test:enabled"))
+        self.assertEqual(normalize_rule("||example.com^$addheader=x-test:enabled"), "||example.com^$addheader=x-test:enabled")
+        self.assertIsNone(normalize_rule("||example.com^$addheader=response:authorization:secret"))
 
     def test_regex_with_dollar_is_preserved(self):
         for rule in (r"/foo\$bar/", r"/foo$/", r"/foo$/$match-case"):
-            self.assertEqual(merge.normalize_rule(rule), rule)
+            self.assertEqual(normalize_rule(rule), rule)
 
     def test_options_are_case_normalized_and_sorted(self):
-        self.assertEqual(merge.normalize_rule("||example.com^$THIRD-PARTY,IMAGE"), "||example.com^$image,third-party")
+        self.assertEqual(normalize_rule("||example.com^$THIRD-PARTY,IMAGE"), "||example.com^$image,third-party")
 
     def test_csp_option_is_preserved(self):
         rule = "||example.com^$csp=script-src: 'none'"
-        self.assertEqual(merge.normalize_rule(rule), rule)
+        self.assertEqual(normalize_rule(rule), rule)
 
     def test_duplicate_options_rejected(self):
-        self.assertIsNone(merge.normalize_rule("||example.com^$script,script"))
+        self.assertIsNone(normalize_rule("||example.com^$script,script"))
 
     def test_unknown_ubo_option_rejected(self):
-        self.assertIsNone(merge.normalize_rule("||example.com^$removeparam=utm_source"))
+        self.assertIsNone(normalize_rule("||example.com^$removeparam=utm_source"))
 
     def test_document_only_exception(self):
-        self.assertIsNone(merge.normalize_rule("||example.com^$document"))
-        self.assertEqual(merge.normalize_rule("@@||example.com^$document"), "@@||example.com^$document")
+        self.assertIsNone(normalize_rule("||example.com^$document"))
+        self.assertEqual(normalize_rule("@@||example.com^$document"), "@@||example.com^$document")
 
     def test_rewrite_requires_domain(self):
-        self.assertIsNone(merge.normalize_rule("||example.com^$rewrite=abp-resource:blank-js"))
-        self.assertEqual(merge.normalize_rule("||example.com^$rewrite=abp-resource:blank-js,domain=example.com"), "||example.com^$domain=example.com,rewrite=abp-resource:blank-js")
+        self.assertIsNone(normalize_rule("||example.com^$rewrite=abp-resource:blank-js"))
+        self.assertEqual(normalize_rule("||example.com^$rewrite=abp-resource:blank-js,domain=example.com"), "||example.com^$domain=example.com,rewrite=abp-resource:blank-js")
 
     def test_comments_and_hosts_are_rejected(self):
-        self.assertIsNone(merge.normalize_rule("! comment"))
-        self.assertIsNone(merge.normalize_rule("0.0.0.0 ads.example.com"))
+        self.assertIsNone(normalize_rule("! comment"))
+        self.assertIsNone(normalize_rule("0.0.0.0 ads.example.com"))
 
     def test_include_url_resolution(self):
         self.assertEqual(urljoin("https://example.com/lists/main.txt", "../child.txt"), "https://example.com/child.txt")
@@ -131,7 +132,7 @@ class MergeMainE2ETests(unittest.TestCase):
 """, encoding="utf-8")
         merge.CUSTOM_RULES.write_text("||custom.example^\n", encoding="utf-8")
         self.config = SimpleNamespace(
-            sources=(SimpleNamespace(name="fixture", url="https://fixture.test/list.txt", category="test", priority=1, required=True, enabled=True),),
+            sources=(SimpleNamespace(name="fixture", url="https://fixture.test/list.txt", category="test", priority=1, required=True, enabled=True, trusted_abp_features=False),),
             minimum_success_ratio=0.5,
             fail_if_zero_sources=True,
             max_rule_length=100000,
@@ -171,6 +172,7 @@ class MergeMainE2ETests(unittest.TestCase):
                     sources=(SimpleNamespace(
                         name="local-fixture", url=source_url, category="test",
                         priority=1, required=True, enabled=True,
+                        trusted_abp_features=False,
                     ),),
                     minimum_success_ratio=1.0,
                     fail_if_zero_sources=True,
@@ -287,7 +289,7 @@ class MergeMainE2ETests(unittest.TestCase):
 
     def test_main_required_source_failure_is_unhealthy_even_with_other_sources(self):
         config = self.config
-        optional = SimpleNamespace(name="optional", url="https://optional.test/list.txt", category="test", priority=2, required=False, enabled=True)
+        optional = SimpleNamespace(name="optional", url="https://optional.test/list.txt", category="test", priority=2, required=False, enabled=True, trusted_abp_features=False)
         config = SimpleNamespace(**{**config.__dict__, "sources": (config.sources[0], optional)})
         stats = {"root_requested": 2, "root_successful": 1, "results": [
             {"url": config.sources[0].url, "status": "failed", "depth": 0, "path": "/required.txt", "reason": "timeout"},
