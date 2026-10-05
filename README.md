@@ -1,6 +1,6 @@
 # 🚀 Filter-Lists
 
-**Filter-Lists** is a deterministic, compatibility-first filter-list compiler. It fetches configured upstream lists, resolves bounded `!#include` graphs, normalizes and deduplicates rules, applies a strict Adblock Plus (ABP) compatibility policy, validates the generated output, and publishes reproducible build metadata.
+**Filter-Lists** is a deterministic, compatibility-first filter-list compiler. It fetches configured upstream lists, resolves bounded `!#include` graphs, normalizes and deduplicates rules, applies a strict Adblock Plus (ABP) compatibility policy, validates the generated output, and publishes build metadata with deterministic hashes and provenance.
 
 **Current builder:** `v7.5.4`  
 **Output profile:** `strict-abp`
@@ -73,7 +73,7 @@ merge.py ──► deduplication + deterministic ordering
     │
     ├────────► validate.py ──► final integrity / Build-ID validation
     │
-    └────────► report.py ────► reproducible build report
+    └────────► report.py ────► build report (deterministic identity + operational metadata)
                   └─ health.py ──► per-source rolling reliability reputation
     │
     ▼
@@ -93,10 +93,11 @@ The builder currently enforces the following:
 - **SSRF protection:** source/include targets are resolved before connection, non-public addresses are blocked, DNS answers are validated and pinned for curl, proxy environment variables are bypassed, and redirects are validated hop-by-hop.
 - **Deadline-aware fetching:** downloads receive only the remaining build deadline; retries are bounded and permanent 4xx failures are not retried.
 - **Canonical source identity:** scheme/host/path normalization and fragment removal are used for source identity and include-cycle detection.
-- **Deterministic output:** normalization, sorting, deduplication, reporting, and Build-ID generation are deterministic.
+- **Deterministic rule output and identity:** normalization, sorting, deduplication, and Build-ID generation are deterministic. `filters.txt` also contains a `Last updated` timestamp, while `reports/latest.json` records `generated_at` and `build_seconds`; those operational fields intentionally vary between runs.
 - **Full Build-ID validation:** `validate.py` recomputes the build identity from the active configuration and normalized rules.
 - **Strict grammar validation:** malformed options, unsupported procedural syntax, unsafe inline styles, malformed regex envelopes, control characters, and over-limit rules are rejected.
 - **Detailed diagnostics:** rejection reasons, per-source statistics, SHA-256 hashes, fetch failures, and anomaly information are retained.
+- **Bounded default concurrency:** the builder uses two download workers by default; effective concurrency is additionally capped by the configured global download budget.
 - **Historical reports:** successful reports are retained chronologically under `reports/history/` according to the configured retention limit.
 - **Safe anomaly handling:** warning-level anomalies are advisory by default; critical anomalies fail the build.
 
@@ -123,7 +124,9 @@ Anomaly thresholds accept byte/rule change ratios from 0–10 (0–1000%) and a 
 
 ## 📊 Build reports
 
-`reports/latest.json` uses **schema 5**. Per-source `input_lines` and rejection counts include every line of the source, so comments, blank lines, and directives appear as rejections with the reasons `comment`, `blank`, and `directive`. The report records:
+`reports/latest.json` uses **schema 5**. Per-source `input_lines` and rejection counts include every input line, so comments, blank lines, and directives are accounted for with the reasons `comment`, `blank`, and `directive`. Successful-build `build_id` values are deterministic hashes of the active source manifest, policy/custom-rule content, and normalized rules. A pre-analysis source-health failure uses the configuration fingerprint as its diagnostic `build_id` because no normalized output has been assembled yet.
+
+The report records:
 
 - root and nested source requests/results
 - total visited sources and download bytes
@@ -135,8 +138,8 @@ Anomaly thresholds accept byte/rule change ratios from 0–10 (0–1000%) and a 
 - per-source diagnostics and content hashes
 - per-source rolling reliability reputation (observations, success rate, consecutive failures)
 - anomaly baseline, thresholds, severity, and enforcement
-- build duration
-- deterministic Build-ID and provenance hashes
+- deterministic Build-ID and provenance hashes (successful builds)
+- operational timestamps and elapsed build duration
 
 See [docs/REPORT-SCHEMA.md](docs/REPORT-SCHEMA.md).
 
@@ -204,7 +207,7 @@ The repository test suite covers:
 - nested includes and canonical include-cycle detection
 - source-health and required-source accounting
 - global source/download limits and deadlines
-- deterministic reporting and Build-ID generation
+- stable report record ordering and Build-ID generation
 - per-source diagnostics and hashes
 - anomaly detection and historical baselines
 - deterministic Unicode/property fuzzing (**5,000 iterations per fuzz property**)
