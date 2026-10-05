@@ -30,10 +30,14 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
     parser.add_argument("--repeats", type=int, default=5)
+    # The shipped fixture is only a handful of lines, which made the reported
+    # lines/second meaningless timer noise. Repeat it to get a stable workload.
+    parser.add_argument("--multiplier", type=int, default=5000, help="repeat the input N times (default: 5000)")
     args = parser.parse_args()
     lines = args.input.read_text(encoding="utf-8").splitlines()
     if not lines:
         raise SystemExit("benchmark input is empty")
+    lines = lines * max(1, args.multiplier)
     median, accepted = run(lines, max(1, args.repeats))
     rate = len(lines) / median if median else float("inf")
     print(f"input_lines={len(lines)} accepted={accepted} median_seconds={median:.6f} lines_per_second={rate:.1f}")

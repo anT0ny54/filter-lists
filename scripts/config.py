@@ -217,10 +217,8 @@ def load_policy_limits() -> tuple[int, int, int, int, int, int]:
     return _policy_limits(_load_policy())
 
 
-@lru_cache(maxsize=1)
-def load_rule_policy() -> dict[str, bool]:
-    """Load rule-processing switches that control normalization."""
-    policy = _load_policy()
+def _rule_policy(policy: dict) -> dict[str, bool]:
+    """Validate and complete the `rules:` section of an already-loaded policy."""
     rules = policy.get("rules", {})
     if not isinstance(rules, dict):
         raise ValueError("policies.yaml: rules must be an object")
@@ -233,10 +231,19 @@ def load_rule_policy() -> dict[str, bool]:
     }
 
 
+@lru_cache(maxsize=1)
+def load_rule_policy() -> dict[str, bool]:
+    """Load rule-processing switches that control normalization."""
+    return _rule_policy(_load_policy())
+
+
 def load_config() -> BuildConfig:
     if not SOURCE_REGISTRY.is_file():
         raise FileNotFoundError(f"Missing source registry: {SOURCE_REGISTRY}")
     policy = _load_policy()
+    # Validate `rules:` now. Previously a bad switch only surfaced as a
+    # traceback inside normalize_rule(), after every source was downloaded.
+    _rule_policy(policy)
     source_data = yaml.safe_load(SOURCE_REGISTRY.read_text(encoding="utf-8")) or {}
     if not isinstance(source_data, dict):
         raise ValueError("sources.yaml: top level must be an object")
@@ -354,7 +361,7 @@ def _hash_source_manifest(digest, config: BuildConfig) -> None:
     for source in config.sources:
         digest.update(
             f"{source.name}\0{source.url}\0{source.category}\0{source.priority}"
-            f"\0{source.required}\0{getattr(source, 'trusted_abp_features', False)}\n".encode()
+            f"\0{source.required}\0{source.trusted_abp_features}\n".encode()
         )
 
 

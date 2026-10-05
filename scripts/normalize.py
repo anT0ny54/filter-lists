@@ -14,7 +14,18 @@ from policy import (
     VALUE_OPTIONS,
 )
 
-MAX_RULE_LENGTH = load_policy_limits()[0]
+
+
+def _default_max_rule_length() -> int:
+    """Policy rule-length limit, resolved lazily.
+
+    This used to be evaluated at import time, so a malformed policies.yaml made
+    `import normalize` (and therefore `merge.py`) crash with a raw traceback
+    before the builder's clean "[ERROR] Configuration" handling could run.
+    """
+    return load_policy_limits()[0]
+
+
 # Shared control-character gate (network patterns, options, cosmetic bodies).
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 # Regex filters may contain ordinary whitespace, but raw control characters
@@ -139,6 +150,17 @@ def _option_split_inside_trailing_slash(rule: str, candidates: list[int], patter
         if valid_regex_filter(rule[pattern_start:candidate]) and OPTION_LIST_RE.match(rule[candidate + 1:]):
             return candidate
     return None
+
+
+def is_overbroad_pattern(pattern_body: str, options: list[str]) -> bool:
+    """True for an option-less pattern made only of `*`, `|` and `^`.
+
+    Such a rule (`*`, `||`, `^`, `|^`, `@@*`, ...) has no literal content, so it
+    would block (or, as an exception, allow) essentially every request. A lone
+    `/` was already rejected for the same reason; with options (`*$script,
+    domain=a.com`) the rule is scoped and stays valid.
+    """
+    return not options and not pattern_body.strip("*|^")
 
 
 def uses_restricted_abp_feature(line: str) -> bool:
@@ -338,6 +360,8 @@ def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> 
         return None
     if not valid_network_pattern(pattern_body):
         return None
+    if is_overbroad_pattern(pattern_body, options):
+        return None
     if not options:
         return pattern
     normalized: list[str] = []
@@ -430,7 +454,7 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
 
 def normalize_rule(raw: str, *, max_rule_length: int | None = None, trusted_abp_features: bool = True) -> str | None:
     line = raw.lstrip("\ufeff").strip()
-    limit = MAX_RULE_LENGTH if max_rule_length is None else max_rule_length
+    limit = _default_max_rule_length() if max_rule_length is None else max_rule_length
     if not line or len(line) > limit:
         return None
     policy = load_rule_policy()
@@ -474,7 +498,7 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None, trusted_ab
         return c.reason
     if c.kind in {"comment", "directive"}:
         return c.kind
-    limit = MAX_RULE_LENGTH if max_rule_length is None else max_rule_length
+    limit = _default_max_rule_length() if max_rule_length is None else max_rule_length
     if len(line) > limit:
         return "rule-too-long"
     if c.kind == "network" and not policy["allow_network_filters"]:
@@ -506,8 +530,10 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None, trusted_ab
         if XPATH_RE.search(line) and "#?#" not in line:
             return "extended-css-selector-requires-#?#"
         return "invalid-cosmetic-rule"
+    pattern, options = split_options(line)
+    if is_overbroad_pattern(pattern[2:] if pattern.startswith("@@") else pattern, options):
+        return "overbroad-pattern"
     if "$" in line:
-        _, options = split_options(line)
         if options:
             names = []
             for option in options:

@@ -16,6 +16,11 @@ def main() -> int:
     if not command:
         print("SKIP: FILTER_ENGINE_CMD is not configured")
         return 0
+    if "{input}" not in command:
+        # Without the placeholder every fixture would run the identical command
+        # and "pass" without ever seeing the fixture.
+        print("ERROR: FILTER_ENGINE_CMD must contain the {input} placeholder")
+        return 2
     fixtures = sorted(CORPUS.glob("*.txt"))
     if not fixtures:
         print("No corpus fixtures found")

@@ -292,7 +292,6 @@ def collect_sources(
         "root_successful": 0,
         "failed": 0,
         "root_failed": 0,
-        "included_requested": 0,
         "included_references": 0,
         "total_download_bytes": 0,
         "max_total_download_bytes": max_total_download_bytes,
@@ -378,7 +377,6 @@ def collect_sources(
                 stats["budget_exhausted"] = True
                 break
 
-            wave_limit = per_source_limit
             wave_size = min(parallelism, len(batch) - wave_start)
             wave = batch[wave_start:wave_start + wave_size]
             wave_start += wave_size
@@ -393,12 +391,12 @@ def collect_sources(
                     sequence += 1
                     remaining = max(1, int(deadline - time.monotonic()))
                     timeout = min(INCLUDE_TIMEOUT if depth else DOWNLOAD_TIMEOUT, remaining)
-                    futures[pool.submit(download, url, target, timeout, wave_limit)] = (
-                        submission_index, url, depth, target, wave_limit
+                    futures[pool.submit(download, url, target, timeout, per_source_limit)] = (
+                        submission_index, url, depth, target
                     )
 
                 for future in concurrent.futures.as_completed(futures):
-                    submission_index, url, depth, target, wave_limit = futures[future]
+                    submission_index, url, depth, target = futures[future]
                     try:
                         ok, error = future.result()
                     except Exception as exc:
@@ -406,7 +404,7 @@ def collect_sources(
 
                     size = target.stat().st_size if target.exists() else 0
                     if ok:
-                        ok, validation_error = validate_download(target, wave_limit)
+                        ok, validation_error = validate_download(target, per_source_limit)
                         error = validation_error or error
                     ordered_outcomes[submission_index] = (url, depth, target, ok, error, size)
 

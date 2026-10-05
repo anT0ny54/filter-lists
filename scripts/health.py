@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 
-def _history_reports(history_dir: Path, limit: int = 30) -> list[dict]:
+def history_reports(history_dir: Path, limit: int = 30) -> list[dict]:
     reports = []
     for path in history_dir.glob("*.json"):
         try:
@@ -22,7 +22,7 @@ def _history_reports(history_dir: Path, limit: int = 30) -> list[dict]:
 def build_source_reputation(history_dir: Path, current_results: list[dict], *, history_limit: int = 30) -> dict:
     """Return per-URL rolling reliability from successful historical reports plus current run."""
     records: dict[str, list[bool]] = {}
-    for report in reversed(_history_reports(history_dir, history_limit)):
+    for report in reversed(history_reports(history_dir, history_limit)):
         for item in report.get("sources", {}).get("results", []):
             url = item.get("url")
             if url:
