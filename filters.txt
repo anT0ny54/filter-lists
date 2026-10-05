@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.5.4-116f029bbe6f
-! Last updated: 2026-10-05 09:18:50 UTC
+! Version: v7.5.4-6bd7fcf556da
+! Last updated: 2026-10-05 09:29:02 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 116f029bbe6f365f256c66801aa45604323cab8da3c2182ed540b54d25d8ec31
+! Build-ID: 6bd7fcf556daa28784856163551103fb3ec00ecc4ee6af22683340d2b62bd036
 ! Source manifest SHA-256: cd964bef9de1e35561dfdb32dcaf73a59e0122bdc80afe4afd232c086b13c654
 ! Root sources: 33
-! Total rules: 170041
+! Total rules: 170049
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -104479,6 +104479,7 @@ zzzyk.com###Tinfo
 ||autotrader.com/pixall/
 ||autotrends.be^*/widget/$third-party
 ||autoxy.it/js/combine/lead_banner_min.js$third-party
+||auuaoiqnxttxp.site^
 ||auusjuyhulimb.space^
 ||auxdciugyclyi.space^
 ||auxeseslongjawvougeot.cyou^
@@ -105947,6 +105948,7 @@ zzzyk.com###Tinfo
 ||bedwlzqwkxpzfc.com^
 ||bee.tc.easebar.com^
 ||beead.net^$third-party
+||beedomcupay.cyou^
 ||beehiiv.com/nectar_analytics
 ||beehiiv.com/page_view
 ||beehivesmokeremotionally.com^
@@ -123722,6 +123724,7 @@ zzzyk.com###Tinfo
 ||gleipevjyhdrm.space^
 ||glemgbitoplzd.space^
 ||glempirteechacm.com^
+||glenealmondsrebrown.cyou^
 ||glenevolapie.com^
 ||glengalaxnurly.qpon^
 ||glevvoqy.com^
@@ -127385,6 +127388,7 @@ zzzyk.com###Tinfo
 ||hydorrxacolif.website^
 ||hydrocarbon77.top^
 ||hydroidcheth.com^
+||hyemeayunbfwv.site^
 ||hyeqzfqgubqkj.space^
 ||hyfiwldsulvvb.website^
 ||hygckbylqhutq.website^
@@ -134972,6 +134976,7 @@ zzzyk.com###Tinfo
 ||loosometime.com^
 ||lootsanenddimeric.cfd^
 ||looverolent.shop^
+||looxloqaeigjk.space^
 ||lopcujih3eoi1coi7zvjqfm11hbv9.rest^
 ||lopedcymolcommaes.qpon^
 ||lopepapula.qpon^
@@ -142724,6 +142729,7 @@ zzzyk.com###Tinfo
 ||p.zol-img.com.cn^
 ||p.zol.com.cn/download/detail.js
 ||p0b2hqyz.xyz^
+||p0h1nfzc2.com^
 ||p0pn18sxvh.com^
 ||p0y.cn^$domain=~ipinyou.com.cn,image
 ||p0yixb3wfv.com^
@@ -143790,6 +143796,7 @@ zzzyk.com###Tinfo
 ||pfmiliexijdfl.website^
 ||pfmlzsxbuvrnp.space^
 ||pfmmzmdba.com^
+||pfmruyacigawjl.com^
 ||pfnxggbwxmrcl.online^
 ||pfosuclihgjxi.space^
 ||pfp.sina.com.cn^$script,subdocument
@@ -152538,6 +152545,7 @@ zzzyk.com###Tinfo
 ||showunionsjoker.com^
 ||showyoursite.com^$third-party
 ||shpg.org^$third-party
+||shpgceahdtjsh.site^
 ||shpuzesoxyfhh.com^
 ||shpyxmtsqnsay.space^
 ||shqjickefiglh.website^
