@@ -1,6 +1,7 @@
 # Filter-Lists v7.5.4 compatibility policy.
-# Output is consumable by Adblock Plus, uBlock Origin and AdGuard; see
-# docs/COMPATIBILITY.md. Unknown top-level keys are rejected at load time.
+# Output is strict ABP syntax: consumed natively by Adblock Plus and by
+# uBlock Origin/AdGuard only as an ABP-compatible subset (no uBO/AdGuard-only
+# extensions are emitted); see docs/COMPATIBILITY.md. Unknown top-level keys are rejected at load time.
 #
 # `version` is the schema revision of this file and `profile` selects the
 # syntax profile. Both are validated by scripts/config.py: a mismatch fails

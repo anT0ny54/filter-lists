@@ -63,7 +63,7 @@ parser.py ──► rule classification
 normalize.py ──► canonical rules
     │
     ▼
-policy.py ──► strict-ABP compatibility/security gate
+policy.py (constants) + normalize.py policy gate ──► strict-ABP compatibility/security enforcement
     │
     ▼
 merge.py ──► deduplication + deterministic ordering
@@ -114,6 +114,8 @@ The shipped `policies.yaml` currently defines:
 
 When upstream syntax is ambiguous, the compiler follows the documented policy and **rejects rather than guessing**.
 
+Anomaly thresholds accept byte/rule change ratios from 0–10 (0–1000%) and a rejection-rate change from 0–1; the shipped `policies.yaml` uses 0.75 / 0.75 / 0.25.
+
 ## 📊 Build reports
 
 `reports/latest.json` uses **schema 5** and records:
@@ -126,6 +128,7 @@ When upstream syntax is ambiguous, the compiler follows the documented policy an
 - input, accepted, rejected, duplicate, and unique-rule counts
 - rejection reasons
 - per-source diagnostics and content hashes
+- per-source rolling reliability reputation (observations, success rate, consecutive failures)
 - anomaly baseline, thresholds, severity, and enforcement
 - build duration
 - deterministic Build-ID and provenance hashes
