@@ -346,9 +346,16 @@ def sha256_file(path: Path) -> str:
 
 
 def _hash_source_manifest(digest, config: BuildConfig) -> None:
-    """Feed the ordered (name, url, category, priority, required) source manifest into `digest`."""
+    """Feed the ordered source manifest into `digest`.
+
+    Includes `trusted_abp_features`: the flag changes which rules are
+    accepted, so the Build-ID must change when it flips.
+    """
     for source in config.sources:
-        digest.update(f"{source.name}\0{source.url}\0{source.category}\0{source.priority}\0{source.required}\n".encode())
+        digest.update(
+            f"{source.name}\0{source.url}\0{source.category}\0{source.priority}"
+            f"\0{source.required}\0{getattr(source, 'trusted_abp_features', False)}\n".encode()
+        )
 
 
 def source_manifest_sha256(config: BuildConfig) -> str:
