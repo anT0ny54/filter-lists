@@ -45,6 +45,9 @@ Security-sensitive features such as snippets, `header=`, and `addheader=` are po
 - Hosts-file syntax.
 - HTML/error pages masquerading as filter lists.
 - Malformed, duplicate, unsafe, or over-limit rules.
+- Option-less patterns with no literal content (`*`, `||`, `^`, `@@*`, ...), which would match every request. Scoped forms such as `*$script,domain=example.com` remain valid.
+
+`!#if` / `!#else` / `!#endif` conditional directives are **not evaluated**: the directive lines are dropped and the rules inside the blocks are processed like any other rule. `!#include` is resolved (bounded, see below).
 
 See [docs/SYNTAX-POLICY.md](docs/SYNTAX-POLICY.md) and [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) for the exact contract.
 
@@ -71,6 +74,7 @@ merge.py ──► deduplication + deterministic ordering
     ├────────► validate.py ──► final integrity / Build-ID validation
     │
     └────────► report.py ────► reproducible build report
+                  └─ health.py ──► per-source rolling reliability reputation
     │
     ▼
 filters.txt + sources.txt + reports/latest.json
@@ -81,6 +85,7 @@ filters.txt + sources.txt + reports/latest.json
 The builder currently enforces the following:
 
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`.
+- **Strict configuration validation:** unknown keys in `policies.yaml` (including every `rules:` switch) and `sources.yaml`, wrong value types, and a mismatched policy `version`/`profile` fail the build immediately with a clean `[ERROR] Configuration` message, before any download starts.
 - **Authoritative source registry:** `sources.yaml` is the only source registry; `sources.txt` is generated as a URL-only compatibility mirror.
 - **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally.
 - **Correct source health:** the health ratio is calculated from configured root sources; nested includes cannot inflate it.
@@ -118,7 +123,7 @@ Anomaly thresholds accept byte/rule change ratios from 0–10 (0–1000%) and a 
 
 ## 📊 Build reports
 
-`reports/latest.json` uses **schema 5** and records:
+`reports/latest.json` uses **schema 5**. Per-source `input_lines` and rejection counts include every line of the source, so comments, blank lines, and directives appear as rejections with the reasons `comment`, `blank`, and `directive`. The report records:
 
 - root and nested source requests/results
 - total visited sources and download bytes
@@ -138,6 +143,8 @@ See [docs/REPORT-SCHEMA.md](docs/REPORT-SCHEMA.md).
 ## ⚙️ Source configuration
 
 `sources.yaml` is the **only authoritative source registry**.
+
+The shipped registry enables 33 root sources (EasyList, EasyPrivacy, Fanboy Social, AdGuard base/privacy/social/annoyance/regional lists, and EasyList/ABP regional lists). EasyList and EasyPrivacy are `required: true`; all others are optional and only count toward the root-source success ratio.
 
 To disable a source:
 
@@ -176,7 +183,14 @@ python3 scripts/benchmark.py --repeats 3
 python3 scripts/differential.py
 ```
 
+`benchmark.py` repeats its small fixture `--multiplier` times (default 5000) so the reported lines/second is stable. `differential.py` is skipped unless `FILTER_ENGINE_CMD` is set; the command must contain the `{input}` placeholder or the script exits with an error.
+
 A live build requires network access to the configured upstream lists. The builder fails instead of publishing an incomplete result when the root-source health threshold is missed, a required source fails, the global source limit is reached, or the build deadline is exceeded.
+
+## 🤖 Automation
+
+- **`update.yml`** runs daily at 03:17 UTC, on manual dispatch, and on pushes to `main` that touch `sources.yaml`, `custom-rules.txt`, `policies.yaml`, `scripts/**`, `tests/**`, `requirements.txt`, or the workflow itself. It runs the test suite, builds, validates, asserts report invariants (schema, builder version, source health, anomalies), then commits `filters.txt`, `sources.txt`, `reports/latest.json`, and `reports/history/` only if they changed.
+- **`validate.yml`** runs on pull requests (and manually): byte-compile, test suite, benchmark, and the optional differential test. It never publishes.
 
 ## 🧪 Verification coverage
 
@@ -195,6 +209,9 @@ The repository test suite covers:
 - anomaly detection and historical baselines
 - deterministic Unicode/property fuzzing (**5,000 iterations per fuzz property**)
 - curated real-world syntax corpus
+- strict configuration key/type validation and fail-fast policy loading
+- generated-list validator hardening (encoding, version/Build-ID suffix, sort order)
+- over-broad pattern rejection
 - regression tests
 - optional external-engine differential testing
 - repeatable parser benchmark
