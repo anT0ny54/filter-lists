@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.5.4-6bd7fcf556da
-! Last updated: 2026-10-05 09:29:02 UTC
+! Version: v7.5.4-2d689ae3e786
+! Last updated: 2026-10-05 10:23:29 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 6bd7fcf556daa28784856163551103fb3ec00ecc4ee6af22683340d2b62bd036
+! Build-ID: 2d689ae3e78608699e0e6094182990936faf3bbebe3299f4f75cf2bcd3bb7268
 ! Source manifest SHA-256: cd964bef9de1e35561dfdb32dcaf73a59e0122bdc80afe4afd232c086b13c654
 ! Root sources: 33
-! Total rules: 170049
+! Total rules: 170048
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -102210,7 +102210,6 @@ zzzyk.com###Tinfo
 ||akeleygrego.qpon^
 ||akfzziowsd.in^
 ||akhaldqp.in^
-||akhflmskoecmk.site^
 ||akhisarhaber.com/reklam
 ||akhisarhaber.net/bursakebap
 ||akhisarhaber.net/reklam*/
