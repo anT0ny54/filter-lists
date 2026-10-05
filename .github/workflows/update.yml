@@ -15,8 +15,8 @@ on:
       - "requirements.txt"
       - ".github/workflows/update.yml"
 
-# Shared with Keep-Alive.yml: both push to the default branch, and their crons
-# used to fire in the same minute, racing on `git push`.
+# Serialize every workflow that pushes to the default branch (group name is
+# shared by convention) so concurrent runs cannot race on `git push`.
 concurrency:
   group: repo-write
   cancel-in-progress: false
