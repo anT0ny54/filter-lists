@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.5.4-d284e4a403c5
-! Last updated: 2026-10-08 23:00:52 UTC
+! Version: v7.5.4-8a30ee5b80c7
+! Last updated: 2026-10-08 23:23:51 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: d284e4a403c5fc6959f469ce11c8d74f089c245944f424551194dcc9b0e90c27
+! Build-ID: 8a30ee5b80c734305edddc06e0caacee7e7f7f125b2c576824387c13025cfa28
 ! Source manifest SHA-256: cd964bef9de1e35561dfdb32dcaf73a59e0122bdc80afe4afd232c086b13c654
 ! Root sources: 33
-! Total rules: 171238
+! Total rules: 171239
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -33347,9 +33347,9 @@ bahisotv36.com##div[style^="margin:"]:has(> a[href][target="_blank"])
 bahlsen.de#@##cookieModal
 bahlsen.de#@#.cookieCompliance
 bahndampf.de,broadwayworld.com,idec.org.br,in.gr##.newsletter-row
-bahsinetv11.site##.footer-links
-bahsinetv11.site##body > a[target="_blank"]
-bahsinetv11.site##body > div[class^="reklam-"]
+bahsinetv12.site##.footer-links
+bahsinetv12.site##body > a[target="_blank"]
+bahsinetv12.site##body > div[class^="reklam-"]
 baibako.tv##.topserial > a
 baidu.com###ad_xbox_1
 baidu.com###ad_xbox_2
@@ -36769,11 +36769,11 @@ boursorama.com##.l-header__gigaban
 boursorama.com##.smart
 boursorama.com,caradisiac.com,dunod.com,ficam.ma,lesechos.fr,lfp.fr,mangario.fr,nouvelobs.com,saint-etienne.fr##.partenaires
 boursorama.com,zdnet.fr##a[href*="smartadserver.com/h/cc?imgid="]
-bovtv42.com##.footer-links
-bovtv42.com##.header-top > div.header-text
-bovtv42.com##.odds-container
-bovtv42.com##body > header
-bovtv42.com##div[class^="reklam-"]
+bovtv43.com##.footer-links
+bovtv43.com##.header-top > div.header-text
+bovtv43.com##.odds-container
+bovtv43.com##body > header
+bovtv43.com##div[class^="reklam-"]
 bowfile.com###popup1
 bowhunter.com,firearmsnews.com,flyfisherman.com,gameandfishmag.com,gunsandammo.com,handgunsmag.com,in-fisherman.com,northamericanwhitetail.com,petersenshunting.com,rifleshootermag.com,shootingtimes.com,wildfowlmag.com##.video-detail-player
 box.blick.ch##.iframe-container--newsletter
@@ -75766,10 +75766,10 @@ patronfutbol61.cfd##a[href="https://x.com/patronsporis"] ~ a[href][target="_blan
 patrongol37.cfd,patrongol38.cfd##.background-link
 patrongol37.cfd,patrongol38.cfd##.top-banner-header
 patrongol37.cfd,patrongol38.cfd##a[href="https://x.com/patronsporis"] ~ a[href][target="_blank"]:not(#telegram-link)
-patronhd8.cfd##.background-link
-patronhd8.cfd##.channel-ad-item
-patronhd8.cfd##.top-banner-header
-patronhd8.cfd##a[href="https://x.com/patronsporis"] ~ a[href][target="_blank"]:not(#telegram-link)
+patronhd9.cfd##.background-link
+patronhd9.cfd##.channel-ad-item
+patronhd9.cfd##.top-banner-header
+patronhd9.cfd##a[href="https://x.com/patronsporis"] ~ a[href][target="_blank"]:not(#telegram-link)
 patronite.pl##.blog__post--share
 patronlardunyasi.com##.Ads
 patronlardunyasi.com##.flex > div.inline-flex:has(> div.items-center > a[href^="https://www.facebook.com/sharer/"])
@@ -77591,7 +77591,7 @@ porno-von-nebenan.net##div[class^="pum"]
 pornocarioca.com##.button-premium
 pornocarioca.com##.list > #postnativesingle
 pornocarioca.com##.top-banner
-pornocudayi46.com##a[href][aria-label^="Bu alana reklam"]
+pornocudayi50.com##a[href][aria-label^="Bu alana reklam"]
 pornodoido.com##.ntv-disclaimer
 pornoeggs.com##div[class^="ib-"]
 pornoeileen.com,videojs.online##body > div.jwplayer ~ a[href]
@@ -90151,10 +90151,10 @@ turizmgazetesi.com##.widget-adver
 turizmgazetesi.com##header > div.container > div[class^="fixed"]
 turizmguncel.com##.haberDetay .list-inline.social
 turizmtatilseyahat.com##.jeg_share_count
-turk-ifsa11.com,turk-ifsa12.com,turk-ifsa13.com,turk-ifsa14.com,turk-ifsa15.com,turk-ifsa16.com,turk-ifsa17.com,turk-ifsa18.com,turk-ifsa19.com,turk-ifsa20.com,turk-ifsa21.com,turk-ifsa22.com,turk-ifsa23.com,turk-ifsa24.com,turk-ifsa25.com##.ad-banner-frame
-turk-ifsa11.com,turk-ifsa12.com,turk-ifsa13.com,turk-ifsa14.com,turk-ifsa15.com,turk-ifsa16.com,turk-ifsa17.com,turk-ifsa18.com,turk-ifsa19.com,turk-ifsa20.com,turk-ifsa21.com,turk-ifsa22.com,turk-ifsa23.com,turk-ifsa24.com,turk-ifsa25.com##div[class]:has(> a:is([href^="https://cutt.ly/"],[href="https://denemebonusumi.com/"]))
-turk-ifsa11.com,turk-ifsa12.com,turk-ifsa13.com,turk-ifsa14.com,turk-ifsa15.com,turk-ifsa16.com,turk-ifsa17.com,turk-ifsa18.com,turk-ifsa19.com,turk-ifsa20.com,turk-ifsa21.com,turk-ifsa22.com,turk-ifsa23.com,turk-ifsa24.com,turk-ifsa25.com##div[class][style^="min-height:"][style*="calc("]
-turk-ifsa11.com,turk-ifsa12.com,turk-ifsa13.com,turk-ifsa14.com,turk-ifsa15.com,turk-ifsa16.com,turk-ifsa17.com,turk-ifsa18.com,turk-ifsa19.com,turk-ifsa20.com,turk-ifsa21.com,turk-ifsa22.com,turk-ifsa23.com,turk-ifsa24.com,turk-ifsa25.com##video + div.absolute
+turk-ifsa11.com,turk-ifsa12.com,turk-ifsa13.com,turk-ifsa14.com,turk-ifsa15.com,turk-ifsa16.com,turk-ifsa17.com,turk-ifsa18.com,turk-ifsa19.com,turk-ifsa20.com,turk-ifsa21.com,turk-ifsa22.com,turk-ifsa23.com##.ad-banner-frame
+turk-ifsa11.com,turk-ifsa12.com,turk-ifsa13.com,turk-ifsa14.com,turk-ifsa15.com,turk-ifsa16.com,turk-ifsa17.com,turk-ifsa18.com,turk-ifsa19.com,turk-ifsa20.com,turk-ifsa21.com,turk-ifsa22.com,turk-ifsa23.com##div[class]:has(> a:is([href^="https://cutt.ly/"],[href="https://denemebonusumi.com/"]))
+turk-ifsa11.com,turk-ifsa12.com,turk-ifsa13.com,turk-ifsa14.com,turk-ifsa15.com,turk-ifsa16.com,turk-ifsa17.com,turk-ifsa18.com,turk-ifsa19.com,turk-ifsa20.com,turk-ifsa21.com,turk-ifsa22.com,turk-ifsa23.com##div[class][style^="min-height:"][style*="calc("]
+turk-ifsa11.com,turk-ifsa12.com,turk-ifsa13.com,turk-ifsa14.com,turk-ifsa15.com,turk-ifsa16.com,turk-ifsa17.com,turk-ifsa18.com,turk-ifsa19.com,turk-ifsa20.com,turk-ifsa21.com,turk-ifsa22.com,turk-ifsa23.com##video + div.absolute
 turk-ifsa17.com,turk-ifsa18.com,turk-ifsa19.com,turk-ifsa20.com,turk-ifsa21.com,turk-ifsa22.com,turk-ifsa23.com,turk-ifsa24.com,turk-ifsa25.com,turkifsalar.site##.ad-banner-frame
 turk-ifsa17.com,turk-ifsa18.com,turk-ifsa19.com,turk-ifsa20.com,turk-ifsa21.com,turk-ifsa22.com,turk-ifsa23.com,turk-ifsa24.com,turk-ifsa25.com,turkifsalar.site##div[class]:has(> a:is([href^="https://cutt.ly/"],[href="https://denemebonusumi.com/"]))
 turk-ifsa17.com,turk-ifsa18.com,turk-ifsa19.com,turk-ifsa20.com,turk-ifsa21.com,turk-ifsa22.com,turk-ifsa23.com,turk-ifsa24.com,turk-ifsa25.com,turkifsalar.site##div[class][style^="min-height:"][style*="calc("]
@@ -90206,7 +90206,7 @@ turkifsalar.art##div[class][style^="min-height:"][style*="calc("]
 turkifsalar.art##video + div.absolute
 turkifsalar26.space,turkifsalar27.space,turkifsalar28.space,turkifsalar29.space,turkifsalar30.space,turkifsalar31.space,turkifsalar32.space,turkifsalar33.space,turkifsalar34.space,turkifsalar35.space,turkifsalar36.space,turkifsalar37.space,turkifsalar38.space,turkifsalar39.space,turkifsalar40.space,turkifsalar41.space,turkifsalar42.space,turkifsalar43.space,turkifsalar44.space,turkifsalar45.space,turkifsalar46.space,turkifsalar47.space,turkifsalar48.space,turkifsalar49.space,turkifsalar50.space,turkifsalar51.space,turkifsalar52.space,turkifsalar53.space,turkifsalar54.space,turkifsalar55.space##.ts-pbox
 turkifsalar26.space,turkifsalar27.space,turkifsalar28.space,turkifsalar29.space,turkifsalar30.space,turkifsalar31.space,turkifsalar32.space,turkifsalar33.space,turkifsalar34.space,turkifsalar35.space,turkifsalar36.space,turkifsalar37.space,turkifsalar38.space,turkifsalar39.space,turkifsalar40.space,turkifsalar41.space,turkifsalar42.space,turkifsalar43.space,turkifsalar44.space,turkifsalar45.space,turkifsalar46.space,turkifsalar47.space,turkifsalar48.space,turkifsalar49.space,turkifsalar50.space,turkifsalar51.space,turkifsalar52.space,turkifsalar53.space,turkifsalar54.space,turkifsalar55.space##section[data-slot="video_above_player"]
-turkifsalife65.lat###block-2
+turkifsalife66.lat###block-2
 turkifsalink10.store,turkifsalink11.store,turkifsalink12.store,turkifsalink13.store,turkifsalink14.store,turkifsalink15.store,turkifsalink16.store,turkifsalink17.store,turkifsalink18.store,turkifsalink19.store,turkifsalink20.store,turkifsalink21.store,turkifsalink22.store,turkifsalink23.store,turkifsalink24.store,turkifsalink25.store,turkifsalink26.store,turkifsalink27.store,turkifsalink28.store,turkifsalink29.store,turkifsalink3.store,turkifsalink30.store,turkifsalink31.store,turkifsalink32.store,turkifsalink4.store,turkifsalink5.store,turkifsalink6.store,turkifsalink7.store,turkifsalink8.store,turkifsalink9.store##a[href="http://ank.ac/"]
 turkish123.com##.alert-warning
 turkish123.com##.social-home
@@ -167597,6 +167597,7 @@ zzzyk.com###Tinfo
 ||xpejigor.in^
 ||xpffdxzsaqfhs.website^
 ||xpfpctnclgruq.online^
+||xpglvruebmgj.com^
 ||xphmbeda.com^
 ||xphrpolxrhqqf.website^
 ||xpj08.oss-cn-beijing.aliyuncs.com^
