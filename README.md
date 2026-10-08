@@ -38,10 +38,10 @@ Security-sensitive features such as snippets, `header=`, and `addheader=` are po
 ### Rejected
 
 - uBlock Origin procedural filters such as `##+js(...)`.
-- uBO-only operators such as `:style()`, `:remove()`, `:upward()`, and `:matches-css()`.
+- uBO-only operators: `:style()`, `:remove()`, `:upward()`, `:nth-ancestor()`, `:matches-css()`, `:matches-css-before()`, `:matches-css-after()`, `:matches-path()`, `:matches-media()`, `:matches-attr()`, `:matches-property()`, `:min-text-length()`, `:watch-attr()`, `:others()`, `:remove-attr()`, `:remove-class()`.
 - uBO-only extended-CSS exception syntax `#?@#`.
-- AdGuard-only cosmetic extensions.
-- Non-ABP network options such as `removeparam`, redirect/scriptlet options, and unknown options.
+- AdGuard-only cosmetic separators (`#%#`, `#@%#`, `#@$#`, `#$?#`, `#@$?#`).
+- Non-ABP network options such as uBO `removeparam`, redirect/scriptlet options, and unknown options.
 - Hosts-file syntax.
 - HTML/error pages masquerading as filter lists.
 - Malformed, duplicate, unsafe, or over-limit rules.
@@ -100,6 +100,10 @@ The builder currently enforces the following:
 - **Bounded default concurrency:** the builder uses two download workers by default; effective concurrency is additionally capped by the configured global download budget.
 - **Historical reports:** successful reports are retained chronologically under `reports/history/` according to the configured retention limit.
 - **Safe anomaly handling:** warning-level anomalies are advisory by default; critical anomalies fail the build.
+- **Staged output safety:** `filters.txt` is written to a temp file and only atomically replaced after anomaly checks pass, so a rejected build can never clobber the last good list.
+- **Trusted ABP feature gating:** `#$#` snippets, `header=`, and `addheader=` are rejected from every source by default; they are only honoured for sources marked `trusted_abp_features: true` and for `custom-rules.txt`.
+- **Deterministic include traversal:** discovered `!#include` children are sorted by `(depth, canonical_url)` so a global source limit cannot make identical builds choose different children depending on timing.
+- **Download-budget-aware parallelism:** effective concurrency is `min(workers, max_total_download_bytes / max_download_bytes)` so simultaneous downloads cannot jointly overshoot the global budget.
 
 ## ⚙️ Limits and policy
 
@@ -114,6 +118,7 @@ The shipped `policies.yaml` currently defines:
 | Maximum total sources | 500 |
 | Total build timeout | 1,800 seconds |
 | Minimum root-source success ratio | 80% |
+| Fail if zero enabled sources | Yes |
 | Successful report retention | 10 |
 | Anomaly detection | Enabled |
 | Warning anomalies fail build | No |
@@ -136,7 +141,7 @@ The report records:
 - input, accepted, rejected, duplicate, and unique-rule counts
 - rejection reasons
 - per-source diagnostics and content hashes
-- per-source rolling reliability reputation (observations, success rate, consecutive failures)
+- per-source rolling reliability reputation (observations, successes, failures, success rate, score, consecutive failures, and a `poor`/`watch`/`good`/`excellent` reputation label)
 - anomaly baseline, thresholds, severity, and enforcement
 - deterministic Build-ID and provenance hashes (successful builds)
 - operational timestamps and elapsed build duration
@@ -155,8 +160,7 @@ To disable a source:
 enabled: false
 ```
 
-ABP security-sensitive features (`#$#` snippets, `header=`, `addheader=`) are rejected from every
-source by default. To allow them for a source you trust, opt in per source:
+ABP security-sensitive features (`#$#` snippets, `header=`, `addheader=`) are rejected from every source by default. To allow them for a source you trust, opt in per source:
 
 ```yaml
 trusted_abp_features: true
@@ -194,6 +198,7 @@ A live build requires network access to the configured upstream lists. The build
 
 - **`update.yml`** runs daily at 03:17 UTC, on manual dispatch, and on pushes to `main` that touch `sources.yaml`, `custom-rules.txt`, `policies.yaml`, `scripts/**`, `tests/**`, `requirements.txt`, or the workflow itself. It runs the test suite, builds, validates, asserts report invariants (schema, builder version, source health, anomalies), then commits `filters.txt`, `sources.txt`, `reports/latest.json`, and `reports/history/` only if they changed.
 - **`validate.yml`** runs on pull requests (and manually): byte-compile, test suite, benchmark, and the optional differential test. It never publishes.
+- **`Keep-Alive.yml`** runs on the 1st and 15th of each month and on manual dispatch. It updates `.github/keep-alive.txt` with a timestamp to prevent fork dormancy.
 
 ## 🧪 Verification coverage
 
@@ -204,17 +209,21 @@ The repository test suite covers:
 - network options and option validation
 - cosmetic and extended-CSS rules
 - ABP header/addheader/snippet/inline-style/remove features
+- trusted ABP feature gating per source and for custom rules
 - nested includes and canonical include-cycle detection
 - source-health and required-source accounting
 - global source/download limits and deadlines
 - stable report record ordering and Build-ID generation
 - per-source diagnostics and hashes
+- per-source rolling reliability reputation
 - anomaly detection and historical baselines
 - deterministic Unicode/property fuzzing (**5,000 iterations per fuzz property**)
 - curated real-world syntax corpus
 - strict configuration key/type validation and fail-fast policy loading
 - generated-list validator hardening (encoding, version/Build-ID suffix, sort order)
 - over-broad pattern rejection
+- staged output (temp file + atomic replace, no clobber on rejection)
+- download validation hardening (HTTP/1.x status lines, NUL beyond first chunk, HTML lookalikes)
 - regression tests
 - optional external-engine differential testing
 - repeatable parser benchmark
