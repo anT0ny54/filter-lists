@@ -2,10 +2,10 @@
 """Centralized build configuration loading and validation."""
 from __future__ import annotations
 
-import functools
 import hashlib
 import math
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
@@ -189,38 +189,6 @@ RULE_POLICY_DEFAULTS = {
 }
 
 
-def _policy_cache_key() -> tuple[str, float]:
-    """Return a (path, mtime) key that changes when POLICY_FILE changes.
-
-    Tests patch ``config.POLICY_FILE`` to point at a temp file. The previous
-    ``lru_cache(maxsize=1)`` decorators on ``load_policy_limits`` and
-    ``load_rule_policy`` ignored that patch and returned stale results from
-    the *original* policies.yaml, so a test that patched the file and then
-    called ``normalize_rule`` could get the wrong limits or rule switches.
-    A manual cache keyed on ``(str(POLICY_FILE), mtime)`` invalidates
-    automatically whenever the module-level path or the file content changes.
-    """
-    try:
-        return str(POLICY_FILE), POLICY_FILE.stat().st_mtime
-    except OSError:
-        return str(POLICY_FILE), 0.0
-
-
-_policy_limits_cache: dict[tuple[str, float], tuple[int, int, int, int, int, int]] = {}
-
-def load_policy_limits() -> tuple[int, int, int, int, int, int]:
-    """Return policy limits in one cached, single-source-of-truth tuple."""
-    key = _policy_cache_key()
-    cached = _policy_limits_cache.get(key)
-    if cached is not None:
-        return cached
-    result = _policy_limits(_load_policy())
-    _policy_limits_cache[key] = result
-    _policy_limits_cache.clear()
-    _policy_limits_cache[key] = result
-    return result
-
-
 def _load_policy() -> dict:
     if not POLICY_FILE.is_file():
         raise FileNotFoundError(f"Missing policy file: {POLICY_FILE}")
@@ -243,6 +211,12 @@ def _load_policy() -> dict:
     return data
 
 
+@lru_cache(maxsize=1)
+def load_policy_limits() -> tuple[int, int, int, int, int, int]:
+    """Return policy limits in one cached, single-source-of-truth tuple."""
+    return _policy_limits(_load_policy())
+
+
 def _rule_policy(policy: dict) -> dict[str, bool]:
     """Validate and complete the `rules:` section of an already-loaded policy."""
     rules = policy.get("rules", {})
@@ -257,19 +231,10 @@ def _rule_policy(policy: dict) -> dict[str, bool]:
     }
 
 
-_rule_policy_cache: dict[tuple[str, float], dict[str, bool]] = {}
-
-@functools.lru_cache(maxsize=1)
+@lru_cache(maxsize=1)
 def load_rule_policy() -> dict[str, bool]:
     """Load rule-processing switches that control normalization."""
-    key = _policy_cache_key()
-    cached = _rule_policy_cache.get(key)
-    if cached is not None:
-        return cached
-    result = _rule_policy(_load_policy())
-    _rule_policy_cache.clear()
-    _rule_policy_cache[key] = result
-    return result
+    return _rule_policy(_load_policy())
 
 
 def load_config() -> BuildConfig:

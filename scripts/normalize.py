@@ -482,75 +482,57 @@ def normalize_rule(raw: str, *, max_rule_length: int | None = None, trusted_abp_
     return normalize_network(line, policy)
 
 
-def normalize_with_reason(
-    raw: str, *, max_rule_length: int | None = None, trusted_abp_features: bool = True,
-) -> tuple[str | None, str | None]:
-    """Normalize a line and return ``(canonical_rule, rejection_reason)``.
-
-    When the rule is accepted, returns ``(rule, None)``.
-    When the rule is rejected, returns ``(None, reason)``.
-
-    This does the classification, policy lookup, and parsing once instead of
-    the two full passes that ``normalize_rule`` + ``rejection_reason`` perform
-    separately — the hot loop in ``report.analyze_files`` previously called
-    both on every rejected line, re-classifying and re-splitting options.
-    """
+def rejection_reason(raw: str, *, max_rule_length: int | None = None, trusted_abp_features: bool = True) -> str:
     line = raw.lstrip("\ufeff").strip()
-    limit = _default_max_rule_length() if max_rule_length is None else max_rule_length
     if not line:
-        return None, "blank"
+        return "blank"
     policy = load_rule_policy()
     if not trusted_abp_features and uses_restricted_abp_feature(line):
-        return None, "abp-security-restricted-feature"
+        return "abp-security-restricted-feature"
     c = classify(line)
     if c.reason == "hosts-format" and not policy["reject_hosts_format"]:
-        return line, None
+        return "hosts-format-allowed"
     if c.reason == "html-or-error-page" and not policy["reject_html_error_pages"]:
-        return line, None
+        return "html-or-error-page-allowed"
     if c.reason:
-        return None, c.reason
+        return c.reason
     if c.kind in {"comment", "directive"}:
-        return None, c.kind
+        return c.kind
+    limit = _default_max_rule_length() if max_rule_length is None else max_rule_length
     if len(line) > limit:
-        return None, "rule-too-long"
+        return "rule-too-long"
     if c.kind == "network" and not policy["allow_network_filters"]:
-        return None, "network-filters-disabled"
+        return "network-filters-disabled"
     if c.kind == "cosmetic" and not policy["allow_abp_cosmetic"]:
-        return None, "cosmetic-filters-disabled"
+        return "cosmetic-filters-disabled"
     if "#?#" in line and not policy["allow_extended_css"]:
-        return None, "extended-css-disabled"
+        return "extended-css-disabled"
     if "#?@#" in line and policy["reject_ubo_extended_exceptions"]:
-        return None, "ubo-only-syntax"
+        return "ubo-only-syntax"
     if policy["reject_ubo_procedural"] and UBO_PROCEDURAL_RE.search(line):
-        return None, "ubo-only-syntax"
+        return "ubo-only-syntax"
     if c.kind == "cosmetic":
-        result = normalize_cosmetic(line, policy)
-        if result is not None:
-            return result, None
         engine_only = [sep for sep in COSMETIC_MARKERS if sep not in ALLOWED_COSMETIC_SEPARATORS and sep in line]
         if engine_only:
-            return None, "engine-specific-syntax"
+            return "engine-specific-syntax"
         if "#$#" in line:
             snippet_match = re.search(r"#\$#", line)
             if snippet_match and not line[:snippet_match.start()].strip():
-                return None, "snippet-domain-required"
+                return "snippet-domain-required"
             if not policy["allow_abp_snippets"]:
-                return None, "abp-snippets-disabled"
+                return "abp-snippets-disabled"
         if "#?#" in line:
             cosmetic_match = re.search(r"#\?#", line)
             if cosmetic_match and not line[:cosmetic_match.start()].strip():
-                return None, "extended-css-domain-required"
+                return "extended-css-domain-required"
         if ":has-text(" in line.lower() and "#?#" not in line:
-            return None, "extended-css-selector-requires-#?#"
+            return "extended-css-selector-requires-#?#"
         if XPATH_RE.search(line) and "#?#" not in line:
-            return None, "extended-css-selector-requires-#?#"
-        return None, "invalid-cosmetic-rule"
-    # Network filter
+            return "extended-css-selector-requires-#?#"
+        return "invalid-cosmetic-rule"
     pattern, options = split_options(line)
     if is_overbroad_pattern(pattern[2:] if pattern.startswith("@@") else pattern, options):
-        return None, "overbroad-pattern"
-    if line.endswith("$") and not line.startswith(("/", "@@/")):
-        return None, "invalid-network-rule"
+        return "overbroad-pattern"
     if "$" in line:
         if options:
             names = []
@@ -564,7 +546,7 @@ def normalize_with_reason(
                     and name not in VALUE_OPTIONS
                     and policy["reject_unknown_options"]
                 ):
-                    return None, "unknown-option"
+                    return "unknown-option"
                 if (
                     "=" not in option
                     and name not in TYPE_OPTIONS
@@ -572,21 +554,11 @@ def normalize_with_reason(
                     and name not in SIMPLE_OPTIONS
                     and policy["reject_unknown_options"]
                 ):
-                    return None, "unknown-option"
+                    return "unknown-option"
                 if not valid_option(option, line.startswith("@@"), policy):
-                    return None, "invalid-option-value" if "=" in option else "context-invalid-option"
+                    return "invalid-option-value" if "=" in option else "context-invalid-option"
             if policy["reject_duplicate_options"] and len(names) != len(set(names)):
-                return None, "duplicate-option"
-        result = normalize_network(line, policy)
-        if result is not None:
-            return result, None
-        return None, "invalid-option-or-network-rule"
-    result = normalize_network(line, policy)
-    if result is not None:
-        return result, None
-    return None, "invalid-network-rule"
-
-
-def rejection_reason(raw: str, *, max_rule_length: int | None = None, trusted_abp_features: bool = True) -> str:
-    _, reason = normalize_with_reason(raw, max_rule_length=max_rule_length, trusted_abp_features=trusted_abp_features)
-    return reason or "accepted"
+                return "duplicate-option"
+        if normalize_network(line) is None:
+            return "invalid-option-or-network-rule"
+    return "invalid-network-rule"

@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from config import BUILDER_VERSION, sha256_file
-from normalize import normalize_with_reason
+from normalize import normalize_rule, rejection_reason
 from health import build_source_reputation
 from policy import PROFILE_NAME
 
@@ -36,9 +36,10 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
             with path.open(encoding="utf-8", errors="replace") as source:
                 for raw in source:
                     local_lines += 1; input_lines += 1
-                    rule, reason = normalize_with_reason(raw.rstrip("\r\n"), max_rule_length=max_rule_length, trusted_abp_features=trusted)
+                    rule = normalize_rule(raw.rstrip("\r\n"), max_rule_length=max_rule_length, trusted_abp_features=trusted)
                     if rule is None:
                         rejected += 1; local_rejected += 1
+                        reason = rejection_reason(raw, max_rule_length=max_rule_length, trusted_abp_features=trusted)
                         reasons[reason] += 1; local_reasons[reason] += 1
                     else:
                         accepted += 1; local_accepted += 1; local_rules.add(rule)
