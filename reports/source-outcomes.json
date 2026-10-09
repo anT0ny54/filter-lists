@@ -479,6 +479,45 @@
     "https://filters.adtidy.org/extension/ublock/filters/8_optimized.txt": true,
     "https://filters.adtidy.org/extension/ublock/filters/9_optimized.txt": true
    }
+  },
+  {
+   "generated_at": "2026-10-09T10:04:22.804757+00:00",
+   "status": "success",
+   "build_id": "4bd2c715895beb590435474047bfeab5b971e61ad4d46524bfc879885e8117be",
+   "outcomes": {
+    "https://easylist-downloads.adblockplus.org/abpindo-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/abpvn-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/bulgarian_list-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/easylist-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/easylistchina-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/easylistdutch-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/easylistgermany-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/easylistitaly-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/easylistlithuania-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/easylistpolish-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/easylistportuguese-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/easylistspanish-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/easyprivacy-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/indianlist-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/israellist-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/latvianlist-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/liste_fr-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/rolist-minified.txt": true,
+    "https://easylist-downloads.adblockplus.org/ruadlist-minified.txt": true,
+    "https://filters.adtidy.org/extension/ublock/filters/13_optimized.txt": true,
+    "https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt": true,
+    "https://filters.adtidy.org/extension/ublock/filters/16_optimized.txt": true,
+    "https://filters.adtidy.org/extension/ublock/filters/1_optimized.txt": true,
+    "https://filters.adtidy.org/extension/ublock/filters/224_optimized.txt": true,
+    "https://filters.adtidy.org/extension/ublock/filters/23_optimized.txt": true,
+    "https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt": true,
+    "https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt": true,
+    "https://filters.adtidy.org/extension/ublock/filters/6_optimized.txt": true,
+    "https://filters.adtidy.org/extension/ublock/filters/7_optimized.txt": true,
+    "https://filters.adtidy.org/extension/ublock/filters/8_optimized.txt": true,
+    "https://filters.adtidy.org/extension/ublock/filters/9_optimized.txt": true
+   }
   }
  ]
 }

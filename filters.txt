@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-61364b87e2e1
-! Last updated: 2026-10-09 09:48:27 UTC
+! Version: v7.6.0-4bd2c715895b
+! Last updated: 2026-10-09 10:04:22 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 61364b87e2e16b2721e93e861f185ba208be7750e0ac7001f0cca9c76e076107
+! Build-ID: 4bd2c715895beb590435474047bfeab5b971e61ad4d46524bfc879885e8117be
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 171325
+! Total rules: 171342
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -5195,6 +5195,7 @@
 ##.frontendAd
 ##.frontpageAdvM
 ##.ft-ad
+##.ftad-ct
 ##.ftAdPaves
 ##.fuck-ivr
 ##.fuck-ivr ~ p[style^="background-color:"]
@@ -13931,6 +13932,7 @@
 .gif?partner=
 .gif|$domain=18j.tv
 .gif|$domain=24taraftarium12.xyz
+.gif|$domain=7mshipin.org
 .gif|$domain=7mshipin.org|viidii.info
 .gif|$domain=8727ck.cc|8726ck.cc
 .gif|$domain=99re.com
@@ -20439,6 +20441,7 @@
 52kd.com###frame2cu3VU
 52life.cc##table[style="margin-top:0"]
 52movieba.com,acglala.cc,awaker.cn,bimiacg4.net,bimiacg5.net,ccav1.com,cgown.com,cn163.net,comicat.org,cosersuki.org,epinv.com,eroacg.com,galacg.me,gmgard.com,haochi123.com,hggard.com,hmoe11.net,ifenpaidy.com,jitapu.com,jitashe.org,kelatv.com,kisssub.org,languang.co,mtrend.cn,mzh.ren,nxing.cn,oyksoft.com,souxue8.com,speedtest.cn,tingroom.com,whsir.com##a[href*=".taobao.com"]
+52movieba.com,acglala.cc,awaker.cn,bimiacg4.net,bimiacg5.net,cgown.com,cn163.net,comicat.org,cosersuki.org,epinv.com,eroacg.com,galacg.me,gmgard.com,haochi123.com,hggard.com,hmoe11.net,ifenpaidy.com,jitapu.com,jitashe.org,kelatv.com,kisssub.org,languang.co,mtrend.cn,mzh.ren,nxing.cn,oyksoft.com,souxue8.com,speedtest.cn,tingroom.com,whsir.com##a[href*=".taobao.com"]
 52niuyan.cc##.top_fixed
 52niuyan.cc##a[onclick][rel][style*="toutiaoimg.com"]
 52pk.com###baidutop
@@ -37711,6 +37714,7 @@ c5n.com##.news-headline__info-wrapper
 ca168.com###slideshow_wrapper
 ca168.com##.admarket
 ca168.com,cs.com.cn,qiannao.com,qinbing.cn,sonimei.cn###rightDiv
+ca168.com,cs.com.cn,qinbing.cn,sonimei.cn###rightDiv
 cabedelo.pb.gov.br##.componentBannerFull
 cabelas.com###EMarketingSpotReactCookie_Tracking_Disclosure
 cabezanews.com##.tw-ads
@@ -61142,6 +61146,7 @@ jukujo-neet.xyz##.ad> div.textwidget:has(> center > a[href^="http://pcmax.jp"])
 jukujo-neet.xyz##.menu_underh2:contains(PCMAX)
 jumbo.com##.container.sponsored
 jumbo.com##[data-pathway-product-position]:contains(Gesponsord)
+jumi.su,preface.ai##a[href*="bit.ly"]
 jumi.tv##a[href^="https://l.tapdb.net/"]
 jumk.de,rechneronline.de,welt-zeit-uhr.de##div[style="font-size:10px;margin-top:1px"]
 jump.x0.to###prs
@@ -96907,6 +96912,7 @@ zgorzelec.info##[ng-if="ctrl.variant=='home_promotion'"]
 zh.moegirl.org.cn##.swiper-slide:has(> a[href^="https://m.tb.cn/"])
 zh141.com###text1
 zh141.com##a[title*="廣告"]
+zhain8.com##.ssr
 zhainanba.org##.marauto > p[style="text-align: left;"]
 zhakao.cn##.main > div[id^="_"][style^="box-sizing: content-box; display: block; position: fixed; z-index:"]
 zhale.me##.sponsor-card
@@ -102047,6 +102053,7 @@ zzzyk.com###Tinfo
 ||agl008.shop^
 ||agl010.pro^
 ||aglaiaazuline.cyou^
+||aglanceciting.cyou^
 ||aglancedariole.cfd^
 ||aglaosheuchs.com^
 ||agle21xe2anfddirite.com^
@@ -102594,6 +102601,7 @@ zzzyk.com###Tinfo
 ||alicdn.com/tps/*-950-90.
 ||alicdn.com/tps/i3/T19NaCFKFaXXckTCTS-300-100.jpg
 ||alicdn.com^$domain=1avlang.com|2334n.com|51dll.com|52kpop.com|5xx44.com|5xx77.com|63ef.com|69t41.com|7mav2.com|99a21.com|aotu101.com|ccxx99.com|dytt.com|hanfan.cc|jb51.net|jitapu.com|junying.com|jvhao.com|lady3.xyz|magnet2048.com|qingmanyong.com|qyl00.com|qyl222.com|spqi.xyz|supfree.net|that2.info|thztv.cc|ttww22.com|viidii.info|wenkuxiazai.com|xiaomingming.org|yzz12.com
+||alicdn.com^$domain=1avlang.com|2334n.com|51dll.com|52kpop.com|5xx44.com|5xx77.com|63ef.com|69t41.com|7mav2.com|99a21.com|aotu101.com|ccxx99.com|dytt.com|hanfan.cc|jb51.net|jitapu.com|junying.com|jvhao.com|lady3.xyz|magnet2048.com|qingmanyong.com|qyl00.com|qyl222.com|spqi.xyz|supfree.net|that2.info|thztv.cc|ttww22.com|wenkuxiazai.com|xiaomingming.org|yzz12.com
 ||alicdn.com^$domain=2c2.website|2p8.space|adultgao.com|caopop.com|caoporn.com|caouoo.com|caox.cc|h3e.pw|h3y.pw|k88.club|me88.pw|p5p.space|se88.space|t2p.space|tb001.xyz|te88.pw|vwan.xyz|xhao1.com
 ||alicdn.com^$domain=99re.com
 ||alicdn.com^$domain=gadget-apple.ru,image
@@ -113139,6 +113147,7 @@ zzzyk.com###Tinfo
 ||crudenessfinishersacred.com^
 ||crudestcarlin.cfd^
 ||cruelnichil.shop^
+||cruetyvraic.com^
 ||cruhliip.com^
 ||cruhtravbsuio.space^
 ||cruietoge.com^
@@ -117472,6 +117481,7 @@ zzzyk.com###Tinfo
 ||duanekhalal.cyou^
 ||duanmeiwen.com/static/cpt/img/write_right_float.png
 ||duapp.com^$domain=bjmama.com|ccav1.com|gzmama.com
+||duapp.com^$domain=bjmama.com|gzmama.com
 ||duba.com/baidu
 ||duba.com/dhads?id=
 ||duba.com/level2/rmd.js
@@ -122157,6 +122167,7 @@ zzzyk.com###Tinfo
 ||fovealgullet.cyou^
 ||fovealkiters.com^
 ||foventcasper.qpon^
+||fowledrings.qpon^
 ||fowlpwlythika.space^
 ||fowlsgum.com^
 ||fox-guide.ru/wp-content/uploads/*/genshindrop-
@@ -152209,6 +152220,7 @@ zzzyk.com###Tinfo
 ||sauterelais.cyou^
 ||savageavowmidland.com^
 ||savaite.lt/uploads/bnr/
+||savamea.org^
 ||save-editor.com/b/in/ad/
 ||savefrom.net/build/js/chunk~popup
 ||saveterracehangnail.com^
@@ -153788,6 +153800,7 @@ zzzyk.com###Tinfo
 ||sinaimg.cn/large^$domain=fcw45.com
 ||sinaimg.cn/unipro/
 ||sinaimg.cn^$domain=04stream.tv|11luba.com|46bk.com|500xxxx.com|522dy.com|63ef.com|7mav2.com|7mshipin.org|94xxmm.com|99a21.com|abminbuy.com|aotu101.com|aotu103.com|blz105.com|blz20.com|blz24.com|caibaojian.com|cangjige.net|ccxx99.com|cnmysoft.com|ems183.cn|fdzone.org|kccdk.com|kiees.cn|kisssub.org|lifan.moe|llj22.com|pianyuan.org|rarbt.cc|sbme.me|se533.com|supfree.net|thztv.cc|tiantianzhibo.com|viidii.info|vx666.com|yaoshe1.com
+||sinaimg.cn^$domain=04stream.tv|11luba.com|46bk.com|500xxxx.com|522dy.com|63ef.com|7mav2.com|7mshipin.org|94xxmm.com|99a21.com|abminbuy.com|aotu101.com|aotu103.com|blz105.com|blz20.com|blz24.com|caibaojian.com|cangjige.net|ccxx99.com|cnmysoft.com|ems183.cn|fdzone.org|kccdk.com|kiees.cn|kisssub.org|lifan.moe|llj22.com|pianyuan.org|rarbt.cc|sbme.me|se533.com|supfree.net|thztv.cc|tiantianzhibo.com|vx666.com|yaoshe1.com
 ||sinaimg.cn^$domain=2c2.website|2p8.space|adultgao.com|caopop.com|caoporn.com|caouoo.com|caox.cc|h3e.pw|h3y.pw|k88.club|me88.pw|p5p.space|se88.space|t2p.space|tb001.xyz|te88.pw|vwan.xyz|xhao1.com
 ||sinaimg.cn^$domain=88files.net|aotu43.com
 ||sinaimg.cn^$domain=99re.com
@@ -154498,6 +154511,7 @@ zzzyk.com###Tinfo
 ||sneezegridtasting.com^
 ||sneezevelary.cyou^
 ||sneezyrestrapabasias.cyou^
+||snfvgwddottlz.website^
 ||snhdwhjfhgrfw.space^
 ||snhgshztmhr.com^
 ||sni.ps^$third-party
@@ -156583,6 +156597,7 @@ zzzyk.com###Tinfo
 ||sunlightelitistbut.com^
 ||sunmedia.tv^$third-party
 ||sunmediaads.com^
+||sunnilygaiting.cfd^
 ||sunnshele.com^
 ||sunny-measurement.pro^
 ||sunny-source.pro^
@@ -161792,6 +161807,7 @@ zzzyk.com###Tinfo
 ||upload.cc/i1/2020/07/13/8BGJiL.gif
 ||upload.cc^$domain=141jj.com|mizhiav.com
 ||upload.cc^$domain=99re.com
+||upload.cc^$domain=mizhiav.com
 ||upload.xchina.biz/ad/
 ||uploadgig.com/static_/$domain=3xpla.net|3xplanet.net
 ||uploadgig.com/static_/$media
@@ -169132,6 +169148,7 @@ zzzyk.com###Tinfo
 ||ypncdn.com/static/partner/
 ||ypocjgogabqjj.website^
 ||ypphgndtjnpyf.online^
+||ypqowrizpahrb.space^
 ||ypsozc.com^
 ||yptolkbcxepbh.online^
 ||yptqys.tianqistatic.com^
