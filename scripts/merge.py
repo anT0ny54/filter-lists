@@ -85,6 +85,23 @@ def archive_successful_report(build_id: str, *, retention: int = 10) -> None:
     if not target.exists():
         shutil.copy2(REPORT, target)
 
+    # Retention counts distinct builds: an older archived report with the same
+    # Build-ID describes the same configuration and output, so only the newest
+    # run is kept. (Per-source run outcomes live in source-outcomes.json.)
+    for path in HISTORY_DIR.glob("*.json"):
+        if path == target:
+            continue
+        try:
+            existing = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if existing.get("build_id") == build_id and existing.get("status", "success") == "success":
+            try:
+                path.unlink()
+                log(f">> Removed superseded duplicate-build report: {path.name}")
+            except OSError as exc:
+                log(f"[WARN] Could not remove duplicate report {path.name}: {exc}")
+
     # Keep retention based on generated_at, not filenames: build IDs are hashes.
     reports = []
     for path in HISTORY_DIR.glob("*.json"):
@@ -225,7 +242,7 @@ def main() -> int:
             if source_stats.get("source_limit_reached"):
                 log("[ERROR] Global source traversal limit was reached before all queued sources completed")
             stats = {"input_lines": 0, "accepted_lines": 0, "rejected_lines": 0, "duplicate_lines": 0, "unique_rules": 0, "rejection_reasons": {}}
-            write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=fingerprint, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="failed")
+            write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=fingerprint, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="failed", source_quality_policy=getattr(config, "source_quality", None))
             return 1
         # Reuse the per-source digest fetch.collect_sources already computed
         # instead of hashing every downloaded file a second time in analyze_files.
@@ -246,15 +263,18 @@ def main() -> int:
         final_rules = sorted(rules, key=_RULE_SORT_KEY)
         build_id = hashlib.sha256((fingerprint + "\n" + "\n".join(final_rules)).encode()).hexdigest()
         staged = stage_output(final_rules, build_id, manifest_sha256=provenance["source_manifest_sha256"], source_count=len(source_urls))
-        write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="success")
+        write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="success", source_quality_policy=getattr(config, "source_quality", None))
         data = json.loads(REPORT.read_text(encoding="utf-8"))
-        if data.get("anomalies", {}).get("enforced_failure", False):
+        quality = data.get("source_quality", {})
+        for item in quality.get("items", []):
+            log(f"[WARN] Source quality ({item.get('severity')}): {item.get('name') or item.get('url')} rejected {item.get('effective_rejection_rate', 0):.1%} of rule lines ({item.get('accepted_lines')}/{item.get('rule_lines')} accepted)")
+        if data.get("anomalies", {}).get("enforced_failure", False) or quality.get("enforced_failure", False):
             staged.unlink(missing_ok=True)  # keep the previous good filters.txt intact
             data["status"] = "failed"
             tmp_report = REPORT.with_suffix(REPORT.suffix + ".tmp")
             tmp_report.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             tmp_report.replace(REPORT)
-            log("[ERROR] Anomaly policy rejected this build")
+            log("[ERROR] Anomaly or source-quality policy rejected this build")
             return 1
         commit_output(staged)
         archive_successful_report(build_id, retention=config.history_retention)

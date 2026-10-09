@@ -15,7 +15,7 @@ from config import (
     load_rule_policy, sha256_file,
 )
 from normalize import default_max_rule_length, normalize_rule_with_reason
-from health import build_source_reputation
+from health import build_source_reputation, default_outcomes_path, record_outcomes
 from policy import PROFILE_NAME
 
 SCHEMA_VERSION = 5
@@ -111,7 +111,60 @@ def detect_anomalies(current_results: list[dict], previous_report: dict | None, 
     return result
 
 
-def write_report(path: Path, *, source_stats: dict, rule_stats: dict, elapsed_seconds: float, source_urls: list[str], build_id: str, previous_report: dict | None = None, anomaly_policy: dict | None = None, provenance: dict | None = None, source_metadata: dict | None = None, history_dir: Path | None = None, status: str = "success") -> None:
+# Reasons that are ordinary non-rule lines, not evidence of an incompatible feed.
+NON_RULE_REASONS = ("comment", "blank", "directive")
+
+
+def evaluate_source_quality(results: list[dict], policy: dict | None) -> dict:
+    """Flag sources whose *rule* lines are mostly rejected.
+
+    Download success says nothing about rule yield: a feed in an incompatible
+    syntax downloads fine and then contributes almost nothing. The effective
+    rejection rate ignores comments, blanks and directives so a heavily
+    commented but compatible list is not penalised.
+    """
+    from config import DEFAULT_SOURCE_QUALITY
+    policy = {**DEFAULT_SOURCE_QUALITY, **(policy or {})}
+    result = {
+        "enabled": bool(policy["enabled"]), "min_lines": int(policy["min_lines"]),
+        "warn_rejection_rate": float(policy["warn_rejection_rate"]),
+        "critical_rejection_rate": float(policy["critical_rejection_rate"]),
+        "fail_on_critical": bool(policy["fail_on_critical"]),
+        "count": 0, "critical_count": 0, "warning_count": 0, "items": [], "enforced_failure": False,
+    }
+    if not result["enabled"]:
+        return result
+    for item in results:
+        if item.get("status") != "ok" or "input_lines" not in item:
+            continue
+        input_lines = int(item.get("input_lines", 0))
+        reasons = item.get("rejection_reasons", {}) or {}
+        non_rule = sum(int(reasons.get(r, 0)) for r in NON_RULE_REASONS)
+        rule_lines = input_lines - non_rule
+        if input_lines < result["min_lines"] or rule_lines <= 0:
+            continue
+        accepted = int(item.get("accepted_lines", 0))
+        rejected_rules = max(0, rule_lines - accepted)
+        rate = rejected_rules / rule_lines
+        if rate < result["warn_rejection_rate"]:
+            continue
+        severity = "critical" if rate >= result["critical_rejection_rate"] else "warning"
+        top = sorted(((k, v) for k, v in reasons.items() if k not in NON_RULE_REASONS), key=lambda kv: (-kv[1], kv[0]))[:3]
+        result["items"].append({
+            "url": item.get("url"), "name": item.get("name"), "severity": severity,
+            "effective_rejection_rate": round(rate, 6), "rule_lines": rule_lines,
+            "accepted_lines": accepted, "input_lines": input_lines,
+            "top_rejection_reasons": dict(top),
+        })
+    result["items"].sort(key=lambda x: (-x["effective_rejection_rate"], str(x["url"])))
+    result["count"] = len(result["items"])
+    result["critical_count"] = sum(x["severity"] == "critical" for x in result["items"])
+    result["warning_count"] = result["count"] - result["critical_count"]
+    result["enforced_failure"] = result["fail_on_critical"] and result["critical_count"] > 0
+    return result
+
+
+def write_report(path: Path, *, source_stats: dict, rule_stats: dict, elapsed_seconds: float, source_urls: list[str], build_id: str, previous_report: dict | None = None, anomaly_policy: dict | None = None, provenance: dict | None = None, source_metadata: dict | None = None, history_dir: Path | None = None, status: str = "success", source_quality_policy: dict | None = None, outcomes_path: Path | None = None) -> None:
     clean_sources = {k: v for k, v in source_stats.items() if k != "results"}
     results = []
     for item in source_stats.get("results", []):
@@ -124,10 +177,19 @@ def write_report(path: Path, *, source_stats: dict, rule_stats: dict, elapsed_se
     results.sort(key=lambda item: (int(item.get("depth", 0)), str(item.get("url", "")), str(item.get("status", ""))))
     clean_sources["results"] = results
     anomalies = detect_anomalies(results, previous_report, anomaly_policy or {"enabled": False})
+    source_quality = evaluate_source_quality(results, source_quality_policy)
+    history_dir = history_dir or path.parent / "history"
+    outcomes_path = outcomes_path or default_outcomes_path(history_dir)
+    generated_at = datetime.now(timezone.utc).isoformat()
     payload = {
-        "schema": SCHEMA_VERSION, "status": status, "generated_at": datetime.now(timezone.utc).isoformat(), "builder": f"Filter-Lists v{BUILDER_VERSION}", "profile": PROFILE_NAME, "build_id": build_id, "source_count": len(source_urls),
-        "provenance": provenance or {}, "sources": clean_sources, "source_reputation": build_source_reputation(history_dir or path.parent / "history", results),
+        "schema": SCHEMA_VERSION, "status": status, "generated_at": generated_at, "builder": f"Filter-Lists v{BUILDER_VERSION}", "profile": PROFILE_NAME, "build_id": build_id, "source_count": len(source_urls),
+        "provenance": provenance or {}, "sources": clean_sources, "source_reputation": build_source_reputation(history_dir, results, outcomes_path=outcomes_path, generated_at=generated_at), "source_quality": source_quality,
         "rules": {k: v for k, v in rule_stats.items() if k != "per_file"}, "anomalies": anomalies, "build_seconds": round(elapsed_seconds, 3),
     }
     path.parent.mkdir(parents=True, exist_ok=True); temporary = path.with_suffix(path.suffix + ".tmp")
     temporary.write_text(json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=False) + "\n", encoding="utf-8"); temporary.replace(path)
+    # Every run (including failed ones) contributes source outcomes to the
+    # reputation history. This is separate from reports/history/, which only
+    # ever holds successful anomaly baselines. Recorded after the reputation
+    # above was computed so the current run is not counted twice.
+    record_outcomes(outcomes_path, history_dir=history_dir, generated_at=generated_at, status=status, build_id=build_id, results=results)

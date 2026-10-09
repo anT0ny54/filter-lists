@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
@@ -22,7 +22,7 @@ CUSTOM_RULES = ROOT / "custom-rules.txt"
 # validate.py, and fetch.py's outbound User-Agent all import this instead of
 # each keeping an independent copy, which previously let the string drift
 # out of sync between modules on a version bump.
-BUILDER_VERSION = "7.5.4"
+BUILDER_VERSION = "7.6.0"
 
 # Schema revision of policies.yaml itself (its `version:` key).
 POLICY_SCHEMA_VERSION = 3
@@ -41,7 +41,7 @@ SOURCE_SCHEMA_VERSION = 1
 DEFAULT_MINIMUM_SUCCESS_RATIO = 0.80
 POLICY_TOP_LEVEL_KEYS = frozenset({
     "version", "profile", "rules", "limits", "history",
-    "source_health", "anomaly_detection",
+    "source_health", "anomaly_detection", "source_quality",
 })
 # Allowed keys inside each policies.yaml section. Unknown keys are rejected so
 # a typo such as `max_bytes_change_ration` cannot silently fall back to the
@@ -57,6 +57,18 @@ POLICY_SECTION_KEYS = {
         "enabled", "max_bytes_change_ratio", "max_rule_count_change_ratio",
         "max_rejection_rate_change", "min_lines", "fail_on_warning",
     }),
+    "source_quality": frozenset({
+        "enabled", "min_lines", "warn_rejection_rate",
+        "critical_rejection_rate", "fail_on_critical",
+    }),
+}
+# Per-source rule-yield gate defaults (kept equal to the shipped policies.yaml).
+DEFAULT_SOURCE_QUALITY = {
+    "enabled": True,
+    "min_lines": 100,
+    "warn_rejection_rate": 0.30,
+    "critical_rejection_rate": 0.90,
+    "fail_on_critical": False,
 }
 SOURCES_TOP_LEVEL_KEYS = frozenset({"version", "sources"})
 SOURCE_ITEM_KEYS = frozenset({"name", "url", "category", "enabled", "priority", "required", "trusted_abp_features"})
@@ -155,6 +167,7 @@ class BuildConfig:
     total_timeout_seconds: int
     anomaly_detection: dict
     history_retention: int
+    source_quality: dict = field(default_factory=lambda: dict(DEFAULT_SOURCE_QUALITY))
 
 
 def _positive_int(value: object, name: str) -> int:
@@ -341,6 +354,21 @@ def load_config() -> BuildConfig:
         "min_lines": _positive_int(anomaly.get("min_lines", DEFAULT_ANOMALY_MIN_LINES), "anomaly_detection.min_lines"),
         "fail_on_warning": _strict_bool(anomaly.get("fail_on_warning", False), "policies.yaml: anomaly_detection.fail_on_warning"),
     }
+    quality = policy.get("source_quality", {})
+    if not isinstance(quality, dict):
+        raise ValueError("policies.yaml: source_quality must be an object")
+    _reject_unknown_keys(quality, POLICY_SECTION_KEYS["source_quality"], "policies.yaml: source_quality")
+    warn_rate = _strict_float(quality.get("warn_rejection_rate", DEFAULT_SOURCE_QUALITY["warn_rejection_rate"]), "policies.yaml: source_quality.warn_rejection_rate")
+    critical_rate = _strict_float(quality.get("critical_rejection_rate", DEFAULT_SOURCE_QUALITY["critical_rejection_rate"]), "policies.yaml: source_quality.critical_rejection_rate")
+    if not 0 <= warn_rate <= critical_rate <= 1:
+        raise ValueError("policies.yaml: source_quality requires 0 <= warn_rejection_rate <= critical_rejection_rate <= 1")
+    quality_config = {
+        "enabled": _strict_bool(quality.get("enabled", True), "policies.yaml: source_quality.enabled"),
+        "min_lines": _positive_int(quality.get("min_lines", DEFAULT_SOURCE_QUALITY["min_lines"]), "source_quality.min_lines"),
+        "warn_rejection_rate": warn_rate,
+        "critical_rejection_rate": critical_rate,
+        "fail_on_critical": _strict_bool(quality.get("fail_on_critical", False), "policies.yaml: source_quality.fail_on_critical"),
+    }
     return BuildConfig(
         tuple(sources),
         ratio,
@@ -353,6 +381,7 @@ def load_config() -> BuildConfig:
         total_timeout,
         anomaly_config,
         history_retention,
+        quality_config,
     )
 
 
