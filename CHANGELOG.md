@@ -13,6 +13,9 @@ Addresses the findings of the v7.5.4 review. `BUILDER_VERSION = "7.6.0"`; report
 - **Source outcome history.** `reports/source-outcomes.json` records per-source fetch outcomes for every run, including failed builds, and is committed by `update.yml` even when the build fails (only that file).
 - Tests in `tests/test_v760.py`.
 
+### Fixed
+- A build rejected by the enforced anomaly or source-quality policy after its report was first written is now marked `failed` in `reports/source-outcomes.json` as well as in `reports/latest.json` (`health.set_outcome_status`, called from `merge.py`). Per-source outcomes were already correct; only the run-level status was inconsistent. Covered by regression tests.
+
 ### Changed
 - **Source reputation** now reads the outcome history instead of successful reports only, and counts one observation per source per UTC day (a day succeeds only if all runs that day succeeded). The first run seeds the history from retained successful reports.
 - **History retention** now keeps one report per Build-ID (newest wins), so retention counts distinct builds; the previous "archive every repeat" test was replaced accordingly.
