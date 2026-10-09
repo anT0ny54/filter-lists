@@ -6,7 +6,7 @@ from pathlib import Path
 
 from _helpers import load_script  # noqa: F401  (adds scripts/ to sys.path)
 import config
-from health import build_source_reputation, load_outcomes, record_outcomes
+from health import build_source_reputation, load_outcomes, record_outcomes, set_outcome_status
 from report import evaluate_source_quality, write_report
 
 URL = "https://example.test/a"
@@ -99,6 +99,76 @@ class OutcomeHistoryTests(unittest.TestCase):
             self.assertEqual(runs[0]["outcomes"], {URL: False})
             self.assertEqual(runs[0]["status"], "failed")
             self.assertFalse((root / "history").exists())
+
+
+class EnforcedRejectionStatusTests(unittest.TestCase):
+    """A build rejected by policy after write_report must be 'failed' everywhere."""
+
+    def test_set_outcome_status_only_changes_matching_run(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "source-outcomes.json"
+            for when in ("2026-10-01T00:00:00+00:00", "2026-10-02T00:00:00+00:00"):
+                record_outcomes(path, history_dir=None, generated_at=when, status="success",
+                                build_id="b", results=[{"url": URL, "status": "ok"}])
+            self.assertTrue(set_outcome_status(path, "2026-10-02T00:00:00+00:00", "failed"))
+            runs = json.loads(path.read_text())["runs"]
+            self.assertEqual([r["status"] for r in runs], ["success", "failed"])
+            self.assertEqual(runs[1]["outcomes"], {URL: True})  # per-source data untouched
+            self.assertFalse(set_outcome_status(path, "2026-10-02T00:00:00+00:00", "failed"))
+
+    def _run_rejected(self, **overrides):
+        import merge
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        tmp = tempfile.TemporaryDirectory(); self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name); (root / "reports").mkdir()
+        saved = {k: getattr(merge, k) for k in ("ROOT", "CUSTOM_RULES", "OUTPUT", "REPORT", "HISTORY_DIR", "SOURCES_TXT")}
+        self.addCleanup(lambda: [setattr(merge, k, v) for k, v in saved.items()])
+        merge.ROOT, merge.CUSTOM_RULES, merge.OUTPUT = root, root / "custom-rules.txt", root / "filters.txt"
+        merge.REPORT, merge.HISTORY_DIR = root / "reports" / "latest.json", root / "reports" / "history"
+        merge.SOURCES_TXT = root / "sources.txt"
+        (root / "sources.yaml").write_text("version: 1\nsources: []\n"); (root / "policies.yaml").write_text("limits: {}\n")
+        merge.CUSTOM_RULES.write_text("||custom.example^\n")
+        src = SimpleNamespace(name="s", url=URL, category="t", priority=1, required=False, enabled=True, trusted_abp_features=False)
+        config = SimpleNamespace(sources=(src,), minimum_success_ratio=0.8, fail_if_zero_sources=True, max_rule_length=100000,
+                                 max_include_depth=5, max_download_bytes=1 << 20, max_total_download_bytes=1 << 20,
+                                 max_total_sources=10, total_timeout_seconds=10, history_retention=10,
+                                 anomaly_detection={"enabled": False, "fail_on_warning": False}, **overrides)
+        stats = {"root_requested": 1, "root_successful": 1, "root_failed": 0, "included_requested": 0, "included_references": 0,
+                 "results": [{"url": URL, "depth": 0, "status": "ok", "bytes": 10, "path": "/f.txt", "sha256": "a" * 64}], "failures": [],
+                 "source_limit_reached": False, "timed_out": False, "budget_exhausted": False}
+        rule_stats = {"input_lines": 1000, "accepted_lines": 1, "rejected_lines": 999, "duplicate_lines": 0, "unique_rules": 1,
+                      "rejection_reasons": {}, "per_file": [{"path": "/f.txt", "input_lines": 1000, "accepted_lines": 1,
+                      "rejected_lines": 999, "duplicate_lines": 0, "unique_rules": 1, "rejection_rate": 0.999,
+                      "rejection_reasons": {"unknown-option": 999}, "sha256": "a" * 64}]}
+        with patch.object(merge, "load_config", return_value=config), \
+             patch.object(merge, "collect_sources", return_value=([], stats)), \
+             patch.object(merge, "analyze_files", return_value=({"||custom.example^"}, rule_stats)), \
+             patch.object(merge.shutil, "which", return_value="/usr/bin/curl"):
+            code = merge.main()
+        report = json.loads(merge.REPORT.read_text())
+        runs = json.loads((root / "reports" / "source-outcomes.json").read_text())["runs"]
+        return code, report, runs, merge
+
+    def test_source_quality_rejection_marks_report_and_outcomes_failed(self):
+        # Critical quality finding + fail_on_critical => build rejected after write_report.
+        code, report, runs, merge = self._run_rejected(source_quality={
+            "enabled": True, "min_lines": 1, "warn_rejection_rate": 0.3,
+            "critical_rejection_rate": 0.9, "fail_on_critical": True})
+        self.assertEqual(code, 1)
+        self.assertEqual(report["status"], "failed")
+        self.assertFalse(merge.OUTPUT.exists())
+        self.assertEqual(len(runs), 1)
+        self.assertEqual(runs[0]["status"], report["status"])
+        self.assertEqual(runs[0]["generated_at"], report["generated_at"])
+        self.assertEqual(runs[0]["outcomes"], {URL: True})
+
+    def test_accepted_build_keeps_success_in_both(self):
+        code, report, runs, _ = self._run_rejected(source_quality={
+            "enabled": True, "min_lines": 1, "warn_rejection_rate": 0.3,
+            "critical_rejection_rate": 0.9, "fail_on_critical": False})
+        self.assertEqual(code, 0)
+        self.assertEqual((report["status"], runs[0]["status"]), ("success", "success"))
 
 
 if __name__ == "__main__":
