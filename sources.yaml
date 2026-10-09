@@ -1,4 +1,4 @@
-# Filter-Lists v7.5.4 source registry.
+# Filter-Lists v7.6.0 source registry.
 # `sources.txt` is retained as a legacy URL-only compatibility file.
 version: 1
 sources:
@@ -34,10 +34,14 @@ sources:
     category: social
     enabled: true
     priority: 60
+  # Disabled in v7.6.0: the uBlock build of this list is almost entirely
+  # AdGuard/uBO-only syntax (2,712 of 2,743 lines hit `unknown-option`; 1 rule
+  # accepted), so it contributed nothing under the strict-ABP profile. Re-enable
+  # only if an ABP-compatible upstream variant is found.
   - name: AdGuard Annoyances
     url: https://filters.adtidy.org/extension/ublock/filters/17_optimized.txt
     category: annoyance
-    enabled: true
+    enabled: false
     priority: 70
   - name: AdGuard Chinese
     url: https://filters.adtidy.org/extension/ublock/filters/224_optimized.txt

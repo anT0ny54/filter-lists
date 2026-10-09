@@ -2,7 +2,7 @@
 
 **Filter-Lists** is a deterministic, compatibility-first filter-list compiler. It fetches configured upstream lists, resolves bounded `!#include` graphs, normalizes and deduplicates rules, applies a strict Adblock Plus (ABP) compatibility policy, validates the generated output, and publishes build metadata with deterministic hashes and provenance.
 
-**Current builder:** `v7.5.4`  
+**Current builder:** `v7.6.0`  
 **Output profile:** `strict-abp`
 
 The project is designed around one principle: **prefer a predictable, portable filter list over accepting engine-specific syntax that may behave differently across blockers.**
@@ -98,8 +98,11 @@ The builder currently enforces the following:
 - **Strict grammar validation:** malformed options, unsupported procedural syntax, unsafe inline styles, malformed regex envelopes, control characters, and over-limit rules are rejected.
 - **Detailed diagnostics:** rejection reasons, per-source statistics, SHA-256 hashes, fetch failures, and anomaly information are retained.
 - **Bounded default concurrency:** the builder uses two download workers by default (override with the `FILTER_LISTS_WORKERS` environment variable); effective concurrency is additionally capped by the configured global download budget.
-- **Historical reports:** successful reports are retained chronologically under `reports/history/` according to the configured retention limit.
-- **Safe anomaly handling:** warning-level anomalies are advisory by default; critical anomalies fail the build.
+- **Historical reports:** only *successful* reports are archived under `reports/history/` as anomaly baselines, kept chronologically up to the configured retention limit. A newer run with the same Build-ID replaces the older archived report, so retention counts distinct builds. Failed builds are never archived there.
+- **Source reputation:** per-URL success rate, consecutive failures, and a `poor`/`watch`/`good`/`excellent` label are computed from `reports/source-outcomes.json`, which records the per-source fetch outcome of **every** run, including failed builds (up to the last 120 runs). One observation is counted per source per UTC day; a day counts as a success only if every run that day succeeded, so rebuilds cannot overweight a day and failures are not hidden. The first run after upgrading seeds the file from retained successful reports.
+- **Source quality gate:** `source_quality` in `policies.yaml` flags sources whose rule lines (comments, blanks and directives excluded) are mostly rejected, recorded in the report and logged as `[WARN]`. Optional `fail_on_critical` makes critical sources fail the build.
+- **Safe anomaly handling:** warning-level anomalies are advisory by default; critical anomalies fail the build. Anomalies compare each source against the previous *successful* report; sources that failed in that report are not used as a baseline.
+- **Safe publication:** `filters.txt` is staged to a temporary file and only replaced after the report and anomaly checks pass, so a rejected build leaves the last good list in place.
 
 ## ⚙️ Limits and policy
 
@@ -116,6 +119,8 @@ The shipped `policies.yaml` currently defines:
 | Minimum root-source success ratio | 80% |
 | Successful report retention | 10 |
 | Anomaly detection | Enabled |
+| Source-quality gate | Enabled; warn ≥ 30%, critical ≥ 90% effective rejection (sources with ≥ 100 lines) |
+| Critical source quality fails build | No |
 | Warning anomalies fail build | No |
 
 When upstream syntax is ambiguous, the compiler follows the documented policy and **rejects rather than guessing**.
@@ -136,7 +141,8 @@ The report records:
 - input, accepted, rejected, duplicate, and unique-rule counts
 - rejection reasons
 - per-source diagnostics and content hashes
-- per-source rolling reliability reputation (observations, success rate, consecutive failures)
+- per-source rolling reliability reputation (daily observations, success rate, consecutive failures)
+- per-source rule-yield findings (`source_quality`)
 - anomaly baseline, thresholds, severity, and enforcement
 - deterministic Build-ID and provenance hashes (successful builds)
 - operational timestamps and elapsed build duration
@@ -147,7 +153,14 @@ See [docs/REPORT-SCHEMA.md](docs/REPORT-SCHEMA.md).
 
 `sources.yaml` is the **only authoritative source registry**.
 
-The shipped registry enables 33 root sources (EasyList, EasyPrivacy, Fanboy Social, AdGuard base/privacy/social/annoyance/regional lists, and EasyList/ABP regional lists). EasyList and EasyPrivacy are `required: true`; all others are optional and only count toward the root-source success ratio.
+The shipped registry enables 32 root sources (AdGuard Annoyances is present but disabled, see below):
+
+- **EasyList family (ABP-native, `*-minified.txt`):** EasyList, EasyPrivacy, Fanboy Social, and 17 regional lists (China, Dutch, Germany, Liste FR, RU AdList, Portuguese, Spanish, Indo, Vietnam, Bulgarian, Israel, Italy, Lithuania, Polish, Indian, Latvian, RO).
+- **AdGuard family (`filters.adtidy.org/extension/ublock/filters/<id>_optimized.txt`):** Base, Tracking Protection, Social Media, and regional lists (Chinese, Dutch, German, Japanese, French, Russian, Spanish, Turkish, Ukrainian) — 12 enabled AdGuard lists in total. These are the **uBlock-flavoured** AdGuard builds, which contain a lot of syntax the strict-ABP profile rejects (see [Source quality](#-source-quality-and-known-limitations)).
+
+EasyList and EasyPrivacy are `required: true`; all others are optional and only count toward the root-source success ratio. Root-source health is judged by download success; rule yield is checked separately by the [source-quality gate](#-source-quality).
+
+**AdGuard Annoyances is disabled** (`enabled: false` in `sources.yaml`): its uBlock build yielded 1 accepted rule from 2,743 lines under the strict-ABP profile. No ABP-compatible upstream variant was verified (no network access during the change), so re-enable it only after finding one.
 
 To disable a source:
 
@@ -192,8 +205,11 @@ A live build requires network access to the configured upstream lists. The build
 
 ## 🤖 Automation
 
-- **`update.yml`** runs daily at 03:17 UTC, on manual dispatch, and on pushes to `main` that touch `sources.yaml`, `custom-rules.txt`, `policies.yaml`, `scripts/**`, `tests/**`, `requirements.txt`, or the workflow itself. It runs the test suite, builds, validates, asserts report invariants (schema, builder version, source health, anomalies), then commits `filters.txt`, `sources.txt`, `reports/latest.json`, and `reports/history/` only if they changed.
-- **`validate.yml`** runs on pull requests (and manually): byte-compile, test suite, benchmark, and the optional differential test. It never publishes.
+- **`update.yml`** runs daily at 03:17 UTC, on manual dispatch, and on pushes to `main` that touch `sources.yaml`, `custom-rules.txt`, `policies.yaml`, `scripts/**`, `tests/**`, `requirements.txt`, or the workflow itself. It runs the test suite, builds, validates, asserts report invariants (schema, builder version, source health, anomalies), then commits `filters.txt`, `sources.txt`, `reports/latest.json`, `reports/history/`, and `reports/source-outcomes.json` only if they changed. If the build fails, only `reports/source-outcomes.json` is committed (nothing else is published) so failures still count toward source reputation.
+- **`validate.yml`** runs on pull requests that touch the same paths (plus `.github/workflows/**`) and on manual dispatch: byte-compile, test suite, benchmark, and the optional differential test. It never publishes.
+- **`Keep-Alive.yml`** runs on the 1st and 15th of each month at 03:47 UTC (and manually) and rewrites `.github/keep-alive.txt` with a timestamp so scheduled workflows are not disabled for repository inactivity.
+
+The `update.yml` and `Keep-Alive.yml` jobs share the `repo-write` concurrency group so they cannot race on `git push`.
 
 ## 🧪 Verification coverage
 
@@ -211,6 +227,10 @@ The repository test suite covers:
 - per-source diagnostics and hashes
 - anomaly detection and historical baselines
 - deterministic Unicode/property fuzzing (**5,000 iterations per fuzz property**)
+- SSRF-protection and redirect handling in `fetch.py`
+- staged-output publication and failed-report baseline handling
+- per-source quality gate and failed-run source-outcome history
+- download validation (binary data, HTML/error pages, empty files)
 - curated real-world syntax corpus
 - strict configuration key/type validation and fail-fast policy loading
 - generated-list validator hardening (encoding, version/Build-ID suffix, sort order)
@@ -219,6 +239,28 @@ The repository test suite covers:
 - optional external-engine differential testing
 - repeatable parser benchmark
 
+
+## 🔍 Source quality
+
+Download success does not mean a source contributes rules, so each build also evaluates rule yield per source. The **effective rejection rate** is the share of rule lines (input lines minus comments, blanks, and directives) that the strict-ABP profile rejected. With the shipped policy, sources of at least 100 lines at or above 30% are reported as `warning` and at or above 90% as `critical` in `reports/latest.json` (`source_quality`) and in the build log. They are advisory unless `source_quality.fail_on_critical: true`.
+
+Snapshot from the 2026-10-09 report (before AdGuard Annoyances was disabled): 33/33 sources OK, 228,552 input lines, 195,977 accepted, 171,249 unique rules, overall rejection rate 14.25%.
+
+| Source | Input lines | Accepted | Rejection rate | Main reasons |
+|---|---:|---:|---:|---|
+| AdGuard Annoyances (now disabled) | 2,743 | 1 | 99.96% | `unknown-option` (2,712) |
+| AdGuard Ukrainian | 5,537 | 3,614 | 34.73% | `unknown-option` (1,771) |
+| AdGuard Social Media | 30,835 | 21,833 | 29.19% | `ubo-only-syntax` (7,334) |
+| AdGuard Turkish | 6,811 | 5,254 | 22.86% | `ubo-only-syntax`, `invalid-cosmetic-rule` |
+| AdGuard Russian | 7,594 | 5,968 | 21.41% | `unknown-option`, `ubo-only-syntax` |
+
+Most EasyList-family sources reject under 5% of lines (mostly comments). Rejection of AdGuard/uBO-only syntax is intentional under the strict-ABP policy. Figures change with every upstream update; consult `reports/latest.json`.
+
+Other behaviour to be aware of: `!#if` blocks are not evaluated (see above), so rules inside conditional blocks are processed unconditionally.
+
+## 📄 License
+
+[`LICENSE`](LICENSE) is the standard MIT License followed by informational notices (no affiliation, third-party list ownership, no warranty, limitation of liability, compliance with local law, severability). The notices do not restrict the MIT grant. Earlier versions of the file added personal-use-only, no-distribution and no-commercial-use terms that contradicted MIT; those were removed in v7.6.0. This is not legal advice — if you want a restrictive license instead, replace the file with one coherent text and consult a lawyer. Third-party upstream lists remain under their own licenses.
 
 ## 📚 Documentation
 
@@ -254,7 +296,3 @@ Bandwidth Hero Server fetches remote images, compresses them on the fly, and del
 If you find this project useful, donations are appreciated:
 
 - **Bitcoin**: `1HntwKxyqGCfnSGvGLMUTRAqLnTvLarAQP`
-
-## License
-
-See [`LICENSE`](LICENSE).

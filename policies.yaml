@@ -1,4 +1,4 @@
-# Filter-Lists v7.5.4 compatibility policy.
+# Filter-Lists v7.6.0 compatibility policy.
 # Output is strict ABP syntax: consumed natively by Adblock Plus and by
 # uBlock Origin/AdGuard only as an ABP-compatible subset (no uBO/AdGuard-only
 # extensions are emitted); see docs/COMPATIBILITY.md. Unknown top-level keys are rejected at load time.
@@ -48,3 +48,14 @@ anomaly_detection:
   min_lines: 100
   # If true, warning-level anomalies fail the build; default keeps them advisory.
   fail_on_warning: false
+
+# Per-source rule-yield gate. Download success says nothing about how many
+# rules a source contributes; this flags feeds whose *rule* lines (comments,
+# blanks and directives excluded) are mostly rejected by the strict-ABP profile.
+source_quality:
+  enabled: true
+  min_lines: 100
+  warn_rejection_rate: 0.30
+  critical_rejection_rate: 0.90
+  # If true, a critical source fails the build; default keeps it advisory.
+  fail_on_critical: false

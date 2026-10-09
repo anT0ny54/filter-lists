@@ -5,7 +5,6 @@ https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt
 https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt
 https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt
 https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt
-https://filters.adtidy.org/extension/ublock/filters/17_optimized.txt
 https://filters.adtidy.org/extension/ublock/filters/224_optimized.txt
 https://easylist-downloads.adblockplus.org/easylistchina-minified.txt
 https://filters.adtidy.org/extension/ublock/filters/8_optimized.txt

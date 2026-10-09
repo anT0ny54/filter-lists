@@ -22,18 +22,13 @@ SOFTWARE.
 
 
 ================================================================================
-ADDITIONAL TERMS, DISCLAIMERS, AND LEGAL NOTICES
+NOTICES AND DISCLAIMERS
 ================================================================================
 
-1. PERSONAL USE ONLY
-   This repository and all of its contents are maintained exclusively for the
-   personal, private, non-commercial use of the repository owner ("Owner") on
-   the Owner's own personal devices for the Owner's personal web browsing
-   purposes. This repository is NOT a product, NOT a service, NOT a platform,
-   and is NOT offered, marketed, distributed, or made available to the general
-   public for their use.
+The notices below are informational. They do not restrict any right granted by
+the MIT License above. "Owner" means the copyright holder named above.
 
-2. NO AFFILIATION — PROFESSIONAL OR ORGANIZATIONAL
+1. NO AFFILIATION — PROFESSIONAL OR ORGANIZATIONAL
    This project is a strictly personal, private initiative of the Owner
    undertaken solely in their individual capacity. It does NOT represent, is
    NOT affiliated with, is NOT endorsed by, is NOT sponsored by, and does NOT
@@ -43,7 +38,7 @@ ADDITIONAL TERMS, DISCLAIMERS, AND LEGAL NOTICES
    — past, present, or future — with which the Owner may be, may have been, or
    may become associated in any capacity.
 
-3. THIRD-PARTY INTELLECTUAL PROPERTY RIGHTS
+2. THIRD-PARTY INTELLECTUAL PROPERTY RIGHTS
    This repository mechanically aggregates and compiles publicly available
    filter lists that are independently created, maintained, published, and
    distributed by third-party open-source projects under their own respective
@@ -59,27 +54,7 @@ ADDITIONAL TERMS, DISCLAIMERS, AND LEGAL NOTICES
    downloading, deduplicating, and concatenating existing publicly available
    lists that are freely distributed by their maintainers.
 
-4. NO DISTRIBUTION, NO RECOMMENDATION, NO ENCOURAGEMENT
-   The Owner does NOT distribute, publish, promote, advertise, market,
-   recommend, suggest, or encourage the use of this repository or its contents
-   by any other person, entity, company, or organization. The Owner does NOT
-   solicit users, does NOT maintain a user base, does NOT provide support or
-   updates for third-party use, and does NOT operate this as a service,
-   product, or offering of any kind. Any third party who independently
-   discovers and accesses this repository does so entirely at their own
-   initiative, volition, risk, and responsibility, without any invitation,
-   solicitation, or encouragement from the Owner.
-
-5. NO COMMERCIAL USE — NO REVENUE — NO BUSINESS PURPOSE
-   This project is strictly and exclusively non-commercial in nature and
-   purpose. It generates no revenue of any kind — no advertising revenue, no
-   subscription fees, no donations, no sponsorships, no affiliate income, and
-   no monetary compensation of any form. It is not used in connection with any
-   commercial activity, business purpose, competitive advantage, or economic
-   gain. It may not be used, in whole or in part, for any commercial purpose
-   by any party.
-
-6. NO INTENT TO CAUSE HARM, ECONOMIC LOSS, OR BUSINESS INTERFERENCE
+3. NO INTENT TO CAUSE HARM, ECONOMIC LOSS, OR BUSINESS INTERFERENCE
    The Owner's sole and exclusive purpose is personal browsing privacy,
    security, and safety on the Owner's own personal devices. The Owner has
    absolutely no intent, purpose, or objective to:
@@ -99,7 +74,7 @@ ADDITIONAL TERMS, DISCLAIMERS, AND LEGAL NOTICES
    publicly available, third-party open-source projects maintained by their
    own communities; the Owner merely aggregates them for personal convenience.
 
-7. RIGHT TO PERSONAL PRIVACY, SECURITY, AND DEVICE AUTONOMY
+4. RIGHT TO PERSONAL PRIVACY, SECURITY, AND DEVICE AUTONOMY
    The use of content-filtering, ad-blocking, and tracker-blocking tools for
    personal privacy, security, and safety is a well-established, recognized,
    and lawful exercise of an individual's fundamental right to:
@@ -140,7 +115,7 @@ ADDITIONAL TERMS, DISCLAIMERS, AND LEGAL NOTICES
    distribution of ad-blocking software does not constitute unfair competition
    or tortious interference with business.
 
-8. AD REVENUE AND PUBLISHER RELATIONSHIPS
+5. AD REVENUE AND PUBLISHER RELATIONSHIPS
    The Owner acknowledges that online advertising is a legitimate business
    model. However, the Owner's personal choice to filter content on the
    Owner's own devices does not constitute:
@@ -157,7 +132,7 @@ ADDITIONAL TERMS, DISCLAIMERS, AND LEGAL NOTICES
    intent — the aggregated filter rules are community-maintained lists that
    operate based on general pattern matching.
 
-9. LIMITATION OF LIABILITY
+6. LIMITATION OF LIABILITY
    TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW IN ANY AND ALL
    JURISDICTIONS, THE OWNER SHALL NOT BE LIABLE FOR ANY DIRECT, INDIRECT,
    INCIDENTAL, SPECIAL, CONSEQUENTIAL, PUNITIVE, OR EXEMPLARY DAMAGES OF
@@ -172,18 +147,7 @@ ADDITIONAL TERMS, DISCLAIMERS, AND LEGAL NOTICES
    STATUTORY LIABILITY, OR OTHERWISE), EVEN IF THE OWNER HAS BEEN ADVISED
    OF THE POSSIBILITY OF SUCH DAMAGES.
 
-10. INDEMNIFICATION
-    Any person, entity, or organization that accesses, uses, copies, forks,
-    mirrors, distributes, or otherwise interacts with this repository or any
-    of its contents does so entirely at their own risk and, to the maximum
-    extent permitted by applicable law, agrees to indemnify, defend, and hold
-    harmless the Owner from and against any and all claims, demands, actions,
-    suits, proceedings, damages, losses, liabilities, costs, and expenses
-    (including reasonable attorneys' fees, court costs, and expert witness
-    fees) arising from or relating to their access to, use of, or reliance
-    on this repository or its contents.
-
-11. NO WARRANTY
+7. NO WARRANTY
     ALL CONTENT IN THIS REPOSITORY IS PROVIDED ON AN "AS-IS," "AS-AVAILABLE,"
     AND "WITH ALL FAULTS" BASIS WITHOUT WARRANTIES, REPRESENTATIONS, OR
     CONDITIONS OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE,
@@ -194,7 +158,7 @@ ADDITIONAL TERMS, DISCLAIMERS, AND LEGAL NOTICES
     IS ACCURATE, COMPLETE, RELIABLE, CURRENT, TIMELY, OR ERROR-FREE, OR THAT
     ANY DEFECTS WILL BE CORRECTED.
 
-12. COMPLIANCE WITH LOCAL LAWS
+8. COMPLIANCE WITH LOCAL LAWS
     Any person accessing this repository is solely and exclusively responsible
     for ensuring that their access to and use of this repository and its
     contents complies with all applicable local, state, provincial, national,
@@ -206,8 +170,8 @@ ADDITIONAL TERMS, DISCLAIMERS, AND LEGAL NOTICES
     China, Australia, Japan, South Korea, Singapore, Brazil, South Africa,
     and any other applicable jurisdiction.
 
-13. SEVERABILITY
-    If any provision or part of any provision of these terms is held to be
+9. SEVERABILITY
+    If any provision or part of any provision of these notices is held to be
     invalid, illegal, void, or unenforceable by any court, tribunal, or
     authority of competent jurisdiction under the laws of any jurisdiction,
     such invalidity, illegality, or unenforceability shall not affect,
@@ -216,21 +180,3 @@ ADDITIONAL TERMS, DISCLAIMERS, AND LEGAL NOTICES
     provision shall be deemed modified to the minimum extent necessary to
     make it valid, legal, and enforceable while preserving its original
     intent to the maximum extent possible.
-
-14. ENTIRE AGREEMENT
-    These terms, together with the MIT License above, constitute the entire
-    agreement between the Owner and any person accessing this repository with
-    respect to its subject matter and supersede all prior or contemporaneous
-    understandings, representations, or agreements.
-
-15. GOVERNING LAW AND DISPUTE RESOLUTION
-    To the extent permitted by applicable law, these terms shall be governed
-    by and construed in accordance with the laws of the jurisdiction in which
-    the Owner resides at the time any dispute arises, without regard to its
-    conflict of law rules or principles. Any dispute arising out of or in
-    connection with these terms shall be subject to the exclusive jurisdiction
-    of the competent courts of that jurisdiction.
-
-16. WAIVER
-    The failure of the Owner to exercise or enforce any right or provision of
-    these terms shall not constitute a waiver of such right or provision.
