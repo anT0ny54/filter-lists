@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-4bd2c715895b
-! Last updated: 2026-10-09 10:05:03 UTC
+! Version: v7.6.0-fb30c4171d8f
+! Last updated: 2026-10-09 10:30:42 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 4bd2c715895beb590435474047bfeab5b971e61ad4d46524bfc879885e8117be
+! Build-ID: fb30c4171d8f46035c015ea04c2f2016f6772509dc29ab606f4dea78586964e9
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 171342
+! Total rules: 171350
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -19450,6 +19450,7 @@
 24tv.ua,football24.ua##app-adv-placeholder
 24tv.ua,football24.ua##app-main-page-adv-block
 24tv.ua,football24.ua##app-video-adv-block
+24tv.ua,football24.ua,sport24.ua##.betting-content
 24tv.ua,news.24tv.ua###informerWrapper
 24tv.ua,news.24tv.ua##.adv-between-newses
 24tv.ua,nibblestew.blogspot.com###mobile-share-button
@@ -30445,6 +30446,9 @@ ani-chat.net###endo_wrc_widget-9
 ani-chat.net##.idname2
 ani-chat.net##.txt > p > a[target="_blank"][rel^="noopener"]
 ani-chat.net,gameguide.tech###block-6
+ani7.top,jut-su.online##.agp-err > b
+ani7.top,jut-su.online##.agp-err > div > [data-ab="reload"]
+ani7.top,jut-su.online##.agp-err > p
 aniagotuje.pl##.ad1
 aniagotuje.pl##.ad2
 anianierosuki.work,apprisejp.xyz,av-baron.com,boin.pink,coco2i.com,g-times.jp,hentai4daily.com,kk1up.jp,minaminumaebi.blogmimi.com,orenoraresne.com,pinapopo.com,senzuri.net,techtechnolog.com,tentacles.biz,xn--gutnkx91i.com###text-9
@@ -51580,6 +51584,7 @@ game2.cn###rb
 game24h.vn###social_left
 game3rb.com###overly-noti
 game3rb.com##center > a[rel]
+game4you.top,rustorka.com,rustorka.net,rustorka.top,rustorkacom.lib##:not(this-site-promotes-malware)
 game735.com##div[id^="ysmAD"]
 game735.com##td.plm > a[onclick*="facebook.com/sharer/"]
 game8.co##.footer-overlay
@@ -61268,9 +61273,6 @@ justwatch.com##.removal-container
 justwatch.com##.sponsored-recommendation
 justwatch.com##.title-sidebar__jump-links
 justwatch.com##div[class*="sr-campaign"]
-jut-su.online##.agp-err > b
-jut-su.online##.agp-err > div > [data-ab="reload"]
-jut-su.online##.agp-err > p
 jut.su##.side_banner_yand
 jut.su##.top_banner_yand
 jutaku-s.com###headbnr
@@ -102994,7 +102996,6 @@ zzzyk.com###Tinfo
 ||amlyyqjwayvmj.top^
 ||ammcg.imgscloud.com/toy/
 ||amminesliquory.cyou^
-||ammkthgqgatco.space^
 ||ammonalquiniakriton.cyou^
 ||ammonalsatirestomach.cfd^
 ||ammonia20.com^
@@ -104283,6 +104284,7 @@ zzzyk.com###Tinfo
 ||assistant.watson.appdomain.cloud^$domain=smartmetertexas.com
 ||assistantinsignificantthings.com^
 ||assisthaboub.com^
+||assistsboxbush.cyou^
 ||assizerpranced.com^
 ||asslikezanyish.com^
 ||assneordfsxwx.site^
@@ -119906,6 +119908,7 @@ zzzyk.com###Tinfo
 ||evilexchanged.com^
 ||evillyhecticmush.cfd^
 ||evilstrike.pro^
+||eviqxgeavbscz.website^
 ||evkiqntfztshq.online^
 ||evkjlmtnqwwcu.space^
 ||evmdamxavzsgk.website^
@@ -120971,6 +120974,7 @@ zzzyk.com###Tinfo
 ||fenxiangdashi.com/img/banner/
 ||fenxiangdashi.com/Res/js/detail_
 ||fenxwelzmarye.space^
+||feodrecallsoutwin.qpon^
 ||feodsflyleaf.cfd^
 ||feoffeevenomer.shop^
 ||feqgpykeuppfi.space^
@@ -136703,6 +136707,7 @@ zzzyk.com###Tinfo
 ||mammothsweetheart.com^
 ||mamotyfattier.cyou^
 ||mamsellciliata.shop^
+||mamshirt.com^$third-party
 ||mamydirect.com^
 ||mamytwink.com/pub2/bg.php?
 ||manage.sifiraracal.com/public/images/advert/
@@ -141257,6 +141262,7 @@ zzzyk.com###Tinfo
 ||ntvpwpush.com^
 ||ntwkbc21.com^
 ||ntwkbc42.com^
+||ntwrqlfkodmkt.site^
 ||ntyivmvvzscaj.store^
 ||ntyuisdqdckij.space^
 ||ntzgwekoefmwq.site^
@@ -167671,6 +167677,7 @@ zzzyk.com###Tinfo
 ||xopldz.icu^
 ||xoqrvickxqjgc.online^
 ||xoqsxdpx.xyz^
+||xorvhaedfqqji.site^
 ||xorxfgokyiygg.online^
 ||xosnteewpgzmh.website^
 ||xostcmdfggwhs.online^
@@ -170821,6 +170828,7 @@ zzzyk.com###Tinfo
 ||zwfbkyofoaqlj.site^
 ||zwfggkynmjymw.space^
 ||zwfqxj.icu^
+||zwg5j61a8.com^
 ||zwgsousozhihm.space^
 ||zwhuehapqxred.online^
 ||zwhxmiesycxku.com^
