@@ -97,7 +97,7 @@ The builder currently enforces the following:
 - **Full Build-ID validation:** `validate.py` recomputes the build identity from the active configuration and normalized rules.
 - **Strict grammar validation:** malformed options, unsupported procedural syntax, unsafe inline styles, malformed regex envelopes, control characters, and over-limit rules are rejected.
 - **Detailed diagnostics:** rejection reasons, per-source statistics, SHA-256 hashes, fetch failures, and anomaly information are retained.
-- **Bounded default concurrency:** the builder uses two download workers by default; effective concurrency is additionally capped by the configured global download budget.
+- **Bounded default concurrency:** the builder uses two download workers by default (override with the `FILTER_LISTS_WORKERS` environment variable); effective concurrency is additionally capped by the configured global download budget.
 - **Historical reports:** successful reports are retained chronologically under `reports/history/` according to the configured retention limit.
 - **Safe anomaly handling:** warning-level anomalies are advisory by default; critical anomalies fail the build.
 
@@ -228,28 +228,33 @@ The repository test suite covers:
 - [Differential engine testing](docs/DIFFERENTIAL-TESTING.md)
 - [Changelog](CHANGELOG.md)
 
-## ⚖️ Legal
+## 🌐 Free DNS Services
 
-See [LICENSE](LICENSE). This project is not affiliated with any upstream filter-list maintainer.
+High-performance DNS utilizing HaGeZi Blocklists (Multi Pro + TIF).
 
-## 🔗 Other projects by the maintainer
+| Blocklist | DNS-over-HTTPS (DoH) |
+| :--- | :--- |
+| Multi Pro + TIF | `https://freedns.koyeb.app/dns-query` (Recommended) |
+| Multi Pro + TIF | `https://dns.mydoh.workers.dev/dns-query` (Recommended) |
+| Multi Pro + TIF | `https://dns-pi.vercel.app/api/doh/dns-query` (Recommended) |
+| Multi Pro + TIF | `https://dnssix.netlify.app/api/doh/dns-query` |
+| Multi Pro + TIF | `https://dns-93aca.containers.snapdeploy.app/dns-query` |
+| Multi Pro + TIF | `https://doh-93aca.containers.snapdeploy.app/dns-query` |
 
-These are unrelated to the filter-list compiler above but are run by the same maintainer.
+## ⚡ Bandwidth Hero Server
 
-**My Free DNS** — DNS-over-HTTPS resolvers using HaGeZi Blocklists Multi Pro + TIF:
+A lightweight image optimization proxy designed to slash bandwidth usage and accelerate web browsing.
 
-| Service | DNS-over-HTTPS URL |
-| --- | --- |
-| Multi Pro + TIF (Recommended) | `https://freedns.koyeb.app/dns-query` |
-| Multi Pro + TIF (Recommended) | `https://dns-pi.vercel.app/api/doh/dns-query` |
-| Multi Pro + TIF (Backup) | `https://dnssix.netlify.app/api/doh/dns-query` |
-| Multi Pro + TIF (Recommended, but will sleep if not use in 15 minute) | `https://dns-93aca.containers.snapdeploy.app/dns-query` |
-| Multi Pro + TIF (Recommended, but will sleep if not use in 15 minute) | `https://doh-93aca.containers.snapdeploy.app/dns-query` |
+Bandwidth Hero Server fetches remote images, compresses them on the fly, and delivers optimized versions to the client. This significantly reduces data consumption while improving page load performance.
 
-**Bandwidth Hero Server** — a lightweight image proxy that fetches remote images, compresses them, and returns optimized versions for faster loading and lower data use: https://bhserv.netlify.app/
+🖥️ **Live Demo:** [Bandwidth Hero](https://bhserv.netlify.app/).
 
-## 💜 Support this project
+## Supporting the Project
 
-If you'd like to support development, consider donating:
+If you find this project useful, donations are appreciated:
 
-**Bitcoin:** `1HntwKxyGCfnSGvGLMUTRAqLnTvLarAQP`
+- **Bitcoin**: `1HntwKxyqGCfnSGvGLMUTRAqLnTvLarAQP`
+
+## License
+
+See [`LICENSE`](LICENSE).
