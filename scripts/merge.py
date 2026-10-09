@@ -41,7 +41,7 @@ from config import BUILDER_VERSION, config_fingerprint, load_config, source_mani
 from fetch import collect_sources  # noqa: E402
 from report import analyze_files, write_report  # noqa: E402
 from policy import PROFILE_DESCRIPTION  # noqa: E402
-from health import history_reports  # noqa: E402
+from health import default_outcomes_path, history_reports, set_outcome_status  # noqa: E402
 
 
 _RULE_SORT_KEY = lambda x: (x.casefold(), x)
@@ -274,6 +274,9 @@ def main() -> int:
             tmp_report = REPORT.with_suffix(REPORT.suffix + ".tmp")
             tmp_report.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             tmp_report.replace(REPORT)
+            # Keep the run-level status in the outcome history consistent
+            # with the report that was just downgraded to "failed".
+            set_outcome_status(default_outcomes_path(HISTORY_DIR), str(data.get("generated_at", "")), "failed")
             log("[ERROR] Anomaly or source-quality policy rejected this build")
             return 1
         commit_output(staged)

@@ -112,6 +112,39 @@ def record_outcomes(
         raise
 
 
+def set_outcome_status(outcomes_path: Path, generated_at: str, status: str) -> bool:
+    """Update the run-level status of an already-recorded run.
+
+    write_report() records outcomes before merge.py applies the anomaly and
+    source-quality policies, so a build rejected afterwards must have its
+    entry corrected to match the report. Per-source outcomes are untouched.
+    Returns True if an entry was changed.
+    """
+    if not outcomes_path.is_file():
+        return False
+    try:
+        data = json.loads(outcomes_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    changed = False
+    for run in data.get("runs", []) if isinstance(data, dict) else []:
+        if isinstance(run, dict) and run.get("generated_at") == generated_at and run.get("status") != status:
+            run["status"] = status
+            changed = True
+    if changed:
+        fd, temporary = tempfile.mkstemp(prefix="outcomes.", suffix=".tmp", dir=outcomes_path.parent)
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
+                json.dump(data, handle, indent=1, ensure_ascii=False)
+                handle.write("\n")
+            os.chmod(temporary, 0o644)
+            os.replace(temporary, outcomes_path)
+        except Exception:
+            Path(temporary).unlink(missing_ok=True)
+            raise
+    return changed
+
+
 def build_source_reputation(
     history_dir: Path,
     current_results: list[dict],
