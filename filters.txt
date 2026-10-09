@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.5.4-8a30ee5b80c7
-! Last updated: 2026-10-08 23:26:59 UTC
+! Version: v7.5.4-6c49efcf9e2d
+! Last updated: 2026-10-09 00:09:41 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 8a30ee5b80c734305edddc06e0caacee7e7f7f125b2c576824387c13025cfa28
+! Build-ID: 6c49efcf9e2dd3b47e95a89beab65e32430a878d37db3533499cf994ea751b64
 ! Source manifest SHA-256: cd964bef9de1e35561dfdb32dcaf73a59e0122bdc80afe4afd232c086b13c654
 ! Root sources: 33
-! Total rules: 171239
+! Total rules: 171249
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -22505,6 +22505,7 @@
 @@||camspacelive.com/widgets/$domain=lemoncams.com
 @@||camvideoshub.com/livejasmin.com.js$script
 @@||canlimacizlemax*.com/*/advert.js
+@@||canliradyodinle.fm/live/fm/gtag.min.js$~third-party
 @@||canna-power.to/links.php?action=$domain=canna-power.to,popup
 @@||canna.to/links.php?action=$domain=canna.to,popup
 @@||canva.com^$generichide
@@ -77803,7 +77804,7 @@ portalmie.com##aside.hidden > div.sticky > section:has(> div.p-3 > .parceiros)
 portalmie.com##figure[data-ad-inserted]
 portalmorski.pl##.pmb_banners
 portalsamorzadowy.pl##.partners
-portalsamorzadowy.pl##div[class*="sad"]
+portalsamorzadowy.pl,propertynews.pl##div[class*="sad"]
 portalspozywczy.pl##body > .one > .pageWidth
 portaltele.com.ua##.td-pb-row > div.td-main-sidebar > div.td-ss-main-sidebar > aside[class^="td_block_template_"]
 portaltele.com.ua##.top-ads-links
@@ -85553,7 +85554,6 @@ stolichki.ru##.pop-coockie
 stolichki.ru##.s-subscribe
 stolichki.ru##div[data-hint="app"]
 stoloto.ru##div[class^="Provider_container"]
-stoneip.info###text-57
 stooq.com,stooq.pl###f13 > table[bgcolor]:has(> tbody:only-child > tr:only-child > td:only-child > b:contains(/^Sponsorowane$/))
 stooq.com,stooq.pl##div[style*="position:"][style*="relative;"][style*="width:"][style*="300px;"][style*="height:"][style*="250px"]:has(> iframe[src*="/ads/"])
 stooq.com,stooq.pl##td[align="center"] > div[style*="position:"][style*="width:"][style*="height"]:has(> iframe[src*="/ads/"])
@@ -106025,6 +106025,7 @@ zzzyk.com###Tinfo
 ||bdm.ye-su.cn^
 ||bdmjs.xywy.com^
 ||bdnbziqcmbhnv.space^
+||bdoliutpjjvfc.website^
 ||bdpgjmobltabc.space^
 ||bdros.com^
 ||bdrrtgdhzqbxk.online^
@@ -107606,6 +107607,7 @@ zzzyk.com###Tinfo
 ||bolecdn.com/button/txt.js
 ||bolichejerl.cyou^
 ||bolitafowled.cyou^
+||bolitamanly.com^
 ||bolliestoluid.cfd^
 ||bollixpapula.com^
 ||bollyocean.com^
@@ -119400,6 +119402,7 @@ zzzyk.com###Tinfo
 ||eqomybdpawjfg.site^
 ||eqpaulxcpirir.site^
 ||eqpmzcorwgnda.store^
+||eqpnkqbsftdqs.space^
 ||eqpuvcjjipmjn.space^
 ||eqqijviondcls.site^
 ||eqqp.cn^
@@ -123353,6 +123356,7 @@ zzzyk.com###Tinfo
 ||gb0143odqh.com^
 ||gb1aff.com^
 ||gb3scpejq.com^
+||gb742ld0c.com^
 ||gbads.net^
 ||gbblpbibctqex.site^
 ||gbcamahjbcsff.site^
@@ -128353,6 +128357,7 @@ zzzyk.com###Tinfo
 ||idevaffiliate.com^$third-party
 ||idgckoaliqcov.site^
 ||idhoyoadekuzf.website^
+||idhubypictjkv.space^
 ||idimquynuaxkm.space^
 ||idiomapron.com^
 ||idioticskill.pro^
@@ -131854,6 +131859,7 @@ zzzyk.com###Tinfo
 ||jugem.jp/user_blog/ad/
 ||jugerfowells.com^
 ||juggingfeinter.qpon^
+||juggler36.com^
 ||jugglingoverfedparalyze.com^
 ||juglansovening.com^
 ||jugloubhtiluv.website^
@@ -134126,6 +134132,7 @@ zzzyk.com###Tinfo
 ||latticeincriminate.com^
 ||latticetaur.com^
 ||lauansaltire.com^
+||lauccedsuskyv.site^
 ||laudercambia.cfd^
 ||laugheeforelay.com^
 ||laugoust.com^
@@ -137818,6 +137825,7 @@ zzzyk.com###Tinfo
 ||mihoutao1868.github.io^
 ||miifhudshrarl.space^
 ||mijqnkabhtbpj.website^
+||mijvwqhqxgmqr.space^
 ||mikanani.me/images/Masha/
 ||mikbpsykmfdqu.online^
 ||mikellli.com^
@@ -156258,6 +156266,7 @@ zzzyk.com###Tinfo
 ||stubborn80.top^
 ||stubbornpianist.com^
 ||stuckashespassion.com^
+||stucketouffeulu.cyou^
 ||studads.com^
 ||studdisablerely.com^
 ||studiedroven.cyou^
@@ -156467,6 +156476,7 @@ zzzyk.com###Tinfo
 ||suldansinclip.cfd^
 ||suleacoenobe.cyou^
 ||sulfatemaioid.shop^
+||sulfatesoluble.com^
 ||sulingvicaire.cyou^
 ||sulkgrinseafood.com^
 ||sulkweapon.com^
@@ -157709,7 +157719,6 @@ zzzyk.com###Tinfo
 ||techpump.com^
 ||techrepublic.com/astrostatic/*/_astro/CardNewsletterSubscribe.*.js
 ||techreviewtech.com^
-||techritual.com/wp-content/uploads/*/HDcource_
 ||techug.com/aatb/
 ||teczoonbdxxug.site^
 ||ted.dailymail.co.uk^
@@ -158085,6 +158094,7 @@ zzzyk.com###Tinfo
 ||thehentaiworld.com/fro_lo*.js
 ||thehill.com/6zcfGH4h/init.js
 ||thehun.net/banners/
+||theinfatuation.com/api/logger
 ||theirbellstudio.co^
 ||theirgult.cyou^
 ||theirpeninsula.com^
