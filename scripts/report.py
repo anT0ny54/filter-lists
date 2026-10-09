@@ -8,8 +8,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from config import BUILDER_VERSION, load_rule_policy, sha256_file
-from normalize import _default_max_rule_length, normalize_rule_with_reason
+from config import (
+    BUILDER_VERSION, DEFAULT_ANOMALY_MAX_BYTES_CHANGE_RATIO,
+    DEFAULT_ANOMALY_MAX_REJECTION_RATE_CHANGE,
+    DEFAULT_ANOMALY_MAX_RULE_COUNT_CHANGE_RATIO, DEFAULT_ANOMALY_MIN_LINES,
+    load_rule_policy, sha256_file,
+)
+from normalize import default_max_rule_length, normalize_rule_with_reason
 from health import build_source_reputation
 from policy import PROFILE_NAME
 
@@ -26,7 +31,7 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
     # Resolved once per call instead of once per input line.
     rule_policy = load_rule_policy()
     if max_rule_length is None:
-        max_rule_length = _default_max_rule_length()
+        max_rule_length = default_max_rule_length()
     paths = sorted(files, key=lambda p: str(p))
     if custom_rules and custom_rules.exists():
         paths.append(custom_rules)
@@ -83,7 +88,7 @@ def detect_anomalies(current_results: list[dict], previous_report: dict | None, 
     # 100% "bytes-change" anomaly.
     previous_by_url = {item.get("url"): item for item in previous if item.get("url") and item.get("status") == "ok"}
     result["baseline"] = previous_report.get("build_id") or "previous-report"
-    min_lines = int(policy.get("min_lines", 100)); max_bytes = float(policy.get("max_bytes_change_ratio", 0.75)); max_rules = float(policy.get("max_rule_count_change_ratio", 0.75)); max_rejection = float(policy.get("max_rejection_rate_change", 0.25))
+    min_lines = int(policy.get("min_lines", DEFAULT_ANOMALY_MIN_LINES)); max_bytes = float(policy.get("max_bytes_change_ratio", DEFAULT_ANOMALY_MAX_BYTES_CHANGE_RATIO)); max_rules = float(policy.get("max_rule_count_change_ratio", DEFAULT_ANOMALY_MAX_RULE_COUNT_CHANGE_RATIO)); max_rejection = float(policy.get("max_rejection_rate_change", DEFAULT_ANOMALY_MAX_REJECTION_RATE_CHANGE))
     for current in current_results:
         if current.get("status") != "ok": continue
         old = previous_by_url.get(current.get("url"))

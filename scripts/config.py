@@ -26,6 +26,13 @@ BUILDER_VERSION = "7.5.4"
 
 # Schema revision of policies.yaml itself (its `version:` key).
 POLICY_SCHEMA_VERSION = 3
+
+# Single source of truth for anomaly-detection defaults (used by load_config()
+# and by report.py's fallbacks).
+DEFAULT_ANOMALY_MAX_BYTES_CHANGE_RATIO = 0.75
+DEFAULT_ANOMALY_MAX_RULE_COUNT_CHANGE_RATIO = 0.75
+DEFAULT_ANOMALY_MAX_REJECTION_RATE_CHANGE = 0.25
+DEFAULT_ANOMALY_MIN_LINES = 100
 # Schema revision of sources.yaml (its `version:` key).
 SOURCE_SCHEMA_VERSION = 1
 # Fallback used when policies.yaml omits source_health.minimum_success_ratio.
@@ -321,9 +328,9 @@ def load_config() -> BuildConfig:
         raise ValueError("policies.yaml: anomaly_detection must be an object")
     _reject_unknown_keys(anomaly, POLICY_SECTION_KEYS["anomaly_detection"], "policies.yaml: anomaly_detection")
     anomaly_enabled = _strict_bool(anomaly.get("enabled", True), "policies.yaml: anomaly_detection.enabled")
-    byte_change = _strict_float(anomaly.get("max_bytes_change_ratio", 0.75), "policies.yaml: max_bytes_change_ratio")
-    rule_change = _strict_float(anomaly.get("max_rule_count_change_ratio", 0.75), "policies.yaml: max_rule_count_change_ratio")
-    rejection_change = _strict_float(anomaly.get("max_rejection_rate_change", 0.25), "policies.yaml: max_rejection_rate_change")
+    byte_change = _strict_float(anomaly.get("max_bytes_change_ratio", DEFAULT_ANOMALY_MAX_BYTES_CHANGE_RATIO), "policies.yaml: max_bytes_change_ratio")
+    rule_change = _strict_float(anomaly.get("max_rule_count_change_ratio", DEFAULT_ANOMALY_MAX_RULE_COUNT_CHANGE_RATIO), "policies.yaml: max_rule_count_change_ratio")
+    rejection_change = _strict_float(anomaly.get("max_rejection_rate_change", DEFAULT_ANOMALY_MAX_REJECTION_RATE_CHANGE), "policies.yaml: max_rejection_rate_change")
     if not 0 <= byte_change <= 10 or not 0 <= rule_change <= 10 or not 0 <= rejection_change <= 1:
         raise ValueError("policies.yaml: invalid anomaly thresholds")
     anomaly_config = {
@@ -331,7 +338,7 @@ def load_config() -> BuildConfig:
         "max_bytes_change_ratio": byte_change,
         "max_rule_count_change_ratio": rule_change,
         "max_rejection_rate_change": rejection_change,
-        "min_lines": _positive_int(anomaly.get("min_lines", 100), "anomaly_detection.min_lines"),
+        "min_lines": _positive_int(anomaly.get("min_lines", DEFAULT_ANOMALY_MIN_LINES), "anomaly_detection.min_lines"),
         "fail_on_warning": _strict_bool(anomaly.get("fail_on_warning", False), "policies.yaml: anomaly_detection.fail_on_warning"),
     }
     return BuildConfig(

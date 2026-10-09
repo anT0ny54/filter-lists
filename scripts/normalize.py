@@ -16,7 +16,7 @@ from policy import (
 
 
 
-def _default_max_rule_length() -> int:
+def default_max_rule_length() -> int:
     """Policy rule-length limit, resolved lazily.
 
     This used to be evaluated at import time, so a malformed policies.yaml made
@@ -365,7 +365,10 @@ def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> 
     if not options:
         return pattern
     normalized: list[str] = []
-    has_addheader = any(option.split("=", 1)[0].casefold() == "addheader" for option in options)
+    # Cheap substring pre-check avoids scanning every option for the common case.
+    has_addheader = "addheader" in rule.casefold() and any(
+        option.split("=", 1)[0].casefold() == "addheader" for option in options
+    )
     for option in options:
         option_name = option.split("=", 1)[0].casefold()
         # ABP explicitly permits $addheader rules to target top-level
@@ -492,7 +495,7 @@ def normalize_rule(
     rule_policy: dict[str, bool] | None = None,
 ) -> str | None:
     line = raw.lstrip("\ufeff").strip()
-    limit = _default_max_rule_length() if max_rule_length is None else max_rule_length
+    limit = default_max_rule_length() if max_rule_length is None else max_rule_length
     policy = load_rule_policy() if rule_policy is None else rule_policy
     return _normalize_line(line, limit, policy, trusted_abp_features)[0]
 
@@ -511,7 +514,7 @@ def normalize_rule_with_reason(
     between normalization and the rejection reason.
     """
     line = raw.lstrip("\ufeff").strip()
-    limit = _default_max_rule_length() if max_rule_length is None else max_rule_length
+    limit = default_max_rule_length() if max_rule_length is None else max_rule_length
     policy = load_rule_policy() if rule_policy is None else rule_policy
     rule, classification = _normalize_line(line, limit, policy, trusted_abp_features)
     if rule is not None:
@@ -527,7 +530,7 @@ def rejection_reason(
     rule_policy: dict[str, bool] | None = None,
 ) -> str:
     line = raw.lstrip("\ufeff").strip()
-    limit = _default_max_rule_length() if max_rule_length is None else max_rule_length
+    limit = default_max_rule_length() if max_rule_length is None else max_rule_length
     policy = load_rule_policy() if rule_policy is None else rule_policy
     return _rejection_reason(line, limit, policy, trusted_abp_features, None)
 
@@ -560,7 +563,14 @@ def _rejection_reason(line, limit, policy, trusted_abp_features, c) -> str:
     if policy["reject_ubo_procedural"] and UBO_PROCEDURAL_RE.search(line):
         return "ubo-only-syntax"
     if c.kind == "cosmetic":
-        engine_only = [sep for sep in COSMETIC_MARKERS if sep not in ALLOWED_COSMETIC_SEPARATORS and sep in line]
+        # `#?@#` is policy-allowed when reject_ubo_extended_exceptions is off;
+        # it must not mask the real rejection reason with "engine-specific-syntax".
+        engine_only = [
+            sep for sep in COSMETIC_MARKERS
+            if sep not in ALLOWED_COSMETIC_SEPARATORS
+            and sep != "#?@#"
+            and sep in line
+        ]
         if engine_only:
             return "engine-specific-syntax"
         if "#$#" in line:
