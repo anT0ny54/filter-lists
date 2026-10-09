@@ -13,7 +13,8 @@
 - `source_count`: enabled root source count.
 - `provenance`: source registry, policy, and source-manifest hashes.
 - `sources`: fetch and per-source parsing statistics.
-- `source_reputation`: rolling historical success/failure score by URL.
+- `source_reputation`: rolling success/failure score by URL, one observation per UTC day, built from `reports/source-outcomes.json` (all runs, including failed) plus the current run.
+- `source_quality`: per-source rule-yield findings (`items` with `severity`, `effective_rejection_rate`, `accepted_lines`, `top_rejection_reasons`), thresholds, counts, and `enforced_failure`. Added in v7.6.0 as an additive field; the schema number is unchanged.
 - `rules`: aggregate accepted/rejected/duplicate statistics.
 - `anomalies`: baseline comparison and enforcement decision.
 - `build_seconds`: elapsed build duration.
@@ -28,4 +29,8 @@ A source result contains URL, depth, status, bytes, SHA-256 content hash, source
 
 ## Historical retention
 
-Successful builds are copied to `reports/history/` as `build-<build_id>-<generated_at>-<report_digest>.json`. The deterministic build ID identifies equivalent configuration/output, while `generated_at` preserves repeated successful runs. Retention is chronological by `generated_at` and defaults to 10 reports; older successful reports are deleted automatically. A failed run updates `latest.json` for diagnostics but is never treated as a successful historical baseline.
+Successful builds are copied to `reports/history/` as `build-<build_id>-<generated_at>-<report_digest>.json`. These are the **anomaly baselines**. When a newer successful run has the same `build_id`, the older archived report is removed, so retention (default 10 reports, chronological by `generated_at`) counts distinct builds. A failed run updates `latest.json` for diagnostics but is never archived or used as a baseline.
+
+## Source outcome history
+
+`reports/source-outcomes.json` (`{"schema": 1, "runs": [...]}`) stores, for every run including failed ones, `generated_at`, `status`, `build_id`, and a `{url: ok}` map. The newest 120 runs are kept. It is the only input to `source_reputation` besides the current run; if it does not exist yet it is seeded from retained successful reports. Reputation counts one observation per source per UTC day, and a day is a success only if every run that day fetched the source successfully.
