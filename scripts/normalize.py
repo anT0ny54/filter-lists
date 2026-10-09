@@ -452,44 +452,93 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
     return f"{domains}{separator}{body}"
 
 
-def normalize_rule(raw: str, *, max_rule_length: int | None = None, trusted_abp_features: bool = True) -> str | None:
-    line = raw.lstrip("\ufeff").strip()
-    limit = _default_max_rule_length() if max_rule_length is None else max_rule_length
+def _normalize_line(line: str, limit: int, policy: dict[str, bool], trusted_abp_features: bool):
+    """Single normalization pass over an already-stripped line.
+
+    Returns ``(rule_or_None, classification_or_None)``. The classification is
+    handed back so the rejection path can reuse it instead of re-classifying.
+    """
     if not line or len(line) > limit:
-        return None
-    policy = load_rule_policy()
+        return None, None
     if not trusted_abp_features and uses_restricted_abp_feature(line):
-        return None
+        return None, None
     classification = classify(line)
     if classification.kind == "invalid":
         if classification.reason == "hosts-format" and not policy["reject_hosts_format"]:
-            return line
+            return line, classification
         if classification.reason == "html-or-error-page" and not policy["reject_html_error_pages"]:
-            return line
+            return line, classification
     if classification.kind in {"comment", "directive", "blank", "invalid"}:
-        return None
+        return None, classification
     if classification.kind == "network" and not policy["allow_network_filters"]:
-        return None
+        return None, classification
     if classification.kind == "cosmetic" and not policy["allow_abp_cosmetic"]:
-        return None
+        return None, classification
     if classification.kind == "cosmetic":
-        return normalize_cosmetic(line, policy)
+        return normalize_cosmetic(line, policy), classification
     # A terminal, unescaped `$` on a normal network filter is an empty
     # option section, not a valid pattern. Regex filters are handled by
     # normalize_network/split_options and may legitimately contain `$`.
     if line.endswith("$") and not line.startswith(("/", "@@/")):
-        return None
-    return normalize_network(line, policy)
+        return None, classification
+    return normalize_network(line, policy), classification
 
 
-def rejection_reason(raw: str, *, max_rule_length: int | None = None, trusted_abp_features: bool = True) -> str:
+def normalize_rule(
+    raw: str,
+    *,
+    max_rule_length: int | None = None,
+    trusted_abp_features: bool = True,
+    rule_policy: dict[str, bool] | None = None,
+) -> str | None:
     line = raw.lstrip("\ufeff").strip()
+    limit = _default_max_rule_length() if max_rule_length is None else max_rule_length
+    policy = load_rule_policy() if rule_policy is None else rule_policy
+    return _normalize_line(line, limit, policy, trusted_abp_features)[0]
+
+
+def normalize_rule_with_reason(
+    raw: str,
+    *,
+    max_rule_length: int | None = None,
+    trusted_abp_features: bool = True,
+    rule_policy: dict[str, bool] | None = None,
+) -> tuple[str | None, str | None]:
+    """Normalize `raw` and, on rejection, explain why, in one pass.
+
+    Returns ``(rule, None)`` when accepted and ``(None, reason)`` otherwise.
+    The policy, length limit and classification are resolved once and shared
+    between normalization and the rejection reason.
+    """
+    line = raw.lstrip("\ufeff").strip()
+    limit = _default_max_rule_length() if max_rule_length is None else max_rule_length
+    policy = load_rule_policy() if rule_policy is None else rule_policy
+    rule, classification = _normalize_line(line, limit, policy, trusted_abp_features)
+    if rule is not None:
+        return rule, None
+    return None, _rejection_reason(line, limit, policy, trusted_abp_features, classification)
+
+
+def rejection_reason(
+    raw: str,
+    *,
+    max_rule_length: int | None = None,
+    trusted_abp_features: bool = True,
+    rule_policy: dict[str, bool] | None = None,
+) -> str:
+    line = raw.lstrip("\ufeff").strip()
+    limit = _default_max_rule_length() if max_rule_length is None else max_rule_length
+    policy = load_rule_policy() if rule_policy is None else rule_policy
+    return _rejection_reason(line, limit, policy, trusted_abp_features, None)
+
+
+def _rejection_reason(line, limit, policy, trusted_abp_features, c) -> str:
     if not line:
         return "blank"
-    policy = load_rule_policy()
     if not trusted_abp_features and uses_restricted_abp_feature(line):
         return "abp-security-restricted-feature"
-    c = classify(line)
+    if c is None:
+        c = classify(line)
     if c.reason == "hosts-format" and not policy["reject_hosts_format"]:
         return "hosts-format-allowed"
     if c.reason == "html-or-error-page" and not policy["reject_html_error_pages"]:
@@ -498,7 +547,6 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None, trusted_ab
         return c.reason
     if c.kind in {"comment", "directive"}:
         return c.kind
-    limit = _default_max_rule_length() if max_rule_length is None else max_rule_length
     if len(line) > limit:
         return "rule-too-long"
     if c.kind == "network" and not policy["allow_network_filters"]:
@@ -550,7 +598,6 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None, trusted_ab
                 if (
                     "=" not in option
                     and name not in TYPE_OPTIONS
-                    and name not in INVERSE_OPTIONS
                     and name not in SIMPLE_OPTIONS
                     and policy["reject_unknown_options"]
                 ):
@@ -559,6 +606,6 @@ def rejection_reason(raw: str, *, max_rule_length: int | None = None, trusted_ab
                     return "invalid-option-value" if "=" in option else "context-invalid-option"
             if policy["reject_duplicate_options"] and len(names) != len(set(names)):
                 return "duplicate-option"
-        if normalize_network(line) is None:
+        if normalize_network(line, policy) is None:
             return "invalid-option-or-network-rule"
     return "invalid-network-rule"

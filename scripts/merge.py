@@ -19,7 +19,22 @@ OUTPUT = ROOT / "filters.txt"
 REPORT = ROOT / "reports" / "latest.json"
 HISTORY_DIR = ROOT / "reports" / "history"
 SOURCES_TXT = ROOT / "sources.txt"
-WORKERS = 2
+# Download parallelism. fetch.collect_sources still caps this by the download
+# byte budget (`max_parallel_by_budget`). Override with FILTER_LISTS_WORKERS.
+DEFAULT_WORKERS = 2
+
+
+def _workers() -> int:
+    raw = os.environ.get("FILTER_LISTS_WORKERS", "").strip()
+    if not raw:
+        return DEFAULT_WORKERS
+    try:
+        value = int(raw)
+    except ValueError:
+        raise ValueError(f"FILTER_LISTS_WORKERS must be an integer, got {raw!r}") from None
+    if value < 1:
+        raise ValueError("FILTER_LISTS_WORKERS must be >= 1")
+    return value
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from config import BUILDER_VERSION, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
@@ -166,8 +181,13 @@ def main() -> int:
         log(">> No enabled source URLs; building custom rules only")
     log(f">> Found {len(source_urls)} enabled source URLs")
     fingerprint = config_fingerprint(config)
+    try:
+        workers = _workers()
+    except ValueError as exc:
+        log(f"[ERROR] Configuration: {exc}")
+        return 1
     with tempfile.TemporaryDirectory(prefix="filter-lists-") as temp_dir:
-        files, source_stats = collect_sources(source_urls, Path(temp_dir), started, WORKERS, log, total_timeout=config.total_timeout_seconds, max_include_depth=config.max_include_depth, max_download_bytes=config.max_download_bytes, max_total_download_bytes=config.max_total_download_bytes, max_total_sources=config.max_total_sources)
+        files, source_stats = collect_sources(source_urls, Path(temp_dir), started, workers, log, total_timeout=config.total_timeout_seconds, max_include_depth=config.max_include_depth, max_download_bytes=config.max_download_bytes, max_total_download_bytes=config.max_total_download_bytes, max_total_sources=config.max_total_sources)
         source_stats["required"] = [s.url for s in config.sources if s.required]
         source_metadata = {s.url: {"name": s.name, "category": s.category, "priority": s.priority, "required": s.required, "trusted_abp_features": s.trusted_abp_features} for s in config.sources}
         provenance = {"source_manifest_sha256": source_manifest_sha256(config), "source_registry": "sources.yaml", "source_registry_sha256": hashlib.sha256((ROOT / "sources.yaml").read_bytes()).hexdigest(), "builder": f"Filter-Lists v{BUILDER_VERSION}", "policy_sha256": hashlib.sha256((ROOT / "policies.yaml").read_bytes()).hexdigest()}
@@ -237,8 +257,7 @@ def main() -> int:
             log("[ERROR] Anomaly policy rejected this build")
             return 1
         commit_output(staged)
-        retention = config.history_retention
-    archive_successful_report(build_id, retention=retention)
+        archive_successful_report(build_id, retention=config.history_retention)
     return 0
 
 

@@ -26,6 +26,8 @@ BUILDER_VERSION = "7.5.4"
 
 # Schema revision of policies.yaml itself (its `version:` key).
 POLICY_SCHEMA_VERSION = 3
+# Schema revision of sources.yaml (its `version:` key).
+SOURCE_SCHEMA_VERSION = 1
 # Fallback used when policies.yaml omits source_health.minimum_success_ratio.
 # Kept equal to the shipped policies.yaml value so that deleting the key does
 # not silently loosen the health gate.
@@ -248,6 +250,10 @@ def load_config() -> BuildConfig:
     if not isinstance(source_data, dict):
         raise ValueError("sources.yaml: top level must be an object")
     _reject_unknown_keys(source_data, SOURCES_TOP_LEVEL_KEYS, "sources.yaml")
+    if "version" in source_data and source_data["version"] != SOURCE_SCHEMA_VERSION:
+        raise ValueError(
+            f"sources.yaml: unsupported version {source_data['version']!r} (expected {SOURCE_SCHEMA_VERSION})"
+        )
     raw_sources = source_data.get("sources")
     if not isinstance(raw_sources, list):
         raise ValueError("sources.yaml: 'sources' must be a list")

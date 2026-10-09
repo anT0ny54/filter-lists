@@ -8,8 +8,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from config import BUILDER_VERSION, sha256_file
-from normalize import normalize_rule, rejection_reason
+from config import BUILDER_VERSION, load_rule_policy, sha256_file
+from normalize import _default_max_rule_length, normalize_rule_with_reason
 from health import build_source_reputation
 from policy import PROFILE_NAME
 
@@ -23,6 +23,10 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
     per_file: list[dict[str, Any]] = []
     known_hashes = known_hashes or {}
     trusted_paths = trusted_paths or set()
+    # Resolved once per call instead of once per input line.
+    rule_policy = load_rule_policy()
+    if max_rule_length is None:
+        max_rule_length = _default_max_rule_length()
     paths = sorted(files, key=lambda p: str(p))
     if custom_rules and custom_rules.exists():
         paths.append(custom_rules)
@@ -36,10 +40,9 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
             with path.open(encoding="utf-8", errors="replace") as source:
                 for raw in source:
                     local_lines += 1; input_lines += 1
-                    rule = normalize_rule(raw.rstrip("\r\n"), max_rule_length=max_rule_length, trusted_abp_features=trusted)
+                    rule, reason = normalize_rule_with_reason(raw.rstrip("\r\n"), max_rule_length=max_rule_length, trusted_abp_features=trusted, rule_policy=rule_policy)
                     if rule is None:
                         rejected += 1; local_rejected += 1
-                        reason = rejection_reason(raw, max_rule_length=max_rule_length, trusted_abp_features=trusted)
                         reasons[reason] += 1; local_reasons[reason] += 1
                     else:
                         accepted += 1; local_accepted += 1; local_rules.add(rule)
