@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-3f0bf6289456
-! Last updated: 2026-10-09 09:45:28 UTC
+! Version: v7.6.0-61364b87e2e1
+! Last updated: 2026-10-09 09:48:27 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 3f0bf62894564762dc64d1f66243b24850ae7ba04c17cce0d6e0477feeb0ade0
-! Source manifest SHA-256: cd964bef9de1e35561dfdb32dcaf73a59e0122bdc80afe4afd232c086b13c654
-! Root sources: 33
-! Total rules: 171326
+! Build-ID: 61364b87e2e16b2721e93e861f185ba208be7750e0ac7001f0cca9c76e076107
+! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
+! Root sources: 32
+! Total rules: 171325
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -28391,7 +28391,6 @@ adguard.app,adguard.com,adguard.info##.hello_from_adguard_japanese
 adguard.app,adguard.com,adguard.info##.hello_from_adguard_russian
 adguard.app,adguard.com,adguard.info##.hello_from_adguard_social
 adguard.app,adguard.com,adguard.info##.hello_from_adguard_spanish
-adguard.app,adguard.com,adguard.info##.hello_from_adguard_tracking_params
 adguard.app,adguard.com,adguard.info##.hello_from_adguard_turkish
 adguard.app,adguard.com,adguard.info##.hello_from_adguard_ukrainian
 adguard.com##.footer__socials

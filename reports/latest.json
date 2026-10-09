@@ -1,27 +1,27 @@
 {
   "schema": 5,
   "status": "success",
-  "generated_at": "2026-10-09T09:45:28.709792+00:00",
+  "generated_at": "2026-10-09T09:48:27.220627+00:00",
   "builder": "Filter-Lists v7.6.0",
   "profile": "strict-abp",
-  "build_id": "3f0bf62894564762dc64d1f66243b24850ae7ba04c17cce0d6e0477feeb0ade0",
-  "source_count": 33,
+  "build_id": "61364b87e2e16b2721e93e861f185ba208be7750e0ac7001f0cca9c76e076107",
+  "source_count": 32,
   "provenance": {
-    "source_manifest_sha256": "cd964bef9de1e35561dfdb32dcaf73a59e0122bdc80afe4afd232c086b13c654",
+    "source_manifest_sha256": "a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781",
     "source_registry": "sources.yaml",
-    "source_registry_sha256": "cfeb6d46a0d2f56db661f2a2831fbb4b2e830073324efc6fd3fdf12acf4fe574",
+    "source_registry_sha256": "b3e220358fd4fa699b3ed926676435b8a8d56965c4ae0a72ce6b9ceee4059805",
     "builder": "Filter-Lists v7.6.0",
-    "policy_sha256": "c94976f1798c1c2c1a6775654b35d9fae1e78e82c847e4e44ba4788ad9920fb3"
+    "policy_sha256": "e8ba7399bd1ade3af80925d99721fb6e6ed65d61e71170136ae8ee32e7f517b7"
   },
   "sources": {
-    "requested": 33,
-    "root_requested": 33,
-    "successful": 33,
-    "root_successful": 33,
+    "requested": 32,
+    "root_requested": 32,
+    "successful": 32,
+    "root_successful": 32,
     "failed": 0,
     "root_failed": 0,
     "included_references": 0,
-    "total_download_bytes": 10463578,
+    "total_download_bytes": 10351963,
     "max_total_download_bytes": 524288000,
     "max_total_sources": 500,
     "max_parallel_by_budget": 10,
@@ -30,7 +30,7 @@
     "timed_out": false,
     "source_limit_reached": false,
     "budget_exhausted": false,
-    "visited": 33,
+    "visited": 32,
     "included_requested": 0,
     "included_successful": 0,
     "included_failed": 0,
@@ -594,29 +594,6 @@
         "trusted_abp_features": false
       },
       {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/17_optimized.txt",
-        "depth": 0,
-        "status": "ok",
-        "bytes": 111615,
-        "sha256": "7d7207fb551962b9ad61de13e6a8a18ad394e4d99e7d727f6988fa37556fb2bd",
-        "input_lines": 2743,
-        "accepted_lines": 1,
-        "rejected_lines": 2742,
-        "duplicate_lines": 0,
-        "unique_rules": 1,
-        "rejection_rate": 0.999635,
-        "rejection_reasons": {
-          "comment": 13,
-          "context-invalid-option": 17,
-          "unknown-option": 2712
-        },
-        "name": "AdGuard Annoyances",
-        "category": "annoyance",
-        "priority": 70,
-        "required": false,
-        "trusted_abp_features": false
-      },
-      {
         "url": "https://filters.adtidy.org/extension/ublock/filters/1_optimized.txt",
         "depth": 0,
         "status": "ok",
@@ -1159,23 +1136,10 @@
     "warn_rejection_rate": 0.3,
     "critical_rejection_rate": 0.9,
     "fail_on_critical": false,
-    "count": 2,
-    "critical_count": 1,
+    "count": 1,
+    "critical_count": 0,
     "warning_count": 1,
     "items": [
-      {
-        "url": "https://filters.adtidy.org/extension/ublock/filters/17_optimized.txt",
-        "name": "AdGuard Annoyances",
-        "severity": "critical",
-        "effective_rejection_rate": 0.999634,
-        "rule_lines": 2730,
-        "accepted_lines": 1,
-        "input_lines": 2743,
-        "top_rejection_reasons": {
-          "unknown-option": 2712,
-          "context-invalid-option": 17
-        }
-      },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/23_optimized.txt",
         "name": "AdGuard Ukrainian",
@@ -1194,16 +1158,16 @@
     "enforced_failure": false
   },
   "rules": {
-    "input_lines": 228415,
-    "accepted_lines": 195837,
-    "rejected_lines": 32578,
+    "input_lines": 225672,
+    "accepted_lines": 195836,
+    "rejected_lines": 29836,
     "duplicate_lines": 24511,
-    "unique_rules": 171326,
-    "rejection_rate": 0.142626,
+    "unique_rules": 171325,
+    "rejection_rate": 0.13221,
     "rejection_reasons": {
       "abp-security-restricted-feature": 1,
-      "comment": 2869,
-      "context-invalid-option": 954,
+      "comment": 2856,
+      "context-invalid-option": 937,
       "extended-css-selector-requires-#?#": 2,
       "hash-comment": 7,
       "invalid-cosmetic-rule": 1774,
@@ -1211,12 +1175,12 @@
       "invalid-option-or-network-rule": 78,
       "invalid-option-value": 89,
       "ubo-only-syntax": 16720,
-      "unknown-option": 10064
+      "unknown-option": 7352
     }
   },
   "anomalies": {
     "enabled": true,
-    "baseline": "19a5fd53daa2731fb5dc8bc6c188f46c0004d3ab490ce942e9ec5ce4cc694e5e",
+    "baseline": "3f0bf62894564762dc64d1f66243b24850ae7ba04c17cce0d6e0477feeb0ade0",
     "count": 0,
     "critical_count": 0,
     "warning_count": 0,
@@ -1224,5 +1188,5 @@
     "fail_on_warning": false,
     "enforced_failure": false
   },
-  "build_seconds": 15.467
+  "build_seconds": 17.411
 }
