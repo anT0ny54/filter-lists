@@ -286,8 +286,8 @@ class MergeRegressionTests(unittest.TestCase):
         self.assertEqual(self.run_main(config_obj), 0)
         self.assertIn("||custom.example^", merge.OUTPUT.read_text(encoding="utf-8"))
 
-    def test_repeated_build_id_archives_reports_with_different_timestamps(self):
-        report = {"status": "success", "generated_at": "2026-01-01T00:00:00+00:00"}
+    def test_repeated_build_id_keeps_only_newest_report(self):
+        report = {"status": "success", "build_id": "same-build", "generated_at": "2026-01-01T00:00:00+00:00"}
         merge.REPORT.write_text(json.dumps(report), encoding="utf-8")
         merge.archive_successful_report("same-build", retention=10)
 
@@ -296,8 +296,8 @@ class MergeRegressionTests(unittest.TestCase):
         merge.archive_successful_report("same-build", retention=10)
 
         archived = sorted(merge.HISTORY_DIR.glob("build-same-build-*.json"))
-        self.assertEqual(len(archived), 2)
-        self.assertEqual(len({path.name for path in archived}), 2)
+        self.assertEqual(len(archived), 1)
+        self.assertIn("2026-01-01T01", json.loads(archived[0].read_text())["generated_at"])
 
 
 if __name__ == "__main__":
