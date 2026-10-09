@@ -5,16 +5,14 @@ import json
 import tempfile
 import threading
 import unittest
-import importlib
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 from urllib.parse import urljoin
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "merge.py"
-spec = importlib.util.spec_from_file_location("merge", SCRIPT)
-merge = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(merge)
+from _helpers import load_script, setup_merge_root  # noqa: E402
+
+merge = load_script("merge.py", "merge")
 fetch = importlib.import_module("fetch")
 from normalize import normalize_rule  # noqa: E402
 
@@ -112,25 +110,13 @@ class ABPStrictTests(unittest.TestCase):
 
 class MergeMainE2ETests(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
-        root = Path(self.tmp.name)
-        merge.ROOT = root
-        merge.CUSTOM_RULES = root / "custom-rules.txt"
-        merge.OUTPUT = root / "filters.txt"
-        merge.REPORT = root / "reports" / "latest.json"
-        merge.HISTORY_DIR = root / "reports" / "history"
-        merge.SOURCES_TXT = root / "sources.txt"
-        (root / "reports").mkdir(parents=True)
-        (root / "sources.yaml").write_text("""sources:
+        setup_merge_root(self, merge, """sources:
   - name: fixture
     url: https://fixture.test/list.txt
     category: test
     priority: 1
     required: true
-""", encoding="utf-8")
-        (root / "policies.yaml").write_text("""limits: {}
-""", encoding="utf-8")
-        merge.CUSTOM_RULES.write_text("||custom.example^\n", encoding="utf-8")
+""")
         self.config = SimpleNamespace(
             sources=(SimpleNamespace(name="fixture", url="https://fixture.test/list.txt", category="test", priority=1, required=True, enabled=True, trusted_abp_features=False),),
             minimum_success_ratio=0.5,
@@ -144,9 +130,6 @@ class MergeMainE2ETests(unittest.TestCase):
             anomaly_detection={"enabled": False, "fail_on_warning": False},
             history_retention=10,
         )
-
-    def tearDown(self):
-        self.tmp.cleanup()
 
     def test_main_real_local_http_fetch_and_analysis(self):
         with tempfile.TemporaryDirectory(prefix="filter-merge-http-") as server_dir:

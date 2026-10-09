@@ -1,7 +1,4 @@
-import contextlib
 import hashlib
-import importlib.util
-import io
 import sys
 import tempfile
 import unittest
@@ -9,10 +6,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "validate.py"
-spec = importlib.util.spec_from_file_location("validate", SCRIPT)
-validate = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(validate)
+from _helpers import load_script, run_validate  # noqa: E402
+
+validate = load_script("validate.py", "validate")
 
 from config import BUILDER_VERSION, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
 from normalize import normalize_rule  # noqa: E402
@@ -45,19 +41,7 @@ class ValidateSortednessTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "filters.txt"
             path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-            buffer = io.StringIO()
-            with contextlib.redirect_stdout(buffer):
-                exit_code = self._invoke(path)
-        return exit_code, buffer.getvalue()
-
-    @staticmethod
-    def _invoke(path):
-        old_argv = sys.argv
-        sys.argv = ["validate.py", str(path)]
-        try:
-            return validate.main()
-        finally:
-            sys.argv = old_argv
+            return run_validate(validate, path)
 
     def test_tie_break_violation_within_same_casefold_is_flagged(self):
         # Correct order per merge.py's (casefold, x) key is ["||A-rule.example^", "||a-rule.example^"]

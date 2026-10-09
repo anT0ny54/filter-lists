@@ -222,26 +222,14 @@ class RulePolicyRegressionTests(unittest.TestCase):
         )
 
 
-SCRIPT = SCRIPTS / "merge.py"
-spec = importlib.util.spec_from_file_location("merge_for_regressions", SCRIPT)
-merge = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(merge)
+from _helpers import load_script, setup_merge_root  # noqa: E402
+
+merge = load_script("merge.py", "merge_for_regressions")
 
 
 class MergeRegressionTests(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
-        root = Path(self.tmp.name)
-        merge.ROOT = root
-        merge.CUSTOM_RULES = root / "custom-rules.txt"
-        merge.OUTPUT = root / "filters.txt"
-        merge.REPORT = root / "reports" / "latest.json"
-        merge.HISTORY_DIR = root / "reports" / "history"
-        merge.SOURCES_TXT = root / "sources.txt"
-        (root / "reports").mkdir(parents=True)
-        (root / "sources.yaml").write_text("sources: []\n", encoding="utf-8")
-        (root / "policies.yaml").write_text("limits: {}\n", encoding="utf-8")
-        merge.CUSTOM_RULES.write_text("||custom.example^\n", encoding="utf-8")
+        setup_merge_root(self, merge, "sources: []\n")
         self.base_config = SimpleNamespace(
             sources=(),
             minimum_success_ratio=0.8,
@@ -267,9 +255,6 @@ class MergeRegressionTests(unittest.TestCase):
             "timed_out": False,
             "budget_exhausted": False,
         }
-
-    def tearDown(self):
-        self.tmp.cleanup()
 
     def run_main(self, config):
         rules = {"||custom.example^"}

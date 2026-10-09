@@ -1,4 +1,4 @@
-"""Regression tests for the post-v7.5.4 audit follow-up fixes."""
+"""Regression tests for the v7.5.4 audit follow-up fixes (applied after the initial audit pass)."""
 import os
 import subprocess
 import sys

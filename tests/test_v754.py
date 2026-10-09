@@ -1,7 +1,4 @@
-import contextlib
 import hashlib
-import importlib.util
-import io
 import sys
 import tempfile
 import unittest
@@ -15,11 +12,9 @@ from fetch import validate_download  # noqa: E402
 from normalize import normalize_rule  # noqa: E402
 from parser import classify  # noqa: E402
 
-_SPEC = importlib.util.spec_from_file_location(
-    "validate_v754", Path(__file__).resolve().parents[1] / "scripts" / "validate.py"
-)
-validate = importlib.util.module_from_spec(_SPEC)
-_SPEC.loader.exec_module(validate)
+from _helpers import load_script, run_validate  # noqa: E402
+
+validate = load_script("validate.py", "validate_v754")
 
 
 class StrictConfigKeyTests(unittest.TestCase):
@@ -102,15 +97,7 @@ class ValidateHardeningTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "filters.txt"
             path.write_bytes(raw_bytes if raw_bytes is not None else ("\n".join(lines) + "\n").encode())
-            buffer = io.StringIO()
-            old = sys.argv
-            sys.argv = ["validate.py", str(path)]
-            try:
-                with contextlib.redirect_stdout(buffer):
-                    code = validate.main()
-            finally:
-                sys.argv = old
-        return code, buffer.getvalue()
+            return run_validate(validate, path)
 
     def test_valid_list_passes(self):
         self.assertEqual(self._run()[0], 0)
