@@ -47,23 +47,7 @@ Normalization is deterministic and idempotent: `normalize_rule(normalize_rule(x)
 
 ### Compatibility matrix
 
-| Feature | Filter-Lists strict ABP | Adblock Plus | uBlock Origin | AdGuard |
-|---|:---:|:---:|:---:|:---:|
-| Network filters | Yes | Yes | Yes | Yes |
-| Exception filters | Yes | Yes | Yes | Yes |
-| ABP network options | Yes | Yes | Yes | Yes |
-| `header=` | Yes | Yes | Partial/Firefox | Varies |
-| `addheader=` | Yes | Yes | Varies | Varies |
-| Element hiding | Yes | Yes | Yes | Yes |
-| ABP extended CSS | Yes | Yes | Partial/compatible subsets | Partial/compatible subsets |
-| ABP snippets | Yes, policy-gated | Yes | No/varies | No/varies |
-| ABP inline styles | Yes | Yes | Varies | Varies |
-| ABP `remove: true` | Yes | Yes | Varies | Varies |
-| uBO procedural `+js` | No | No | Yes | Partial/varies |
-| AdGuard-only extensions | No | Varies | Varies | Yes |
-| Hosts-file syntax | No | No | No | Varies |
-
-The matrix describes the compiler's syntax/emission policy, not identical runtime behavior in every browser or engine.
+The compatibility matrix lives in [`COMPATIBILITY.md`](COMPATIBILITY.md), the single canonical copy.
 
 ### Compatibility rule
 
