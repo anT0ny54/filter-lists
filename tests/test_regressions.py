@@ -148,10 +148,12 @@ class RulePolicyRegressionTests(unittest.TestCase):
             policy_file.write_text(rules_yaml, encoding="utf-8")
             with patch.object(config, "POLICY_FILE", policy_file):
                 config.load_rule_policy.cache_clear()
+                config.load_policy_limits.cache_clear()
                 try:
                     return normalize_rule(rule)
                 finally:
                     config.load_rule_policy.cache_clear()
+                    config.load_policy_limits.cache_clear()
 
     def test_yaml_can_disable_network_filters(self):
         self.assertIsNone(
