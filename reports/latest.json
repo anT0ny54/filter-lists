@@ -1,7 +1,7 @@
 {
   "schema": 5,
   "status": "success",
-  "generated_at": "2026-10-11T21:57:31.882710+00:00",
+  "generated_at": "2026-10-11T22:02:46.323292+00:00",
   "builder": "Filter-Lists v7.6.0",
   "profile": "strict-abp",
   "build_id": "3fbc1cade8d559f7ccb09731ddfa7415819be41c42a62eaff99e024d6e542300",
@@ -704,7 +704,7 @@
         "depth": 0,
         "status": "ok",
         "bytes": 595951,
-        "sha256": "abcde1859876025092fcee865d138f30b0b47fd8b0fc00b29673a10d391063fe",
+        "sha256": "1e67408e361c7973efcd2f23d9f13ad13498bd98c29a83b50114378945ded2e1",
         "input_lines": 10491,
         "accepted_lines": 9963,
         "rejected_lines": 528,
@@ -1170,7 +1170,7 @@
   },
   "anomalies": {
     "enabled": true,
-    "baseline": "d4683016cde59587f1047c5cc9177bd53edca18674d8e521fcc940b98b26df3e",
+    "baseline": "3fbc1cade8d559f7ccb09731ddfa7415819be41c42a62eaff99e024d6e542300",
     "count": 0,
     "critical_count": 0,
     "warning_count": 0,
@@ -1178,5 +1178,5 @@
     "fail_on_warning": false,
     "enforced_failure": false
   },
-  "build_seconds": 22.403
+  "build_seconds": 20.076
 }
