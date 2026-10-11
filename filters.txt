@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-4ef320f44898
-! Last updated: 2026-10-11 09:58:29 UTC
+! Version: v7.6.0-c3e3a5c2eab4
+! Last updated: 2026-10-11 19:21:37 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 4ef320f4489827438388abbd88f4132cdc90532a3929d61fadce831c27df6c10
+! Build-ID: c3e3a5c2eab497c14cbc526358a506edc0826b0e9432bf7067b0ac51e8b684f8
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 171989
+! Total rules: 172088
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -19315,7 +19315,6 @@
 24tv.ua,nibblestew.blogspot.com###mobile-share-button
 24tv.ua,pise4ka.net##.adv-wrapper
 24tv.ua,sport24.ua##app-notification-popup
-24tv.ua,zaxid.net##.partner-info
 24u.app,aksaelektrik.com.tr,arabateknik.com,azbuz.org,bankadunyasi.com,bilisimogretmeni.com,birsenaltuntas.com,cheatermad.com,denizcilikbilgileri.com,dizihastasi.com,dnschecker.org,engelli.com,ergo.de,fosforludusunceler.com,gazikent27.com,hockerty.de,iplocation.io,izlemedia.com,konuneydi.com,korsanedebiyat.com,kriptoradar.com,krombacher.de,kwansei.ac.jp,mansetebak.com,mustafabukulmez.com,ozgunbilgi.com,stakingrewards.com,techdergi.net,teknobird.com,teknoinfo.com.tr,teknoistan.com,tilki.net,ultrabilgi.com,url-decode.com,zamaninvarken.com###cookie-box
 24u.jp###contents > div[style="height: 200px;"]
 24webnews.com,36garhi.com,a2znewsup.com,agrasor.com,avikaluttarakhand.com,azchavattomonline.com,banglanewsupdate24.com,dainikchhattisgarhwatch.com,darpanpratidin.com,dhakalive24.com,fatafatnews.com,impactvoice.news,insightonlinenews.in,kathastar.com,keelainews.com,keepinspiringme.in,khabareducation.com,kholabazar24.com,mukhyadhara.in,nammakudlanews.com,newsriveting.com,odishatime.com,rashtrasamvad.com,samastipurlive.com,thekeralatimes.com,thetruths.in,udaydarpan.com,upaajtak.com##.widget_block
@@ -21955,6 +21954,7 @@
 @@||api.service.cmp.usercentrics.eu/latest/$domain=deepsilver.com
 @@||api.service.cmp.usercentrics.eu/latest/1/cmp/$domain=sporteurope.tv
 @@||api.service.cmp.usercentrics.eu/latest/core/$domain=sporteurope.tv
+@@||api.service.cmp.usercentrics.eu^$domain=rsi.ch
 @@||api.spendino.de/admanager^
 @@||api.useinsider.com^$domain=ing.com.tr
 @@||api.usercentrics.eu/gvl/*.json$domain=joyn.de
@@ -27021,6 +27021,7 @@
 @@||web.cmp.usercentrics.eu/ui/$domain=deepsilver.com
 @@||web.cmp.usercentrics.eu/ui/$domain=gls-pakete.de,script
 @@||web.cmp.usercentrics.eu/ui/$domain=sporteurope.tv,script
+@@||web.cmp.usercentrics.eu/ui/*.js$domain=rsi.ch
 @@||web.de/image
 @@||web.telegram.org^$generichide
 @@||webcache.googleusercontent.com^$generichide
@@ -29081,7 +29082,6 @@ akittv.com.tr##.ad-blank
 akittv.com.tr##.module-social .facebook
 akittv.com.tr##.module-social .twitter
 akittv.com.tr##[class^="ad-zone-"]
-akkbd.com,indiakhabarnews.in,ojasvitimes.in,telugumalli.com###block-17
 akket.com###anycomment-root .MuiSnackbarContent-root
 akket.com###interesting_articles_google
 akket.com##.adsense
@@ -35397,7 +35397,6 @@ bleepingcomputer.com##ul#bc-home-news-main-wrap > li:contains(Sponsored)
 bleepingcomputer.com##ul#bc-home-news-main-wrap > li:has(> div > ul > li > a[rel="noopener sponsored"])
 bleepingcomputer.com#?#.bc-heading:has-text(ponsor Posts)
 bleepingcomputer.com#?#.bc-heading:has-text(ponsor Posts) + ul
-bleepingcomputer.com#?#.cz-line-heading:has-text(Sponsor Posts) + ul
 blesk.cz##div[class^="socialMedia"]
 blesk.cz##div[class^="stickyContentBottom_"]
 blesk.cz##div[id^="ads-"]
@@ -43696,14 +43695,14 @@ dizipal1.com,dizipal10.com,dizipal1017.com,dizipal1021.com,dizipal1022.com,dizip
 dizipal10.com.tr,dizipal11.com.tr,dizipal12.com.tr,dizipal13.com.tr,dizipal14.com.tr,dizipal15.com.tr,dizipal16.com.tr,dizipal17.com.tr,dizipal18.com.tr,dizipal19.com.tr,dizipal20.com.tr,dizipal3.com.tr,dizipal4.com.tr,dizipal5.com.tr,dizipal6.com.tr,dizipal7.com.tr,dizipal8.com.tr,dizipal9.com.tr##.iptv-promo-help
 dizipal10.com.tr,dizipal11.com.tr,dizipal12.com.tr,dizipal13.com.tr,dizipal14.com.tr,dizipal15.com.tr,dizipal16.com.tr,dizipal17.com.tr,dizipal18.com.tr,dizipal19.com.tr,dizipal20.com.tr,dizipal3.com.tr,dizipal4.com.tr,dizipal5.com.tr,dizipal6.com.tr,dizipal7.com.tr,dizipal8.com.tr,dizipal9.com.tr##.iptv-promo-link
 dizipal12.plus,dizipal13.plus,dizipal14.plus,dizipal15.plus,dizipal16.plus,dizipal17.plus,dizipal18.plus,dizipal19.plus,dizipal20.plus,dizipal21.plus,dizipal22.plus,dizipal23.plus,dizipal24.plus,dizipal25.plus,dizipal26.plus,dizipal27.plus,dizipal28.plus,dizipal29.plus,dizipal30.plus,dizipal31.plus##.top-banner-container
-dizipal1555.com,dizipal1556.com,dizipal1557.com,dizipal1558.com,dizipal1559.com,dizipal1560.com,dizipal1561.com,dizipal1562.com,dizipal1563.com,dizipal1564.com,dizipal1565.com,dizipal1566.com,dizipal1567.com,dizipal1568.com,dizipal1569.com,dizipal1570.com,dizipal1571.com,dizipal1572.com,dizipal1573.com,dizipal1574.com,dizipal1575.com,dizipal1576.com,dizipal1577.com,dizipal1578.com,dizipal1579.com,dizipal1580.com,dizipal1581.com,dizipal1582.com,dizipal1583.com,dizipal1584.com,dizipal1585.com,dizipal1586.com,dizipal1587.com,dizipal1588.com,dizipal1589.com,dizipal1590.com,dizipal1591.com,dizipal1592.com,dizipal1593.com,dizipal1594.com,dizipal1595.com,dizipal1596.com,dizipal1597.com,dizipal1598.com,dizipal1599.com,dizipal1600.com###psContainer
-dizipal1555.com,dizipal1556.com,dizipal1557.com,dizipal1558.com,dizipal1559.com,dizipal1560.com,dizipal1561.com,dizipal1562.com,dizipal1563.com,dizipal1564.com,dizipal1565.com,dizipal1566.com,dizipal1567.com,dizipal1568.com,dizipal1569.com,dizipal1570.com,dizipal1571.com,dizipal1572.com,dizipal1573.com,dizipal1574.com,dizipal1575.com,dizipal1576.com,dizipal1577.com,dizipal1578.com,dizipal1579.com,dizipal1580.com,dizipal1581.com,dizipal1582.com,dizipal1583.com,dizipal1584.com,dizipal1585.com,dizipal1586.com,dizipal1587.com,dizipal1588.com,dizipal1589.com,dizipal1590.com,dizipal1591.com,dizipal1592.com,dizipal1593.com,dizipal1594.com,dizipal1595.com,dizipal1596.com,dizipal1597.com,dizipal1598.com,dizipal1599.com,dizipal1600.com##.grid:has(> div.banner-slot)
-dizipal1555.com,dizipal1556.com,dizipal1557.com,dizipal1558.com,dizipal1559.com,dizipal1560.com,dizipal1561.com,dizipal1562.com,dizipal1563.com,dizipal1564.com,dizipal1565.com,dizipal1566.com,dizipal1567.com,dizipal1568.com,dizipal1569.com,dizipal1570.com,dizipal1571.com,dizipal1572.com,dizipal1573.com,dizipal1574.com,dizipal1575.com,dizipal1576.com,dizipal1577.com,dizipal1578.com,dizipal1579.com,dizipal1580.com,dizipal1581.com,dizipal1582.com,dizipal1583.com,dizipal1584.com,dizipal1585.com,dizipal1586.com,dizipal1587.com,dizipal1588.com,dizipal1589.com,dizipal1590.com,dizipal1591.com,dizipal1592.com,dizipal1593.com,dizipal1594.com,dizipal1595.com,dizipal1596.com,dizipal1597.com,dizipal1598.com,dizipal1599.com,dizipal1600.com##a.st-bg
-dizipal1555.com,dizipal1556.com,dizipal1557.com,dizipal1558.com,dizipal1559.com,dizipal1560.com,dizipal1561.com,dizipal1562.com,dizipal1563.com,dizipal1564.com,dizipal1565.com,dizipal1566.com,dizipal1567.com,dizipal1568.com,dizipal1569.com,dizipal1570.com,dizipal1571.com,dizipal1572.com,dizipal1573.com,dizipal1574.com,dizipal1575.com,dizipal1576.com,dizipal1577.com,dizipal1578.com,dizipal1579.com,dizipal1580.com,dizipal1581.com,dizipal1582.com,dizipal1583.com,dizipal1584.com,dizipal1585.com,dizipal1586.com,dizipal1587.com,dizipal1588.com,dizipal1589.com,dizipal1590.com,dizipal1591.com,dizipal1592.com,dizipal1593.com,dizipal1594.com,dizipal1595.com,dizipal1596.com,dizipal1597.com,dizipal1598.com,dizipal1599.com,dizipal1600.com##div.banner-slot
+dizipal1589.com,dizipal2089.com,dizipal2090.com,dizipal2091.com,dizipal2096.com,dizipal2097.com,dizipal2098.com,dizipal2099.com,dizipal2100.com,dizipal2101.com,dizipal2106.com,dizipal2107.com,dizipal2108.com,dizipal2109.com,dizipal2110.com,dizipal2111.com,dizipal2112.com,dizipal2113.com,dizipal2114.com,dizipal2115.com,dizipal2116.com,dizipal2117.com,dizipal2118.com,dizipal2119.com,dizipal2120.com,dizipal2121.com,dizipal2122.com,dizipal2123.com,dizipal2124.com,dizipal2125.com,dizipal2126.com,dizipal2127.com,dizipal2128.com,dizipal2129.com,dizipal2130.com,dizipal2131.com,dizipal2132.com,dizipal2133.com,dizipal2134.com,dizipal2135.com,dizipal2136.com,dizipal2137.com,dizipal2138.com,dizipal2200.com,dizipal2203.com,dizipal2204.com,dizipal2205.com,dizipal2206.com,dizipal2207.com,dizipal2208.com,dizipal2209.com,dizipal2210.com,dizipal2211.com,dizipal2212.com,dizipal2213.com,dizipal2214.com,dizipal2215.com,dizipal2216.com,dizipal2218.com,dizipal2219.com,dizipal2220.com,dizipal2221.com,dizipal2222.com,dizipal2223.com,dizipal2224.com,dizipal2225.com###psContainer
+dizipal1589.com,dizipal2089.com,dizipal2090.com,dizipal2091.com,dizipal2096.com,dizipal2097.com,dizipal2098.com,dizipal2099.com,dizipal2100.com,dizipal2101.com,dizipal2106.com,dizipal2107.com,dizipal2108.com,dizipal2109.com,dizipal2110.com,dizipal2111.com,dizipal2112.com,dizipal2113.com,dizipal2114.com,dizipal2115.com,dizipal2116.com,dizipal2117.com,dizipal2118.com,dizipal2119.com,dizipal2120.com,dizipal2121.com,dizipal2122.com,dizipal2123.com,dizipal2124.com,dizipal2125.com,dizipal2126.com,dizipal2127.com,dizipal2128.com,dizipal2129.com,dizipal2130.com,dizipal2131.com,dizipal2132.com,dizipal2133.com,dizipal2134.com,dizipal2135.com,dizipal2136.com,dizipal2137.com,dizipal2138.com,dizipal2200.com,dizipal2203.com,dizipal2204.com,dizipal2205.com,dizipal2206.com,dizipal2207.com,dizipal2208.com,dizipal2209.com,dizipal2210.com,dizipal2211.com,dizipal2212.com,dizipal2213.com,dizipal2214.com,dizipal2215.com,dizipal2216.com,dizipal2218.com,dizipal2219.com,dizipal2220.com,dizipal2221.com,dizipal2222.com,dizipal2223.com,dizipal2224.com,dizipal2225.com##.grid:has(> div.banner-slot)
+dizipal1589.com,dizipal2089.com,dizipal2090.com,dizipal2091.com,dizipal2096.com,dizipal2097.com,dizipal2098.com,dizipal2099.com,dizipal2100.com,dizipal2101.com,dizipal2106.com,dizipal2107.com,dizipal2108.com,dizipal2109.com,dizipal2110.com,dizipal2111.com,dizipal2112.com,dizipal2113.com,dizipal2114.com,dizipal2115.com,dizipal2116.com,dizipal2117.com,dizipal2118.com,dizipal2119.com,dizipal2120.com,dizipal2121.com,dizipal2122.com,dizipal2123.com,dizipal2124.com,dizipal2125.com,dizipal2126.com,dizipal2127.com,dizipal2128.com,dizipal2129.com,dizipal2130.com,dizipal2131.com,dizipal2132.com,dizipal2133.com,dizipal2134.com,dizipal2135.com,dizipal2136.com,dizipal2137.com,dizipal2138.com,dizipal2200.com,dizipal2203.com,dizipal2204.com,dizipal2205.com,dizipal2206.com,dizipal2207.com,dizipal2208.com,dizipal2209.com,dizipal2210.com,dizipal2211.com,dizipal2212.com,dizipal2213.com,dizipal2214.com,dizipal2215.com,dizipal2216.com,dizipal2218.com,dizipal2219.com,dizipal2220.com,dizipal2221.com,dizipal2222.com,dizipal2223.com,dizipal2224.com,dizipal2225.com##.video-wrapper > a[href][target="_blank"]
+dizipal1589.com,dizipal2089.com,dizipal2090.com,dizipal2091.com,dizipal2096.com,dizipal2097.com,dizipal2098.com,dizipal2099.com,dizipal2100.com,dizipal2101.com,dizipal2106.com,dizipal2107.com,dizipal2108.com,dizipal2109.com,dizipal2110.com,dizipal2111.com,dizipal2112.com,dizipal2113.com,dizipal2114.com,dizipal2115.com,dizipal2116.com,dizipal2117.com,dizipal2118.com,dizipal2119.com,dizipal2120.com,dizipal2121.com,dizipal2122.com,dizipal2123.com,dizipal2124.com,dizipal2125.com,dizipal2126.com,dizipal2127.com,dizipal2128.com,dizipal2129.com,dizipal2130.com,dizipal2131.com,dizipal2132.com,dizipal2133.com,dizipal2134.com,dizipal2135.com,dizipal2136.com,dizipal2137.com,dizipal2138.com,dizipal2200.com,dizipal2203.com,dizipal2204.com,dizipal2205.com,dizipal2206.com,dizipal2207.com,dizipal2208.com,dizipal2209.com,dizipal2210.com,dizipal2211.com,dizipal2212.com,dizipal2213.com,dizipal2214.com,dizipal2215.com,dizipal2216.com,dizipal2218.com,dizipal2219.com,dizipal2220.com,dizipal2221.com,dizipal2222.com,dizipal2223.com,dizipal2224.com,dizipal2225.com##a.st-bg
+dizipal1589.com,dizipal2089.com,dizipal2090.com,dizipal2091.com,dizipal2096.com,dizipal2097.com,dizipal2098.com,dizipal2099.com,dizipal2100.com,dizipal2101.com,dizipal2106.com,dizipal2107.com,dizipal2108.com,dizipal2109.com,dizipal2110.com,dizipal2111.com,dizipal2112.com,dizipal2113.com,dizipal2114.com,dizipal2115.com,dizipal2116.com,dizipal2117.com,dizipal2118.com,dizipal2119.com,dizipal2120.com,dizipal2121.com,dizipal2122.com,dizipal2123.com,dizipal2124.com,dizipal2125.com,dizipal2126.com,dizipal2127.com,dizipal2128.com,dizipal2129.com,dizipal2130.com,dizipal2131.com,dizipal2132.com,dizipal2133.com,dizipal2134.com,dizipal2135.com,dizipal2136.com,dizipal2137.com,dizipal2138.com,dizipal2200.com,dizipal2203.com,dizipal2204.com,dizipal2205.com,dizipal2206.com,dizipal2207.com,dizipal2208.com,dizipal2209.com,dizipal2210.com,dizipal2211.com,dizipal2212.com,dizipal2213.com,dizipal2214.com,dizipal2215.com,dizipal2216.com,dizipal2218.com,dizipal2219.com,dizipal2220.com,dizipal2221.com,dizipal2222.com,dizipal2223.com,dizipal2224.com,dizipal2225.com##a[target="_blank"][rel="nofollow"]
+dizipal1589.com,dizipal2089.com,dizipal2090.com,dizipal2091.com,dizipal2096.com,dizipal2097.com,dizipal2098.com,dizipal2099.com,dizipal2100.com,dizipal2101.com,dizipal2106.com,dizipal2107.com,dizipal2108.com,dizipal2109.com,dizipal2110.com,dizipal2111.com,dizipal2112.com,dizipal2113.com,dizipal2114.com,dizipal2115.com,dizipal2116.com,dizipal2117.com,dizipal2118.com,dizipal2119.com,dizipal2120.com,dizipal2121.com,dizipal2122.com,dizipal2123.com,dizipal2124.com,dizipal2125.com,dizipal2126.com,dizipal2127.com,dizipal2128.com,dizipal2129.com,dizipal2130.com,dizipal2131.com,dizipal2132.com,dizipal2133.com,dizipal2134.com,dizipal2135.com,dizipal2136.com,dizipal2137.com,dizipal2138.com,dizipal2200.com,dizipal2203.com,dizipal2204.com,dizipal2205.com,dizipal2206.com,dizipal2207.com,dizipal2208.com,dizipal2209.com,dizipal2210.com,dizipal2211.com,dizipal2212.com,dizipal2213.com,dizipal2214.com,dizipal2215.com,dizipal2216.com,dizipal2218.com,dizipal2219.com,dizipal2220.com,dizipal2221.com,dizipal2222.com,dizipal2223.com,dizipal2224.com,dizipal2225.com##body a[class^="pageskin-"]
+dizipal1589.com,dizipal2089.com,dizipal2090.com,dizipal2091.com,dizipal2096.com,dizipal2097.com,dizipal2098.com,dizipal2099.com,dizipal2100.com,dizipal2101.com,dizipal2106.com,dizipal2107.com,dizipal2108.com,dizipal2109.com,dizipal2110.com,dizipal2111.com,dizipal2112.com,dizipal2113.com,dizipal2114.com,dizipal2115.com,dizipal2116.com,dizipal2117.com,dizipal2118.com,dizipal2119.com,dizipal2120.com,dizipal2121.com,dizipal2122.com,dizipal2123.com,dizipal2124.com,dizipal2125.com,dizipal2126.com,dizipal2127.com,dizipal2128.com,dizipal2129.com,dizipal2130.com,dizipal2131.com,dizipal2132.com,dizipal2133.com,dizipal2134.com,dizipal2135.com,dizipal2136.com,dizipal2137.com,dizipal2138.com,dizipal2200.com,dizipal2203.com,dizipal2204.com,dizipal2205.com,dizipal2206.com,dizipal2207.com,dizipal2208.com,dizipal2209.com,dizipal2210.com,dizipal2211.com,dizipal2212.com,dizipal2213.com,dizipal2214.com,dizipal2215.com,dizipal2216.com,dizipal2218.com,dizipal2219.com,dizipal2220.com,dizipal2221.com,dizipal2222.com,dizipal2223.com,dizipal2224.com,dizipal2225.com##div.banner-slot
 dizipal2080.com###prerollAd
-dizipal2089.com,dizipal2090.com,dizipal2091.com,dizipal2096.com,dizipal2097.com,dizipal2098.com,dizipal2099.com,dizipal2100.com,dizipal2101.com,dizipal2106.com,dizipal2107.com,dizipal2108.com,dizipal2109.com,dizipal2110.com,dizipal2111.com,dizipal2112.com,dizipal2113.com,dizipal2114.com,dizipal2115.com,dizipal2116.com,dizipal2117.com,dizipal2118.com,dizipal2119.com,dizipal2120.com,dizipal2121.com,dizipal2122.com,dizipal2123.com,dizipal2124.com,dizipal2125.com,dizipal2126.com,dizipal2127.com,dizipal2128.com,dizipal2129.com,dizipal2130.com,dizipal2131.com,dizipal2132.com,dizipal2133.com,dizipal2200.com,dizipal2203.com,dizipal2204.com,dizipal2205.com,dizipal2206.com,dizipal2207.com,dizipal2208.com,dizipal2209.com,dizipal2210.com,dizipal2211.com,dizipal2212.com,dizipal2213.com,dizipal2214.com,dizipal2215.com,dizipal2216.com,dizipal2218.com,dizipal2219.com,dizipal2220.com,dizipal2221.com##.video-wrapper > a[href][target="_blank"]
-dizipal2089.com,dizipal2090.com,dizipal2091.com,dizipal2096.com,dizipal2097.com,dizipal2098.com,dizipal2099.com,dizipal2100.com,dizipal2101.com,dizipal2106.com,dizipal2107.com,dizipal2108.com,dizipal2109.com,dizipal2110.com,dizipal2111.com,dizipal2112.com,dizipal2113.com,dizipal2114.com,dizipal2115.com,dizipal2116.com,dizipal2117.com,dizipal2118.com,dizipal2119.com,dizipal2120.com,dizipal2121.com,dizipal2122.com,dizipal2123.com,dizipal2124.com,dizipal2125.com,dizipal2126.com,dizipal2127.com,dizipal2128.com,dizipal2129.com,dizipal2130.com,dizipal2131.com,dizipal2132.com,dizipal2133.com,dizipal2200.com,dizipal2203.com,dizipal2204.com,dizipal2205.com,dizipal2206.com,dizipal2207.com,dizipal2208.com,dizipal2209.com,dizipal2210.com,dizipal2211.com,dizipal2212.com,dizipal2213.com,dizipal2214.com,dizipal2215.com,dizipal2216.com,dizipal2218.com,dizipal2219.com,dizipal2220.com,dizipal2221.com##a[target="_blank"][rel="nofollow"]
-dizipal2089.com,dizipal2090.com,dizipal2091.com,dizipal2096.com,dizipal2097.com,dizipal2098.com,dizipal2099.com,dizipal2100.com,dizipal2101.com,dizipal2106.com,dizipal2107.com,dizipal2108.com,dizipal2109.com,dizipal2110.com,dizipal2111.com,dizipal2112.com,dizipal2113.com,dizipal2114.com,dizipal2115.com,dizipal2116.com,dizipal2117.com,dizipal2118.com,dizipal2119.com,dizipal2120.com,dizipal2121.com,dizipal2122.com,dizipal2123.com,dizipal2124.com,dizipal2125.com,dizipal2126.com,dizipal2127.com,dizipal2128.com,dizipal2129.com,dizipal2130.com,dizipal2131.com,dizipal2132.com,dizipal2133.com,dizipal2200.com,dizipal2203.com,dizipal2204.com,dizipal2205.com,dizipal2206.com,dizipal2207.com,dizipal2208.com,dizipal2209.com,dizipal2210.com,dizipal2211.com,dizipal2212.com,dizipal2213.com,dizipal2214.com,dizipal2215.com,dizipal2216.com,dizipal2218.com,dizipal2219.com,dizipal2220.com,dizipal2221.com##body a[class^="pageskin-"]
 dizipalorjinal14.com##[aria-label="Reklam"]
 dizipalorjinal14.com##body > a[class^="pageskin-"]
 dizipia.com##[data-time]
@@ -51877,7 +51876,6 @@ ganpapa.com##div[class*="_9cb0d"]
 ganref.jp##.p-banner-wrap
 ganref.jp##.p-index_regist
 gansudaily.com.cn##.itemFloat
-gantantranews.online##[id^="ganta-"]
 ganyancanavari.com###contract
 gaode.com##.amap-app-download
 gaodun.com##.js_appdownload
@@ -54651,7 +54649,6 @@ habr.com##.tm-adfox-banner__container
 habr.com##.tm-article-blocks > section:has(> div.tm-block__body > div.tm-vacancies-block__item)
 habr.com##.tm-article-card-list > div.tm-bordered-card:empty
 habr.com##.tm-article-presenter__banner
-habr.com##.tm-articles-list__after-article [class*="special "]
 habr.com##.tm-company-card__branding
 habr.com##.tm-company-card__top-image
 habr.com##.tm-company-widgets
@@ -55999,7 +55996,6 @@ hindi.news24online.com##.vdoBox
 hindi.news24online.com##[class*="adBlock"]
 hindi.news24online.com##[class*="rhsAds"]
 hindivivek.org,newslive24x7.com,raibaaruttarakhand.com,sarthakprayash.com,shivshahilive.com,uttarakhandsamachar.com##.elementor-widget-video
-hindustannewsexpress.com##img[src=""]
 hindustantimes.com###divshopnowRight
 hindustantimes.com###divTopNews:empty
 hindustantimes.com###echosdk_click_overlay
@@ -58757,10 +58753,7 @@ interestingengineering.com##div[class^="ArticleSubscribeModal"]
 interestingengineering.com##div[class^="NewsLetterBanner"]
 interestingengineering.com##li[class^="socialShare_"][class*="share_item"]
 interestingengineering.com##section[aria-label="Newsletter signup banner"]
-interface31.ru###js-dynamic-ad-container
-interface31.ru##.ads-sidebar-top
 interface31.ru##.ads-top-container {min-height:0;margin-bottom:0;}
-interface31.ru##.ads-widget-bottom
 interfax-russia.ru##.list-social-net
 interfax-russia.ru##div[class] > div.border-bottom:has(> span:contains(Читайте нас))
 interfax.com.ua##.art-follow
@@ -61790,9 +61783,6 @@ kerfskelts.cfd
 kern-haus.de#@##tarteaucitronAlertBig
 kern-haus.de#@##tarteaucitronRoot
 kesanpostasi.com##.entry-content > div.be-read-views ~ p > img[srcset*="-212x300.jpg"]
-ketqua16.net##.baloon
-ketqua16.net##.col-sm-10.kqcenter
-ketqua16.net##.kqbackground.vien ~ a[target="_blank"]
 kevserinmutfagi.com##.category-carousel-ad
 kewpie.co.jp##.c-sec-sns
 keyakizaka46matomemory.net##.adsbygoogle ~ table[width="100%"]
@@ -66053,7 +66043,6 @@ madcatz.com###cookirPolicy
 madchensex.com###nrad
 madchensex.com###side-spot
 made-in.be###leaderboard_row
-madhepuralivenews.com##.elementor-element-4a3bbf2a
 madnessporn.com##.cam
 madnessporn.com##.video div.header:has(> h2:contains(Madness Webcam))
 maersk.com##.p-section__article__meta__share
@@ -67729,9 +67718,6 @@ meltoday.com,sydneytoday.com##.mtgad
 meltoday.com,sydneytoday.com##.promo
 melty-novel.com##.ams-place
 melty.fr##.share
-mem-hub.ru###appPromoModal {display:none;}
-mem-hub.ru##body.modal-open > .modal-backdrop {display:none;}
-mem-hub.ru##body.modal-open {overflow:auto;padding-right:0;}
 member.11st.co.kr#@#.sns_kakao
 member.bilibili.com#@#.share-page
 member.id.rakuten.co.jp###recommendService
@@ -69567,8 +69553,6 @@ movies123-online.me##.jw-logo-top-left
 movies123-online.me##.sadhjasdjkASDd
 movies123-online.me##a[href$="/premium-membership"] > img
 movies123-online.me##body > div[class]:has(> div[id] > div[id] > a[href$="/premium-membership"])
-moviestape.lat##.dle_b_branding
-moviestape.lat##.r-block
 moviewalker.jp##.bl_adSPWrap
 moviewalker.jp##div[style^="margin: 20px 0;"]
 moviewalker.jp##div[style^="padding-top:10px;  padding-bottom: 10px"][style*="min-height"]
@@ -69683,6 +69667,7 @@ ms.bridgestone.co.jp###sns-share-block
 mscbsc.com##.bao1
 mschistota.ru##.share > div.row > div.col-md-6 > div:contains(Поделитесь)
 mscw-guidebook.com##.plaza-ad-wrap
+mscw-guidebook.com##.qiyou-ad
 msdmanuals.com##.a2a_dd
 msdmanuals.com##aside[class^="StickyRightToolbar_"] > ul > li[class^="StickyRightToolbar_"]:has(> div > button[class*="_shareIcon_"])
 msdmanuals.com##button[class*="StickyRightToolbar_shareIcon"]
@@ -79827,6 +79812,7 @@ rebates.jp###stickyFooter
 rebates.jp##a[class^="css-"][href^="https://ac.ebis.ne.jp/"][href*="_mno_"]
 rebelnews.com##.shopify-buy-frame
 rebooo.com###gong
+reborn.layarwibu.com##a[rel~="sponsored"]
 reborntrans.com##a[rel][target="_blank"] > img
 rebosoku.com##.kiji-ad1
 rebosoku.com##.sidebody-r
@@ -80775,6 +80761,7 @@ rosreserv.ru#@#.b-banner
 rossaprimavera.ru##.share_tool
 rosserialhd.ru##.player_ad_attention
 rossmann.pl#@##onetrust-consent-sdk
+rosteplo.ru##div[style="margin: auto; text-align:left;"]
 rostics.ru###links-menu + div[class]:has(> div[class] a[href="/legal/loyalty_program"])
 rostics.ru##._3l3oK3nIbnZ
 rotabettv370.com,rotabettv371.com,rotabettv372.com,rotabettv373.com,rotabettv374.com,rotabettv375.com,rotabettv376.com,rotabettv377.com,rotabettv378.com,rotabettv379.com,rotabettv380.com,rotabettv381.com,rotabettv382.com,rotabettv383.com,rotabettv384.com,rotabettv385.com,rotabettv386.com,rotabettv387.com,rotabettv388.com,rotabettv389.com,rotabettv390.com,rotabettv391.com,rotabettv392.com,rotabettv393.com,rotabettv394.com,rotabettv395.com,rotabettv396.com,rotabettv397.com,rotabettv398.com,rotabettv399.com,rotabettv400.com,rotabettv401.com,rotabettv402.com,rotabettv403.com,rotabettv404.com,rotabettv405.com,rotabettv406.com,rotabettv407.com,rotabettv408.com,rotabettv409.com,rotabettv410.com,rotabettv411.com,rotabettv412.com,rotabettv413.com,rotabettv414.com,rotabettv415.com##body > a[href^="https://"][target="_blank"]
@@ -89980,10 +89967,10 @@ turkifsa27.site,turkifsa32.site,turkifsa40.site,turkifsa41.site,turkifsa42.site,
 turkifsa27.site,turkifsa32.site,turkifsa40.site,turkifsa41.site,turkifsa42.site,turkifsa43.site,turkifsa44.site,turkifsa45.site,turkifsa5.site##div[class]:has(> a:is([href^="https://cutt.ly/"],[href="https://denemebonusumi.com/"]))
 turkifsa27.site,turkifsa32.site,turkifsa40.site,turkifsa41.site,turkifsa42.site,turkifsa43.site,turkifsa44.site,turkifsa45.site,turkifsa5.site##div[class][style^="min-height:"][style*="calc("]
 turkifsa27.site,turkifsa32.site,turkifsa40.site,turkifsa41.site,turkifsa42.site,turkifsa43.site,turkifsa44.site,turkifsa45.site,turkifsa5.site##video + div.absolute
-turkifsa73.com,turkifsa74.com,turkifsa75.com,turkifsa76.com,turkifsa77.com,turkifsa78.com,turkifsa79.com,turkifsa80.com,turkifsa81.com,turkifsa82.com,turkifsa83.com,turkifsa84.com,turkifsa85.com,turkifsa86.com,turkifsa87.com,turkifsa88.com,turkifsa89.com,turkifsa90.com##.ad-banner-frame
-turkifsa73.com,turkifsa74.com,turkifsa75.com,turkifsa76.com,turkifsa77.com,turkifsa78.com,turkifsa79.com,turkifsa80.com,turkifsa81.com,turkifsa82.com,turkifsa83.com,turkifsa84.com,turkifsa85.com,turkifsa86.com,turkifsa87.com,turkifsa88.com,turkifsa89.com,turkifsa90.com##div[class]:has(> a:is([href^="https://cutt.ly/"],[href="https://denemebonusumi.com/"]))
-turkifsa73.com,turkifsa74.com,turkifsa75.com,turkifsa76.com,turkifsa77.com,turkifsa78.com,turkifsa79.com,turkifsa80.com,turkifsa81.com,turkifsa82.com,turkifsa83.com,turkifsa84.com,turkifsa85.com,turkifsa86.com,turkifsa87.com,turkifsa88.com,turkifsa89.com,turkifsa90.com##div[class][style^="min-height:"][style*="calc("]
-turkifsa73.com,turkifsa74.com,turkifsa75.com,turkifsa76.com,turkifsa77.com,turkifsa78.com,turkifsa79.com,turkifsa80.com,turkifsa81.com,turkifsa82.com,turkifsa83.com,turkifsa84.com,turkifsa85.com,turkifsa86.com,turkifsa87.com,turkifsa88.com,turkifsa89.com,turkifsa90.com##video + div.absolute
+turkifsa73.com,turkifsa74.com,turkifsa75.com,turkifsa76.com,turkifsa77.com,turkifsa78.com,turkifsa79.com,turkifsa80.com,turkifsa81.com,turkifsa82.com,turkifsa83.com,turkifsa84.com,turkifsa85.com,turkifsa86.com,turkifsa87.com,turkifsa88.com,turkifsa89.com,turkifsa90.com,turkifsa93.com##.ad-banner-frame
+turkifsa73.com,turkifsa74.com,turkifsa75.com,turkifsa76.com,turkifsa77.com,turkifsa78.com,turkifsa79.com,turkifsa80.com,turkifsa81.com,turkifsa82.com,turkifsa83.com,turkifsa84.com,turkifsa85.com,turkifsa86.com,turkifsa87.com,turkifsa88.com,turkifsa89.com,turkifsa90.com,turkifsa93.com##div[class]:has(> a:is([href^="https://cutt.ly/"],[href="https://denemebonusumi.com/"]))
+turkifsa73.com,turkifsa74.com,turkifsa75.com,turkifsa76.com,turkifsa77.com,turkifsa78.com,turkifsa79.com,turkifsa80.com,turkifsa81.com,turkifsa82.com,turkifsa83.com,turkifsa84.com,turkifsa85.com,turkifsa86.com,turkifsa87.com,turkifsa88.com,turkifsa89.com,turkifsa90.com,turkifsa93.com##div[class][style^="min-height:"][style*="calc("]
+turkifsa73.com,turkifsa74.com,turkifsa75.com,turkifsa76.com,turkifsa77.com,turkifsa78.com,turkifsa79.com,turkifsa80.com,turkifsa81.com,turkifsa82.com,turkifsa83.com,turkifsa84.com,turkifsa85.com,turkifsa86.com,turkifsa87.com,turkifsa88.com,turkifsa89.com,turkifsa90.com,turkifsa93.com##video + div.absolute
 turkifsaclub.org##.ads-grid
 turkifsaclub.org##main > h3:contains(Sponsor Bannerlar)
 turkifsaclub130.sbs,turkifsaclub131.sbs,turkifsaclub132.sbs,turkifsaclub133.sbs,turkifsaclub134.sbs,turkifsaclub135.sbs,turkifsaclub136.sbs,turkifsaclub137.sbs,turkifsaclub138.sbs,turkifsaclub139.sbs,turkifsaclub140.sbs,turkifsaclub141.sbs,turkifsaclub142.sbs,turkifsaclub143.sbs,turkifsaclub144.sbs,turkifsaclub145.sbs,turkifsaclub146.sbs,turkifsaclub147.sbs,turkifsaclub148.sbs,turkifsaclub149.sbs,turkifsaclub150.sbs,turkifsaclub151.sbs,turkifsaclub152.sbs,turkifsaclub153.sbs,turkifsaclub154.sbs,turkifsaclub155.sbs,turkifsaclub156.sbs,turkifsaclub157.sbs,turkifsaclub158.sbs,turkifsaclub159.sbs,turkifsaclub160.sbs,turkifsaclub161.sbs,turkifsaclub162.sbs,turkifsaclub163.sbs,turkifsaclub164.sbs,turkifsaclub165.sbs,turkifsaclub166.sbs,turkifsaclub167.sbs,turkifsaclub168.sbs,turkifsaclub169.sbs,turkifsaclub170.sbs,turkifsaclub171.sbs,turkifsaclub172.sbs,turkifsaclub173.sbs,turkifsaclub174.sbs,turkifsaclub175.sbs,turkifsaclub176.sbs,turkifsaclub177.sbs,turkifsaclub178.sbs,turkifsaclub179.sbs,turkifsaclub180.sbs,turkifsaclub181.sbs,turkifsaclub182.sbs,turkifsaclub183.sbs,turkifsaclub184.sbs,turkifsaclub185.sbs,turkifsaclub186.sbs,turkifsaclub187.sbs,turkifsaclub189.sbs,turkifsaclub191.sbs,turkifsaclub192.sbs,turkifsaclub193.sbs,turkifsaclub194.sbs,turkifsaclub195.sbs,turkifsaclub196.sbs,turkifsaclub197.sbs,turkifsaclub198.sbs,turkifsaclub199.sbs,turkifsaclub200.sbs,turkifsaclub201.sbs,turkifsaclub202.sbs,turkifsaclub203.sbs,turkifsaclub204.sbs,turkifsaclub205.sbs,turkifsaclub206.sbs,turkifsaclub207.sbs,turkifsaclub208.sbs,turkifsaclub209.sbs,turkifsaclub210.sbs,turkifsaclub211.sbs,turkifsaclub212.sbs,turkifsaclub213.sbs,turkifsaclub214.sbs,turkifsaclub215.sbs##.ads-grid
@@ -90856,8 +90843,6 @@ ultrabookreview.com##div[id^="zzif"]
 ultradownloads.uol.com.br##table[height="600"]
 ultradownloads.uol.com.br##tr[height="90"]
 ultrafarma.com.br###modal-lgpd
-ultrathots.com##.top_player
-ultrathots.com##.under_header
 uludagsozluk.com###big-masthead
 uludagsozluk.com###overlay
 uludagsozluk.com##.adulu-col-right-ulu
@@ -92646,8 +92631,6 @@ vook.vc##.note-main-spnsr a:not([href*="vook.vc"])
 vook.vc##.note-right-spnsr
 vook.vc##.note-share-sns
 vorablesen.de###tos_pp_update
-voratoon.com##div[class^="ad-slot"]
-voratoon.com##div[class^="ranking-promo-popup"]
 vorsprung-online.de##.custom > p[style="text-align: center;"]
 vorsprung-online.de##a[href="/index.php/anzeigenpreise.html"]
 vortexgaming.io##div[class^="postdetail_right_box__"] > div[class^="PostReact_post_button_wrap__"]:has(use[href$="#ico-share-hover"])
@@ -97327,6 +97310,7 @@ zzzyk.com###Tinfo
 ||1024down.com/images/*.gif
 ||1024tera.com/api/ad/
 ||1024tera.com/api/analytics?
+||1024txt.com/js/
 ||102tv.cn/js/main.js
 ||103.224.182.210^
 ||103092804.com^
@@ -97943,6 +97927,7 @@ zzzyk.com###Tinfo
 ||25img.com/nnn2/189guding.js
 ||25img.com/nnn2/accd.js
 ||25obpfr.de^
+||25pbowv7h377el8ptlpqxv.rest^
 ||25rpllbbg.com^
 ||25t9uxgnx.com^
 ||268de.com/js/
@@ -98099,6 +98084,7 @@ zzzyk.com###Tinfo
 ||2vb347nth742ibr.rest^
 ||2vcb9onxjm.com^
 ||2vegptboucfvc3.cfd^
+||2w7urj3f2.com^
 ||2wg8pp90e.com^
 ||2wn4bycie4tznq44mf396xojlrl5f.cfd^
 ||2wqs6d2gp.com^
@@ -99435,6 +99421,7 @@ zzzyk.com###Tinfo
 ||8mrmb8n1z2zowboufw7ohyo2z9hjg.cfd^
 ||8n2iu6djx6.com^
 ||8n67t.com^
+||8nrjifigyphw77n6pr.rest^
 ||8o5v23yip.com^
 ||8oghu1wcau.com^
 ||8p14q886v2.com^
@@ -101734,6 +101721,7 @@ zzzyk.com###Tinfo
 ||aestheticlawspebble.com^
 ||aetfwitotdnvn.online^
 ||aetvellt.net^
+||aevdefpuisqmh.website^
 ||aevumestmark.qpon^
 ||aexjgndyyeaha.space^
 ||aexoao7lg6.com^
@@ -102074,6 +102062,7 @@ zzzyk.com###Tinfo
 ||ahm.135320.com^
 ||aholtashler.com^
 ||ahort.xyz^
+||ahqoqgffak.in^
 ||ahqwswioi.com^
 ||ahrefs.com^$third-party
 ||ahscdn.com^
@@ -104305,6 +104294,7 @@ zzzyk.com###Tinfo
 ||atendimen.to^$third-party
 ||aterlthkgirxw.space^
 ||ateuchiclatch.shop^
+||atgroup-link.id^$third-party
 ||atgsvcs.com/js/atgsvcs.js
 ||atgvmlnbtnlxl.website^
 ||athelittlewallo.com^
@@ -104754,6 +104744,7 @@ zzzyk.com###Tinfo
 ||awberaurir.com^
 ||awbrwryaeozmj.top^
 ||awcecrod.com^
+||awchrxkuengsj.site^
 ||awcrpu.com^
 ||awdeliverynet.com^
 ||awdfkryyfgmqd.website^
@@ -105399,6 +105390,7 @@ zzzyk.com###Tinfo
 ||ballive.*/addm/
 ||balloonshrived.cyou^
 ||ballroomprudentauditorium.com^
+||ballsyemprise.cyou^
 ||balmsmarket.cyou^
 ||balmygorger.cfd^
 ||balmyrind.com^
@@ -105670,6 +105662,7 @@ zzzyk.com###Tinfo
 ||bassemeraldlizzie.com^
 ||basspro.com/api/*/Cookie_Tracking_Disclosure|
 ||bastardnonethelessuseless.com^
+||bastianrugging.cfd^
 ||bastion1.top^
 ||bat.bing.com^
 ||bat.bing.net^
@@ -105840,6 +105833,8 @@ zzzyk.com###Tinfo
 ||bckbhadz.com^
 ||bclogin-check.com^
 ||bcloudhost.com^
+||bcmbmedbqx.icu^
+||bcmbmedbqx.top^
 ||bcmimhkecgwfj.space^
 ||bcnmnhublbnsw.website^
 ||bcnonwgwntvpv.website^
@@ -106521,6 +106516,7 @@ zzzyk.com###Tinfo
 ||bgajeddhdcjhbijhgaj.world^$third-party
 ||bgbaysohkaaee.site^
 ||bgbeqdtopwumc.online^
+||bgblnjirhksri.online^
 ||bgblsb5s6a.com^
 ||bgbtbtwrmcgoa.website^
 ||bgbyvx.icu^
@@ -106532,6 +106528,8 @@ zzzyk.com###Tinfo
 ||bgjswxiwaocng.website^
 ||bgjylr.icu^
 ||bgkuoiryzvhni.site^
+||bgkvozgkjpchx.space^
+||bgnhscdudpmrj.website^
 ||bgore.xyz^
 ||bgqamxuxabntp.space^
 ||bgqantksojipe.online^
@@ -107068,6 +107066,7 @@ zzzyk.com###Tinfo
 ||blehcourt.com^
 ||blekdkibtepdo.site^
 ||blendedbird.com^
+||blendedliteral.cfd^
 ||blendee.com^
 ||blendfencingprune.com^$popup
 ||blendox.cfd^
@@ -107168,8 +107167,8 @@ zzzyk.com###Tinfo
 ||blogclans.com^$third-party
 ||bloger51.com/wp-content/themes/*/banner/
 ||blogger.com/followers.g?blogID
-||blogger.googleusercontent.com/img/$domain=dizipal1555.com|dizipal1556.com|dizipal1557.com|dizipal1558.com|dizipal1559.com|dizipal1560.com|dizipal1561.com|dizipal1562.com|dizipal1563.com|dizipal1564.com|dizipal1565.com|dizipal1566.com|dizipal1567.com|dizipal1568.com|dizipal1569.com|dizipal1570.com|dizipal1571.com|dizipal1572.com|dizipal1573.com|dizipal1574.com|dizipal1575.com|dizipal1576.com|dizipal1577.com|dizipal1578.com|dizipal1579.com|dizipal1580.com|dizipal1581.com|dizipal1582.com|dizipal1583.com|dizipal1584.com|dizipal1585.com|dizipal1586.com|dizipal1587.com|dizipal1588.com|dizipal1589.com|dizipal1590.com|dizipal1591.com|dizipal1592.com|dizipal1593.com|dizipal1594.com|dizipal1595.com|dizipal1596.com|dizipal1597.com|dizipal1598.com|dizipal1599.com|dizipal1600.com
-||blogger.googleusercontent.com/img/$domain=dizipal2089.com|dizipal2091.com|dizipal2098.com|dizipal2100.com|dizipal2101.com|dizipal2200.com|dizipal2203.com|dizipal2204.com|dizipal2205.com|dizipal2207.com|dizipal2107.com|dizipal2108.com|dizipal2109.com|dizipal2214.com|dizipal2110.com|dizipal2215.com|dizipal2111.com|dizipal2112.com|dizipal2106.com|dizipal2113.com|dizipal2096.com|dizipal2097.com|dizipal2090.com|dizipal2099.com|dizipal2114.com|dizipal2115.com|dizipal2116.com|dizipal2117.com|dizipal2118.com|dizipal2119.com|dizipal2120.com|dizipal2121.com|dizipal2122.com|dizipal2123.com|dizipal2124.com|dizipal2125.com|dizipal2126.com|dizipal2127.com|dizipal2128.com|dizipal2129.com|dizipal2130.com|dizipal2206.com|dizipal2208.com|dizipal2209.com|dizipal2210.com|dizipal2211.com|dizipal2212.com|dizipal2213.com|dizipal2216.com|dizipal2218.com|dizipal2219.com|dizipal2220.com|dizipal2131.com|dizipal2132.com|dizipal2133.com|dizipal2221.com
+||blogger.googleusercontent.com/img/$domain=dizipal1589.com|dizipal2089.com|dizipal2090.com|dizipal2091.com|dizipal2096.com|dizipal2097.com|dizipal2098.com|dizipal2099.com|dizipal2100.com|dizipal2101.com|dizipal2106.com|dizipal2107.com|dizipal2108.com|dizipal2109.com|dizipal2110.com|dizipal2111.com|dizipal2112.com|dizipal2113.com|dizipal2114.com|dizipal2115.com|dizipal2116.com|dizipal2117.com|dizipal2118.com|dizipal2119.com|dizipal2120.com|dizipal2121.com|dizipal2122.com|dizipal2123.com|dizipal2124.com|dizipal2125.com|dizipal2126.com|dizipal2127.com|dizipal2128.com|dizipal2129.com|dizipal2130.com|dizipal2131.com|dizipal2132.com|dizipal2133.com|dizipal2134.com|dizipal2135.com|dizipal2136.com|dizipal2137.com|dizipal2138.com|dizipal2200.com|dizipal2203.com|dizipal2204.com|dizipal2205.com|dizipal2206.com|dizipal2207.com|dizipal2208.com|dizipal2209.com|dizipal2210.com|dizipal2211.com|dizipal2212.com|dizipal2213.com|dizipal2214.com|dizipal2215.com|dizipal2216.com|dizipal2218.com|dizipal2219.com|dizipal2220.com|dizipal2221.com|dizipal2222.com|dizipal2223.com|dizipal2224.com|dizipal2225.com
+||blogger.googleusercontent.com/img/$domain=dizipal1589.com|dizipal2091.com|dizipal2098.com|dizipal2100.com|dizipal2101.com|dizipal2200.com|dizipal2203.com|dizipal2204.com|dizipal2205.com|dizipal2207.com|dizipal2107.com|dizipal2108.com|dizipal2109.com|dizipal2214.com|dizipal2110.com|dizipal2215.com|dizipal2111.com|dizipal2112.com|dizipal2106.com|dizipal2113.com|dizipal2096.com|dizipal2097.com|dizipal2090.com|dizipal2099.com|dizipal2114.com|dizipal2115.com|dizipal2116.com|dizipal2117.com|dizipal2118.com|dizipal2119.com|dizipal2120.com|dizipal2121.com|dizipal2122.com|dizipal2123.com|dizipal2124.com|dizipal2125.com|dizipal2126.com|dizipal2127.com|dizipal2128.com|dizipal2129.com|dizipal2130.com|dizipal2206.com|dizipal2208.com|dizipal2209.com|dizipal2210.com|dizipal2211.com|dizipal2212.com|dizipal2213.com|dizipal2216.com|dizipal2218.com|dizipal2219.com|dizipal2220.com|dizipal2131.com|dizipal2132.com|dizipal2133.com|dizipal2221.com|dizipal2089.com|dizipal2134.com|dizipal2135.com|dizipal2136.com|dizipal2137.com|dizipal2138.com|dizipal2222.com|dizipal2223.com|dizipal2224.com|dizipal2225.com
 ||blogger.googleusercontent.com/img/$domain=inattv1325.xyz
 ||blogger.googleusercontent.com/img/$domain=justintvsh.baby|justinttvvamphd.cfd
 ||blogger.googleusercontent.com/img/$domain=justintvx30.blogspot.com|justintvxx10.blogspot.com|inattv-taraftarium24-macizle.blogspot.com|canli-mac-izle-taraftarium24-izle.blogspot.com|justintvgiris.blogspot.com|sportboss-macizlesbs.blogspot.com|taraftarium402.blogspot.com|macicanliizle.sbs|taraftarium24canli-macizlesene.blogspot.com|taraftarium24hdgiris1.blogspot.com|selcukspor-taraftarium24canliizle1.blogspot.com|hdtaraftartv1000.blogspot.com|efo-bf.net|taraftariumizle.in|pressedfur.com
@@ -107595,6 +107594,7 @@ zzzyk.com###Tinfo
 ||boodschappen.nl/wp-json/boodschappen/v1/banners/get_banners
 ||boodschappen.nl/wp-json/boodschappen/v1/banners/get_native_banner
 ||boogiesreedphilol.cyou^
+||boohoonor.com^
 ||bookadil.com^
 ||bookbang.jp/common/js/ad.js
 ||bookbannershop.com^
@@ -108245,6 +108245,7 @@ zzzyk.com###Tinfo
 ||bskuxhcaduumi.online^
 ||bslbpb.icu^
 ||bsldkaxqzrcdn.website^
+||bsldwpszdbwxz.online^
 ||bslonjlshq.com^
 ||bsmvroohwwakx.site^
 ||bsmyaurgljhae.online^
@@ -108558,6 +108559,7 @@ zzzyk.com###Tinfo
 ||burlacemautinfame.cfd^
 ||burlerornate.com^
 ||burleskspoiler.com^
+||burleyalgy.com^
 ||burlyringman.qpon^
 ||burlytonight.pro^
 ||burniecrepes.com^
@@ -108716,6 +108718,7 @@ zzzyk.com###Tinfo
 ||bvycqrmqlqvp.com^
 ||bvyepg32omkvnv2f.cyou^
 ||bvyhpxikzylmn.space^
+||bw1fb9ryrmp1f7.rest^
 ||bw3uqlpvjyegkxivzlxc5rnhig5f.cfd^
 ||bw66.cn/template/default_pc/bbs/
 ||bwau1s2fm.com^
@@ -110440,7 +110443,6 @@ zzzyk.com###Tinfo
 ||championshipgirlie.com^
 ||chancesarmlessimpulse.com^
 ||chancobinocle.cfd^
-||chandaulisamachar.com^*/Ads--
 ||change.org/api-proxy/-/et
 ||changedadroitharassment.com^
 ||changelessbleach.com^
@@ -110615,6 +110617,7 @@ zzzyk.com###Tinfo
 ||chewy.com/api/event/
 ||chexun.com/delivery?
 ||chexun.net/images/sales//cxgg/
+||chezsissysunket.cfd^
 ||chfpgcbe.com^
 ||chftwkoiswquf.site^
 ||chgrods.cyou^
@@ -110738,6 +110741,7 @@ zzzyk.com###Tinfo
 ||chivieslocker.cyou^
 ||chixi.jp/img.php?filename=b_
 ||chizzelfudgy.cfd^
+||chlorylrewedssebait.cfd^
 ||chmhhmmiphmdl.website^
 ||chmnniqaajrrl.online^
 ||chmsrv.com^
@@ -110905,6 +110909,7 @@ zzzyk.com###Tinfo
 ||cipangonone.com^
 ||cipezicsdpmzi.space^
 ||cipgvqwylbcoa.site^
+||cipodidymus.cyou^
 ||cipqzgarguxht.online^
 ||cipyhdjcfnfqm.website^
 ||ciqfawsa.in^
@@ -112343,6 +112348,7 @@ zzzyk.com###Tinfo
 ||contentx.me/assets/dm.png
 ||contentyet.com^$domain=gry-online.pl
 ||contesphloeum.qpon^
+||conteurturus.qpon^
 ||context.hotline.ua^
 ||contextads.live^$third-party
 ||contextelvira.cyou^
@@ -112859,6 +112865,7 @@ zzzyk.com###Tinfo
 ||crakrevenue.go2cloud.org^
 ||cramblyexposer.com^
 ||crambobauds.com^
+||cramminion.com^
 ||crampetarean.com^
 ||crampleadspace.com^
 ||crampstigreanunnice.cfd^
@@ -113530,6 +113537,7 @@ zzzyk.com###Tinfo
 ||cvqpuusbccduh.online^
 ||cvt1.sibnet.ru/j79fbdxg.js
 ||cvt1.sibnet.ru^
+||cvtmsjlcmiixi.online^
 ||cvuestnhwbnix.site^
 ||cvuydvdirfxxq.site^
 ||cvwgltvuviniv.space^
@@ -115333,6 +115341,7 @@ zzzyk.com###Tinfo
 ||deputydelicacyopt.com^
 ||depwwdntgavyc.website^
 ||deqixs.com/config/
+||dequeenabiders.qpon^
 ||dequeens.com^
 ||deqwas.net^$third-party
 ||derbytestulebimini.qpon^
@@ -115594,8 +115603,6 @@ zzzyk.com###Tinfo
 ||dh5t3pyb6r.com^
 ||dh8azcl753e1e.cloudfront.net^
 ||dh8ypn3lq8.com^
-||dhading.com/wp-content/uploads/2016/12/banner-covid.jpg
-||dhading.com/wp-content/uploads/2016/12/ctxpress-sept26.gif
 ||dhakatimes24.com/templates/web-v3/images/sept-09.jpg
 ||dhangarkokia.com^
 ||dhanroop.cfd^
@@ -115820,6 +115827,7 @@ zzzyk.com###Tinfo
 ||dinkydawdy.cyou^
 ||dinmansennas.com^
 ||dinomicrummies.com^
+||dinomysstorm.com^
 ||dinosaurprinciples.com^
 ||dinsbetrlsiqc.space^
 ||dinxkqucszaza.space^
@@ -118816,6 +118824,7 @@ zzzyk.com###Tinfo
 ||electcocktail.com^
 ||electkooka.cyou^
 ||electosake.com^
+||electoutnook.com^
 ||electranowel.com^
 ||electricalbicyclelistnonfiction.com^
 ||electrode28.com^
@@ -118968,6 +118977,7 @@ zzzyk.com###Tinfo
 ||embusyjurata.help^
 ||embwmpt.com^
 ||emceevicilin.cyou^
+||emcv4fcvxbefc7ve9wgfq.cfd^
 ||emdcadvertise.eastmoney.com^
 ||emdnriustcngd.website^
 ||emediate.dk^
@@ -120036,6 +120046,7 @@ zzzyk.com###Tinfo
 ||exalted-engineering.com^
 ||exaltedlucy.com^
 ||exaltedsleep.com^
+||examafeard.cyou^
 ||exasperatebubblyorthodox.com^
 ||exbyrdcuekvgr.space^
 ||excafwcwlpevm.site^
@@ -121032,6 +121043,7 @@ zzzyk.com###Tinfo
 ||feodrecallsoutwin.qpon^
 ||feodsflyleaf.cfd^
 ||feoffeevenomer.shop^
+||feowerdamping.com^
 ||feqgpykeuppfi.space^
 ||feqriiemuqxis.online^
 ||feqwggxdibzmq.online^
@@ -121554,6 +121566,7 @@ zzzyk.com###Tinfo
 ||fishnet.ru/_/fb/
 ||fishymonster.com^
 ||fiskaqqjajwqv.website^
+||fiskgouges.cyou^
 ||fissilescyphae.cfd^
 ||fistpoke.com^
 ||fitchpmsa.com^
@@ -122067,6 +122080,7 @@ zzzyk.com###Tinfo
 ||foozlesopcode.qpon^
 ||fopduzolpqdue.space^
 ||foppedsnickgreenuk.cfd^
+||fopperyrynds.com^
 ||fopxicajsprkh.site^
 ||foqspucuejbxp.website^
 ||forabodiesonly.com/mopar/sidebarbanners/
@@ -122726,6 +122740,7 @@ zzzyk.com###Tinfo
 ||fukzsbkp8.com^
 ||fulalurkerswaco.cyou^
 ||fulanimesses.cfd^
+||fuleeaziyfrna.website^
 ||fulgentrosalyn.com^
 ||fulibac.com/images/upload/ad/
 ||fulibl.com/wp-content/uploads/2016/06/320-230.jpg
@@ -123728,6 +123743,7 @@ zzzyk.com###Tinfo
 ||geo.yahoo.com^
 ||geoaddicted.net^
 ||geobanner.adultfriendfinder.com^
+||geobasket.ru/*/crm-bnrs/
 ||geodator.com^
 ||geodistpterian.shop^
 ||geoedge.be^
@@ -124057,6 +124073,7 @@ zzzyk.com###Tinfo
 ||giddifytannery.cyou^
 ||giddyplastic.pro^
 ||giddyrabiddaylight.com^
+||gideonlnr.cyou^
 ||gidyeamotivesnavar.qpon^
 ||gie0izinx.com^
 ||giedcastled.com^
@@ -124286,6 +124303,7 @@ zzzyk.com###Tinfo
 ||gladlyconceitcucumbers.com^
 ||gladlydotselfevident.com^
 ||gladlythattoady.com^
+||glairedgestalt.qpon^
 ||glairemastax.cyou^
 ||glairyratwaterpane.qpon^
 ||glamorousconditionsattempt.com^
@@ -125036,6 +125054,7 @@ zzzyk.com###Tinfo
 ||gqpphcywxrnji.website^
 ||gqprjkneyocuo.site^
 ||gqqynxixjotce.site^
+||gqtdckecwvjym.site^
 ||gqtvkxhycjthdx.com^
 ||gqwu.cn^
 ||gqxgrffjsyviu.space^
@@ -127784,6 +127803,7 @@ zzzyk.com###Tinfo
 ||htdixisbyvulc.store^
 ||htduxqdikogmt.site^
 ||htdvt.com^
+||htdzeloriyeiw.space^
 ||hteniplvbxeqt.space^
 ||htfgames.com/bilder/2006/casino.jpg
 ||htfgames.com/bilder/2006/kostenlose_games.jpg
@@ -127955,6 +127975,7 @@ zzzyk.com###Tinfo
 ||hunterers.com^
 ||hunterheroiccompassion.com^
 ||hunterlead.com^
+||huntfishbrag.store^$third-party
 ||hunzlj.icu^
 ||huo720.com/files/vidhub
 ||huoche.net/Images/pc/ad_
@@ -129612,6 +129633,7 @@ zzzyk.com###Tinfo
 ||injbwbtfrzbmy.website^
 ||injd.site^$third-party
 ||injectbriers.cyou^
+||injunarerola.cfd^
 ||injuredripplegentleman.com^
 ||injusthurlock.cfd^
 ||injusticebakery.com^
@@ -130767,6 +130789,7 @@ zzzyk.com###Tinfo
 ||jalan.net^*/adsSearchCondition.js
 ||jalan.net^*/jkg_ads$script
 ||jaleeazymous.cfd^
+||jalousedoglesswejack.cfd^
 ||jalrlgochsjoe.space^
 ||jamanetwork.com/AMA/AdTag
 ||jambeflushescatlap.cfd^
@@ -131105,6 +131128,7 @@ zzzyk.com###Tinfo
 ||jezebelheckle.cyou^
 ||jezer.site^
 ||jezjcfxhnsyts.website^
+||jezjwauhqqvor.site^
 ||jf.nairydeices.com/rXAp4JBa7jNUt/114370$domain=lxmanga.space,rewrite=abp-resource:blank-js
 ||jfacflmbkvxez.online^
 ||jfapiprod.optimonk.com^
@@ -131307,6 +131331,7 @@ zzzyk.com###Tinfo
 ||jiptcrzamhujz.space^
 ||jirblegrylle.qpon^
 ||jirot.xyz^
+||jirqbdrqmpevy.online^
 ||jirqrmfxaeoyr.site^
 ||jishulink.com/jishulink/searching/ad/get?
 ||jishuqq.com/images/haodian.gif
@@ -131381,6 +131406,7 @@ zzzyk.com###Tinfo
 ||jjwxc.net/jjad*.html$popup
 ||jjwxc.net/jjPopup.php
 ||jjxcwurdtouaw.online^
+||jjxhwow75cehgr7yhe4.cfd^
 ||jjxipmaerbtdj.online^
 ||jjzuqyezehdnj.space^
 ||jk-to-mn.com^
@@ -131714,6 +131740,7 @@ zzzyk.com###Tinfo
 ||jphnagyscnekv.site^
 ||jpisoprhajjyx.space^
 ||jpixwkrjebyht.online^
+||jpklzzgkyzisf.space^
 ||jpktldryxvuzk.online^
 ||jpnebfqxdaatz.site^
 ||jpnhxthuxiplo.site^
@@ -132094,6 +132121,7 @@ zzzyk.com###Tinfo
 ||juklfwgznmzky.site^
 ||jukmbthw.com^
 ||julianoalvaroz12.com^
+||juliottanconal.cyou^
 ||jullyambery.net^
 ||julmykunobltqkl.com^
 ||julolecalve.website^
@@ -132726,6 +132754,7 @@ zzzyk.com###Tinfo
 ||kdcnqedoikwsx.site^
 ||kddgprcrbttbc.site^
 ||kddlljplazsfp.website^
+||kddxspguyyqgq.site^
 ||kdewa111.familydoctor.com.cn^
 ||kdfjlppcvgbdj.space^
 ||kdfxyazua.com^
@@ -132977,6 +133006,7 @@ zzzyk.com###Tinfo
 ||kgqbaogrwf.com^
 ||kgrdrkgyl.com^
 ||kgricuptghssu.website^
+||kgskpetrdmceb.site^
 ||kgslcxtpctxru.online^
 ||kgsxcozeuccrs.website^
 ||kgt628.5qg9etryc95zhuvtxpuqiq.cyou^
@@ -134418,6 +134448,7 @@ zzzyk.com###Tinfo
 ||laxityblames.cfd^
 ||laxsikcp.in^
 ||laxsqiibtpijk.site^
+||layarotaku.id^$third-party
 ||laycosmicstill.com^
 ||laydowndeusan.shop^
 ||laydownfaunist.com^
@@ -134518,6 +134549,7 @@ zzzyk.com###Tinfo
 ||lcqncipmxvelsw.com^
 ||lcrebbqmvlbtno.com^
 ||lcrimedxoyhgy.space^
+||lcrugepbvscja.website^
 ||lcs.naver.com^
 ||lcsirlytsncmg.space^
 ||lctpvmaxz.icu^
@@ -136105,6 +136137,7 @@ zzzyk.com###Tinfo
 ||lqbzvmvwjyor.top^
 ||lqcldweyteatn.site^
 ||lqdhllq.com^
+||lqezxyarmhopy.site^
 ||lqfakbohpecho.online^
 ||lqfmquntlylae.website^
 ||lqkkoozzekbov.top^
@@ -136566,6 +136599,7 @@ zzzyk.com###Tinfo
 ||lzwr42toihmrzw3j4.cfd^
 ||lzxdx24yib.com^
 ||lzybyzttqdrzq.online^
+||lzyqzgsdgvvgz.site^
 ||lzyysw.com/upload/
 ||m-hentai.net/img/Native%20Ads/
 ||m-pe.tv/img/banner/
@@ -137715,6 +137749,7 @@ zzzyk.com###Tinfo
 ||melodic-mess.com^
 ||melodramaticquery.com^
 ||meloshounder.com^
+||melosthosnarc.cfd^
 ||meltingpristaw.qpon^
 ||melty-novel.com/fanza/
 ||member.javtvnow.xyz^
@@ -138530,6 +138565,7 @@ zzzyk.com###Tinfo
 ||mmvideocdn.com^
 ||mmwebhandler.888.com^
 ||mmzanjxhvcgub.online^
+||mmzuidfhzk.com^
 ||mn-nl.mncdn.com/tvnet/tvnet/playlist.m3u8$domain=yenisafak.com
 ||mn-tz.com/adv_out.js
 ||mn-tz.ltd^$third-party
@@ -138997,7 +139033,6 @@ zzzyk.com###Tinfo
 ||moviekhhd.biz/ads/
 ||moviesatm.com^
 ||moviesprofit.com^
-||moviestape.lat/templates/*/branding
 ||movieweb.ru^$script,third-party
 ||moviewingz.com/wp-content/uploads/2026/08/IMG-20260813-WA0080.jpg
 ||movshow.com/*portal/
@@ -139535,6 +139570,7 @@ zzzyk.com###Tinfo
 ||mweb-hb.presage.io^
 ||mwed.jp/c/*/articles/company_advertisement/
 ||mwefxgtrcg.com^
+||mwesnaglyxurm.space^
 ||mweujqszechsw.site^
 ||mwfohkbyparzk.online^
 ||mwhjmncborxmg.website^
@@ -139703,6 +139739,7 @@ zzzyk.com###Tinfo
 ||myijptgjyj.com^
 ||myiqvn5w3.com^
 ||myitisvaire.cfd^
+||myiyufaoudldo.site^
 ||myk8n9piqkwfkgpyew.cfd^
 ||mykydlznkanfk.online^
 ||mylomza.pl/static/files/inline_images/*/inline__
@@ -140273,6 +140310,7 @@ zzzyk.com###Tinfo
 ||neechube.net^
 ||needeevo.xyz^
 ||needfullabor.com^
+||needlesbennel.com^
 ||needymission.pro^
 ||needyscarcasserole.com^
 ||needyvarietysaucer.com^
@@ -140283,6 +140321,7 @@ zzzyk.com###Tinfo
 ||nefurmjnsxefq.site^
 ||negatedebits.com^
 ||negationomitor.com^
+||negerpeptizetez.qpon^
 ||negishim.com/accessibility/
 ||neglectoffset.com^
 ||neglectsquad.com^
@@ -141421,6 +141460,7 @@ zzzyk.com###Tinfo
 ||nqyvanxrvjfng.website^
 ||nqz6wor4.xyz^
 ||nqzcerwetwnlr.site^
+||nqzkoympmsrwr.site^
 ||nr-data.net^$third-party
 ||nr-data.noelleeming.co.nz^
 ||nraluhknrvpwt.online^
@@ -141497,6 +141537,7 @@ zzzyk.com###Tinfo
 ||nsvvwqnnivvyjm.com^
 ||nsvzqoxdgwjlv.space^
 ||nsxfqbfzcx.com^
+||nsxgiktugixhz.online^
 ||nsxrfh.icu^
 ||nta1vb6cdlrl.com^
 ||ntamil.com/ads/banner/
@@ -141628,6 +141669,7 @@ zzzyk.com###Tinfo
 ||nutritioussilver.com^
 ||nutsag.com^
 ||nutsantireddemotic.cfd^
+||nutterguava.cyou^
 ||nuttermontjoy.shop^
 ||nuttfthetpnq.com^
 ||nuttylog.com^
@@ -141667,6 +141709,7 @@ zzzyk.com###Tinfo
 ||nvmrtixasylwt.online^
 ||nvobrvcxjhcbm.online^
 ||nvozrkcclawcy.site^
+||nvpbhfbsyvqzt.site^
 ||nvpbwocxzbumr.space^
 ||nvqcfaqybhpqz.site^
 ||nvqvibvtalsmj.online^
@@ -141936,6 +141979,7 @@ zzzyk.com###Tinfo
 ||oafykdjouaesy.site^
 ||oagirlodug.com^
 ||oagooazlqgcpg.site^
+||oahdnkktdcdlq.online^
 ||oainternetservices.com^
 ||oaipqzragewef.com^
 ||oakchokerfumes.com^
@@ -142390,6 +142434,7 @@ zzzyk.com###Tinfo
 ||oglalacajuelarainer.cfd^
 ||ogle-0740lb.com^
 ||oglepupilarloosely.qpon^
+||ogmpciberlnvk.website^
 ||ogmslkksd.com^
 ||ognuhmzyfudyd.site^
 ||ogol.com.br/img/logos/bookmakers/
@@ -142564,6 +142609,7 @@ zzzyk.com###Tinfo
 ||okey-online.com/prg/daten/datenbanken/banner
 ||okhwpomwoo.in^
 ||okhzwjshcpqjz.site^
+||okigapxooygky.site^
 ||okiiajtpeyycg.website^
 ||okiyfmhdmtvgs.website^
 ||okj5w2n19gm72z.cfd^
@@ -143267,6 +143313,7 @@ zzzyk.com###Tinfo
 ||orqbvhkyufnxk.space^
 ||orqlzuoqgad.com^
 ||orqnwehagogn.in^
+||orqpiuonqgiuh.website^
 ||orquideassp.com^
 ||orrfphxldambu.site^
 ||orricescalmy.cfd^
@@ -144236,6 +144283,7 @@ zzzyk.com###Tinfo
 ||parlouroutlayfavor.com^
 ||parloursixty.com^
 ||parochfreezer.cyou^
+||parpenuncles.com^
 ||parrable.com^$third-party
 ||parrot-flow.com^
 ||parsec.media^$third-party
@@ -144464,6 +144512,7 @@ zzzyk.com###Tinfo
 ||pbeldhnbk.com^
 ||pbemlrfpiqbzn.site^
 ||pbfhahctctuoa.site^
+||pbfxgigzm.com^
 ||pbgcxdfyfgjlt.online^
 ||pbgrd.com^$third-party
 ||pbiauzycouesz.space^
@@ -144624,7 +144673,9 @@ zzzyk.com###Tinfo
 ||peacefulhillwalk.com^
 ||peacefulmeadowwalk.com^
 ||peacefulspecialist.pro^
+||peachring.com/new-page/js/human-verify.
 ||peachring.com/new-page/js/human-verify.js$script
+||peachring.com/popunder$popup
 ||peachurnet.com/templates/banner-*x*-*.png
 ||peachurnet.com/templates/stake.com-banner-size-*-min.jpg
 ||peacockresistpeppermint.com^
@@ -146440,6 +146491,7 @@ zzzyk.com###Tinfo
 ||pozatorun.pl/wp-content/uploads/2022/06/TANI_WEEKEND_BANNER_1000_300_12_03_26.jpg
 ||pozkbycypzgty.site^
 ||ppaamxfm.com^
+||ppauvlzcsdotc.website^
 ||ppbbhvizrkryo.website^
 ||ppcent.org^
 ||ppcmate.com^
@@ -146909,6 +146961,7 @@ zzzyk.com###Tinfo
 ||prod.one.lt^
 ||prod.untd.com^
 ||prod.webpu.sh^
+||proddedfrantic.cfd^
 ||prodigalirrigate.com^
 ||prodigiouseducation.com^
 ||prodigiousundercover.com^
@@ -147319,7 +147372,6 @@ zzzyk.com###Tinfo
 ||puata.info^
 ||pub-3d10bad2840341eaa1c7e39b09958b46.r2.dev^$third-party
 ||pub-algeriatenders.s3.eu-central-1.amazonaws.com^
-||pub-ee3a5bccda2d49c7bbc62bd60d648707.r2.dev^$third-party
 ||pub-referral-widget.current.us^$third-party
 ||pub.akadigital.vn^
 ||pub.dv.tech^
@@ -148020,6 +148072,7 @@ zzzyk.com###Tinfo
 ||qdtagixhvccco.space^
 ||qdtednqvwsgbt.site^
 ||qdtvdmtrlrelw.space^
+||qdtxanswqyims.space^
 ||qdurzzrmxptvr.online^
 ||qdvdesuqdanwc.store^
 ||qdvoltiagcxke.online^
@@ -148286,6 +148339,7 @@ zzzyk.com###Tinfo
 ||qkcrfylskdedo.website^
 ||qkdrsi4et.com^
 ||qkeweajdxbmqy.space^
+||qkfywghv.com^
 ||qkg7yplpfo.com^
 ||qkgoahutyimrf.site^
 ||qkieitettuode.store^
@@ -148516,6 +148570,7 @@ zzzyk.com###Tinfo
 ||qqeamubuikcai.site^
 ||qqfby.com^*ad
 ||qqfzedopftitm.website^
+||qqgtkazi.com^
 ||qqhjdsbubacon.online^
 ||qqhuhu.com^
 ||qqhuwthhmxeuc.space^
@@ -148671,6 +148726,7 @@ zzzyk.com###Tinfo
 ||quaedamchaeta.cfd^
 ||quagdcisczfvh.space^
 ||quailsbs.shop^
+||quailsquinonelr.cyou^
 ||quaintbitter.com^
 ||quaintcounty.pro^
 ||quaintgeneratestink.com^
@@ -148904,6 +148960,7 @@ zzzyk.com###Tinfo
 ||qwfmqkysepqin.online^
 ||qwgayltthcval.space^
 ||qwgruwrtcyxft.store^
+||qwhyajzlpodvf.online^
 ||qwikln.com^
 ||qwkfljghzcmsl.site^
 ||qwkunzuhtgbyu.site^
@@ -149345,6 +149402,7 @@ zzzyk.com###Tinfo
 ||raptureinsanity.com^
 ||rapturevirtueblake.com^
 ||raqakkfowptuc.online^
+||raqtyigxkx.com^
 ||rarbt.cc/js/index960_
 ||rarejob.com/cms/wp-content/themes/awaken/js/fix-banner.js
 ||rarelywithinlull.com^
@@ -149887,6 +149945,7 @@ zzzyk.com###Tinfo
 ||reedmanovereyegutsily.cfd^
 ||reedsbullyingpastel.com^
 ||reedsinterfering.com^
+||reedsoutpop.com^
 ||reef2reef.com/data/siropu/am/user/
 ||reefierblibe.qpon^
 ||reefsetupaccidentally.com^
@@ -150343,6 +150402,7 @@ zzzyk.com###Tinfo
 ||restudyfocoids.shop^
 ||resu8.hjfile.cn^
 ||resultlinks.com^
+||resumessilted.com^
 ||resumetwigincarnate.com^
 ||resurgehyblan.com^
 ||reswardamuairbill.cfd^
@@ -151370,6 +151430,7 @@ zzzyk.com###Tinfo
 ||rsbnhruphyuxn.site^
 ||rsc.cdn77.org/betper/
 ||rscyoaposqeay.space^
+||rsezsegxpjyps.site^
 ||rsfeeygucnywb.online^
 ||rsfzjtdmbmxdfq.com^
 ||rsgumgvzqwnce.online^
@@ -152413,6 +152474,7 @@ zzzyk.com###Tinfo
 ||salutationwantedaccustom.com^
 ||salutetutortwiddling.com^
 ||saluton.cizion.com^
+||saluvvpkzbmed.online^
 ||salvador24.com^$third-party
 ||salvageapplet.com^
 ||salvocutling.qpon^
@@ -153787,6 +153849,7 @@ zzzyk.com###Tinfo
 ||sheenlypentyl.com^
 ||sheepplus.com/info/img/rakuten/rakuten.png
 ||sheererretsina.qpon^
+||sheerskrausenumbrana.cyou^
 ||sheetvibe.com^
 ||sheez.io^
 ||sheldparole.com^
@@ -153845,6 +153908,7 @@ zzzyk.com###Tinfo
 ||shinshi-manga.net/ad/
 ||shinybirdwhispered.com^
 ||shinystat.com^$third-party
+||shinywoman.pro^
 ||shipin188.com/66
 ||shipletcatsos.cyou^
 ||shipmanhulky.cyou^
@@ -154485,6 +154549,7 @@ zzzyk.com###Tinfo
 ||skitour.fr/divers/a/
 ||skitpossy.qpon^
 ||skitsmisdid.cyou^
+||skivingmessage.com^
 ||skivvybecarve.cfd^
 ||skjsxlnvnlrcs.space^
 ||skkjtopbgnflw.website^
@@ -154669,6 +154734,7 @@ zzzyk.com###Tinfo
 ||slopeaota.com^$third-party
 ||slopepointlesstin.com^
 ||slopershoji.cyou^
+||sloppedneckful.qpon^
 ||sloshesbracker.cfd^
 ||sloto.live^
 ||slotsmiling.com^
@@ -155046,6 +155112,7 @@ zzzyk.com###Tinfo
 ||soccagetubal.qpon^
 ||soccer.ru/sites/all/modules/baner/baner.js
 ||soccer.ru/special-rotator.php
+||socceragitate.qpon^
 ||socde.com^
 ||socdem-enrich.getshop.tv^
 ||socdm.com^
@@ -157923,7 +157990,7 @@ zzzyk.com###Tinfo
 ||tankscoccyx.cyou^
 ||tannasemedakas.cfd^
 ||tanseb.com/vads/
-||tantegacor88.link^-party
+||tantegacor88.link^$third-party
 ||tanuki.pl/imglink^
 ||tanvvybruhuju.website^
 ||tanx.com^$domain=~1688.com|~alimama.com|~tmall.com|~www.taobao.com,third-party
@@ -158791,6 +158858,7 @@ zzzyk.com###Tinfo
 ||thrivensiskins.com^
 ||thrivenstoae.qpon^
 ||thriverhobnail.qpon^
+||thrjnyabvrhnj.com^
 ||throatentrepreneur.com^
 ||throbbingcometprobability.com^
 ||throbbingdisplaystub.com^
@@ -159332,6 +159400,7 @@ zzzyk.com###Tinfo
 ||tnsmesfbmzqqw.online^
 ||tntmvohksuaju.space^
 ||tntxtyapobjrk.space^
+||tnuxoapudspye.site^
 ||tnvxfjdildtso.website^
 ||tnwotuqey.com^
 ||tnxgvdzwqpizt.site^
@@ -159350,6 +159419,7 @@ zzzyk.com###Tinfo
 ||tobymengemmary.cfd^
 ||tocembkjynznc.space^
 ||tochka.by/*/banners/
+||tockcexnnxwlh.online^
 ||tocologist44.top^
 ||tocplus*.com/chatLoader.do?
 ||tocswcbbwbnjn.space^
@@ -160723,7 +160793,6 @@ zzzyk.com###Tinfo
 ||turrellcoryza.qpon^
 ||turretsabluted.cfd^
 ||turrwarst.qpon^
-||turtlecute.org/assets/partners/
 ||turtlermelena.qpon^
 ||tusbpuqtobu.in^
 ||tushfoxily.cyou^
@@ -160998,6 +161067,7 @@ zzzyk.com###Tinfo
 ||tydrumgmari.org^
 ||tyeemegrimgelds.qpon^
 ||tyeupgpxarrgq.site^
+||tyevrvoavbbbq.space^
 ||tyfwdtaynqoss.online^
 ||tyfzzkmryomnt.site^
 ||tyhvohmkmnitu.space^
@@ -161292,6 +161362,7 @@ zzzyk.com###Tinfo
 ||udblog.huya.com^
 ||udcfewmnyqliqu.com^
 ||udd1i5.zhihu.com^
+||udderedcuorin.cyou^
 ||udderedhurrerreweave.qpon^
 ||uddougqbgbhmg.website^
 ||udempnhxtsuvt.site^
@@ -161527,6 +161598,7 @@ zzzyk.com###Tinfo
 ||ujfyzxfc01.com^
 ||ujhu.cn^
 ||ujj1ndg5i.com^
+||ujjktqovkohcl.space^
 ||ujkemwsgdlsmy.space^
 ||ujkewxkcnkyqg.online^
 ||ujkjhxeltkshw.online^
@@ -161621,6 +161693,7 @@ zzzyk.com###Tinfo
 ||ullmqufjprrcd.space^
 ||ullrqcoqifslu.space^
 ||ulm-news.de/image/banners/
+||ulmidxwcnglah.online^
 ||ulmoyc.com^
 ||ulny.cn^
 ||ulogin.ru^
@@ -162121,6 +162194,7 @@ zzzyk.com###Tinfo
 ||unsoggydipodelocker.cyou^
 ||unsolefumbled.cfd^
 ||unsorebox.qpon^
+||unsoulxenyl.com^
 ||unspeednoddi.cyou^
 ||unspicysarcel.shop^
 ||unstableshakenspecimen.com^
@@ -162151,6 +162225,7 @@ zzzyk.com###Tinfo
 ||untimely-promotion.com^
 ||untimely-proof.pro^
 ||untimely-way.pro^
+||untipsyunmoorflossie.cfd^
 ||untitled.dwstatic.com^
 ||untopdeashes.qpon^
 ||untopproplex.com^
@@ -162193,6 +162268,7 @@ zzzyk.com###Tinfo
 ||unwrittenheight.pro^
 ||unynuatetmujq.space^
 ||uoarghkmwxcvj.website^
+||uoayvkhgccupw.site^
 ||uofddaueodbeq.space^
 ||uoftickbbe.com^
 ||uogmhiynccsdr.website^
@@ -162592,6 +162668,7 @@ zzzyk.com###Tinfo
 ||utchwarper.qpon^
 ||utdmvlibauwup.online^
 ||utgpsiesiotbx.website^
+||utherpsedera.cyou^
 ||utherverse.com^$third-party
 ||uthorner.info^
 ||uticksnotter.cyou^
@@ -163184,6 +163261,7 @@ zzzyk.com###Tinfo
 ||vdggilkiyeagl.online^
 ||vdgtzmfxlfpmb.space^
 ||vdgxabnuwfsrn.site^
+||vdgynycwcczjm.site^
 ||vdhatq0co.com^
 ||vdhflgzfvuoae.online^
 ||vdhqxwawhltll.online^
@@ -163377,6 +163455,7 @@ zzzyk.com###Tinfo
 ||veselchaga.link^
 ||veselchaga.link^$third-party
 ||veskitnerved.com^
+||veskmyjmoiovz.website^
 ||vespoidpeching.cfd^
 ||vespymedia.com^
 ||vesseldoubts.com^
@@ -163395,6 +163474,7 @@ zzzyk.com###Tinfo
 ||vetoersegues.com^
 ||vetofellowshipfly.com^
 ||vetoplain.com^
+||vetustborlase.cyou^
 ||veuf2obzc8.com^
 ||veuptyvapstbj.space^
 ||vewikvuvrucdc.online^
@@ -164537,6 +164617,7 @@ zzzyk.com###Tinfo
 ||vvolnzdglprvf.store^
 ||vvqc95xhtx.com^
 ||vvru.*.link/$media,third-party
+||vvs0eu66z.com^
 ||vvskgwkxrdtaf.space^
 ||vvslrpwkkqvwe.online^
 ||vvtpftuiqrbdha.com^
@@ -164636,6 +164717,7 @@ zzzyk.com###Tinfo
 ||vyebzzqjkjmey.top^
 ||vyecpfypnwu.net^
 ||vyeqerkexpebzd.com^
+||vyeuqdytjkjt.com^
 ||vyilmellyqbfs.online^
 ||vyis.net^
 ||vympzhnxgoweg.store^
@@ -165147,6 +165229,7 @@ zzzyk.com###Tinfo
 ||wct.link^
 ||wctgatauxfggq.space^
 ||wctomfpolmxxr.online^
+||wcu79k85a.com^
 ||wcumiqigmpkoc.site^
 ||wcuujkywusvpv.online^
 ||wcvevntrztrdi.site^
@@ -166110,6 +166193,7 @@ zzzyk.com###Tinfo
 ||wiringswyes.shop^
 ||wirostulareparous.qpon^
 ||wirrasparks.qpon^
+||wirrfiocl.in^
 ||wirrsglzkmccj.site^
 ||wirsiegen.de/wp-content/uploads/*/Anwalt-Baranowski.jpg
 ||wirsiegen.de/wp-content/uploads/*/hoffman_bau300_250.jpg
@@ -166506,6 +166590,7 @@ zzzyk.com###Tinfo
 ||wootric.com^$third-party
 ||wootscratch.com^
 ||woozilyascula.qpon^
+||woozilyotalgictheir.cyou^
 ||woozooo.com/img/*.js
 ||wopsstocker.shop^
 ||wordamazinglylamb.com^
@@ -166899,6 +166984,7 @@ zzzyk.com###Tinfo
 ||wubizigeng.com^
 ||wucnmyrcici.com^
 ||wucvvf3t6n.com^
+||wuddiecoppers.cfd^
 ||wudidaxheqblk.site^
 ||wudismays.cfd^
 ||wudizuqiu.com/fy
@@ -167486,6 +167572,7 @@ zzzyk.com###Tinfo
 ||xetcwccnfdudu.online^
 ||xeuesswygmuso.site^
 ||xexkerkgrfyaf.site^
+||xfabqkelmfmrv.online^
 ||xfalmawladvew.site^
 ||xfast.sbs/media/$domain=fullcliphot.org|fulllivehot.us,image
 ||xfast.sbs^*.gif$domain=clipphot.co,image
@@ -168225,6 +168312,7 @@ zzzyk.com###Tinfo
 ||xmtrading.com^$third-party
 ||xmuwxndzrvaqy.site^
 ||xmvawickdvmhc.online^
+||xmxxrjnjvegvo.online^
 ||xmyvtjuwanzjz.online^
 ||xmzppziqajevl.site^
 ||xn--152-1dd8d.xn--p1ai/widget/
@@ -168247,6 +168335,7 @@ zzzyk.com###Tinfo
 ||xnhau.blog^$domain=xnhau.foo,media
 ||xniyaklqxkech.website^
 ||xnjkjowmtijwa.online^
+||xnjkxgwhgetfz.site^
 ||xnkldnhifcdmr.site^
 ||xnm4x0ali.com^
 ||xnnews.com.cn/adgl/
@@ -168412,6 +168501,7 @@ zzzyk.com###Tinfo
 ||xsbdujkox.com^
 ||xsbjtmzcpqlst.space^
 ||xsbsfifapiemx.site^
+||xschnnbbciyvq.com^
 ||xscp03091xq.com^
 ||xscp03100xq.com^
 ||xscp03101xq.com^
@@ -169034,6 +169124,7 @@ zzzyk.com###Tinfo
 ||ybeckzpppxurb.space^
 ||ybehernkobazm.site^
 ||ybfqkggkcivnv.online^
+||ybgfodhsc.com^
 ||ybibpwduubqhk.space^
 ||ybieggryuprfs.online^
 ||ybifthgupqclf.online^
@@ -169417,6 +169508,7 @@ zzzyk.com###Tinfo
 ||yjfhpbpnofkne.website^
 ||yjfivvaueahxg.space^
 ||yjflqogyltlsc.website^
+||yjfyotojqzlfn.online^
 ||yjgkufrdloaih.space^
 ||yjhallzqjulyh.site^
 ||yjhcwchynwgko.website^
@@ -169428,6 +169520,7 @@ zzzyk.com###Tinfo
 ||yjjsxwisdjmbm.website^
 ||yjjvzmruicyav.online^
 ||yjkskpoeydskz.space^
+||yjloffoltgcgo.online^
 ||yjonbxthuxllt.website^
 ||yjopmnjbxlgys.site^
 ||yjotqzesimahl.online^
@@ -169864,6 +169957,7 @@ zzzyk.com###Tinfo
 ||yruzemfhgcwri.website^
 ||yrvamtdweysom.site^
 ||yrwks6l3cy.com^
+||yrxuanmenhwyx.online^
 ||ys2000.cdn.bcebos.com^
 ||ys73fwrg.xyz^
 ||ysaohbqahvvyq.online^
@@ -170495,6 +170589,7 @@ zzzyk.com###Tinfo
 ||zdzxbbfuthazp.space^
 ||zdzyuqnezvjiq.site^
 ||zeads.com^
+||zealous-deposit.pro^
 ||zealousimage.com^
 ||zealousoutfit.com^
 ||zealshaving.com^
@@ -170508,6 +170603,7 @@ zzzyk.com###Tinfo
 ||zebrassbrahmas.cfd^
 ||zecfdjbyxewow.online^
 ||zecsriilqkdei.site^
+||zedbofooahsvg.website^
 ||zedessoulrwfb.website^
 ||zedmunkpdtjkf.website^
 ||zedo.com^$third-party
@@ -170763,6 +170859,7 @@ zzzyk.com###Tinfo
 ||zikpwr.com^
 ||zikqbfbgczdnl.online^
 ||ziksqmromrsqpr.com^
+||zikzdummbruai.website^
 ||zilaarunta.shop^
 ||zilemtusighi.net^
 ||zilliondisfigureboldly.com^
@@ -171189,6 +171286,7 @@ zzzyk.com###Tinfo
 ||zqmblmvzkvwmb.top^
 ||zqmhl8lgj.com^
 ||zqmpenssnrzmc.site^
+||zqosmmsnualym.com^
 ||zqqwr9snx1.com^
 ||zqqxtbygklfan.online^
 ||zqrctmpxxagnb.website^
@@ -171531,6 +171629,7 @@ zzzyk.com###Tinfo
 ||zybrdr.com^
 ||zycjclvhhzhqv.online^
 ||zyek35wsn.com^
+||zyflsfotdnsnc.space^
 ||zyfsnsggeqdia.site^
 ||zygionexodoi.cyou^
 ||zygoojpfbiqdi.online^
