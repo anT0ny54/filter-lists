@@ -67,14 +67,39 @@ class FetchSecurityTests(unittest.TestCase):
                 "_public_address_for_url",
                 side_effect=[("93.184.216.34", ""), (None, "blocked-non-public-address")],
             ), patch.object(fetch.subprocess, "run", side_effect=fake_run):
-                ok, reason = fetch.download("http://example.test/start", output, 10, 1024)
+                ok, reason, transferred = fetch.download("http://example.test/start", output, 10, 1024)
 
         self.assertFalse(ok)
         self.assertEqual(reason, "redirect-blocked-non-public-address")
+        self.assertEqual(transferred, 0)
         self.assertEqual(len(calls), 1)
         self.assertIn("--resolve", calls[0])
         self.assertIn("--noproxy", calls[0])
         self.assertNotIn("--location", calls[0])
+
+    def test_failed_transfer_reports_bytes_from_deleted_partial_output(self):
+        body = b"||example.com^\npartial transfer body"
+        response = type(
+            "Proc",
+            (),
+            {"returncode": 18, "stdout": "", "stderr": "curl: (18) partial file"},
+        )()
+
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "source.txt"
+
+            def fake_run(command, **kwargs):
+                output.write_bytes(body)
+                return response
+
+            with patch.object(fetch, "_public_address_for_url", return_value=("93.184.216.34", "")), \
+                 patch.object(fetch.subprocess, "run", side_effect=fake_run):
+                ok, reason, transferred = fetch.download("http://example.test/list", output, 10, 1024)
+
+        self.assertFalse(ok)
+        self.assertEqual(reason, "curl: (18) partial file")
+        self.assertEqual(transferred, len(body))
+        self.assertFalse(output.exists())
 
     def test_public_redirect_is_followed_one_hop_at_a_time(self):
         calls = []
@@ -104,13 +129,14 @@ class FetchSecurityTests(unittest.TestCase):
 
             with patch.object(fetch, "_public_address_for_url", return_value=("93.184.216.34", "")), \
                  patch.object(fetch.subprocess, "run", side_effect=fake_run):
-                ok, reason = fetch.download("http://example.com/start", output, 10, 1024)
+                ok, reason, transferred = fetch.download("http://example.com/start", output, 10, 1024)
                 self.assertTrue(ok)
                 self.assertEqual(reason, "")
                 self.assertEqual(len(calls), 2)
                 self.assertTrue(output.exists())
                 self.assertNotIn("--location", calls[0])
                 self.assertEqual(output.read_text(encoding="utf-8").splitlines()[0], "||example.com^")
+                self.assertEqual(transferred, output.stat().st_size)
 
 
 class FetchTests(unittest.TestCase):
@@ -167,7 +193,7 @@ class FetchTests(unittest.TestCase):
         def slow_download(url, output, timeout, max_download_bytes):
             time.sleep(0.15)
             output.write_text("||example.com^\n! enough padding for validation\n", encoding="utf-8")
-            return True, ""
+            return True, "", output.stat().st_size
 
         try:
             fetch.download = slow_download
@@ -231,7 +257,7 @@ class FetchSchedulingTests(unittest.TestCase):
                     else:
                         content = "||z-child.example^\n! padding for validation\n"
                     output.write_text(content, encoding="utf-8")
-                    return True, ""
+                    return True, "", output.stat().st_size
 
                 with patch.object(fetch, "download", side_effect=fake_download):
                     files, stats = collect_sources(
@@ -266,7 +292,7 @@ class FetchSchedulingTests(unittest.TestCase):
 
             def fake_download(url, output, timeout, max_download_bytes):
                 output.write_text("!#include https://example.com/shared-child\n||root.example^\n", encoding="utf-8")
-                return True, ""
+                return True, "", output.stat().st_size
 
             with patch.object(fetch, "download", side_effect=fake_download):
                 _, stats = collect_sources(
@@ -321,7 +347,7 @@ class FetchBudgetWaveTests(unittest.TestCase):
 
         def fixed_size_download(url, output, timeout, max_download_bytes):
             output.write_text("||example.com^\n!! padding for budget cutoff\n", encoding="utf-8")
-            return True, ""
+            return True, "", output.stat().st_size
 
         try:
             fetch.download = fixed_size_download
@@ -364,7 +390,7 @@ class FetchBudgetWaveTests(unittest.TestCase):
 
         def invalid_download(url, output, timeout, max_download_bytes):
             output.write_bytes(body)
-            return True, ""
+            return True, "", len(body)
 
         try:
             fetch.download = invalid_download
@@ -394,6 +420,87 @@ class FetchBudgetWaveTests(unittest.TestCase):
             sum(item.get("reason") == "global-download-budget-exhausted" for item in stats["results"]),
             1,
         )
+
+    def test_concurrent_requests_near_budget_boundary_get_reserved_limits(self):
+        original_download = fetch.download
+        child_barrier = threading.Barrier(2)
+        limits: dict[str, int] = {}
+
+        def body_of_size(prefix: bytes, size: int) -> bytes:
+            if len(prefix) > size:
+                raise AssertionError("test fixture body exceeds requested size")
+            return prefix + (b"#" * (size - len(prefix)))
+
+        def fake_download(url, output, timeout, max_download_bytes):
+            if url == "https://example.test/root":
+                body = body_of_size(
+                    b"!#include child-a\n!#include child-b\n",
+                    50,
+                )
+            else:
+                # Barrier.wait() returns an integer barrier state, not a success flag.
+                child_barrier.wait(timeout=5)
+                body = body_of_size(b"||example.com^\n", max_download_bytes)
+            output.write_bytes(body)
+            limits[url] = max_download_bytes
+            return True, "", len(body)
+
+        try:
+            fetch.download = fake_download
+            with tempfile.TemporaryDirectory() as tmp:
+                files, stats = collect_sources(
+                    ["https://example.test/root"],
+                    Path(tmp),
+                    time.monotonic(),
+                    2,
+                    lambda _: None,
+                    total_timeout=30,
+                    max_include_depth=1,
+                    max_download_bytes=60,
+                    max_total_download_bytes=130,
+                    max_total_sources=10,
+                )
+        finally:
+            fetch.download = original_download
+
+        self.assertEqual(limits["https://example.test/child-a"], 60)
+        self.assertEqual(limits["https://example.test/child-b"], 20)
+        self.assertEqual(stats["total_download_bytes"], 130)
+        self.assertEqual(stats["successful"], 3)
+        self.assertFalse(stats["budget_exhausted"])
+        self.assertEqual(len(files), 3)
+
+    def test_failed_download_still_contributes_transferred_bytes(self):
+        original_download = fetch.download
+        partial_size = 47
+
+        def failing_download(url, output, timeout, max_download_bytes):
+            return False, "connection reset", partial_size
+
+        try:
+            fetch.download = failing_download
+            with tempfile.TemporaryDirectory() as tmp:
+                files, stats = collect_sources(
+                    ["https://example.test/partial-failure"],
+                    Path(tmp),
+                    time.monotonic(),
+                    2,
+                    lambda _: None,
+                    total_timeout=30,
+                    max_include_depth=0,
+                    max_download_bytes=1024,
+                    max_total_download_bytes=100,
+                    max_total_sources=10,
+                )
+        finally:
+            fetch.download = original_download
+
+        result = stats["results"][0]
+        self.assertEqual(files, [])
+        self.assertEqual(stats["total_download_bytes"], partial_size)
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["reason"], "connection reset")
+        self.assertEqual(result["bytes"], partial_size)
 
     def test_budget_parallelism_is_bounded_by_global_budget(self):
         started = time.monotonic()

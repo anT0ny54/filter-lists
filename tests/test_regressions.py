@@ -29,7 +29,7 @@ class DeterministicFetchTests(unittest.TestCase):
                         time.sleep(z_delay)
                         content = "||z.example^\n! enough padding for validation\n"
                     output.write_text(content, encoding="utf-8")
-                    return True, ""
+                    return True, "", output.stat().st_size
 
                 with patch.object(fetch, "download", side_effect=fake_download):
                     files, stats = collect_sources(
