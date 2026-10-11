@@ -87,7 +87,7 @@ The builder currently enforces the following:
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`.
 - **Strict configuration validation:** unknown keys in `policies.yaml` (including every `rules:` switch) and `sources.yaml`, wrong value types, and a mismatched policy `version`/`profile` fail the build immediately with a clean `[ERROR] Configuration` message, before any download starts.
 - **Authoritative source registry:** `sources.yaml` is the only source registry; `sources.txt` is generated as a URL-only compatibility mirror.
-- **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally. Transferred bytes count against the global download budget even when the response is rejected (e.g. an HTML error page), so invalid responses cannot consume unlimited bandwidth.
+- **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally. Before a request is scheduled, its worst-case byte allocation is reserved against the remaining global budget and the transfer is limited to that allocation. Transferred bytes count against the budget for accepted, rejected, and partially failed transfers; once no unreserved budget remains, pending sources are queued as budget-exhausted.
 - **Correct source health:** the health ratio is calculated from configured root sources; nested includes cannot inflate it.
 - **Required-source gates:** configured required root sources must succeed.
 - **SSRF protection:** source/include targets are resolved before connection, non-public addresses are blocked, DNS answers are validated and pinned for curl, proxy environment variables are bypassed, and redirects are validated hop-by-hop.
@@ -97,7 +97,7 @@ The builder currently enforces the following:
 - **Full Build-ID validation:** `validate.py` recomputes the build identity from the active configuration and normalized rules.
 - **Strict grammar validation:** malformed options, unsupported procedural syntax, unsafe inline styles, malformed regex envelopes, control characters, and over-limit rules are rejected.
 - **Detailed diagnostics:** rejection reasons, per-source statistics, SHA-256 hashes, fetch failures, and anomaly information are retained.
-- **Bounded default concurrency:** the builder uses two download workers by default (override with the `FILTER_LISTS_WORKERS` environment variable); effective concurrency is additionally capped by the configured global download budget.
+- **Bounded default concurrency:** the builder uses two download workers by default (override with the `FILTER_LISTS_WORKERS` environment variable); effective concurrency is additionally capped by the configured global download budget and the reservations required by active transfers.
 - **Historical reports:** only *successful* reports are archived under `reports/history/` as anomaly baselines, kept chronologically up to the configured retention limit. A newer run with the same Build-ID replaces the older archived report, so retention counts distinct builds. Failed builds are never archived there.
 - **Source reputation:** per-URL success rate, consecutive failures, and a `poor`/`watch`/`good`/`excellent` label are computed from `reports/source-outcomes.json`, which records the per-source fetch outcome of **every** run, including failed builds (up to the last 120 runs). One observation is counted per source per UTC day; a day counts as a success only if every run that day succeeded, so rebuilds cannot overweight a day and failures are not hidden. The first run after upgrading seeds the file from retained successful reports.
 - **Source quality gate:** `source_quality` in `policies.yaml` flags sources whose rule lines (comments, blanks and directives excluded) are mostly rejected, recorded in the report and logged as `[WARN]`. Optional `fail_on_critical` makes critical sources fail the build.
@@ -232,7 +232,7 @@ The repository test suite covers:
 - staged-output publication and failed-report baseline handling
 - per-source quality gate and failed-run source-outcome history
 - download validation (binary data, HTML/error pages, empty files)
-- download-byte accounting across rejected responses (invalid transfers consume the global budget)
+- download-byte accounting and per-request reservations across rejected responses and partial transfer failures
 - malformed inline-style brace rejection (unbalanced braces, trailing text after a style block)
 - duplicate metadata-header rejection in the generated-list validator
 - two-phase benchmark covering normalization and a representative merge workload
