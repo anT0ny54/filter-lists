@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-c3e3a5c2eab4
-! Last updated: 2026-10-11 19:23:41 UTC
+! Version: v7.6.0-c894dfa3b192
+! Last updated: 2026-10-11 20:10:03 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: c3e3a5c2eab497c14cbc526358a506edc0826b0e9432bf7067b0ac51e8b684f8
+! Build-ID: c894dfa3b1929758e180062094d847ecc11d603aa5d7433b7b07fb304b700dc6
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 172088
+! Total rules: 172085
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -33640,7 +33640,6 @@ baofeng.com##.ad-pop-wrap
 baofeng.com##.play-ads
 baoliny.com,gasaq.com,hgitv.com,ifooday.cn,nen.com.cn##.guanggao
 baomidou.com##.sidebar-content > astro-island
-baomidou.com##astro-island[opts^="{\"name\":\"CheckAdBlocked\""]
 baomidou.com##body > div[style^="position: absolute; top: 0px; left: 0px; width: 100%;"]
 baomoi.com##.is-show.xxxxxx
 baomoi.com##.masthead-wrapper
@@ -58368,7 +58367,6 @@ info-chunithm.sega.jp##.chuniSNS
 info-clipper.com###pubBando
 info-comp.ru###secondary > div.widget:has(> div.textwidget div#vk_groups)
 info-maimai.sega.jp,monogatari-series.com##.SNS
-info-war.gr##.sidebar-inner > div > div[data-settings="{\"background_background\":\"classic\"}"]
 info.city.tsu.mie.jp##.AdBnrList
 info.credly.com###hs-web-interactives-top-anchor
 info.elblag.pl,mierzeja.com,radiowroclawkultura.pl,speedtest.pl,synonim.net,wsensie.pl###rodo
@@ -75371,7 +75369,6 @@ paper.li##.m-ib
 papergames.io##app-ad-banner
 paperpaper.io##.main-socials
 paperpaper.io##.text__content > p:has(> a[href="https://www.youtube.com/paperpapertv"])
-paperpaper.io,paperpaper.ru##div[data-elementor-type="wp-post"] > section[data-settings="{\"background_background\":\"classic\"}"]
 paperpaper.ru##.stk-post > div.stk-grid:has(> div[class] > a[href^="https://papersupport.ru/"])
 paperswithcode.com##.list-button-subscribe
 papier.com###email-pop-up-container
@@ -76874,7 +76871,6 @@ pnp.de##.container:has(> div.OUTBRAIN)
 pnp.de##.container:has(> div[id^="traffective-ad-"])
 pnp.de##.social-media-article
 pnp.de##.social-media-article + div:not([class]) > a
-pnp.ru##.full_width_hr:has(> a[onclick^="dataLayer"][onclick*="'social'}"])
 po-kaki-to.com###apptemppk2
 po-kaki-to.com###text-5 div.site-Introduction
 po-kaki-to.com##.pkt-adw
@@ -84467,7 +84463,6 @@ spiegel.de##div[data-area*="sponsored"]
 spiegel.de##div[data-area="heise-widget"]
 spiegel.de##div[data-area="vouchers"]
 spiegel.de##div[data-component="AffiliateBox"]
-spiegel.de##div[x-data^="{adIndex:"]
 spiegel.de##nav li.bg-shade-lightest
 spiegel.de##section.relative[data-area="block>smartfeed"]:has(.peer[data-target-id="smartfeed-sponsored-box-1"])
 spiegel.de##section[data-advertisement]
@@ -92319,7 +92314,6 @@ vivino.com##div[class^="purchaseAvailabilityPPC__takeOverBanner"]
 vivo.com##.cookes-banner
 vivo.com##.vep-head-download
 vivo.com.br##.alert__cookie
-vivo.com.br##.barra-conversao--purple[data-settings='{"pagina": "Vivo Easy Prime: Plano de celular digital com Cashback"}']
 vix.com##button[data-testid="player-up-sell-entry-button"]
 viz.com##a[href*="Share()"]
 viz.com##a[href^="http://twitter.com/intent/tweet?"]
@@ -94224,8 +94218,6 @@ winfuture.de##.rutschdiv
 winfuture.de##.singleblock_vhd
 winfuture.de##.social_link_share
 winfuture.de##.topnews > .clearfix
-winfuture.de##.topnews > div:has(a:contains(/(Anzeige)|Schnäppchen|sale|(?<!-)Angebot(?!s)|für nur [0-9]{1,} Euro/))
-winfuture.de##.topnews > div:has(span:contains(/(Anzeige)|Schnäppchen|sale|(?<!-)Angebot(?!s)|für nur [0-9]{1,} Euro|nur bis[\s\S]*Euro|günstig/))
 winfuture.de##.topnews > div[class]:has(> div[class^="news"] > .anz)
 winfuture.de##.topnews > div[class]:has(> h2 > a[href*="/special/"][href*="/angebote/"])
 winfuture.de##.topnews > div[style]:has(> .adsbygoogle)
@@ -94841,7 +94833,6 @@ www.kinopoisk.ru##.ya-share2
 www.kinopoisk.ru##[data-tid="a913e1e7"] {min-height:0;}
 www.kinopoisk.ru##a[href="https://hd.kinopoisk.ru/?source=kinopoisk_head_button"]
 www.kinopoisk.ru##div[class*="-share-buttons"]
-www.kinopoisk.ru##div[class*="_"]:has(> div[aria-hidden][data-tid] > div[id][class][data-tid] + script:contains(/JSON\.parse\(\'\{\"containerId\"/))
 www.kinopoisk.ru##div[class*="__AMNhR styles_"]
 www.kinopoisk.ru##div[class*="listSuperBanner"]
 www.kinopoisk.ru##div[class*="styles_height250__"]
@@ -116731,6 +116722,7 @@ zzzyk.com###Tinfo
 ||doucolle-kako.livedoor.biz/dmm_$subdocument
 ||doucolle-kako.livedoor.biz/pick-dmm.html
 ||doucolle.net/wp-content/pick-dmm.html
+||douemoiiqvjrc.site^
 ||douga.geo-online.co.jp/campaign_bnr.js
 ||douga18.com/wp-content/uploads/2025/07/douga18_top_bunner2-1024x341.webp$domain=fc2ppv.mhx.jp
 ||doughgenuinelypreviously.com^
@@ -119799,6 +119791,7 @@ zzzyk.com###Tinfo
 ||euboicarmpit.top^
 ||euboicgaloped.com^
 ||eucmlcosmfxyz.online^
+||euerxbqvhghon.site^
 ||euezpnhisvvhl.online^
 ||eufnidveovlsj.online^
 ||eugeniy.org^$third-party
@@ -125562,6 +125555,7 @@ zzzyk.com###Tinfo
 ||guiltymince.com^
 ||guindeencurl.com^
 ||guisardcorner.cfd^
+||guisianoutyardwee.cfd^
 ||guitaralliance.com^$third-party
 ||guitarchina.com/1/*.gif
 ||guitarinterim.com^
@@ -128202,6 +128196,7 @@ zzzyk.com###Tinfo
 ||hyvirttguqnwt.online^
 ||hyvmmxgohrnpc.site^
 ||hyyfarqre.com^
+||hyyllfvitznww.site^
 ||hyzoneshilpit.com^
 ||hz.shouyoutv.com^
 ||hz62cbo4ffkc9zrp.cfd^
@@ -168734,6 +168729,7 @@ zzzyk.com###Tinfo
 ||xwtpdmsgkfbrz.online^
 ||xwudjqpvigrfz.space^
 ||xwulpoov.in^
+||xwvilogpxoxbe.site^
 ||xwvjjjyxtusalw.com^
 ||xwvsmeuegpbfne.com^
 ||xwvtqtsrlgedu.space^
@@ -171560,6 +171556,7 @@ zzzyk.com###Tinfo
 ||zwartewaterfm.nl/images/SponsorenZwarteWaterFM.jpg
 ||zwbngpnpa.com^
 ||zwbrwixdzgxve.site^
+||zwcbkxmtykjsw.space^
 ||zwcuougbmsdbl.online^
 ||zwfbkyofoaqlj.site^
 ||zwfggkynmjymw.space^
