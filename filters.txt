@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-cd6ae58a8930
-! Last updated: 2026-10-11 20:40:31 UTC
+! Version: v7.6.0-ac57c9d4e9f6
+! Last updated: 2026-10-11 21:14:08 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: cd6ae58a893068c755da86d7cbc49622b33bd8bb78fa7e6b65f5bfad161af9df
+! Build-ID: ac57c9d4e9f67f9b6333212b7f28804df1f66831f8cbfd50839f7aaa5418805a
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 172088
+! Total rules: 172089
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -30293,9 +30293,9 @@ ani-chat.net###endo_wrc_widget-9
 ani-chat.net##.idname2
 ani-chat.net##.txt > p > a[target="_blank"][rel^="noopener"]
 ani-chat.net,gameguide.tech###block-6
-ani7.top,jut-su.online##.agp-err > b
-ani7.top,jut-su.online##.agp-err > div > [data-ab="reload"]
-ani7.top,jut-su.online##.agp-err > p
+ani5.top,ani7.top,jut-su.online##.agp-err > b
+ani5.top,ani7.top,jut-su.online##.agp-err > div > [data-ab="reload"]
+ani5.top,ani7.top,jut-su.online##.agp-err > p
 aniagotuje.pl##.ad1
 aniagotuje.pl##.ad2
 anianierosuki.work,apprisejp.xyz,av-baron.com,boin.pink,coco2i.com,g-times.jp,hentai4daily.com,kk1up.jp,minaminumaebi.blogmimi.com,orenoraresne.com,pinapopo.com,senzuri.net,techtechnolog.com,tentacles.biz,xn--gutnkx91i.com###text-9
@@ -147456,6 +147456,7 @@ zzzyk.com###Tinfo
 ||puffinsgushing.cyou^
 ||puffnetwork.com^$third-party
 ||puffytr.com/js/popup-
+||puflrkpitokpp.space^
 ||pufted.com^
 ||pugbozkfpaoqh.online^
 ||puggryemodins.cfd^
