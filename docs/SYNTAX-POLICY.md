@@ -23,7 +23,7 @@ ABP documents `document`, `elemhide`, `generichide`, and `genericblock` as excep
 
 - Element hiding: `##`.
 - Element hiding exceptions: `#@#`.
-- Extended CSS: `#?#`, including ABP `:-abp-has()`, `:-abp-contains()` / `:has-text()`, `:-abp-properties()`, `:not()`, and `:xpath()`.
+- Extended CSS: `#?#`, including ABP `:has()`, `:has-text()`, `:-abp-has()`, `:-abp-properties()`, `:-abp-contains()`, `:not()`, and `:xpath()`.
 - ABP snippets: `#$#`, with a required domain scope.
 - ABP inline CSS declarations on `##` / `#?#` selectors, restricted to ABP's documented safe property/value grammar.
 - ABP `remove: true;` action.
@@ -40,6 +40,7 @@ ABP documents snippets as JavaScript snippet commands and restricts them to cust
 - Hosts-file lines (`0.0.0.0 host`).
 - HTML/error pages masquerading as lists.
 - Duplicate or malformed options, invalid header values, unsafe inline-style values, control characters, malformed regex envelopes, and over-limit rules.
+- Option-less patterns with no literal content (`*`, `||`, `^`, `@@*`, ...), which would match every request. Scoped forms such as `*$script,domain=example.com` remain valid.
 
 ### Canonicalization contract
 
