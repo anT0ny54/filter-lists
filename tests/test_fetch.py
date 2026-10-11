@@ -350,6 +350,51 @@ class FetchBudgetWaveTests(unittest.TestCase):
             1,
         )
 
+    def test_rejected_responses_consume_global_download_budget(self):
+        """Invalid but fully transferred responses must still burn budget.
+
+        Regression: only accepted files incremented
+        `stats["total_download_bytes"]`, so several large invalid responses
+        (e.g. HTML error pages) could transfer far more than
+        `max_total_download_bytes` before fetching stopped.
+        """
+        original_download = fetch.download
+        body = b"<!doctype html><html><head><title>404</title></head><body>" + b"x" * 1024
+        budget = (2 * len(body)) + len(body) // 2  # 2.5 bodies
+
+        def invalid_download(url, output, timeout, max_download_bytes):
+            output.write_bytes(body)
+            return True, ""
+
+        try:
+            fetch.download = invalid_download
+            with tempfile.TemporaryDirectory() as tmp:
+                files, stats = collect_sources(
+                    [f"https://example.test/invalid-{i}" for i in range(4)],
+                    Path(tmp),
+                    time.monotonic(),
+                    4,
+                    lambda _: None,
+                    total_timeout=30,
+                    max_include_depth=0,
+                    max_download_bytes=50 * 1024,
+                    max_total_download_bytes=budget,
+                    max_total_sources=10,
+                )
+        finally:
+            fetch.download = original_download
+
+        self.assertEqual(files, [])
+        self.assertTrue(stats["budget_exhausted"])
+        # Two bodies fit, the third transfer trips the budget, and the fourth
+        # source is never attempted. Every transferred byte is accounted for,
+        # including the two responses that failed validation.
+        self.assertEqual(stats["total_download_bytes"], 3 * len(body))
+        self.assertEqual(
+            sum(item.get("reason") == "global-download-budget-exhausted" for item in stats["results"]),
+            1,
+        )
+
     def test_budget_parallelism_is_bounded_by_global_budget(self):
         started = time.monotonic()
         with self.allow_local_fixture_fetch():

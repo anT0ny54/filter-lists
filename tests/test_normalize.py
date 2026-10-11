@@ -120,5 +120,18 @@ class NormalizeTests(unittest.TestCase):
     def test_regex_payload_may_contain_whitespace(self):
         self.assertEqual(normalize_rule(r"/foo bar/"), r"/foo bar/")
 
+    def test_unmatched_opening_brace_in_style_block_is_rejected(self):
+        self.assertIsNone(normalize_rule("example.com##div { color: red"))
+
+    def test_unmatched_closing_brace_in_cosmetic_body_is_rejected(self):
+        self.assertIsNone(normalize_rule("example.com##div }"))
+
+    def test_trailing_text_after_style_block_is_rejected(self):
+        self.assertIsNone(normalize_rule("example.com##div { color: red } trailing"))
+
+    def test_well_formed_inline_style_remains_accepted(self):
+        rule = "example.com##div { display: none }"
+        self.assertEqual(normalize_rule(rule), rule)
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

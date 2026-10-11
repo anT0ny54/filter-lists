@@ -58,5 +58,54 @@ class ValidateSortednessTests(unittest.TestCase):
         self.assertEqual(exit_code, 0)
 
 
+class ValidateMetadataHeaderTests(unittest.TestCase):
+    """Each required metadata header may appear at most once."""
+
+    def _write(self, extra_headers):
+        config = load_config()
+        rule = "||dup-header.example^"
+        build_id = hashlib.sha256(
+            (config_fingerprint(config) + "\n" + normalize_rule(rule)).encode()
+        ).hexdigest()
+        lines = [
+            "! Title: Test",
+            f"! Version: v{BUILDER_VERSION}-{build_id[:12]}",
+            f"! Build-ID: {build_id}",
+            *extra_headers,
+            f"! Source manifest SHA-256: {source_manifest_sha256(config)}",
+            "! Total rules: 1",
+            "!",
+            rule,
+        ]
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        path = Path(tmp.name) / "filters.txt"
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return path
+
+    def test_duplicate_total_rules_header_is_rejected(self):
+        exit_code, output = run_validate(validate, self._write(["! Total rules: 1"]))
+        self.assertIn("[METADATA]", output)
+        self.assertEqual(exit_code, 1)
+
+    def test_duplicate_build_id_header_is_rejected(self):
+        config = load_config()
+        build_id = hashlib.sha256(
+            (config_fingerprint(config) + "\n" + normalize_rule("||dup-header.example^")).encode()
+        ).hexdigest()
+        exit_code, output = run_validate(validate, self._write([f"! Build-ID: {build_id}"]))
+        self.assertIn("[METADATA]", output)
+        self.assertEqual(exit_code, 1)
+
+    def test_duplicate_source_manifest_header_is_rejected(self):
+        config = load_config()
+        exit_code, output = run_validate(
+            validate,
+            self._write([f"! Source manifest SHA-256: {source_manifest_sha256(config)}"]),
+        )
+        self.assertIn("[METADATA]", output)
+        self.assertEqual(exit_code, 1)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
