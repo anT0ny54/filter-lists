@@ -36,6 +36,10 @@ def main() -> int:
     declared_total = None
     declared_build_id = None
     declared_source_manifest = None
+    # Duplicate metadata headers previously overwrote earlier values and the
+    # validator checked only the final stored value. Track each required
+    # header and fail validation on a second occurrence.
+    metadata_seen: set[str] = set()
     version_seen = False
     version_hash = None
 
@@ -47,12 +51,21 @@ def main() -> int:
     try:
         for number, raw in _numbered_lines():
             if m := TOTAL_RE.match(raw):
+                if "total" in metadata_seen:
+                    errors.append(f"[METADATA] line {number}: duplicate '! Total rules:' header")
+                metadata_seen.add("total")
                 declared_total = int(m.group(1))
                 continue
             if m := BUILD_RE.match(raw):
+                if "build-id" in metadata_seen:
+                    errors.append(f"[METADATA] line {number}: duplicate '! Build-ID:' header")
+                metadata_seen.add("build-id")
                 declared_build_id = m.group(1)
                 continue
             if m := SOURCE_MANIFEST_RE.match(raw):
+                if "source-manifest" in metadata_seen:
+                    errors.append(f"[METADATA] line {number}: duplicate '! Source manifest SHA-256:' header")
+                metadata_seen.add("source-manifest")
                 declared_source_manifest = m.group(1)
                 continue
             if raw.startswith("! Version:"):

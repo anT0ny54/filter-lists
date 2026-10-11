@@ -366,10 +366,11 @@ def collect_sources(
             log(f">> Download batch: {len(batch)} URL(s), workers={parallelism}")
             discovered_children: list[tuple[str, int]] = []
 
-            # Schedule by worker capacity and the per-source byte cap. The accepted
-            # global byte total is enforced after each completed download. This keeps
-            # many small sources from being serialized just because the remaining
-            # budget is below one source's worst-case allocation.
+            # Schedule by worker capacity and the per-source byte cap. The global
+            # byte total — accepted and rejected transfers alike — is enforced
+            # after each completed download. This keeps many small sources from
+            # being serialized just because the remaining budget is below one
+            # source's worst-case allocation.
             wave_start = 0
             while wave_start < len(batch):
                 if time.monotonic() >= deadline:
@@ -424,15 +425,26 @@ def collect_sources(
                     # in completion order used a stale total, so parallel
                     # downloads could jointly overshoot the budget and the
                     # rejected source depended on network timing.
-                    if ok and stats["total_download_bytes"] + size > max_total_download_bytes:
+                    #
+                    # Transferred bytes count against the budget whether or not
+                    # the response was accepted. A downloaded HTML error page is
+                    # a failed source, but its bytes still consumed bandwidth;
+                    # previously only accepted files were added to
+                    # `total_download_bytes`, so a wave of invalid responses
+                    # could bypass `max_total_download_bytes` entirely. The
+                    # original validation/transfer failure reason is preserved;
+                    # only an otherwise-accepted source is relabelled
+                    # "global-download-budget-exhausted".
+                    if stats["total_download_bytes"] + size > max_total_download_bytes:
+                        if ok:
+                            error = "global-download-budget-exhausted"
                         ok = False
-                        error = "global-download-budget-exceeded"
                         stats["budget_exhausted"] = True
+                    stats["total_download_bytes"] += size
 
                     if ok:
                         files.append(target)
                         stats["successful"] += 1
-                        stats["total_download_bytes"] += size
                         if depth == 0:
                             stats["root_successful"] += 1
                         stats["results"].append({

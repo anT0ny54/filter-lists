@@ -299,6 +299,7 @@ def valid_inline_style(body: str) -> bool:
 
 
 def has_inline_style(body: str) -> bool:
+    """ABP inline styles are a selector followed by one trailing `{...}` block."""
     return "{" in body and body.rstrip().endswith("}")
 
 
@@ -426,7 +427,15 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
             return None
     if not body or CONTROL_RE.search(body):
         return None
-    if has_inline_style(body):
+    # Any brace in a cosmetic body marks an intended `{...}` inline-style
+    # block, which must be well-formed: balanced braces closing the body plus
+    # the safe declaration grammar. Unbalanced braces, trailing text after
+    # the block, and blocks outside the grammar are malformed style syntax —
+    # not ordinary cosmetic selectors — and are rejected rather than slipping
+    # past validation as cosmetic rules.
+    if "{" in body or "}" in body:
+        if not has_inline_style(body):
+            return None
         if not policy["allow_abp_inline_styles"] or not valid_inline_style(body):
             return None
     # (spaces are removed first, so a separate "{remove :" test was unreachable)
