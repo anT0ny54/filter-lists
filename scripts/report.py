@@ -12,7 +12,7 @@ from config import (
     BUILDER_VERSION, DEFAULT_ANOMALY_MAX_BYTES_CHANGE_RATIO,
     DEFAULT_ANOMALY_MAX_REJECTION_RATE_CHANGE,
     DEFAULT_ANOMALY_MAX_RULE_COUNT_CHANGE_RATIO, DEFAULT_ANOMALY_MIN_LINES,
-    load_rule_policy, sha256_file,
+    DEFAULT_SOURCE_QUALITY, load_rule_policy, sha256_file,
 )
 from normalize import default_max_rule_length, normalize_rule_with_reason
 from health import build_source_reputation, default_outcomes_path, record_outcomes
@@ -123,7 +123,6 @@ def evaluate_source_quality(results: list[dict], policy: dict | None) -> dict:
     rejection rate ignores comments, blanks and directives so a heavily
     commented but compatible list is not penalised.
     """
-    from config import DEFAULT_SOURCE_QUALITY
     policy = {**DEFAULT_SOURCE_QUALITY, **(policy or {})}
     result = {
         "enabled": bool(policy["enabled"]), "min_lines": int(policy["min_lines"]),
