@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-d4683016cde5
-! Last updated: 2026-10-11 21:56:44 UTC
+! Version: v7.6.0-3fbc1cade8d5
+! Last updated: 2026-10-11 21:57:31 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: d4683016cde59587f1047c5cc9177bd53edca18674d8e521fcc940b98b26df3e
+! Build-ID: 3fbc1cade8d559f7ccb09731ddfa7415819be41c42a62eaff99e024d6e542300
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 172203
+! Total rules: 172206
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -51048,6 +51048,7 @@ futura-sciences.com##.viously > div.viously-sticked
 futura-sciences.com##.zone-insert
 futura-sciences.com##div[class*="ad-parent"]
 futura-sciences.com##div[class^="box__Box-"][style^="min-height:"]
+futura-sciences.com##li[class*="article-"]:has(.tag-sponsorise)
 futura-sciences.com#?#.postcontainer:has(.username:has-text(Publicité))
 futureaudiophile.com#@#.ad_slot
 futureaudiophile.com#@#.ad_unit
@@ -113690,6 +113691,7 @@ zzzyk.com###Tinfo
 ||cydonrespelt.cyou^
 ||cydwyzuianudt.site^
 ||cyfiaeojxyrsu.space^
+||cyfrmlahj.com^
 ||cyfyxkqvqfvfm.space^
 ||cygalwwkhhimv.space^
 ||cygldmgonirjm.online^
@@ -123074,6 +123076,7 @@ zzzyk.com###Tinfo
 ||fyovqgkrvoiyo.website^
 ||fyqvlsvraskhk.online^
 ||fytbadthewihr.store^
+||fyvkhqjluqzcm.site^
 ||fywc6.chimeratool.com^
 ||fyxhvdyjwyilg.space^
 ||fyyakrzubolls.online^
