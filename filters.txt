@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-c894dfa3b192
-! Last updated: 2026-10-11 20:11:47 UTC
+! Version: v7.6.0-cd6ae58a8930
+! Last updated: 2026-10-11 20:40:31 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: c894dfa3b1929758e180062094d847ecc11d603aa5d7433b7b07fb304b700dc6
+! Build-ID: cd6ae58a893068c755da86d7cbc49622b33bd8bb78fa7e6b65f5bfad161af9df
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 172085
+! Total rules: 172088
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -69401,7 +69401,6 @@ motogonki.ru##div[style^="float:"]:has(> div[style] a[onclick*="/go/click.php?"]
 motokicx.com##div[id^="adtemplate"]
 motokicx.com,motorrijder.be##div[id^="bannerhome"]
 motom-jp.com###footer_btn
-motopodhale.info,nano-reef.pl,polski-tenis.pl##img[src*="banery"]
 motor-fan.jp##.ad-management:not([data-key="default__single__main_after"])
 motor-fan.jp,suzuri.jp,volleyballking.jp##.share-area
 motor-talk.de##.AdPlacement
@@ -126807,6 +126806,7 @@ zzzyk.com###Tinfo
 ||hfr8l4ebdt.com^
 ||hfrkamhoz.com^
 ||hfrmetlbzovrr.com^
+||hfsijlilwfwgu.online^
 ||hfsmoyooeywgq.site^
 ||hfsqpkalpdyio.space^
 ||hftciwcfqrotx.online^
@@ -134348,6 +134348,7 @@ zzzyk.com###Tinfo
 ||laptopchoose.com^
 ||laptopprivacyado.com^
 ||laqcroflisdvu.website^
+||laqjhhicgqnzm.online^
 ||laqnfoulvnakr.online^
 ||larasub.conxxx.pro^
 ||larchesrotates.com^
@@ -147848,6 +147849,7 @@ zzzyk.com###Tinfo
 ||pyrfpb.icu^
 ||pyroium.net^
 ||pyrrhicmmmmmondsee.cfd^
+||pyruvilpacinkohauler.qpon^
 ||pysdjnutumhyv.site^
 ||pysdvwrawkwjz.space^
 ||pythianziarat.cyou^
@@ -166371,6 +166373,7 @@ zzzyk.com###Tinfo
 ||wlxcjkmqc.com^
 ||wlyzvscpimkxvl.com^
 ||wlzhmngyhuebs.space^
+||wlzzjqyjapurf.com^
 ||wlzzwzeyrbbrw.top^
 ||wlzzwzeyrbbyk.top^
 ||wm-help.net/b.php?
