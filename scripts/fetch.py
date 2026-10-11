@@ -106,41 +106,57 @@ def _redirect_location(headers: Path) -> str | None:
     return None
 
 
-def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> tuple[bool, str]:
+def _file_size(path: Path) -> int:
+    try:
+        return path.stat().st_size
+    except OSError:
+        return 0
+
+
+def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> tuple[bool, str, int]:
     """Download one source with bounded retries and SSRF-safe redirects.
 
     Redirects are handled one hop at a time so every destination is validated
     before the next network connection. curl is run without environment proxy
     settings and the validated DNS address is pinned with --resolve.
+
+    The returned byte count includes every body observed during the download,
+    including a partial body removed after a transfer failure.
     """
     timeout = max(1, int(timeout))
     deadline = time.monotonic() + timeout
     current_url = canonical_url(url)
     redirects = 0
+    transferred_bytes = 0
     headers = output.with_suffix(output.suffix + ".headers")
+
+    def discard_partial() -> None:
+        nonlocal transferred_bytes
+        transferred_bytes += _file_size(output)
+        output.unlink(missing_ok=True)
+
+    def fail(reason: str) -> tuple[bool, str, int]:
+        discard_partial()
+        return False, reason, transferred_bytes
 
     try:
         while True:
             remaining = int(deadline - time.monotonic())
             if remaining <= 0:
-                output.unlink(missing_ok=True)
-                return False, "global-timeout"
+                return fail("global-timeout")
 
             try:
                 parsed = urlsplit(current_url)
                 host = parsed.hostname
                 port = parsed.port or (443 if parsed.scheme == "https" else 80)
                 if not host or parsed.scheme not in {"http", "https"}:
-                    output.unlink(missing_ok=True)
-                    return False, "invalid-fetch-url"
+                    return fail("invalid-fetch-url")
             except ValueError as exc:
-                output.unlink(missing_ok=True)
-                return False, f"invalid-fetch-url: {exc}"
+                return fail(f"invalid-fetch-url: {exc}")
 
             address, resolution_error = _public_address_for_url(current_url)
             if resolution_error:
-                output.unlink(missing_ok=True)
-                return False, resolution_error if redirects == 0 else f"redirect-{resolution_error}"
+                return fail(resolution_error if redirects == 0 else f"redirect-{resolution_error}")
 
             connect_timeout = min(20, remaining)
             command = [
@@ -171,34 +187,32 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
                     timeout=remaining + 5,
                 )
             except (OSError, subprocess.TimeoutExpired) as exc:
-                output.unlink(missing_ok=True)
-                return False, "global-timeout" if isinstance(exc, subprocess.TimeoutExpired) else str(exc)
+                return fail("global-timeout" if isinstance(exc, subprocess.TimeoutExpired) else str(exc))
 
             if proc.returncode:
-                output.unlink(missing_ok=True)
-                return False, proc.stderr.strip() or f"curl exit {proc.returncode}"
+                return fail(proc.stderr.strip() or f"curl exit {proc.returncode}")
 
             try:
                 status = int(proc.stdout.strip() or "0")
             except ValueError:
-                output.unlink(missing_ok=True)
-                return False, "invalid-http-status"
+                return fail("invalid-http-status")
 
             if status in REDIRECT_STATUSES:
                 location = _redirect_location(headers)
-                output.unlink(missing_ok=True)
+                discard_partial()
                 if not location:
-                    return False, "redirect-missing-location"
+                    return fail("redirect-missing-location")
                 redirects += 1
                 if redirects > MAX_REDIRECTS:
-                    return False, "too-many-redirects"
+                    return fail("too-many-redirects")
                 next_url = urljoin(current_url, location)
                 if not valid_url(next_url):
-                    return False, "redirect-invalid-url"
+                    return fail("redirect-invalid-url")
                 current_url = canonical_url(next_url)
                 continue
 
-            return True, ""
+            transferred_bytes += _file_size(output)
+            return True, "", transferred_bytes
     finally:
         headers.unlink(missing_ok=True)
 
@@ -277,10 +291,9 @@ def collect_sources(
     sequence = 0
     deadline = started + total_timeout
 
-    # A source is allowed to consume at most max_download_bytes.  Bound the
-    # number of simultaneous downloads so that the reserved worst-case
-    # bytes can never exceed the global budget. Sources waiting for a slot
-    # are queued, not counted as failures.
+    # A source is allowed to consume at most max_download_bytes. Bound the
+    # initial worker count by that configured worst case; collect_sources then
+    # applies a tighter reservation to every request before it is submitted.
     per_source_limit = min(max_download_bytes, max_total_download_bytes)
     max_parallel_by_budget = max(1, max_total_download_bytes // per_source_limit)
     parallelism = max(1, min(int(workers), max_parallel_by_budget))
@@ -366,49 +379,68 @@ def collect_sources(
             log(f">> Download batch: {len(batch)} URL(s), workers={parallelism}")
             discovered_children: list[tuple[str, int]] = []
 
-            # Schedule by worker capacity and the per-source byte cap. The global
-            # byte total — accepted and rejected transfers alike — is enforced
-            # after each completed download. This keeps many small sources from
-            # being serialized just because the remaining budget is below one
-            # source's worst-case allocation.
+            # Schedule by worker capacity and an explicit per-request budget
+            # reservation. A request is submitted only while its worst-case
+            # allocation still fits in the budget left after both completed
+            # transfers and all active reservations. The request itself is
+            # capped at that allocation, so the global byte total can never be
+            # exceeded by work already in flight.
             wave_start = 0
+            reserved_download_bytes = 0
             while wave_start < len(batch):
                 if time.monotonic() >= deadline:
                     stats["timed_out"] = True
                     break
 
-                remaining_budget = max_total_download_bytes - stats["total_download_bytes"]
-                if remaining_budget <= 0:
-                    stats["budget_exhausted"] = True
-                    break
-
                 wave_size = min(parallelism, len(batch) - wave_start)
                 wave = batch[wave_start:wave_start + wave_size]
-                wave_start += wave_size
-
                 futures = {}
+                scheduled_count = 0
                 ordered_outcomes: list[
                     tuple[str, int, Path, bool, str, int] | None
                 ] = [None] * len(wave)
+
                 for submission_index, (url, depth) in enumerate(wave):
+                    remaining_budget = (
+                        max_total_download_bytes
+                        - stats["total_download_bytes"]
+                        - reserved_download_bytes
+                    )
+                    if remaining_budget <= 0:
+                        stats["budget_exhausted"] = True
+                        break
+
+                    # The final request near the boundary receives only what is
+                    # still unreserved. curl's --max-filesize is set to this
+                    # allocation rather than the larger per-source default.
+                    request_limit = min(per_source_limit, remaining_budget)
+                    reserved_download_bytes += request_limit
                     target = tmp / f"source-{sequence:06d}.txt"
                     sequence += 1
                     remaining = max(1, int(deadline - time.monotonic()))
                     timeout = min(INCLUDE_TIMEOUT if depth else DOWNLOAD_TIMEOUT, remaining)
-                    futures[pool.submit(download, url, target, timeout, per_source_limit)] = (
-                        submission_index, url, depth, target
+                    futures[pool.submit(download, url, target, timeout, request_limit)] = (
+                        submission_index, url, depth, target, request_limit
                     )
+                    scheduled_count += 1
+
+                if not futures:
+                    break
 
                 for future in concurrent.futures.as_completed(futures):
-                    submission_index, url, depth, target = futures[future]
+                    submission_index, url, depth, target, request_limit = futures[future]
                     try:
-                        ok, error = future.result()
+                        ok, error, transferred_bytes = future.result()
                     except Exception as exc:
-                        ok, error = False, str(exc)
+                        ok, error, transferred_bytes = False, str(exc), 0
+                    reserved_download_bytes -= request_limit
 
-                    size = target.stat().st_size if target.exists() else 0
+                    # A failed transfer may already have deleted its partial
+                    # output. Trust the byte count returned by download() in
+                    # that case instead of reading a now-missing file.
+                    size = max(transferred_bytes, _file_size(target))
                     if ok:
-                        ok, validation_error = validate_download(target, per_source_limit)
+                        ok, validation_error = validate_download(target, request_limit)
                         error = validation_error or error
                     ordered_outcomes[submission_index] = (url, depth, target, ok, error, size)
 
@@ -417,14 +449,14 @@ def collect_sources(
                 # order even when downloads finish in the opposite order.
                 for outcome in ordered_outcomes:
                     if outcome is None:
-                        raise RuntimeError("internal error: missing download outcome")
+                        # No reservation remained for this entry. It remains
+                        # pending and is accounted for below.
+                        continue
                     url, depth, target, ok, error, size = outcome
 
-                    # Enforce the global byte budget here, in deterministic
-                    # submission order, against the *running* total. Checking it
-                    # in completion order used a stale total, so parallel
-                    # downloads could jointly overshoot the budget and the
-                    # rejected source depended on network timing.
+                    # Reservations make this check redundant for compliant
+                    # transfers, but retain it as a hard backstop for a worker
+                    # that reports more bytes than its allocation.
                     #
                     # Transferred bytes count against the budget whether or not
                     # the response was accepted. A downloaded HTML error page is
@@ -477,6 +509,8 @@ def collect_sources(
                             stats["failures"].append({"url": url, "reason": reason, "depth": depth})
                         target.unlink(missing_ok=True)
                         log(f"   [SKIP] {url[:110]} — {reason}")
+
+                wave_start += scheduled_count
 
             # Network completion order must never decide which includes are visited
             # first. Without this stable ordering, a global source limit can make
