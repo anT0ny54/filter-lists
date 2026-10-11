@@ -8,11 +8,20 @@ from __future__ import annotations
 
 import re
 from config import load_policy_limits, load_rule_policy
-from parser import COSMETIC_MARKERS, COSMETIC_RE, classify
+from parser import COSMETIC_MARKERS, COSMETIC_RE, classify, clean_line
 from policy import (
     INVERSE_OPTIONS, REWRITE_RESOURCES, SIMPLE_OPTIONS, TYPE_OPTIONS,
     VALUE_OPTIONS,
 )
+
+
+def rule_sort_key(rule: str) -> tuple[str, str]:
+    """Deterministic output order: case-insensitive, ties broken by raw text.
+
+    Shared by merge.py (writing), validate.py (checking order and recomputing
+    the Build-ID) and the benchmark, so the three can never drift apart.
+    """
+    return (rule.casefold(), rule)
 
 
 def default_max_rule_length() -> int:
@@ -162,16 +171,24 @@ def is_overbroad_pattern(pattern_body: str, options: list[str]) -> bool:
     return not options and not pattern_body.strip("*|^")
 
 
-def uses_restricted_abp_feature(line: str) -> bool:
+def uses_restricted_abp_feature(line: str, classification=None) -> bool:
     """True if `line` needs a source trusted for ABP security-sensitive features.
 
     The previous check only matched `$header=` / `$addheader=` as the *first*
     option, so `||x^$script,header=...` slipped through untrusted sources.
     Options are now located with the real option parser.
+
+    Comments, directives and blank lines never carry a feature, even when the
+    text mentions `$header=` or `#$#`; flagging them mislabelled ordinary
+    comments as `abp-security-restricted-feature` in untrusted sources.
+    `classification` lets callers reuse a classification they already hold.
     """
+    kind = (classification or classify(line)).kind
+    if kind in {"comment", "directive", "blank"}:
+        return False
     if "#$#" in line or RESTRICTED_RAW_RE.search(line):
         return True
-    if "$" not in line or classify(line).kind != "network":
+    if "$" not in line or kind != "network":
         return False
     _, options = split_options(line)
     return any(option.split("=", 1)[0].casefold() in RESTRICTED_OPTIONS for option in options)
@@ -268,10 +285,12 @@ def valid_addheader(value: str) -> bool:
     return True
 
 
-def valid_inline_style(body: str) -> bool:
+def valid_inline_style(body: str, allow_remove: bool = True) -> bool:
     # ABP inline styles are a selector followed by a single declaration block.
     # The property/value grammar is intentionally security-restricted to ABP's
     # documented allowlist; custom properties and arbitrary CSS are rejected.
+    # `remove: true` is honoured only when `allow_remove` (policy switch
+    # `allow_abp_remove_action`) is set, wherever it appears in the block.
     if "{" not in body or not body.endswith("}"):
         return False
     selector, declarations = body.rsplit("{", 1)
@@ -290,7 +309,7 @@ def valid_inline_style(body: str) -> bool:
         if not name or name.startswith("--") or not CSS_PROPERTY_RE.fullmatch(name):
             return False
         if name.lower() == "remove":
-            if value.lower() != "true":
+            if not allow_remove or value.lower() != "true":
                 return False
             continue
         if not ABP_CSS_VALUE_RE.fullmatch(value):
@@ -436,17 +455,15 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
     if "{" in body or "}" in body:
         if not has_inline_style(body):
             return None
-        if not policy["allow_abp_inline_styles"] or not valid_inline_style(body):
+        if not policy["allow_abp_inline_styles"]:
             return None
-    # (spaces are removed first, so a separate "{remove :" test was unreachable)
-    if "{" in body and "{remove:" in body.replace(" ", "").lower():
-        if not policy["allow_abp_remove_action"]:
+        if not valid_inline_style(body, policy["allow_abp_remove_action"]):
             return None
     if domains:
         items = [x.strip().lower() for x in domains.split(",")]
         if any(not x or not DOMAIN_RE.fullmatch(x) for x in items):
             return None
-        domains = ",".join(sorted(set(items), key=lambda x: (x.casefold(), x)))
+        domains = ",".join(sorted(set(items), key=rule_sort_key))
     # Extended CSS is deliberately domain-scoped in this strict profile.
     if separator == "#?#" and not domains:
         return None
@@ -471,9 +488,9 @@ def _normalize_line(line: str, limit: int, policy: dict[str, bool], trusted_abp_
     """
     if not line or len(line) > limit:
         return None, None
-    if not trusted_abp_features and uses_restricted_abp_feature(line):
-        return None, None
     classification = classify(line)
+    if not trusted_abp_features and uses_restricted_abp_feature(line, classification):
+        return None, classification
     if classification.kind == "invalid":
         if classification.reason == "hosts-format" and not policy["reject_hosts_format"]:
             return line, classification
@@ -502,7 +519,7 @@ def normalize_rule(
     trusted_abp_features: bool = True,
     rule_policy: dict[str, bool] | None = None,
 ) -> str | None:
-    line = raw.lstrip("\ufeff").strip()
+    line = clean_line(raw)
     limit = default_max_rule_length() if max_rule_length is None else max_rule_length
     policy = load_rule_policy() if rule_policy is None else rule_policy
     return _normalize_line(line, limit, policy, trusted_abp_features)[0]
@@ -521,7 +538,7 @@ def normalize_rule_with_reason(
     The policy, length limit and classification are resolved once and shared
     between normalization and the rejection reason.
     """
-    line = raw.lstrip("\ufeff").strip()
+    line = clean_line(raw)
     limit = default_max_rule_length() if max_rule_length is None else max_rule_length
     policy = load_rule_policy() if rule_policy is None else rule_policy
     rule, classification = _normalize_line(line, limit, policy, trusted_abp_features)
@@ -537,7 +554,7 @@ def rejection_reason(
     trusted_abp_features: bool = True,
     rule_policy: dict[str, bool] | None = None,
 ) -> str:
-    line = raw.lstrip("\ufeff").strip()
+    line = clean_line(raw)
     limit = default_max_rule_length() if max_rule_length is None else max_rule_length
     policy = load_rule_policy() if rule_policy is None else rule_policy
     return _rejection_reason(line, limit, policy, trusted_abp_features, None)
@@ -546,10 +563,10 @@ def rejection_reason(
 def _rejection_reason(line, limit, policy, trusted_abp_features, c) -> str:
     if not line:
         return "blank"
-    if not trusted_abp_features and uses_restricted_abp_feature(line):
-        return "abp-security-restricted-feature"
     if c is None:
         c = classify(line)
+    if not trusted_abp_features and uses_restricted_abp_feature(line, c):
+        return "abp-security-restricted-feature"
     if c.reason == "hosts-format" and not policy["reject_hosts_format"]:
         return "hosts-format-allowed"
     if c.reason == "html-or-error-page" and not policy["reject_html_error_pages"]:
@@ -582,14 +599,12 @@ def _rejection_reason(line, limit, policy, trusted_abp_features, c) -> str:
         if engine_only:
             return "engine-specific-syntax"
         if "#$#" in line:
-            snippet_match = re.search(r"#\$#", line)
-            if snippet_match and not line[:snippet_match.start()].strip():
+            if not line[:line.find("#$#")].strip():
                 return "snippet-domain-required"
             if not policy["allow_abp_snippets"]:
                 return "abp-snippets-disabled"
         if "#?#" in line:
-            cosmetic_match = re.search(r"#\?#", line)
-            if cosmetic_match and not line[:cosmetic_match.start()].strip():
+            if not line[:line.find("#?#")].strip():
                 return "extended-css-domain-required"
         if ":has-text(" in line.lower() and "#?#" not in line:
             return "extended-css-selector-requires-#?#"

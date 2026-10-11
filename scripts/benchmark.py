@@ -18,7 +18,7 @@ import sys
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
-from normalize import normalize_rule  # noqa: E402
+from normalize import normalize_rule, rule_sort_key  # noqa: E402
 
 DEFAULT_INPUT = SCRIPT_DIR.parent / "tests" / "fixtures" / "sample-filter.txt"
 
@@ -44,7 +44,7 @@ def run_merge(lines: list[str], repeats: int) -> tuple[float, int]:
             normalized = normalize_rule(line)
             if normalized is not None:
                 seen.add(normalized)
-        ordered = sorted(seen, key=lambda rule: (rule.casefold(), rule))
+        ordered = sorted(seen, key=rule_sort_key)
         timings.append(time.perf_counter() - start)
         unique = len(ordered)
     return statistics.median(timings), unique

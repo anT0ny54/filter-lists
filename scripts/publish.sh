@@ -102,8 +102,10 @@ while :; do
   echo "$out" >&2
 
   # Only a moved branch is worth retrying; auth/permission/protection errors
-  # would fail identically every time.
-  if ! grep -Eiq 'rejected|non-fast-forward|fetch first|stale info|different commit|failed to update ref|cannot lock ref' <<<"$out"; then
+  # would fail identically every time. A bare `rejected` also matches
+  # `[remote rejected] ... (protected branch hook declined)`, which is
+  # permanent, so only git's non-fast-forward form `[rejected]` is accepted.
+  if ! grep -Eiq '\[rejected\]|non-fast-forward|fetch first|stale info|different commit|failed to update ref|cannot lock ref' <<<"$out"; then
     echo "::error::push failed for a reason other than a moved branch; not retrying" >&2
     exit 1
   fi

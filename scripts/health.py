@@ -33,7 +33,7 @@ def history_reports(history_dir: Path, limit: int = 30) -> list[dict]:
     for path in history_dir.glob("*.json"):
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
-            if data.get("status", "success") == "success":
+            if isinstance(data, dict) and data.get("status", "success") == "success":
                 reports.append(data)
         except (OSError, ValueError):
             continue

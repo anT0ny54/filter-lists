@@ -13,8 +13,9 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-CUSTOM_RULES = ROOT / "custom-rules.txt"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from config import BUILDER_VERSION, CUSTOM_RULES, ROOT, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
+
 OUTPUT = ROOT / "filters.txt"
 REPORT = ROOT / "reports" / "latest.json"
 HISTORY_DIR = ROOT / "reports" / "history"
@@ -36,15 +37,11 @@ def _workers() -> int:
         raise ValueError("FILTER_LISTS_WORKERS must be >= 1")
     return value
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from config import BUILDER_VERSION, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
 from fetch import collect_sources  # noqa: E402
 from report import analyze_files, write_report  # noqa: E402
 from policy import PROFILE_DESCRIPTION  # noqa: E402
 from health import default_outcomes_path, history_reports, set_outcome_status  # noqa: E402
-
-
-_RULE_SORT_KEY = lambda x: (x.casefold(), x)
+from normalize import rule_sort_key  # noqa: E402
 
 
 def log(message: str) -> None:
@@ -55,7 +52,7 @@ def load_previous_report() -> dict | None:
     if REPORT.is_file():
         try:
             data = json.loads(REPORT.read_text(encoding="utf-8"))
-            if data.get("status", "success") == "success":
+            if isinstance(data, dict) and data.get("status", "success") == "success":
                 return data
         except (OSError, ValueError):
             pass
@@ -260,7 +257,7 @@ def main() -> int:
             if detail:
                 item.update({k: v for k, v in detail.items() if k != "path"})
         source_stats["content_hash_algorithm"] = "sha256"
-        final_rules = sorted(rules, key=_RULE_SORT_KEY)
+        final_rules = sorted(rules, key=rule_sort_key)
         build_id = hashlib.sha256((fingerprint + "\n" + "\n".join(final_rules)).encode()).hexdigest()
         staged = stage_output(final_rules, build_id, manifest_sha256=provenance["source_manifest_sha256"], source_count=len(source_urls))
         write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="success", source_quality_policy=getattr(config, "source_quality", None))

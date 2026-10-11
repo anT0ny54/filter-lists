@@ -11,7 +11,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
 sys.path.insert(0, str(SCRIPT_DIR))
 from config import BUILDER_VERSION, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
-from normalize import normalize_rule  # noqa: E402
+from normalize import normalize_rule, rule_sort_key  # noqa: E402
 
 TOTAL_RE = re.compile(r"^! Total rules: ([0-9]+)$")
 BUILD_RE = re.compile(r"^! Build-ID: ([0-9a-f]{64})$")
@@ -40,7 +40,6 @@ def main() -> int:
     # validator checked only the final stored value. Track each required
     # header and fail validation on a second occurrence.
     metadata_seen: set[str] = set()
-    version_seen = False
     version_hash = None
 
     def _numbered_lines():
@@ -69,7 +68,9 @@ def main() -> int:
                 declared_source_manifest = m.group(1)
                 continue
             if raw.startswith("! Version:"):
-                version_seen = True
+                if "version" in metadata_seen:
+                    errors.append(f"[METADATA] line {number}: duplicate '! Version:' header")
+                metadata_seen.add("version")
                 if m := VERSION_RE.match(raw):
                     version_hash = m.group(1)
                 else:
@@ -85,7 +86,7 @@ def main() -> int:
                 errors.append(f"[DUPLICATE] line {number}: {raw[:180]}")
             seen.add(normalized)
             # Track only the previous sort key instead of retaining every rule.
-            current_key = (normalized.casefold(), normalized)
+            current_key = rule_sort_key(normalized)
             if previous_key is not None and current_key < previous_key:
                 errors.append(f"[UNSORTED] line {number}: {raw[:180]}")
             previous_key = current_key
@@ -102,7 +103,7 @@ def main() -> int:
     if declared_build_id is None:
         errors.append("[BUILD-ID] missing or invalid")
     else:
-        actual_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(sorted(seen, key=lambda x: (x.casefold(), x)))).encode()).hexdigest()
+        actual_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(sorted(seen, key=rule_sort_key))).encode()).hexdigest()
         if actual_id != declared_build_id:
             errors.append("[BUILD-ID] does not match configuration and normalized rules")
     if declared_source_manifest is None:
@@ -110,7 +111,7 @@ def main() -> int:
     else:
         if source_manifest_sha256(config) != declared_source_manifest:
             errors.append("[PROVENANCE] source manifest hash does not match sources.yaml")
-    if not version_seen:
+    if "version" not in metadata_seen:
         errors.append("[VERSION] missing")
     elif version_hash and declared_build_id and not declared_build_id.startswith(version_hash):
         errors.append("[VERSION] hash suffix does not match Build-ID")

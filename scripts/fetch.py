@@ -21,9 +21,10 @@ REDIRECT_STATUSES = {301, 302, 303, 307, 308}
 INCLUDE_RE = re.compile(r"^\s*!#include\s+(.+?)\s*$", re.I)
 # `\b` keeps `<header`/`<htmlfoo` from matching. The status-line branch needs
 # `[0-9.]+`: with a single-character class `HTTP/1.1 404` never matched, so only
-# HTTP/2-style error bodies were detected.
+# HTTP/2-style error bodies were detected. A leading BOM (not `\s`) must not
+# hide the page, hence `[\s\ufeff]*`.
 HTML_ERROR_PAGE_RE = re.compile(
-    r"^\s*(?:<!doctype\b|<html\b|<head\b|HTTP/[0-9.]+\s+[45]\d\d)",
+    r"^[\s\ufeff]*(?:<!doctype\b|<html\b|<head\b|HTTP/[0-9.]+\s+[45]\d\d)",
     re.I | re.M,
 )
 
@@ -253,8 +254,10 @@ def include_urls(path: Path, base_url: str) -> list[str]:
     result: list[str] = []
     try:
         # Stream the include scan instead of materializing a potentially
-        # 50 MiB source plus all of its split-line objects at once.
-        with path.open(encoding="utf-8", errors="replace") as source:
+        # 50 MiB source plus all of its split-line objects at once. `utf-8-sig`
+        # drops a leading BOM so an include on the first line is still found
+        # (the classifier already treats such a line as a directive).
+        with path.open(encoding="utf-8-sig", errors="replace") as source:
             for raw in source:
                 # Cheap substring gate: nearly every line in a 50 MiB list is
                 # not an include, so skip the regex for all of those.

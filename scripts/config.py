@@ -244,9 +244,11 @@ def _rule_policy(policy: dict) -> dict[str, bool]:
     rules = policy.get("rules", {})
     if not isinstance(rules, dict):
         raise ValueError("policies.yaml: rules must be an object")
-    unknown = sorted(set(rules) - set(RULE_POLICY_DEFAULTS))
+    # YAML keys need not be strings (`1: true`); sort/join via str() so a bad
+    # key produces the clean configuration error instead of a raw TypeError.
+    unknown = sorted(set(rules) - set(RULE_POLICY_DEFAULTS), key=str)
     if unknown:
-        raise ValueError(f"policies.yaml: unknown rule policies: {', '.join(unknown)}")
+        raise ValueError(f"policies.yaml: unknown rule policies: {', '.join(map(str, unknown))}")
     return {
         key: _strict_bool(rules.get(key, default), f"policies.yaml: rules.{key}")
         for key, default in RULE_POLICY_DEFAULTS.items()

@@ -180,9 +180,18 @@ def write_report(path: Path, *, source_stats: dict, rule_stats: dict, elapsed_se
     history_dir = history_dir or path.parent / "history"
     outcomes_path = outcomes_path or default_outcomes_path(history_dir)
     generated_at = datetime.now(timezone.utc).isoformat()
+    # Outcome history keeps every URL ever seen, so a since-disabled source
+    # (AdGuard Annoyances) would still be listed. Report reputation only for
+    # the sources of this run; its history is retained if it is re-enabled.
+    current_urls = {item.get("url") for item in results}
+    reputation = {
+        url: value
+        for url, value in build_source_reputation(history_dir, results, outcomes_path=outcomes_path, generated_at=generated_at).items()
+        if url in current_urls
+    }
     payload = {
         "schema": SCHEMA_VERSION, "status": status, "generated_at": generated_at, "builder": f"Filter-Lists v{BUILDER_VERSION}", "profile": PROFILE_NAME, "build_id": build_id, "source_count": len(source_urls),
-        "provenance": provenance or {}, "sources": clean_sources, "source_reputation": build_source_reputation(history_dir, results, outcomes_path=outcomes_path, generated_at=generated_at), "source_quality": source_quality,
+        "provenance": provenance or {}, "sources": clean_sources, "source_reputation": reputation, "source_quality": source_quality,
         "rules": {k: v for k, v in rule_stats.items() if k != "per_file"}, "anomalies": anomalies, "build_seconds": round(elapsed_seconds, 3),
     }
     path.parent.mkdir(parents=True, exist_ok=True); temporary = path.with_suffix(path.suffix + ".tmp")

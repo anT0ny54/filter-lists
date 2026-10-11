@@ -21,6 +21,23 @@ COSMETIC_MARKERS = (
 COSMETIC_RE = re.compile("|".join(re.escape(marker) for marker in COSMETIC_MARKERS))
 
 
+BOM = "\ufeff"
+
+
+def clean_line(line: str) -> str:
+    """Strip surrounding whitespace and any leading BOM, even behind whitespace.
+
+    Single definition shared by the classifier and every normalizer entry
+    point. They used to strip `\\ufeff` and whitespace in different orders, so
+    `"  \\ufeffads.js"` kept its BOM inside the accepted rule and the validator
+    (which re-normalizes) then reported it as NONCANONICAL. Idempotent.
+    """
+    value = line.strip()
+    while value.startswith(BOM):
+        value = value[1:].lstrip()
+    return value
+
+
 @dataclass(frozen=True)
 class LineClassification:
     kind: str
@@ -28,7 +45,7 @@ class LineClassification:
 
 
 def classify(line: str) -> LineClassification:
-    value = line.lstrip("\ufeff").strip()
+    value = clean_line(line)
     if not value:
         return LineClassification("blank")
     # Directives (`!#include`, `!#if`, ...) start with the same `!` prefix as
