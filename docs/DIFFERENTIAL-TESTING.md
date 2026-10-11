@@ -10,6 +10,8 @@ Set an engine command using an environment variable such as `FILTER_ENGINE_CMD`.
 FILTER_ENGINE_CMD='my-engine --validate {input}' python3 scripts/differential.py
 ```
 
+The command must contain the `{input}` placeholder; without it the harness prints an error and exits with status 2. Each fixture runs with a 300 second timeout, and a timeout is reported as a failure. If `FILTER_ENGINE_CMD` is unset the run is skipped with status 0.
+
 The harness tests the curated corpus and reports which fixtures an external engine accepts or rejects. This is deliberately opt-in because ABP, uBO, and AdGuard do not share a universal CLI interface.
 
 CI can run the harness whenever a supported engine adapter is installed; otherwise the step is skipped rather than pretending that engine coverage exists.

@@ -13,7 +13,7 @@
 - `source_count`: enabled root source count.
 - `provenance`: source registry, policy, and source-manifest hashes.
 - `sources`: fetch and per-source parsing statistics.
-- `source_reputation`: rolling success/failure score by URL, one observation per UTC day, built from `reports/source-outcomes.json` (all runs, including failed) plus the current run.
+- `source_reputation`: rolling success/failure score by URL for the sources of the current run (a disabled source is not listed), one observation per UTC day, built from `reports/source-outcomes.json` (all runs, including failed) plus the current run.
 - `source_quality`: per-source rule-yield findings (`items` with `severity`, `effective_rejection_rate`, `accepted_lines`, `top_rejection_reasons`), thresholds, counts, and `enforced_failure`. Added in v7.6.0 as an additive field; the schema number is unchanged.
 - `rules`: aggregate accepted/rejected/duplicate statistics.
 - `anomalies`: baseline comparison and enforcement decision.
@@ -21,7 +21,7 @@
 
 ## Per-source fields
 
-A source result contains URL, depth, status, bytes, SHA-256 content hash, source metadata (name/category/priority/required), rule counts, rejection rate, and rejection reasons when available. A source with `status: "failed"` additionally carries a `reason` field describing the fetch/validation failure (for example `timeout`, `html-or-error-page`, or `source-limit`).
+A source result contains URL, depth, status, bytes, SHA-256 content hash, source metadata (name/category/priority/required), rule counts, rejection rate, and rejection reasons when available. A source with `status: "failed"` additionally carries a `reason` field describing the fetch/validation failure (for example `global-timeout`, `html-or-error-page`, `source-limit`, or `global-download-budget-exhausted`).
 
 ## Reproducibility
 
