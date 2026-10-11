@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from _helpers import load_script  # noqa: F401  (adds scripts/ to sys.path)
+from _helpers import load_script, setup_merge_root
 import config
 from health import build_source_reputation, load_outcomes, record_outcomes, set_outcome_status
 from report import evaluate_source_quality, write_report
@@ -117,18 +117,10 @@ class EnforcedRejectionStatusTests(unittest.TestCase):
             self.assertFalse(set_outcome_status(path, "2026-10-02T00:00:00+00:00", "failed"))
 
     def _run_rejected(self, **overrides):
-        import merge
         from types import SimpleNamespace
         from unittest.mock import patch
-        tmp = tempfile.TemporaryDirectory(); self.addCleanup(tmp.cleanup)
-        root = Path(tmp.name); (root / "reports").mkdir()
-        saved = {k: getattr(merge, k) for k in ("ROOT", "CUSTOM_RULES", "OUTPUT", "REPORT", "HISTORY_DIR", "SOURCES_TXT")}
-        self.addCleanup(lambda: [setattr(merge, k, v) for k, v in saved.items()])
-        merge.ROOT, merge.CUSTOM_RULES, merge.OUTPUT = root, root / "custom-rules.txt", root / "filters.txt"
-        merge.REPORT, merge.HISTORY_DIR = root / "reports" / "latest.json", root / "reports" / "history"
-        merge.SOURCES_TXT = root / "sources.txt"
-        (root / "sources.yaml").write_text("version: 1\nsources: []\n"); (root / "policies.yaml").write_text("limits: {}\n")
-        merge.CUSTOM_RULES.write_text("||custom.example^\n")
+        merge = load_script("merge.py", "merge_v760_rejected")
+        root = setup_merge_root(self, merge, "version: 1\nsources: []\n")
         src = SimpleNamespace(name="s", url=URL, category="t", priority=1, required=False, enabled=True, trusted_abp_features=False)
         config = SimpleNamespace(sources=(src,), minimum_success_ratio=0.8, fail_if_zero_sources=True, max_rule_length=100000,
                                  max_include_depth=5, max_download_bytes=1 << 20, max_total_download_bytes=1 << 20,

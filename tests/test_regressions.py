@@ -1,4 +1,3 @@
-import importlib.util
 import json
 import tempfile
 import time
@@ -104,56 +103,40 @@ class ConfigRegressionTests(unittest.TestCase):
         )
 
     def test_duplicate_source_names_are_rejected_case_insensitively(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            source_file = root / "sources.yaml"
-            policy_file = root / "policies.yaml"
-            source_file.write_text("""sources:
+        setup_config_root(self, config, sources_yaml="""sources:
   - name: Example List
     url: https://example.com/one.txt
   - name: example list
     url: https://example.org/two.txt
-""", encoding="utf-8")
-            policy_file.write_text("""limits: {}
+""", policies_yaml="""limits: {}
 source_health: {}
 history: {}
 anomaly_detection:
   enabled: false
-""", encoding="utf-8")
-            with patch.object(config, "SOURCE_REGISTRY", source_file), \
-                 patch.object(config, "POLICY_FILE", policy_file):
-                with self.assertRaisesRegex(ValueError, "duplicate source name"):
-                    config.load_config()
+""")
+        with self.assertRaisesRegex(ValueError, "duplicate source name"):
+            config.load_config()
 
     def test_zero_enabled_sources_can_be_allowed_by_policy(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            source_file = root / "sources.yaml"
-            policy_file = root / "policies.yaml"
-            source_file.write_text("sources: []\n", encoding="utf-8")
-            policy_file.write_text("""source_health:
+        setup_config_root(self, config, sources_yaml="sources: []\n",
+                          policies_yaml="""source_health:
   fail_if_zero_sources: false
-""", encoding="utf-8")
-            with patch.object(config, "SOURCE_REGISTRY", source_file), \
-                 patch.object(config, "POLICY_FILE", policy_file):
-                loaded = config.load_config()
-            self.assertEqual(loaded.sources, ())
-            self.assertFalse(loaded.fail_if_zero_sources)
+""")
+        loaded = config.load_config()
+        self.assertEqual(loaded.sources, ())
+        self.assertFalse(loaded.fail_if_zero_sources)
 
 
 class RulePolicyRegressionTests(unittest.TestCase):
     def normalize_with_rules(self, rules_yaml: str, rule: str):
-        with tempfile.TemporaryDirectory() as tmp:
-            policy_file = Path(tmp) / "policies.yaml"
-            policy_file.write_text(rules_yaml, encoding="utf-8")
-            with patch.object(config, "POLICY_FILE", policy_file):
-                config.load_rule_policy.cache_clear()
-                config.load_policy_limits.cache_clear()
-                try:
-                    return normalize_rule(rule)
-                finally:
-                    config.load_rule_policy.cache_clear()
-                    config.load_policy_limits.cache_clear()
+        setup_config_root(self, config, policies_yaml=rules_yaml)
+        config.load_rule_policy.cache_clear()
+        config.load_policy_limits.cache_clear()
+        try:
+            return normalize_rule(rule)
+        finally:
+            config.load_rule_policy.cache_clear()
+            config.load_policy_limits.cache_clear()
 
     def test_yaml_can_disable_network_filters(self):
         self.assertIsNone(
@@ -224,7 +207,7 @@ class RulePolicyRegressionTests(unittest.TestCase):
         )
 
 
-from _helpers import load_script, setup_merge_root  # noqa: E402
+from _helpers import load_script, setup_config_root, setup_merge_root  # noqa: E402
 
 merge = load_script("merge.py", "merge_for_regressions")
 

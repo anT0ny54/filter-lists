@@ -8,6 +8,9 @@ from normalize import normalize_rule, rejection_reason
 from parser import classify
 from report import detect_anomalies
 
+import config  # noqa: E402
+from _helpers import load_script, setup_config_root  # noqa: E402
+
 
 class ProceduralCosmeticTests(unittest.TestCase):
     def test_ubo_procedural_operators_are_rejected(self):
@@ -63,34 +66,22 @@ class AnomalyBaselineTests(unittest.TestCase):
 
 class StagedOutputTests(unittest.TestCase):
     def test_stage_does_not_touch_output_until_commit(self):
-        import merge
+        merge = load_script("merge.py", "merge_v753")
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "filters.txt"
             out.write_text("previous\n", encoding="utf-8")
-            old = merge.OUTPUT
             merge.OUTPUT = out
-            try:
-                staged = merge.stage_output(["||a.example^"], "0" * 64, manifest_sha256="1" * 64, source_count=1)
-                self.assertEqual(out.read_text(encoding="utf-8"), "previous\n")
-                merge.commit_output(staged)
-                self.assertIn("||a.example^", out.read_text(encoding="utf-8"))
-                self.assertFalse(staged.exists())
-            finally:
-                merge.OUTPUT = old
+            staged = merge.stage_output(["||a.example^"], "0" * 64, manifest_sha256="1" * 64, source_count=1)
+            self.assertEqual(out.read_text(encoding="utf-8"), "previous\n")
+            merge.commit_output(staged)
+            self.assertIn("||a.example^", out.read_text(encoding="utf-8"))
+            self.assertFalse(staged.exists())
 
 
 class PolicyFileValidationTests(unittest.TestCase):
     def _load(self, yaml_text):
-        import config
-        with tempfile.TemporaryDirectory() as tmp:
-            policy = Path(tmp) / "policies.yaml"
-            policy.write_text(yaml_text, encoding="utf-8")
-            old = config.POLICY_FILE
-            config.POLICY_FILE = policy
-            try:
-                return config._load_policy()
-            finally:
-                config.POLICY_FILE = old
+        setup_config_root(self, config, policies_yaml=yaml_text)
+        return config._load_policy()
 
     def test_unknown_top_level_key_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "unknown top-level keys: compatibility"):

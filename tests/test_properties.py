@@ -18,19 +18,6 @@ class PropertyAndFuzzTests(unittest.TestCase):
             result = normalize_rule(value)
             self.assertTrue(result is None or isinstance(result, str))
 
-    def test_normalization_is_idempotent(self):
-        rules = [
-            "||example.com^",
-            "@@||example.com^$document",
-            "||example.com^$script,third-party",
-            "example.com##.ad",
-            r"/foo\$bar/",
-        ]
-        for rule in rules:
-            normalized = normalize_rule(rule)
-            self.assertIsNotNone(normalized)
-            self.assertEqual(normalize_rule(normalized), normalized)
-
     def test_normalizer_is_deterministic_for_fuzzed_input(self):
         rng = random.Random(0xC0DE)
         alphabet = string.ascii_letters + string.digits + "|$^/\\#@,.:_-"

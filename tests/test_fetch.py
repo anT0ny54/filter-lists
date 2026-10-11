@@ -11,7 +11,8 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import fetch
-from fetch import canonical_url, collect_sources, include_urls, validate_download
+from config import canonical_url
+from fetch import collect_sources, include_urls, validate_download
 
 
 class FetchSecurityTests(unittest.TestCase):

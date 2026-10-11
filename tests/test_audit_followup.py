@@ -5,10 +5,11 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
+
+from _helpers import setup_config_root  # noqa: E402
 import config  # noqa: E402
 from normalize import normalize_rule, rejection_reason  # noqa: E402
 
@@ -45,14 +46,10 @@ class LazyPolicyTests(unittest.TestCase):
         self.assertIn("imported", proc.stdout)
 
     def test_invalid_rule_switch_fails_in_load_config(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            (root / "sources.yaml").write_text("sources: []\n", encoding="utf-8")
-            (root / "policies.yaml").write_text("rules:\n  allow_network_filterz: true\n", encoding="utf-8")
-            with patch.object(config, "SOURCE_REGISTRY", root / "sources.yaml"), \
-                 patch.object(config, "POLICY_FILE", root / "policies.yaml"):
-                with self.assertRaisesRegex(ValueError, "unknown rule policies"):
-                    config.load_config()
+        setup_config_root(self, config, sources_yaml="sources: []\n",
+                          policies_yaml="rules:\n  allow_network_filterz: true\n")
+        with self.assertRaisesRegex(ValueError, "unknown rule policies"):
+            config.load_config()
 
 
 class DifferentialPlaceholderTests(unittest.TestCase):

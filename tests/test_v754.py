@@ -3,29 +3,23 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import config  # noqa: E402
 from config import BUILDER_VERSION, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
 from fetch import validate_download  # noqa: E402
-from normalize import normalize_rule  # noqa: E402
 from parser import classify  # noqa: E402
 
-from _helpers import load_script, run_validate  # noqa: E402
+from _helpers import load_script, run_validate, setup_config_root  # noqa: E402
 
 validate = load_script("validate.py", "validate_v754")
 
 
 class StrictConfigKeyTests(unittest.TestCase):
     def _load(self, sources_yaml="", policy_yaml=""):
-        with tempfile.TemporaryDirectory() as tmp:
-            src = Path(tmp) / "sources.yaml"
-            pol = Path(tmp) / "policies.yaml"
-            src.write_text(sources_yaml or "sources:\n  - name: a\n    url: https://a.test/l.txt\n", encoding="utf-8")
-            pol.write_text(policy_yaml or "limits: {}\n", encoding="utf-8")
-            with patch.object(config, "SOURCE_REGISTRY", src), patch.object(config, "POLICY_FILE", pol):
-                return config.load_config()
+        setup_config_root(self, config, sources_yaml=sources_yaml or None,
+                          policies_yaml=policy_yaml or None)
+        return config.load_config()
 
     def test_shipped_files_load(self):
         self.assertTrue(load_config().sources)
@@ -111,15 +105,6 @@ class ValidateHardeningTests(unittest.TestCase):
         code, out = self._run(raw_bytes=b"! Version: x\n\xff\xfe||a.example^\n")
         self.assertEqual(code, 1)
         self.assertIn("[ENCODING]", out)
-
-
-class NormalizeRegressionTests(unittest.TestCase):
-    def test_normalization_is_idempotent_for_new_forms(self):
-        for rule in ("/ads/banner.gif", "/ads/*$image,domain=a.xn--p1ai", "b.xn--p1ai,a.com##.ad"):
-            with self.subTest(rule=rule):
-                once = normalize_rule(rule)
-                self.assertIsNotNone(once)
-                self.assertEqual(normalize_rule(once), once)
 
 
 if __name__ == "__main__":

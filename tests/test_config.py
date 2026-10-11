@@ -4,9 +4,11 @@ import sys
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import config as config_module
 from config import load_config, valid_url
-from unittest.mock import patch
-import tempfile
+
+from _helpers import setup_config_root
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -37,28 +39,21 @@ class ConfigTests(unittest.TestCase):
 
 
     def test_duplicate_urls_are_checked_after_canonicalization(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            source_file = root / "sources.yaml"
-            policy_file = root / "policies.yaml"
-            source_file.write_text("""sources:
+        setup_config_root(self, config_module, sources_yaml="""sources:
   - name: first
     url: https://EXAMPLE.com/list#one
     enabled: true
   - name: second
     url: https://example.com/list#two
     enabled: true
-""", encoding="utf-8")
-            policy_file.write_text("""limits: {}
+""", policies_yaml="""limits: {}
 source_health: {}
 history: {}
 anomaly_detection:
   enabled: false
-""", encoding="utf-8")
-            import config as config_module
-            with patch.object(config_module, "SOURCE_REGISTRY", source_file),                  patch.object(config_module, "POLICY_FILE", policy_file):
-                with self.assertRaisesRegex(ValueError, "duplicate canonical URL"):
-                    config_module.load_config()
+""")
+        with self.assertRaisesRegex(ValueError, "duplicate canonical URL"):
+            config_module.load_config()
 
     def test_anomaly_detection_policy_is_loaded(self):
         cfg = load_config()
@@ -73,96 +68,64 @@ anomaly_detection:
         self.assertTrue(all(isinstance(s.trusted_abp_features, bool) for s in cfg.sources))
 
     def test_required_source_cannot_be_disabled(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            source_file = root / "sources.yaml"
-            policy_file = root / "policies.yaml"
-            source_file.write_text("""sources:
+        setup_config_root(self, config_module, sources_yaml="""sources:
   - name: required-but-disabled
     url: https://example.com/list.txt
     enabled: false
     required: true
-""", encoding="utf-8")
-            policy_file.write_text("""limits: {}
+""", policies_yaml="""limits: {}
 source_health: {}
 history: {}
 anomaly_detection:
   enabled: false
-""", encoding="utf-8")
-            import config as config_module
-            with patch.object(config_module, "SOURCE_REGISTRY", source_file), \
-                 patch.object(config_module, "POLICY_FILE", policy_file):
-                with self.assertRaisesRegex(ValueError, "cannot be required and disabled"):
-                    config_module.load_config()
+""")
+        with self.assertRaisesRegex(ValueError, "cannot be required and disabled"):
+            config_module.load_config()
 
     def test_policy_limits_require_real_integers(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            source_file = root / "sources.yaml"
-            policy_file = root / "policies.yaml"
-            source_file.write_text("""sources:
+        setup_config_root(self, config_module, sources_yaml="""sources:
   - name: source
     url: https://example.com/list.txt
     enabled: true
-""", encoding="utf-8")
-            policy_file.write_text("""limits:
+""", policies_yaml="""limits:
   max_download_bytes: 1.5
 source_health: {}
 history: {}
 anomaly_detection:
   enabled: false
-""", encoding="utf-8")
-            import config as config_module
-            with patch.object(config_module, "SOURCE_REGISTRY", source_file), \
-                 patch.object(config_module, "POLICY_FILE", policy_file):
-                with self.assertRaisesRegex(ValueError, "max_download_bytes must be an integer"):
-                    config_module.load_config()
+""")
+        with self.assertRaisesRegex(ValueError, "max_download_bytes must be an integer"):
+            config_module.load_config()
 
     def test_policy_ratios_require_real_numbers(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            source_file = root / "sources.yaml"
-            policy_file = root / "policies.yaml"
-            source_file.write_text("""sources:
+        setup_config_root(self, config_module, sources_yaml="""sources:
   - name: source
     url: https://example.com/list.txt
     enabled: true
-""", encoding="utf-8")
-            policy_file.write_text("""limits: {}
+""", policies_yaml="""limits: {}
 source_health:
   minimum_success_ratio: "0.80"
 history: {}
 anomaly_detection:
   enabled: false
-""", encoding="utf-8")
-            import config as config_module
-            with patch.object(config_module, "SOURCE_REGISTRY", source_file), \
-                 patch.object(config_module, "POLICY_FILE", policy_file):
-                with self.assertRaisesRegex(ValueError, "minimum_success_ratio must be a number"):
-                    config_module.load_config()
+""")
+        with self.assertRaisesRegex(ValueError, "minimum_success_ratio must be a number"):
+            config_module.load_config()
 
     def test_policy_booleans_require_real_yaml_booleans(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            source_file = root / "sources.yaml"
-            policy_file = root / "policies.yaml"
-            source_file.write_text("""sources:
+        setup_config_root(self, config_module, sources_yaml="""sources:
   - name: source
     url: https://example.com/list.txt
     enabled: true
-""", encoding="utf-8")
-            policy_file.write_text("""limits: {}
+""", policies_yaml="""limits: {}
 source_health:
   fail_if_zero_sources: "false"
 history: {}
 anomaly_detection:
   enabled: false
-""", encoding="utf-8")
-            import config as config_module
-            with patch.object(config_module, "SOURCE_REGISTRY", source_file), \
-                 patch.object(config_module, "POLICY_FILE", policy_file):
-                with self.assertRaisesRegex(ValueError, "source_health.fail_if_zero_sources must be a boolean"):
-                    config_module.load_config()
+""")
+        with self.assertRaisesRegex(ValueError, "source_health.fail_if_zero_sources must be a boolean"):
+            config_module.load_config()
 
     def test_urls_reject_credentials_and_malformed_ports(self):
         self.assertFalse(valid_url("https://user:secret@example.com/list.txt"))

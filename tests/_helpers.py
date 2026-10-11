@@ -53,3 +53,28 @@ def setup_merge_root(testcase, merge_module, sources_yaml: str) -> Path:
     (root / "policies.yaml").write_text("limits: {}\n", encoding="utf-8")
     merge_module.CUSTOM_RULES.write_text("||custom.example^\n", encoding="utf-8")
     return root
+
+
+def setup_config_root(testcase, config_module, *, sources_yaml=None, policies_yaml=None):
+    """Point config's registry paths at a throwaway root and seed it.
+
+    Centralizes the temp-dir + sources.yaml/policies.yaml +
+    patch(SOURCE_REGISTRY/POLICY_FILE) + load_config() pattern repeated
+    across many test files. Returns the root path; the real registry paths
+    are restored after the test.
+    """
+    saved_registry = config_module.SOURCE_REGISTRY
+    saved_policy = config_module.POLICY_FILE
+    tmp = tempfile.TemporaryDirectory()
+    testcase.addCleanup(tmp.cleanup)
+    testcase.addCleanup(setattr, config_module, "SOURCE_REGISTRY", saved_registry)
+    testcase.addCleanup(setattr, config_module, "POLICY_FILE", saved_policy)
+    root = Path(tmp.name)
+    config_module.SOURCE_REGISTRY = root / "sources.yaml"
+    config_module.POLICY_FILE = root / "policies.yaml"
+    (root / "sources.yaml").write_text(
+        sources_yaml if sources_yaml is not None else
+        "sources:\n  - name: a\n    url: https://a.test/l.txt\n", encoding="utf-8")
+    (root / "policies.yaml").write_text(
+        policies_yaml if policies_yaml is not None else "limits: {}\n", encoding="utf-8")
+    return root

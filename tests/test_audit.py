@@ -3,9 +3,10 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+
+from _helpers import setup_config_root  # noqa: E402
 import config as config_module  # noqa: E402
 from normalize import normalize_rule, rejection_reason, split_options  # noqa: E402
 from parser import classify  # noqa: E402
@@ -57,13 +58,9 @@ class TrustedFeatureGateTests(unittest.TestCase):
 
 class TrustedFlagConfigTests(unittest.TestCase):
     def _load(self, sources_yaml: str):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            (root / "sources.yaml").write_text(sources_yaml, encoding="utf-8")
-            (root / "policies.yaml").write_text("limits: {}\nsource_health: {}\nhistory: {}\n", encoding="utf-8")
-            with patch.object(config_module, "SOURCE_REGISTRY", root / "sources.yaml"), \
-                 patch.object(config_module, "POLICY_FILE", root / "policies.yaml"):
-                return config_module.load_config()
+        setup_config_root(self, config_module, sources_yaml=sources_yaml,
+                          policies_yaml="limits: {}\nsource_health: {}\nhistory: {}\n")
+        return config_module.load_config()
 
     def test_trusted_abp_features_is_loaded_from_sources_yaml(self):
         cfg = self._load(

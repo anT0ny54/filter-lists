@@ -1,11 +1,10 @@
 """Tests for schema-version validation, single-pass rejection reasons, and worker config."""
 import os
-import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from _helpers import load_script  # noqa: E402  (also puts scripts/ on sys.path)
+from _helpers import load_script, setup_config_root  # noqa: E402  (also puts scripts/ on sys.path)
 
 import config
 from normalize import normalize_rule, normalize_rule_with_reason, rejection_reason
@@ -15,13 +14,8 @@ merge = load_script("merge.py", "merge_cleanup")
 
 class SourcesVersionTests(unittest.TestCase):
     def _load(self, text):
-        with tempfile.TemporaryDirectory() as tmp:
-            src = Path(tmp) / "sources.yaml"
-            pol = Path(tmp) / "policies.yaml"
-            src.write_text(text, encoding="utf-8")
-            pol.write_text("limits: {}\n", encoding="utf-8")
-            with patch.object(config, "SOURCE_REGISTRY", src), patch.object(config, "POLICY_FILE", pol):
-                return config.load_config()
+        setup_config_root(self, config, sources_yaml=text)
+        return config.load_config()
 
     def test_future_version_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "sources.yaml: unsupported version 999"):
