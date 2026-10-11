@@ -15,8 +15,10 @@ on:
       - "requirements.txt"
       - ".github/workflows/update.yml"
 
-# Serialize every workflow that pushes to the default branch (group name is
-# shared by convention) so concurrent runs cannot race on `git push`.
+# Serialize every *workflow* that pushes to the default branch (group name is
+# shared by convention). Human pushes are not in this group and can still move
+# the branch during a build, so every publish goes through
+# scripts/publish.sh, which retries a rejected push on top of the new tip.
 concurrency:
   group: repo-write
   cancel-in-progress: false
@@ -49,7 +51,7 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          chmod +x scripts/*.py scripts/merge.sh
+          chmod +x scripts/*.py scripts/merge.sh scripts/publish.sh
           python -m py_compile scripts/*.py
           python -m unittest discover -s tests -p 'test_*.py' -v
 
@@ -103,15 +105,18 @@ jobs:
           set -Eeuo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- filters.txt reports/latest.json reports/history reports/source-outcomes.json sources.txt
-          if git diff --cached --quiet -- filters.txt reports/latest.json reports/history reports/source-outcomes.json sources.txt; then
-            echo "No generated changes"
-            exit 0
-          fi
           rules="$(sed -n 's/^! Total rules: //p' filters.txt)"
           version="$(sed -n 's/^! Version: //p' filters.txt | cut -d- -f1)"
-          git commit -m "chore(filters): auto-update ${version} filter list (${rules} rules) [skip ci]"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          # If `main` moved while we were building, publish.sh re-applies the
+          # generated files on the new tip and retries -- unless a build input
+          # changed upstream, in which case this output is stale and the
+          # change's own run rebuilds.
+          bash scripts/publish.sh \
+            -m "chore(filters): auto-update ${version} filter list (${rules} rules) [skip ci]" \
+            --guard sources.yaml --guard custom-rules.txt --guard policies.yaml \
+            --guard scripts/ --guard tests/ --guard requirements.txt \
+            --guard .github/workflows/update.yml \
+            -- filters.txt reports/latest.json reports/history reports/source-outcomes.json sources.txt
 
       # A failed build never publishes filters.txt, but its per-source fetch
       # outcomes must still be kept so repeated failures count against a
@@ -127,10 +132,7 @@ jobs:
             echo "No outcomes recorded"
             exit 0
           fi
-          git add -- reports/source-outcomes.json
-          if git diff --cached --quiet -- reports/source-outcomes.json; then
-            echo "No outcome changes"
-            exit 0
-          fi
-          git commit -m "chore(reports): record failed-build source outcomes [skip ci]"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          # Outcomes are keyed by source URL, so no input guard is needed.
+          bash scripts/publish.sh \
+            -m "chore(reports): record failed-build source outcomes [skip ci]" \
+            -- reports/source-outcomes.json
