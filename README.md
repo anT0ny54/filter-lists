@@ -28,7 +28,7 @@ The compiler accepts documented ABP syntax and rejects unsupported engine-specif
 - `header=` response-header matching.
 - `addheader=` header injection, including the documented `document` targeting case.
 - Element hiding: `##` and `#@#`.
-- ABP extended CSS: `#?#`, including supported `:has`, `:has-text`, `:-abp-properties`, `:not`, and `:xpath` forms.
+- ABP extended CSS: `#?#`, including supported `:has()`, `:has-text()`, `:-abp-has()`, `:-abp-properties()`, `:-abp-contains()`, `:not()`, and `:xpath()` forms.
 - ABP snippets: `#$#`, with the required domain scope.
 - ABP inline CSS declarations under the documented safe property/value grammar.
 - ABP `remove: true`.
@@ -156,7 +156,7 @@ See [docs/REPORT-SCHEMA.md](docs/REPORT-SCHEMA.md).
 The shipped registry enables 32 root sources (AdGuard Annoyances is present but disabled, see below):
 
 - **EasyList family (ABP-native, `*-minified.txt`):** EasyList, EasyPrivacy, Fanboy Social, and 17 regional lists (China, Dutch, Germany, Liste FR, RU AdList, Portuguese, Spanish, Indo, Vietnam, Bulgarian, Israel, Italy, Lithuania, Polish, Indian, Latvian, RO).
-- **AdGuard family (`filters.adtidy.org/extension/ublock/filters/<id>_optimized.txt`):** Base, Tracking Protection, Social Media, and regional lists (Chinese, Dutch, German, Japanese, French, Russian, Spanish, Turkish, Ukrainian) — 12 enabled AdGuard lists in total. These are the **uBlock-flavoured** AdGuard builds, which contain a lot of syntax the strict-ABP profile rejects (see [Source quality](#-source-quality-and-known-limitations)).
+- **AdGuard family (`filters.adtidy.org/extension/ublock/filters/<id>_optimized.txt`):** Base, Tracking Protection, Social Media, and regional lists (Chinese, Dutch, German, Japanese, French, Russian, Spanish, Turkish, Ukrainian) — 12 enabled AdGuard lists in total. These are the **uBlock-flavoured** AdGuard builds, which contain a lot of syntax the strict-ABP profile rejects (see [Source quality](#-source-quality)).
 
 EasyList and EasyPrivacy are `required: true`; all others are optional and only count toward the root-source success ratio. Root-source health is judged by download success; rule yield is checked separately by the [source-quality gate](#-source-quality).
 
@@ -217,6 +217,7 @@ The repository test suite covers:
 
 - parser classification
 - strict ABP normalization and canonicalization
+- normalization idempotency (corpus, fuzz-property and regression inputs)
 - network options and option validation
 - cosmetic and extended-CSS rules
 - ABP header/addheader/snippet/inline-style/remove features
@@ -270,7 +271,11 @@ Other behaviour to be aware of: `!#if` blocks are not evaluated (see above), so 
 - [Differential engine testing](docs/DIFFERENTIAL-TESTING.md)
 - [Changelog](CHANGELOG.md)
 
-## 🌐 Free DNS Services
+## 🔗 Related projects (not part of this repository)
+
+The services below are maintained separately and are **not** part of this repository, its build pipeline, or its release cycle. They are listed here for convenience only.
+
+### 🌐 Free DNS Services
 
 High-performance DNS utilizing HaGeZi Blocklists (Multi Pro + TIF).
 
@@ -283,7 +288,7 @@ High-performance DNS utilizing HaGeZi Blocklists (Multi Pro + TIF).
 | Multi Pro + TIF | `https://dns-93aca.containers.snapdeploy.app/dns-query` |
 | Multi Pro + TIF | `https://doh-93aca.containers.snapdeploy.app/dns-query` |
 
-## ⚡ Bandwidth Hero Server
+### ⚡ Bandwidth Hero Server
 
 A lightweight image optimization proxy designed to slash bandwidth usage and accelerate web browsing.
 
