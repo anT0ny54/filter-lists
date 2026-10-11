@@ -63,21 +63,18 @@ fetch.py ──► downloads + bounded !#include traversal
 parser.py ──► rule classification
     │
     ▼
-normalize.py ──► canonical rules
+normalize.py ──► canonical rules (policy gate from policies.yaml; constants in policy.py)
     │
     ▼
-policy.py (constants) + normalize.py policy gate ──► strict-ABP compatibility/security enforcement
-    │
+merge.py ──► deduplication + deterministic ordering, staged write of filters.txt
+    │          └─ report.py ──► build report + anomaly/source-quality checks
+    │                └─ health.py ──► per-source rolling reliability reputation
     ▼
-merge.py ──► deduplication + deterministic ordering
-    │
-    ├────────► validate.py ──► final integrity / Build-ID validation
-    │
-    └────────► report.py ────► build report (deterministic identity + operational metadata)
-                  └─ health.py ──► per-source rolling reliability reputation
-    │
-    ▼
-filters.txt + sources.txt + reports/latest.json
+filters.txt + sources.txt + reports/latest.json + reports/history/ + reports/source-outcomes.json
+
+Run afterwards by the workflow (not called by merge.py):
+    validate.py ──► final integrity / Build-ID validation of filters.txt
+    publish.sh  ──► commit + race-safe push (see Automation)
 ```
 
 ## 🔐 Reliability and correctness
@@ -201,15 +198,22 @@ python3 scripts/differential.py
 
 `benchmark.py` repeats its small fixture `--multiplier` times (default 5000) so the reported lines/second is stable. It benchmarks both per-line normalization and a representative merge workload (normalize → deduplicate → deterministic sort); pass `--skip-merge` to run only the normalization benchmark. `differential.py` is skipped unless `FILTER_ENGINE_CMD` is set; the command must contain the `{input}` placeholder or the script exits with an error.
 
+`scripts/publish.sh` is for CI; it commits and pushes, so do not run it in a working copy you care about.
+
 A live build requires network access to the configured upstream lists. The builder fails instead of publishing an incomplete result when the root-source health threshold is missed, a required source fails, the global source limit is reached, or the build deadline is exceeded.
 
 ## 🤖 Automation
 
-- **`update.yml`** runs daily at 03:17 UTC, on manual dispatch, and on pushes to `main` that touch `sources.yaml`, `custom-rules.txt`, `policies.yaml`, `scripts/**`, `tests/**`, `requirements.txt`, or the workflow itself. It runs the test suite, builds, validates, asserts report invariants (schema, builder version, source health, anomalies), then commits `filters.txt`, `sources.txt`, `reports/latest.json`, `reports/history/`, and `reports/source-outcomes.json` only if they changed. If the build fails, only `reports/source-outcomes.json` is committed (nothing else is published) so failures still count toward source reputation.
+- **`update.yml`** runs daily at 03:17 UTC, on manual dispatch, and on pushes to `main` that touch `sources.yaml`, `custom-rules.txt`, `policies.yaml`, `scripts/**`, `tests/**`, `requirements.txt`, or the workflow itself. It runs the test suite, builds, validates, asserts report invariants (schema, builder version, source health, anomalies), then publishes `filters.txt`, `sources.txt`, `reports/latest.json`, `reports/history/`, and `reports/source-outcomes.json` only if they changed. If the build fails, only `reports/source-outcomes.json` is published (nothing else) so failures still count toward source reputation.
 - **`validate.yml`** runs on pull requests that touch the same paths (plus `.github/workflows/**`) and on manual dispatch: byte-compile, test suite, benchmark, and the optional differential test. It never publishes.
 - **`Keep-Alive.yml`** runs on the 1st and 15th of each month at 03:47 UTC (and manually) and rewrites `.github/keep-alive.txt` with a timestamp so scheduled workflows are not disabled for repository inactivity.
+- **`scripts/publish.sh`** is the only code that pushes from CI (both `update.yml` steps and `Keep-Alive.yml` use it). The workflows check out `main` once and push minutes later, so a human push in between makes a plain `git push` fail as a non-fast-forward. `publish.sh` handles that:
+  1. It commits the generated paths and pushes.
+  2. If the push is rejected because the branch moved, it fetches the new tip, resets onto it, copies the freshly built files over the top (deletions such as history pruning included) and pushes again, up to 5 attempts (`PUBLISH_MAX_ATTEMPTS`) with a short backoff (`PUBLISH_RETRY_DELAY`). Generated files are overwritten rather than merged, so this cannot hit a merge conflict.
+  3. `update.yml` passes its build inputs (`sources.yaml`, `custom-rules.txt`, `policies.yaml`, `scripts/`, `tests/`, `requirements.txt`, the workflow file) as `--guard`s. If any of them changed on the new tip, the output just built is stale, so it is **not** published (the step exits 0 with a warning) and the run that the change triggers, or the next scheduled run, rebuilds.
+  4. Failures that are not a moved branch (permissions, branch protection, network) fail immediately instead of being retried.
 
-The `update.yml` and `Keep-Alive.yml` jobs share the `repo-write` concurrency group so they cannot race on `git push`.
+Human pushes are not part of the `repo-write` concurrency group, which only serializes `update.yml` and `Keep-Alive.yml` with each other; `publish.sh` covers the rest. Note that a human push that touches build inputs and carries `[skip ci]` will not trigger its own rebuild, so the next scheduled run picks it up.
 
 ## 🧪 Verification coverage
 
@@ -241,6 +245,7 @@ The repository test suite covers:
 - generated-list validator hardening (encoding, version/Build-ID suffix, sort order)
 - over-broad pattern rejection
 - regression tests
+- race-safe publishing (`publish.sh`) against a real bare remote: moved branch, generated-file conflicts, pruned history files, stale build inputs, repeated races, non-retryable failures
 - optional external-engine differential testing
 - repeatable parser benchmark
 
