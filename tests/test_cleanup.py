@@ -1,7 +1,6 @@
 """Tests for schema-version validation, single-pass rejection reasons, and worker config."""
 import os
 import unittest
-from pathlib import Path
 from unittest.mock import patch
 
 from _helpers import load_script, setup_config_root  # noqa: E402  (also puts scripts/ on sys.path)

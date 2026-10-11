@@ -180,6 +180,21 @@ class PublishRetryTests(unittest.TestCase):
         self.assertEqual(proc.returncode, 1)
         self.assertIn("not retrying", proc.stderr)
 
+    def test_permanent_remote_rejection_is_not_retried(self):
+        # A hook / branch-protection decline prints `[remote rejected]`, not
+        # `[rejected]`. It fails identically every time, so it must not be
+        # retried under the "moved during the build" warning.
+        self._build()
+        hook = self.remote / "hooks" / "pre-receive"
+        hook.write_text("#!/usr/bin/env bash\necho 'protected branch hook declined' >&2\nexit 1\n", encoding="utf-8")
+        hook.chmod(0o755)
+        proc = self._publish()
+        self.assertEqual(proc.returncode, 1)
+        self.assertIn("[remote rejected]", proc.stderr)
+        self.assertIn("not retrying", proc.stderr)
+        self.assertNotIn("moved during the build", proc.stderr)
+        self.assertEqual(self._remote_show("filters.txt"), "old\n")
+
     def test_missing_optional_path_is_skipped(self):
         write(self.runner, "filters.txt", "new\n")
         proc = self._publish(paths=["filters.txt", "reports/does-not-exist.json"])

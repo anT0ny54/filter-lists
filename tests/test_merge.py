@@ -8,7 +8,6 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
-from urllib.parse import urljoin
 
 from _helpers import load_script, setup_merge_root  # noqa: E402
 
@@ -105,7 +104,13 @@ class ABPStrictTests(unittest.TestCase):
         self.assertIsNone(normalize_rule("0.0.0.0 ads.example.com"))
 
     def test_include_url_resolution(self):
-        self.assertEqual(urljoin("https://example.com/lists/main.txt", "../child.txt"), "https://example.com/child.txt")
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "main.txt"
+            path.write_text("!#include ../child.txt\n!#include child.txt\n!#include ../child.txt\n", encoding="utf-8")
+            self.assertEqual(
+                fetch.include_urls(path, "https://example.com/lists/main.txt"),
+                ["https://example.com/child.txt", "https://example.com/lists/child.txt"],
+            )
 
 
 class MergeMainE2ETests(unittest.TestCase):
