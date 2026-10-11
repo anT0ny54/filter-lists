@@ -1,7 +1,7 @@
 {
   "schema": 5,
   "status": "success",
-  "generated_at": "2026-10-11T21:14:08.629422+00:00",
+  "generated_at": "2026-10-11T21:14:52.566496+00:00",
   "builder": "Filter-Lists v7.6.0",
   "profile": "strict-abp",
   "build_id": "ac57c9d4e9f67f9b6333212b7f28804df1f66831f8cbfd50839f7aaa5418805a",
@@ -1179,7 +1179,7 @@
   },
   "anomalies": {
     "enabled": true,
-    "baseline": "cd6ae58a893068c755da86d7cbc49622b33bd8bb78fa7e6b65f5bfad161af9df",
+    "baseline": "ac57c9d4e9f67f9b6333212b7f28804df1f66831f8cbfd50839f7aaa5418805a",
     "count": 0,
     "critical_count": 0,
     "warning_count": 0,
@@ -1187,5 +1187,5 @@
     "fail_on_warning": false,
     "enforced_failure": false
   },
-  "build_seconds": 25.557
+  "build_seconds": 17.052
 }
