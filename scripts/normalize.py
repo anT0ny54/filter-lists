@@ -15,7 +15,6 @@ from policy import (
 )
 
 
-
 def default_max_rule_length() -> int:
     """Policy rule-length limit, resolved lazily.
 

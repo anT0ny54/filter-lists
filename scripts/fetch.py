@@ -329,59 +329,62 @@ def collect_sources(
                 stats["failures"].append({"url": url, "reason": reason, "depth": depth})
             log(f"   [SKIP] {url[:110]} — {reason}")
 
-    while current:
-        if time.monotonic() >= deadline:
-            stats["timed_out"] = True
-            record_unattempted(current, "global-timeout")
-            current = []
-            break
-
-        if len(visited) >= max_total_sources:
-            stats["source_limit_reached"] = True
-            record_unattempted(current, "source-limit")
-            current = []
-            break
-
-        batch: list[tuple[str, int]] = []
-        deferred_by_source_limit: list[tuple[str, int]] = []
-        for url, depth in current:
-            if len(visited) >= max_total_sources:
-                deferred_by_source_limit.append((url, depth))
-                continue
-            key = canonical_url(url)
-            if key not in visited and valid_url(key):
-                visited.add(key)
-                batch.append((key, depth))
-        if not batch:
-            if deferred_by_source_limit:
-                stats["source_limit_reached"] = True
-                record_unattempted(deferred_by_source_limit, "source-limit")
-            current = []
-            break
-
-        log(f">> Download batch: {len(batch)} URL(s), workers={parallelism}")
-        discovered_children: list[tuple[str, int]] = []
-
-        # Schedule by worker capacity and the per-source byte cap. The accepted
-        # global byte total is enforced after each completed download. This keeps
-        # many small sources from being serialized just because the remaining
-        # budget is below one source's worst-case allocation.
-        wave_start = 0
-        while wave_start < len(batch):
+    # One executor is reused for every wave of every batch; creating a fresh
+    # pool per wave wasted thread-pool setup on multi-wave builds. Wave sizes
+    # never exceed `parallelism`, so one pool of that size covers all waves.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=parallelism) as pool:
+        while current:
             if time.monotonic() >= deadline:
                 stats["timed_out"] = True
+                record_unattempted(current, "global-timeout")
+                current = []
                 break
 
-            remaining_budget = max_total_download_bytes - stats["total_download_bytes"]
-            if remaining_budget <= 0:
-                stats["budget_exhausted"] = True
+            if len(visited) >= max_total_sources:
+                stats["source_limit_reached"] = True
+                record_unattempted(current, "source-limit")
+                current = []
                 break
 
-            wave_size = min(parallelism, len(batch) - wave_start)
-            wave = batch[wave_start:wave_start + wave_size]
-            wave_start += wave_size
+            batch: list[tuple[str, int]] = []
+            deferred_by_source_limit: list[tuple[str, int]] = []
+            for url, depth in current:
+                if len(visited) >= max_total_sources:
+                    deferred_by_source_limit.append((url, depth))
+                    continue
+                key = canonical_url(url)
+                if key not in visited and valid_url(key):
+                    visited.add(key)
+                    batch.append((key, depth))
+            if not batch:
+                if deferred_by_source_limit:
+                    stats["source_limit_reached"] = True
+                    record_unattempted(deferred_by_source_limit, "source-limit")
+                current = []
+                break
 
-            with concurrent.futures.ThreadPoolExecutor(max_workers=len(wave)) as pool:
+            log(f">> Download batch: {len(batch)} URL(s), workers={parallelism}")
+            discovered_children: list[tuple[str, int]] = []
+
+            # Schedule by worker capacity and the per-source byte cap. The accepted
+            # global byte total is enforced after each completed download. This keeps
+            # many small sources from being serialized just because the remaining
+            # budget is below one source's worst-case allocation.
+            wave_start = 0
+            while wave_start < len(batch):
+                if time.monotonic() >= deadline:
+                    stats["timed_out"] = True
+                    break
+
+                remaining_budget = max_total_download_bytes - stats["total_download_bytes"]
+                if remaining_budget <= 0:
+                    stats["budget_exhausted"] = True
+                    break
+
+                wave_size = min(parallelism, len(batch) - wave_start)
+                wave = batch[wave_start:wave_start + wave_size]
+                wave_start += wave_size
+
                 futures = {}
                 ordered_outcomes: list[
                     tuple[str, int, Path, bool, str, int] | None
@@ -463,35 +466,35 @@ def collect_sources(
                         target.unlink(missing_ok=True)
                         log(f"   [SKIP] {url[:110]} — {reason}")
 
-        # Network completion order must never decide which includes are visited
-        # first. Without this stable ordering, a global source limit can make
-        # identical builds choose different children depending on timing.
-        discovered: dict[str, int] = {}
-        for url, depth in discovered_children:
-            key = canonical_url(url)
-            if key not in discovered or depth < discovered[key]:
-                discovered[key] = depth
-        next_batch = sorted(discovered.items(), key=lambda item: (item[1], item[0]))
+            # Network completion order must never decide which includes are visited
+            # first. Without this stable ordering, a global source limit can make
+            # identical builds choose different children depending on timing.
+            discovered: dict[str, int] = {}
+            for url, depth in discovered_children:
+                key = canonical_url(url)
+                if key not in discovered or depth < discovered[key]:
+                    discovered[key] = depth
+            next_batch = sorted(discovered.items(), key=lambda item: (item[1], item[0]))
 
-        pending: list[tuple[str, int]] = batch[wave_start:]
-        pending.extend(deferred_by_source_limit)
-        pending.extend(next_batch)
+            pending: list[tuple[str, int]] = batch[wave_start:]
+            pending.extend(deferred_by_source_limit)
+            pending.extend(next_batch)
 
-        if stats["timed_out"]:
-            record_unattempted(pending, "global-timeout")
-            current = []
-            break
-        if stats["budget_exhausted"]:
-            record_unattempted(pending, "global-download-budget-exhausted")
-            current = []
-            break
-        if deferred_by_source_limit or (len(visited) >= max_total_sources and next_batch):
-            stats["source_limit_reached"] = True
-            record_unattempted(pending, "source-limit")
-            current = []
-            break
+            if stats["timed_out"]:
+                record_unattempted(pending, "global-timeout")
+                current = []
+                break
+            if stats["budget_exhausted"]:
+                record_unattempted(pending, "global-download-budget-exhausted")
+                current = []
+                break
+            if deferred_by_source_limit or (len(visited) >= max_total_sources and next_batch):
+                stats["source_limit_reached"] = True
+                record_unattempted(pending, "source-limit")
+                current = []
+                break
 
-        current = next_batch
+            current = next_batch
 
     stats["visited"] = len(visited)
     stats["included_requested"] = stats["included_references"]
