@@ -87,7 +87,7 @@ The builder currently enforces the following:
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`.
 - **Strict configuration validation:** unknown keys in `policies.yaml` (including every `rules:` switch) and `sources.yaml`, wrong value types, and a mismatched policy `version`/`profile` fail the build immediately with a clean `[ERROR] Configuration` message, before any download starts.
 - **Authoritative source registry:** `sources.yaml` is the only source registry; `sources.txt` is generated as a URL-only compatibility mirror.
-- **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally.
+- **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally. Transferred bytes count against the global download budget even when the response is rejected (e.g. an HTML error page), so invalid responses cannot consume unlimited bandwidth.
 - **Correct source health:** the health ratio is calculated from configured root sources; nested includes cannot inflate it.
 - **Required-source gates:** configured required root sources must succeed.
 - **SSRF protection:** source/include targets are resolved before connection, non-public addresses are blocked, DNS answers are validated and pinned for curl, proxy environment variables are bypassed, and redirects are validated hop-by-hop.
@@ -199,7 +199,7 @@ python3 scripts/benchmark.py --repeats 3
 python3 scripts/differential.py
 ```
 
-`benchmark.py` repeats its small fixture `--multiplier` times (default 5000) so the reported lines/second is stable. `differential.py` is skipped unless `FILTER_ENGINE_CMD` is set; the command must contain the `{input}` placeholder or the script exits with an error.
+`benchmark.py` repeats its small fixture `--multiplier` times (default 5000) so the reported lines/second is stable. It benchmarks both per-line normalization and a representative merge workload (normalize → deduplicate → deterministic sort); pass `--skip-merge` to run only the normalization benchmark. `differential.py` is skipped unless `FILTER_ENGINE_CMD` is set; the command must contain the `{input}` placeholder or the script exits with an error.
 
 A live build requires network access to the configured upstream lists. The builder fails instead of publishing an incomplete result when the root-source health threshold is missed, a required source fails, the global source limit is reached, or the build deadline is exceeded.
 
@@ -232,6 +232,10 @@ The repository test suite covers:
 - staged-output publication and failed-report baseline handling
 - per-source quality gate and failed-run source-outcome history
 - download validation (binary data, HTML/error pages, empty files)
+- download-byte accounting across rejected responses (invalid transfers consume the global budget)
+- malformed inline-style brace rejection (unbalanced braces, trailing text after a style block)
+- duplicate metadata-header rejection in the generated-list validator
+- two-phase benchmark covering normalization and a representative merge workload
 - curated real-world syntax corpus
 - strict configuration key/type validation and fail-fast policy loading
 - generated-list validator hardening (encoding, version/Build-ID suffix, sort order)
