@@ -33,7 +33,9 @@ The compiler accepts documented ABP syntax and rejects unsupported engine-specif
 - ABP inline CSS declarations under the documented safe property/value grammar.
 - ABP `remove: true`.
 
-Security-sensitive features such as snippets, `header=`, and `addheader=` are policy-gated and should only be enabled for trusted sources.
+Security-sensitive features such as snippets, `header=`, and `addheader=` are policy-gated and should only be enabled for trusted sources. `remove: true` is controlled by the `allow_abp_remove_action` switch in `policies.yaml`; when it is off, a `remove` declaration is rejected wherever it appears in the style block.
+
+Input lines are trimmed of surrounding whitespace and a leading byte-order mark (BOM, also when whitespace follows it) before classification, so the same line always normalizes to the same rule and re-normalizing a published rule never changes it.
 
 ### Rejected
 
@@ -47,7 +49,7 @@ Security-sensitive features such as snippets, `header=`, and `addheader=` are po
 - Malformed, duplicate, unsafe, or over-limit rules.
 - Option-less patterns with no literal content (`*`, `||`, `^`, `@@*`, ...), which would match every request. Scoped forms such as `*$script,domain=example.com` remain valid.
 
-`!#if` / `!#else` / `!#endif` conditional directives are **not evaluated**: the directive lines are dropped and the rules inside the blocks are processed like any other rule. `!#include` is resolved (bounded, see below).
+`!#if` / `!#else` / `!#endif` conditional directives are **not evaluated**: the directive lines (together with `!#safari` and `!#end`) are dropped and the rules inside the blocks are processed like any other rule. `!#include` is resolved (bounded, see below) and its line is dropped from the output as well.
 
 See [docs/SYNTAX-POLICY.md](docs/SYNTAX-POLICY.md) and [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) for the exact contract.
 
@@ -60,7 +62,7 @@ sources.yaml
 fetch.py ──► downloads + bounded !#include traversal
     │
     ▼
-parser.py ──► rule classification
+parser.py ──► line cleaning (whitespace/BOM) + rule classification
     │
     ▼
 normalize.py ──► canonical rules (policy gate from policies.yaml; constants in policy.py)
@@ -96,7 +98,7 @@ The builder currently enforces the following:
 - **Detailed diagnostics:** rejection reasons, per-source statistics, SHA-256 hashes, fetch failures, and anomaly information are retained.
 - **Bounded default concurrency:** the builder uses two download workers by default (override with the `FILTER_LISTS_WORKERS` environment variable); effective concurrency is additionally capped by the configured global download budget and the reservations required by active transfers.
 - **Historical reports:** only *successful* reports are archived under `reports/history/` as anomaly baselines, kept chronologically up to the configured retention limit. A newer run with the same Build-ID replaces the older archived report, so retention counts distinct builds. Failed builds are never archived there.
-- **Source reputation:** per-URL success rate, consecutive failures, and a `poor`/`watch`/`good`/`excellent` label are computed from `reports/source-outcomes.json`, which records the per-source fetch outcome of **every** run, including failed builds (up to the last 120 runs). One observation is counted per source per UTC day; a day counts as a success only if every run that day succeeded, so rebuilds cannot overweight a day and failures are not hidden. The first run after upgrading seeds the file from retained successful reports.
+- **Source reputation:** per-URL success rate, consecutive failures, and a `poor`/`watch`/`good`/`excellent` label are computed from `reports/source-outcomes.json`, which records the per-source fetch outcome of **every** run, including failed builds (up to the last 120 runs). One observation is counted per source per UTC day; a day counts as a success only if every run that day succeeded, so rebuilds cannot overweight a day and failures are not hidden. The first run after upgrading seeds the file from retained successful reports. The report lists reputation only for the sources of the current run, so a disabled source disappears from it (its history is kept in case it is re-enabled).
 - **Source quality gate:** `source_quality` in `policies.yaml` flags sources whose rule lines (comments, blanks and directives excluded) are mostly rejected, recorded in the report and logged as `[WARN]`. Optional `fail_on_critical` makes critical sources fail the build.
 - **Safe anomaly handling:** warning-level anomalies are advisory by default; critical anomalies fail the build. Anomalies compare each source against the previous *successful* report; sources that failed in that report are not used as a baseline.
 - **Safe publication:** `filters.txt` is staged to a temporary file and only replaced after the report and anomaly checks pass, so a rejected build leaves the last good list in place.
@@ -172,7 +174,7 @@ source by default. To allow them for a source you trust, opt in per source:
 trusted_abp_features: true
 ```
 
-`custom-rules.txt` is always trusted. The flag must be a real YAML boolean.
+Comment and directive lines are never counted as restricted features, even if their text mentions `$header=` or `#$#`. `custom-rules.txt` is always trusted. The flag must be a real YAML boolean.
 
 Do not edit `filters.txt` or `sources.txt` directly; they are generated artifacts.
 
@@ -196,7 +198,7 @@ python3 scripts/benchmark.py --repeats 3
 python3 scripts/differential.py
 ```
 
-`benchmark.py` repeats its small fixture `--multiplier` times (default 5000) so the reported lines/second is stable. It benchmarks both per-line normalization and a representative merge workload (normalize → deduplicate → deterministic sort); pass `--skip-merge` to run only the normalization benchmark. `differential.py` is skipped unless `FILTER_ENGINE_CMD` is set; the command must contain the `{input}` placeholder or the script exits with an error.
+`benchmark.py` repeats its small fixture `--multiplier` times (default 5000) so the reported lines/second is stable. It benchmarks both per-line normalization and a representative merge workload (normalize → deduplicate → deterministic sort); pass `--skip-merge` to run only the normalization benchmark. `differential.py` is skipped unless `FILTER_ENGINE_CMD` is set; the command must contain the `{input}` placeholder or the script exits with status 2. Each fixture runs with a 300 s timeout, and a timeout counts as a failure.
 
 `scripts/publish.sh` is for CI; it commits and pushes, so do not run it in a working copy you care about.
 
@@ -211,7 +213,7 @@ A live build requires network access to the configured upstream lists. The build
   1. It commits the generated paths and pushes.
   2. If the push is rejected because the branch moved, it fetches the new tip, resets onto it, copies the freshly built files over the top (deletions such as history pruning included) and pushes again, up to 5 attempts (`PUBLISH_MAX_ATTEMPTS`) with a short backoff (`PUBLISH_RETRY_DELAY`). Generated files are overwritten rather than merged, so this cannot hit a merge conflict.
   3. `update.yml` passes its build inputs (`sources.yaml`, `custom-rules.txt`, `policies.yaml`, `scripts/`, `tests/`, `requirements.txt`, the workflow file) as `--guard`s. If any of them changed on the new tip, the output just built is stale, so it is **not** published (the step exits 0 with a warning) and the run that the change triggers, or the next scheduled run, rebuilds.
-  4. Failures that are not a moved branch (permissions, branch protection, network) fail immediately instead of being retried.
+  4. Failures that are not a moved branch (permissions, branch protection or hook declines reported as `[remote rejected]`, network) fail immediately instead of being retried. Only git's `[rejected]` non-fast-forward / `fetch first` forms, stale-info and ref-lock errors are retried.
 
 Human pushes are not part of the `repo-write` concurrency group, which only serializes `update.yml` and `Keep-Alive.yml` with each other; `publish.sh` covers the rest. Note that a human push that touches build inputs and carries `[skip ci]` will not trigger its own rebuild, so the next scheduled run picks it up.
 
@@ -238,14 +240,18 @@ The repository test suite covers:
 - download validation (binary data, HTML/error pages, empty files)
 - download-byte accounting and per-request reservations across rejected responses and partial transfer failures
 - malformed inline-style brace rejection (unbalanced braces, trailing text after a style block)
-- duplicate metadata-header rejection in the generated-list validator
+- duplicate metadata-header rejection (`Total rules`, `Build-ID`, `Source manifest SHA-256`, `Version`) in the generated-list validator
+- `allow_abp_remove_action` honoured in every declaration position
+- BOM/whitespace cleaning: BOM-prefixed rules, HTML error pages and first-line includes, plus a BOM fuzz idempotency check
+- comment/directive lines never labelled as restricted ABP features
+- source reputation limited to the sources of the current run
 - two-phase benchmark covering normalization and a representative merge workload
 - curated real-world syntax corpus
 - strict configuration key/type validation and fail-fast policy loading
 - generated-list validator hardening (encoding, version/Build-ID suffix, sort order)
 - over-broad pattern rejection
 - regression tests
-- race-safe publishing (`publish.sh`) against a real bare remote: moved branch, generated-file conflicts, pruned history files, stale build inputs, repeated races, non-retryable failures
+- race-safe publishing (`publish.sh`) against a real bare remote: moved branch, generated-file conflicts, pruned history files, stale build inputs, repeated races, non-retryable failures including hook declines
 - optional external-engine differential testing
 - repeatable parser benchmark
 
@@ -254,15 +260,17 @@ The repository test suite covers:
 
 Download success does not mean a source contributes rules, so each build also evaluates rule yield per source. The **effective rejection rate** is the share of rule lines (input lines minus comments, blanks, and directives) that the strict-ABP profile rejected. With the shipped policy, sources of at least 100 lines at or above 30% are reported as `warning` and at or above 90% as `critical` in `reports/latest.json` (`source_quality`) and in the build log. They are advisory unless `source_quality.fail_on_critical: true`.
 
-Snapshot from the 2026-10-09 report (before AdGuard Annoyances was disabled): 33/33 sources OK, 228,552 input lines, 195,977 accepted, 171,249 unique rules, overall rejection rate 14.25%.
+Snapshot from the newest retained report (`reports/latest.json`, generated 2026-10-11, AdGuard Annoyances already disabled): 32/32 root sources OK, 226,665 input lines, 196,829 accepted, 172,089 unique rules, overall rejection rate 13.16%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`).
 
 | Source | Input lines | Accepted | Rejection rate | Main reasons |
 |---|---:|---:|---:|---|
-| AdGuard Annoyances (now disabled) | 2,743 | 1 | 99.96% | `unknown-option` (2,712) |
-| AdGuard Ukrainian | 5,537 | 3,614 | 34.73% | `unknown-option` (1,771) |
-| AdGuard Social Media | 30,835 | 21,833 | 29.19% | `ubo-only-syntax` (7,334) |
-| AdGuard Turkish | 6,811 | 5,254 | 22.86% | `ubo-only-syntax`, `invalid-cosmetic-rule` |
-| AdGuard Russian | 7,594 | 5,968 | 21.41% | `unknown-option`, `ubo-only-syntax` |
+| AdGuard Ukrainian | 5,538 | 3,615 | 34.72% | `unknown-option` (1,771), `ubo-only-syntax` (122) |
+| AdGuard Social Media | 30,846 | 21,844 | 29.18% | `ubo-only-syntax` (7,323), `unknown-option` (674) |
+| AdGuard Turkish | 6,812 | 5,254 | 22.87% | `ubo-only-syntax` (785), `invalid-cosmetic-rule` (469) |
+| AdGuard Russian | 7,628 | 5,991 | 21.46% | `unknown-option` (822), `ubo-only-syntax` (636) |
+| AdGuard French | 4,809 | 3,898 | 18.94% | `unknown-option` (619), `ubo-only-syntax` (237) |
+
+The rejection rate here is the plain share of all input lines (comments included); the quality gate uses the effective rate, which excludes comments, blanks and directives, so its figures differ slightly (AdGuard Ukrainian: 34.52% effective).
 
 Most EasyList-family sources reject under 5% of lines (mostly comments). Rejection of AdGuard/uBO-only syntax is intentional under the strict-ABP policy. Figures change with every upstream update; consult `reports/latest.json`.
 
