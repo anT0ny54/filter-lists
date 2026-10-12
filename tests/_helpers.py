@@ -47,6 +47,7 @@ def setup_merge_root(testcase, merge_module, sources_yaml: str) -> Path:
     merge_module.OUTPUT = root / "filters.txt"
     merge_module.REPORT = root / "reports" / "latest.json"
     merge_module.HISTORY_DIR = root / "reports" / "history"
+    merge_module.BASELINE_FILE = root / "reports" / "baseline.json"
     merge_module.SOURCES_TXT = root / "sources.txt"
     (root / "reports").mkdir(parents=True)
     (root / "sources.yaml").write_text(sources_yaml, encoding="utf-8")

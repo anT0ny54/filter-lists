@@ -12,6 +12,7 @@ sys.path.insert(0, str(SCRIPTS))
 
 import config
 import fetch
+import normalize
 from config import canonical_url
 from fetch import collect_sources, validate_download
 from normalize import normalize_rule
@@ -154,9 +155,16 @@ class RulePolicyRegressionTests(unittest.TestCase):
         )
 
     def test_yaml_can_disable_cosmetic_and_extended_css_filters(self):
+        # Disabling the cosmetic gate drops ordinary cosmetic rules; the
+        # sub-feature switches must be disabled alongside it (an enabled
+        # sub-feature under a disabled gate is a contradictory config, see
+        # test_yaml_contradictory_cosmetic_policy_is_rejected).
         self.assertIsNone(
             self.normalize_with_rules(
-                "rules:\n  allow_abp_cosmetic: false\n",
+                "rules:\n"
+                "  allow_abp_cosmetic: false\n"
+                "  allow_abp_snippets: false\n"
+                "  allow_extended_css: false\n",
                 "example.com##.ad",
             )
         )
@@ -166,6 +174,21 @@ class RulePolicyRegressionTests(unittest.TestCase):
                 "example.com#?#div:-abp-has(.ad)",
             )
         )
+
+    def test_yaml_contradictory_cosmetic_policy_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "allow_abp_cosmetic"):
+            self.normalize_with_rules(
+                "rules:\n  allow_abp_cosmetic: false\n",
+                "example.com##.ad",
+            )
+        with self.assertRaisesRegex(ValueError, "allow_abp_cosmetic"):
+            self.normalize_with_rules(
+                "rules:\n"
+                "  allow_abp_cosmetic: false\n"
+                "  allow_abp_snippets: false\n"
+                "  allow_extended_css: true\n",
+                "example.com##.ad",
+            )
 
     def test_yaml_can_allow_ubo_only_cosmetic_forms(self):
         self.assertEqual(
@@ -285,3 +308,64 @@ class MergeRegressionTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SplitOptionsRegressionTests(unittest.TestCase):
+    def test_single_dollar_before_trailing_slash_still_splits(self):
+        # A regex rule with exactly one unescaped `$` followed by a trailing
+        # slash used to be accepted as one big unvalidated regex because the
+        # final `$` was excluded from the split candidates.
+        self.assertEqual(
+            normalize.split_options(r"/banner\d/$script"),
+            (r"/banner\d/", ["script"]),
+        )
+        self.assertEqual(normalize.split_options("/foo$/"), ("/foo$/", []))
+        self.assertEqual(
+            normalize_rule(r"/banner\d/$script"),
+            r"/banner\d/$script",
+        )
+
+
+class NetworkReasonConsistencyTests(unittest.TestCase):
+    """The fast reason path must agree with the full _rejection_reason."""
+
+    def test_reason_matches_full_rejection_explainer(self):
+        # Rejected network rules spanning every reason branch of the fast
+        # path; the reasons must agree with the full explainer, and the
+        # normalizer itself must keep rejecting these lines.
+        cases = [
+            "*",                      # overbroad-pattern
+            "^|^",                    # overbroad-pattern (invalid shape too)
+            "||",                     # overbroad-pattern
+            "foo bar",                # invalid-network-rule (whitespace, no $)
+            "foo$ bar",               # invalid-option-or-network-rule (unparsed option section)
+            "$script",                # invalid-option-or-network-rule (empty pattern)
+            "@@$script",              # invalid-option-or-network-rule (empty @@ pattern)
+            "$foobar",                # unknown-option
+            "foo$script,foobar",      # unknown-option
+            "foo$script=1",           # unknown-option (value option with unknown name)
+            "foo$domain=",            # invalid-option-value (empty value)
+            "foo$domain=a b",         # invalid-option-value
+            "foo$document",           # context-invalid-option (exception-only type)
+            "foo$script,~script",     # duplicate-option
+            "foo$script,SCRIPT",      # duplicate-option (case-insensitive)
+            "||x^$rewrite=blank-js",  # invalid-option-or-network-rule (rewrite needs domain)
+            "/foo\tbar/",            # invalid-network-rule (regex payload with raw TAB)
+        ]
+        policy = config.load_rule_policy()
+        checked = 0
+        for line in cases:
+            rule, reason = normalize.normalize_rule_with_reason(line, rule_policy=policy)
+            self.assertIsNone(rule, msg=f"expected rejection: {line!r}")
+            self.assertIsNotNone(reason, msg=f"missing reason: {line!r}")
+            classification = normalize.classify(normalize.clean_line(line))
+            self.assertEqual(classification.kind, "network", msg=f"case not network: {line!r}")
+            checked += 1
+            self.assertEqual(
+                reason,
+                normalize._rejection_reason(
+                    normalize.clean_line(line), 100_000, policy, True, classification
+                ),
+                msg=f"reason mismatch for line: {line!r}",
+            )
+        self.assertGreater(checked, 0)

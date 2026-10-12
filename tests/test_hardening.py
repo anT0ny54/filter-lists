@@ -6,7 +6,9 @@ import hashlib
 import json
 import random
 import tempfile
+import time
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from _helpers import load_script, run_validate, setup_config_root  # noqa: E402  (also puts scripts/ on sys.path)
@@ -159,6 +161,7 @@ class NonObjectReportJsonTests(unittest.TestCase):
             root = Path(tmp)
             merge.REPORT = root / "latest.json"
             merge.HISTORY_DIR = root / "history"
+            merge.BASELINE_FILE = root / "baseline.json"
             merge.REPORT.write_text("[1, 2]", encoding="utf-8")
             self.assertIsNone(merge.load_previous_report())
 
@@ -203,3 +206,102 @@ class SortKeyTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SubmitFailureReservationTests(unittest.TestCase):
+    """A pool.submit() failure must release its download-budget reservation.
+
+    Regression: the reservation was taken before submit and never released,
+    so with a fully reserved budget every later request was refused as
+    "global-download-budget-exhausted" and the wave accounting stalled.
+    """
+
+    def test_submit_failure_releases_reservation_and_records_failure(self):
+        import concurrent.futures
+        calls = {"n": 0}
+        real_pool = concurrent.futures.ThreadPoolExecutor
+
+        class FlakyPool:
+            def __init__(self, max_workers=None):
+                # Capture the real class before the patch: the patch replaces
+                # the attribute on the module, so a lookup here would recurse.
+                self._real = real_pool(max_workers=max_workers)
+
+            def submit(self, fn, *args, **kwargs):
+                calls["n"] += 1
+                if calls["n"] == 1:
+                    raise RuntimeError("pool closed")
+                return self._real.submit(fn, *args, **kwargs)
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                self._real.__exit__(*exc)
+                return False
+
+            def shutdown(self, *args, **kwargs):
+                self._real.shutdown(*args, **kwargs)
+
+        def fake_download(url, output, timeout, max_download_bytes):
+            output.write_text("||a.example^\n! enough padding for validation\n", encoding="utf-8")
+            return True, "", output.stat().st_size
+
+        urls = ["https://a.example/one.txt", "https://b.example/two.txt"]
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(concurrent.futures, "ThreadPoolExecutor", FlakyPool), \
+                mock.patch.object(fetch, "download", fake_download):
+            files, stats = fetch.collect_sources(
+                urls, Path(tmp), time.monotonic(), 2, lambda msg: None,
+                total_timeout=30, max_include_depth=0,
+                max_download_bytes=1 << 20, max_total_download_bytes=1 << 20,
+                max_total_sources=10,
+            )
+
+        # The leaked reservation (1 MiB of a 1 MiB budget) would have refused
+        # the second request with "global-download-budget-exhausted".
+        self.assertFalse(stats["budget_exhausted"])
+        self.assertEqual(stats["requested"], 2)
+        self.assertEqual(stats["successful"], 1)
+        self.assertEqual(stats["failed"], 1)
+        self.assertEqual(len(files), 1)
+        failure = [r for r in stats["results"] if r["status"] == "failed"]
+        self.assertEqual(len(failure), 1)
+        self.assertTrue(failure[0]["reason"].startswith("submit-failed"), failure[0]["reason"])
+        success = [r for r in stats["results"] if r["status"] == "ok"]
+        self.assertEqual([r["url"] for r in success], ["https://b.example/two.txt"])
+
+
+class DnsPinCacheTests(unittest.TestCase):
+    """Validated getaddrinfo pins are cached per (host, port) for the build."""
+
+    def setUp(self):
+        fetch._ADDRESS_PIN_CACHE.clear()
+        self.addCleanup(fetch._ADDRESS_PIN_CACHE.clear)
+
+    def _fake_infos(self):
+        import socket as _socket
+        return [(_socket.AF_INET, _socket.SOCK_STREAM, 6, "", ("93.184.216.34", 443))]
+
+    def test_second_lookup_for_same_host_uses_cache(self):
+        with mock.patch.object(fetch.socket, "getaddrinfo", side_effect=lambda *a, **k: self._fake_infos()) as resolver:
+            first = fetch._public_address_for_url("https://pin-cache-a.example/list.txt")
+            second = fetch._public_address_for_url("https://pin-cache-a.example/other.txt")
+        self.assertEqual(first, ("93.184.216.34", ""))
+        self.assertEqual(second, first)
+        self.assertEqual(resolver.call_count, 1)
+
+    def test_different_port_is_a_separate_cache_entry(self):
+        with mock.patch.object(fetch.socket, "getaddrinfo", side_effect=lambda *a, **k: self._fake_infos()) as resolver:
+            fetch._public_address_for_url("https://pin-cache-b.example/list.txt")
+            fetch._public_address_for_url("http://pin-cache-b.example/list.txt")
+        self.assertEqual(resolver.call_count, 2)
+
+    def test_resolution_failure_is_cached_as_sticky_within_the_build(self):
+        with mock.patch.object(fetch.socket, "getaddrinfo", side_effect=OSError("no dns")) as resolver:
+            first = fetch._public_address_for_url("https://pin-cache-c.example/list.txt")
+            second = fetch._public_address_for_url("https://pin-cache-c.example/other.txt")
+        self.assertEqual(first[0], None)
+        self.assertTrue(first[1].startswith("dns-resolution-failed"))
+        self.assertEqual(second, first)
+        self.assertEqual(resolver.call_count, 1)
