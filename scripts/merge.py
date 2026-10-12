@@ -18,11 +18,15 @@ from config import BUILDER_VERSION, CUSTOM_RULES, ROOT, config_fingerprint, load
 
 OUTPUT = ROOT / "filters.txt"
 REPORT = ROOT / "reports" / "latest.json"
+BASELINE_FILE = REPORT.with_name("baseline.json")
 HISTORY_DIR = ROOT / "reports" / "history"
 SOURCES_TXT = ROOT / "sources.txt"
 # Download parallelism. fetch.collect_sources still caps this by the download
-# byte budget (`max_parallel_by_budget`). Override with FILTER_LISTS_WORKERS.
-DEFAULT_WORKERS = 2
+# byte budget (`max_parallel_by_budget` = max_total_download_bytes //
+# per-source worst case = 500 MiB // 50 MiB = 10), so 10 is the budget's own
+# ceiling and the build is network-bound long before it is CPU-bound.
+# Override with FILTER_LISTS_WORKERS.
+DEFAULT_WORKERS = 10
 
 
 def _workers() -> int:
@@ -56,6 +60,16 @@ def load_previous_report() -> dict | None:
                 return data
         except (OSError, ValueError):
             pass
+    # Slim baseline of the newest archived success: carries exactly the
+    # per-source fields anomaly detection compares against, so it avoids
+    # parsing full history JSONs for a baseline.
+    if BASELINE_FILE.is_file():
+        try:
+            data = json.loads(BASELINE_FILE.read_text(encoding="utf-8"))
+            if isinstance(data, dict) and data.get("status", "success") == "success":
+                return data
+        except (OSError, ValueError):
+            pass
     # Build IDs are hashes, so filename order is not chronological. Use the
     # report timestamp when selecting the newest successful baseline.
     newest = history_reports(HISTORY_DIR, 1)
@@ -82,40 +96,70 @@ def archive_successful_report(build_id: str, *, retention: int = 10) -> None:
     if not target.exists():
         shutil.copy2(REPORT, target)
 
-    # Retention counts distinct builds: an older archived report with the same
-    # Build-ID describes the same configuration and output, so only the newest
-    # run is kept. (Per-source run outcomes live in source-outcomes.json.)
+    # Single directory pass: collect (generated_at, build_id, status, path)
+    # once, then apply both the superseded-duplicate rule and retention from
+    # that listing instead of globbing and JSON-parsing every history file
+    # twice per build.
+    archived = []
     for path in HISTORY_DIR.glob("*.json"):
-        if path == target:
-            continue
         try:
             existing = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
-        if existing.get("build_id") == build_id and existing.get("status", "success") == "success":
+        archived.append((
+            str(existing.get("generated_at", "")),
+            str(existing.get("build_id", "")),
+            existing.get("status", "success"),
+            path,
+        ))
+
+    # Retention counts distinct builds: an older archived report with the same
+    # Build-ID describes the same configuration and output, so only the newest
+    # run is kept. (Per-source run outcomes live in source-outcomes.json.)
+    removed: set[Path] = set()
+    for _, existing_build, status, path in archived:
+        if path != target and path not in removed \
+                and existing_build == build_id and status == "success":
             try:
                 path.unlink()
+                removed.add(path)
                 log(f">> Removed superseded duplicate-build report: {path.name}")
             except OSError as exc:
                 log(f"[WARN] Could not remove duplicate report {path.name}: {exc}")
 
     # Keep retention based on generated_at, not filenames: build IDs are hashes.
-    reports = []
-    for path in HISTORY_DIR.glob("*.json"):
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-            if data.get("status", "success") == "success":
-                reports.append((str(data.get("generated_at", "")), path))
-        except (OSError, ValueError):
-            continue
-    reports.sort(key=lambda item: (item[0], item[1].name), reverse=True)
+    successful = [(generated_at, path) for generated_at, _, status, path in archived
+                  if status == "success" and path not in removed]
+    successful.sort(key=lambda item: (item[0], item[1].name), reverse=True)
 
-    for _, path in reports[retention:]:
+    for _, path in successful[retention:]:
         try:
             path.unlink()
             log(f">> Removed old history report: {path.name}")
         except OSError as exc:
             log(f"[WARN] Could not remove old history report {path.name}: {exc}")
+
+    # Slim anomaly baseline: detect_anomalies() only needs per-source
+    # (url, status, bytes, input_lines, unique_rules, rejection_rate, sha256)
+    # plus build identity, so persist exactly those fields and let
+    # load_previous_report() avoid parsing full history JSONs for them.
+    results = data.get("sources", {}).get("results", [])
+    slim_results = [
+        {key: item[key] for key in
+         ("url", "status", "bytes", "input_lines", "unique_rules", "rejection_rate", "sha256")
+         if key in item}
+        for item in results if isinstance(item, dict)
+    ]
+    baseline = {
+        "schema": data.get("schema"),
+        "status": data.get("status", "success"),
+        "generated_at": data.get("generated_at", ""),
+        "build_id": data.get("build_id", ""),
+        "sources": {"results": slim_results},
+    }
+    temporary = BASELINE_FILE.with_suffix(BASELINE_FILE.suffix + ".tmp")
+    temporary.write_text(json.dumps(baseline, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    temporary.replace(BASELINE_FILE)
 
 
 def sync_legacy_sources(config) -> None:

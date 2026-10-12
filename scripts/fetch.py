@@ -19,6 +19,13 @@ CURL_RETRIES = 5
 MAX_REDIRECTS = 5
 REDIRECT_STATUSES = {301, 302, 303, 307, 308}
 INCLUDE_RE = re.compile(r"^\s*!#include\s+(.+?)\s*$", re.I)
+# DNS pins are validated once per (host, port) and reused for the whole
+# build: a source and its !#include children typically share a host, and
+# getaddrinfo round-trips dominated per-request setup. Resolution failures
+# are cached too — within one build they are treated as sticky.
+_ADDRESS_PIN_CACHE: dict[tuple[str, int], tuple[str | None, str]] = {}
+
+
 # `\b` keeps `<header`/`<htmlfoo` from matching. The status-line branch needs
 # `[0-9.]+`: with a single-character class `HTTP/1.1 404` never matched, so only
 # HTTP/2-style error bodies were detected. A leading BOM (not `\s`) must not
@@ -56,10 +63,16 @@ def _public_address_for_url(url: str) -> tuple[str | None, str]:
             return None, "blocked-non-public-address"
         return literal.compressed, ""
 
+    cache_key = (host, port)
+    cached = _ADDRESS_PIN_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
     try:
         infos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
     except OSError as exc:
-        return None, f"dns-resolution-failed: {exc}"
+        result = (None, f"dns-resolution-failed: {exc}")
+        _ADDRESS_PIN_CACHE[cache_key] = result
+        return result
 
     addresses: list[str] = []
     for info in infos:
@@ -67,22 +80,30 @@ def _public_address_for_url(url: str) -> tuple[str | None, str]:
         if candidate not in addresses:
             addresses.append(candidate)
     if not addresses:
-        return None, "dns-resolution-empty"
+        result = (None, "dns-resolution-empty")
+        _ADDRESS_PIN_CACHE[cache_key] = result
+        return result
 
     parsed_addresses: list[ipaddress.IPv4Address | ipaddress.IPv6Address] = []
     for candidate in addresses:
         try:
             parsed_candidate = ipaddress.ip_address(candidate)
         except ValueError:
-            return None, "dns-resolution-invalid-address"
+            result = (None, "dns-resolution-invalid-address")
+            _ADDRESS_PIN_CACHE[cache_key] = result
+            return result
         if not parsed_candidate.is_global:
-            return None, "blocked-non-public-address"
+            result = (None, "blocked-non-public-address")
+            _ADDRESS_PIN_CACHE[cache_key] = result
+            return result
         parsed_addresses.append(parsed_candidate)
 
     # Prefer IPv4 when available for broad runner compatibility; otherwise use
     # the first validated address returned by the resolver.
     parsed_addresses.sort(key=lambda addr: (addr.version != 4, addr.compressed))
-    return parsed_addresses[0].compressed, ""
+    result = (parsed_addresses[0].compressed, "")
+    _ADDRESS_PIN_CACHE[cache_key] = result
+    return result
 
 
 def _resolve_arg(host: str, port: int, address: str) -> str:
@@ -422,12 +443,38 @@ def collect_sources(
                     sequence += 1
                     remaining = max(1, int(deadline - time.monotonic()))
                     timeout = min(INCLUDE_TIMEOUT if depth else DOWNLOAD_TIMEOUT, remaining)
-                    futures[pool.submit(download, url, target, timeout, request_limit)] = (
+                    try:
+                        future = pool.submit(download, url, target, timeout, request_limit)
+                    except Exception as exc:
+                        # A submit-time failure must not leak its budget
+                        # reservation or stall wave accounting.
+                        reserved_download_bytes -= request_limit
+                        stats["failed"] += 1
+                        if depth == 0:
+                            stats["root_failed"] += 1
+                        reason = f"submit-failed: {exc}"
+                        stats["results"].append({
+                            "url": url, "depth": depth, "status": "failed",
+                            "reason": reason, "bytes": 0, "path": str(target),
+                        })
+                        if len(stats["failures"]) < 100:
+                            stats["failures"].append({"url": url, "reason": reason, "depth": depth})
+                        log(f"   [SKIP] {url[:110]} — {reason}")
+                        scheduled_count += 1
+                        continue
+                    futures[future] = (
                         submission_index, url, depth, target, request_limit
                     )
                     scheduled_count += 1
 
                 if not futures:
+                    if scheduled_count:
+                        # Submissions were attempted but every one failed at
+                        # submit time; release-driven bookkeeping already ran,
+                        # so keep advancing through the batch instead of
+                        # abandoning its remaining entries.
+                        wave_start += scheduled_count
+                        continue
                     break
 
                 for future in concurrent.futures.as_completed(futures):

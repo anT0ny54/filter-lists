@@ -94,9 +94,28 @@ def record_outcomes(
     build_id: str,
     results: list[dict],
 ) -> None:
-    """Append this run's per-source outcomes (successful or failed) atomically."""
+    """Append this run's per-source outcomes (successful or failed) atomically.
+
+    Reputation counts one observation per source per UTC day, so consecutive
+    same-day runs are compacted into a single stored entry instead of keeping
+    one per rerun. The per-source outcome is the AND of the day's runs (a
+    failure is never hidden by a later same-day success) and the entry keeps
+    the newest run's identity, so set_outcome_status() can still find it by
+    the report's generated_at.
+    """
     runs = load_outcomes(outcomes_path, history_dir)
-    runs.append(_entry(generated_at, status, build_id, results))
+    entry = _entry(generated_at, status, build_id, results)
+    day = generated_at[:10]
+    if runs and str(runs[-1].get("generated_at", ""))[:10] == day:
+        previous = runs[-1]
+        merged = {url: bool(previous["outcomes"].get(url, True)) and ok
+                  for url, ok in entry["outcomes"].items()}
+        for url, ok in previous["outcomes"].items():
+            merged.setdefault(url, bool(ok))
+        entry["outcomes"] = merged
+        runs[-1] = entry
+    else:
+        runs.append(entry)
     runs.sort(key=lambda r: str(r.get("generated_at", "")))
     runs = runs[-MAX_STORED_RUNS:]
     outcomes_path.parent.mkdir(parents=True, exist_ok=True)

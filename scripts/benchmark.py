@@ -24,19 +24,21 @@ DEFAULT_INPUT = SCRIPT_DIR.parent / "tests" / "fixtures" / "sample-filter.txt"
 
 
 def run(lines: list[str], repeats: int) -> tuple[float, int]:
-    timings = []; accepted = 0
+    timings = []
     for _ in range(repeats):
         start = time.perf_counter(); count = 0
         for line in lines:
             if normalize_rule(line) is not None:
                 count += 1
-        timings.append(time.perf_counter() - start); accepted = count
-    return statistics.median(timings), accepted
+        timings.append(time.perf_counter() - start)
+    # The workload is deterministic, so the final repeat's count stands for
+    # every repeat; no per-iteration accumulator is needed.
+    return statistics.median(timings), count
 
 
 def run_merge(lines: list[str], repeats: int) -> tuple[float, int]:
     """Representative merge-pipeline workload: normalize, deduplicate, sort."""
-    timings = []; unique = 0
+    timings = []
     for _ in range(repeats):
         start = time.perf_counter()
         seen: set[str] = set()
@@ -46,8 +48,7 @@ def run_merge(lines: list[str], repeats: int) -> tuple[float, int]:
                 seen.add(normalized)
         ordered = sorted(seen, key=rule_sort_key)
         timings.append(time.perf_counter() - start)
-        unique = len(ordered)
-    return statistics.median(timings), unique
+    return statistics.median(timings), len(ordered)
 
 
 def main() -> int:

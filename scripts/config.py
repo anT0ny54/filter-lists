@@ -249,10 +249,26 @@ def _rule_policy(policy: dict) -> dict[str, bool]:
     unknown = sorted(set(rules) - set(RULE_POLICY_DEFAULTS), key=str)
     if unknown:
         raise ValueError(f"policies.yaml: unknown rule policies: {', '.join(map(str, unknown))}")
-    return {
+    merged = {
         key: _strict_bool(rules.get(key, default), f"policies.yaml: rules.{key}")
         for key, default in RULE_POLICY_DEFAULTS.items()
     }
+    # Cosmetic sub-features are unreachable when the cosmetic gate itself is
+    # off (_normalize_line returns before normalize_cosmetic runs), so a
+    # config that disables cosmetics but enables snippets/extended-css is
+    # contradictory and must fail loudly instead of being silently masked.
+    if not merged["allow_abp_cosmetic"]:
+        dependent = [
+            name for name in ("allow_abp_snippets", "allow_extended_css")
+            if merged[name]
+        ]
+        if dependent:
+            raise ValueError(
+                "policies.yaml: rules."
+                + ", rules.".join(dependent)
+                + " have no effect unless rules.allow_abp_cosmetic is true"
+            )
+    return merged
 
 
 @lru_cache(maxsize=1)

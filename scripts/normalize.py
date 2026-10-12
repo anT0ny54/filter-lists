@@ -218,7 +218,7 @@ def split_options(rule: str) -> tuple[str, list[str]]:
             # (`/re/$script,header=etag:/^W\\/x$/`). Treating that as one big
             # regex skipped all option validation, so look for an earlier `$`
             # that closes a valid regex envelope and opens a valid option list.
-            pos = _option_split_inside_trailing_slash(rule, positions[:-1], pattern_start)
+            pos = _option_split_inside_trailing_slash(rule, positions, pattern_start)
             if pos is None:
                 return rule, []
     option_text = rule[pos + 1:]
@@ -368,21 +368,46 @@ def valid_option(
     return False
 
 
-def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> str | None:
-    policy = load_rule_policy() if rule_policy is None else rule_policy
+def _option_list_reason(options: list[str], is_exception: bool, policy: dict[str, bool]) -> str | None:
+    """First rejection reason in an option list, or None if all options validate.
+
+    Mirrors the per-option checks of ``_rejection_reason()`` so callers can
+    explain a rejection without re-validating the whole rule.
+    """
+    for option in options:
+        option_name = option.split("=", 1)[0].casefold()
+        bare_name = option_name[1:] if option_name.startswith("~") else option_name
+        allowed = VALUE_OPTIONS if "=" in option else TYPE_OPTIONS | SIMPLE_OPTIONS
+        if bare_name not in allowed and policy["reject_unknown_options"]:
+            return "unknown-option"
+        if not valid_option(option, is_exception, policy):
+            return "invalid-option-value" if "=" in option else "context-invalid-option"
+    return None
+
+
+def _normalize_network_with_reason(rule: str, policy: dict[str, bool]) -> tuple[str | None, str | None]:
+    """Normalize `rule`, returning ``(rule, None)`` or ``(None, reason)``.
+
+    The reason strings mirror ``_rejection_reason()``'s network branch exactly
+    (same check order: overbroad -> option list -> pattern shape), so the
+    rejection hot path — thousands of rejects per source — no longer
+    re-validates a rejected rule a second time just to explain it.
+    """
     is_exception = rule.startswith("@@")
     pattern, options = split_options(rule.strip())
-    if not pattern:
-        return None
     pattern_body = pattern[2:] if pattern.startswith("@@") else pattern
-    if not pattern_body:
-        return None
-    if not valid_network_pattern(pattern_body):
-        return None
     if is_overbroad_pattern(pattern_body, options):
-        return None
+        return None, "overbroad-pattern"
+    if not pattern or not pattern_body:
+        if options:
+            reason = _option_list_reason(options, is_exception, policy)
+            if reason is not None:
+                return None, reason
+        return None, "invalid-option-or-network-rule"
+    if not valid_network_pattern(pattern_body):
+        return None, ("invalid-option-or-network-rule" if "$" in rule else "invalid-network-rule")
     if not options:
-        return pattern
+        return pattern, None
     normalized: list[str] = []
     # Cheap substring pre-check avoids scanning every option for the common case.
     has_addheader = "addheader" in rule.casefold() and any(
@@ -390,6 +415,10 @@ def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> 
     )
     for option in options:
         option_name = option.split("=", 1)[0].casefold()
+        bare_name = option_name[1:] if option_name.startswith("~") else option_name
+        allowed = VALUE_OPTIONS if "=" in option else TYPE_OPTIONS | SIMPLE_OPTIONS
+        if bare_name not in allowed and policy["reject_unknown_options"]:
+            return None, "unknown-option"
         # ABP explicitly permits $addheader rules to target top-level
         # documents with the `document` type even though ordinary `$document`
         # is exception-only. This is a narrow, documented exception to the
@@ -398,7 +427,7 @@ def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> 
             option_name == "document" and has_addheader and not is_exception
         ) or valid_option(option, is_exception, policy)
         if not option_valid:
-            return None
+            return None, "invalid-option-value" if "=" in option else "context-invalid-option"
         if "=" in option:
             name, value = option.split("=", 1)
             name = name.lower()
@@ -413,17 +442,24 @@ def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> 
     # be combined. Keep this canonical name check aligned with rejection_reason().
     option_names = [option.split("=", 1)[0].lstrip("~").lower() for option in normalized]
     if policy["reject_duplicate_options"] and len(option_names) != len(set(option_names)):
-        return None
+        return None, "duplicate-option"
     if any(x.startswith("rewrite=") for x in normalized):
         if "third-party" in normalized or "~third-party" in normalized:
-            return None
+            return None, "invalid-option-or-network-rule"
         if not (pattern_body == "*" or pattern_body.startswith("||")):
-            return None
+            return None, "invalid-option-or-network-rule"
         if policy["require_domain_for_rewrite"] and not any(
             x.startswith("domain=") for x in normalized
         ):
-            return None
-    return ("@@" if is_exception else "") + pattern_body + "$" + ",".join(sorted(normalized, key=str.casefold))
+            return None, "invalid-option-or-network-rule"
+    return ("@@" if is_exception else "") + pattern_body + "$" + ",".join(sorted(normalized, key=str.casefold)), None
+
+
+def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> str | None:
+    policy = load_rule_policy() if rule_policy is None else rule_policy
+    normalized, _reason = _normalize_network_with_reason(rule, policy)
+    return normalized
+
 
 
 def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) -> str | None:
@@ -483,33 +519,36 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
 def _normalize_line(line: str, limit: int, policy: dict[str, bool], trusted_abp_features: bool):
     """Single normalization pass over an already-stripped line.
 
-    Returns ``(rule_or_None, classification_or_None)``. The classification is
-    handed back so the rejection path can reuse it instead of re-classifying.
+    Returns ``(rule_or_None, classification_or_None, reason_or_None)``. The
+    classification is handed back so the rejection path can reuse it instead
+    of re-classifying; the reason carries the exact network-rejection cause
+    when normalization itself produced one, so callers need not re-validate.
     """
     if not line or len(line) > limit:
-        return None, None
+        return None, None, None
     classification = classify(line)
     if not trusted_abp_features and uses_restricted_abp_feature(line, classification):
-        return None, classification
+        return None, classification, None
     if classification.kind == "invalid":
         if classification.reason == "hosts-format" and not policy["reject_hosts_format"]:
-            return line, classification
+            return line, classification, None
         if classification.reason == "html-or-error-page" and not policy["reject_html_error_pages"]:
-            return line, classification
+            return line, classification, None
     if classification.kind in {"comment", "directive", "blank", "invalid"}:
-        return None, classification
+        return None, classification, None
     if classification.kind == "network" and not policy["allow_network_filters"]:
-        return None, classification
+        return None, classification, None
     if classification.kind == "cosmetic" and not policy["allow_abp_cosmetic"]:
-        return None, classification
+        return None, classification, None
     if classification.kind == "cosmetic":
-        return normalize_cosmetic(line, policy), classification
+        return normalize_cosmetic(line, policy), classification, None
     # A terminal, unescaped `$` on a normal network filter is an empty
     # option section, not a valid pattern. Regex filters are handled by
     # normalize_network/split_options and may legitimately contain `$`.
     if line.endswith("$") and not line.startswith(("/", "@@/")):
-        return None, classification
-    return normalize_network(line, policy), classification
+        return None, classification, None
+    normalized, reason = _normalize_network_with_reason(line, policy)
+    return normalized, classification, reason
 
 
 def normalize_rule(
@@ -541,9 +580,14 @@ def normalize_rule_with_reason(
     line = clean_line(raw)
     limit = default_max_rule_length() if max_rule_length is None else max_rule_length
     policy = load_rule_policy() if rule_policy is None else rule_policy
-    rule, classification = _normalize_line(line, limit, policy, trusted_abp_features)
+    rule, classification, reason = _normalize_line(line, limit, policy, trusted_abp_features)
     if rule is not None:
         return rule, None
+    # Network rejections already carry their exact reason from the
+    # normalizer; everything else (policy gates, cosmetic rejections, ...)
+    # goes through the full explainer as before.
+    if reason is not None:
+        return None, reason
     return None, _rejection_reason(line, limit, policy, trusted_abp_features, classification)
 
 
