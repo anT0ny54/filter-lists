@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-ff671c960a9f
-! Last updated: 2026-10-17 23:59:24 UTC
+! Version: v7.6.0-b04cc0dc4424
+! Last updated: 2026-10-18 00:12:33 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: ff671c960a9fbd8e71aeecd8c090eda3306a0db24033b6ffbf45d6e8b6d2d05c
+! Build-ID: b04cc0dc44242928f7b34c681990ac1d65f3ee63f34d14c4c00de9e6454a13fb
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 174012
+! Total rules: 173957
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -12264,11 +12264,10 @@
 ##img[alt="Slot777" i]
 ##img[alt^=" agen bola terpercaya" i]
 ##img[alt^=" judi bola online" i]
-##img[alt^=" luxury 111 "]
 ##img[alt^=" situs judi bola" i]
 ##img[alt^="1001win" i]
 ##img[alt^="1188POKER" i]
-##img[alt^="1cbet i"]
+##img[alt^="1cbet" i]
 ##img[alt^="1POKER" i]
 ##img[alt^="1xbet" i]
 ##img[alt^="33sbet" i]
@@ -12276,7 +12275,6 @@
 ##img[alt^="381bet" i]
 ##img[alt^="388baik" i]
 ##img[alt^="388HERO" i]
-##img[alt^="388hero"]
 ##img[alt^="526betclub" i]
 ##img[alt^="5Starsbet" i]
 ##img[alt^="77 BANDAR" i]
@@ -12291,11 +12289,8 @@
 ##img[alt^="7UPCASH" i]
 ##img[alt^="8080SPORT " i]
 ##img[alt^="8080SPORT" i]
-##img[alt^="8080SPORT"]
 ##img[alt^="88 DEWA" i]
 ##img[alt^="8TOGEL" i]
-##img[alt^="8togel" i]
-##img[alt^="8TOGEL"]
 ##img[alt^="933Bola" i]
 ##img[alt^="99DEWA" i]
 ##img[alt^="ADAQQ" i]
@@ -12304,7 +12299,7 @@
 ##img[alt^="ADUPOKER88" i]
 ##img[alt^="ADUQQ" i]
 ##img[alt^="AFAPOKER" i]
-##img[alt^="agb99"]
+##img[alt^="agb99" i]
 ##img[alt^="agen bandarq online" i]
 ##img[alt^="agen bola online" i]
 ##img[alt^="agen bola tangkas" i]
@@ -12324,12 +12319,10 @@
 ##img[alt^="Agen Dominoqq" i]
 ##img[alt^="Agen Judi Bola" i]
 ##img[alt^="Agen Judi Online" i]
-##img[alt^="agen judi online" i]
 ##img[alt^="Agen Judi Poker" i]
 ##img[alt^="Agen Judi Terpercaya" i]
 ##img[alt^="Agen Judi Togel" i]
 ##img[alt^="AGEN JUDI" i]
-##img[alt^="agen judi" i]
 ##img[alt^="AGEN LAPAKQQ" i]
 ##img[alt^="agen livecasino" i]
 ##img[alt^="Agen Online" i]
@@ -12340,7 +12333,6 @@
 ##img[alt^="Agen Poker Online" i]
 ##img[alt^="Agen Poker Terpercaya" i]
 ##img[alt^="Agen Poker" i]
-##img[alt^="agen poker" i]
 ##img[alt^="Agen QQ Terpercaya" i]
 ##img[alt^="agen qq" i]
 ##img[alt^="AGEN SABUNG" i]
@@ -12356,7 +12348,6 @@
 ##img[alt^="Agen Togel Online" i]
 ##img[alt^="Agen Togel Terpercaya" i]
 ##img[alt^="Agen Togel" i]
-##img[alt^="agen togel" i]
 ##img[alt^="Agen Toto" i]
 ##img[alt^="AgenQQ" i]
 ##img[alt^="AGENQQ365" i]
@@ -12430,13 +12421,10 @@
 ##img[alt^="bandar sakong" i]
 ##img[alt^="Bandar Taruhan Judi" i]
 ##img[alt^="Bandar Togel" i]
-##img[alt^="bandar togel" i]
 ##img[alt^="Bandar toto" i]
 ##img[alt^="bandar303" i]
 ##img[alt^="Bandar36" i]
-##img[alt^="bandar36" i]
 ##img[alt^="Bandar855" i]
-##img[alt^="bandar855" i]
 ##img[alt^="BandarCapsa" i]
 ##img[alt^="Bandarkiu" i]
 ##img[alt^="BandarQ Online" i]
@@ -12448,9 +12436,6 @@
 ##img[alt^="BANDARQQ365" i]
 ##img[alt^="bandarwalet" i]
 ##img[alt^="BANDARXL" i]
-##img[alt^="BandarXL" i]
-##img[alt^="bandarxl" i]
-##img[alt^="bandarxl"]
 ##img[alt^="banner sidebar" i]
 ##img[alt^="bannertengah" i]
 ##img[alt^="BantengMerah" i][src$=".gif"]
@@ -12476,8 +12461,6 @@
 ##img[alt^="birutoto" i]
 ##img[alt^="BISAQQ" i]
 ##img[alt^="BISNIS4D" i]
-##img[alt^="Bisnis4D" i]
-##img[alt^="bisnis4d"]
 ##img[alt^="blatogel" i]
 ##img[alt^="bola tangkas online" i]
 ##img[alt^="Bola Togel" i]
@@ -12507,8 +12490,6 @@
 ##img[alt^="BUNDAPOKER" i]
 ##img[alt^="BUNGAQQ" i]
 ##img[alt^="BUYSPINSLOT" i]
-##img[alt^="BuySpinSLOT" i]
-##img[alt^="buyspinslot" i]
 ##img[alt^="CafeQQ" i]
 ##img[alt^="CAHAYAPOKER" i]
 ##img[alt^="CAHAYAQQ" i]
@@ -12566,9 +12547,7 @@
 ##img[alt^="DewaSport" i]
 ##img[alt^="Dewataqq" i]
 ##img[alt^="DEWATASLOT" i]
-##img[alt^="Dewataslot" i]
 ##img[alt^="DEWATERBANG" i]
-##img[alt^="Dewaterbang" i]
 ##img[alt^="dewavegas" i]
 ##img[alt^="DEWIQQ" i]
 ##img[alt^="DHX4D" i]
@@ -12601,15 +12580,11 @@
 ##img[alt^="ELANGQQ" i]
 ##img[alt^="ENAKBET" i]
 ##img[alt^="EnakSlot" i]
-##img[alt^="Enakslot" i]
-##img[alt^="enakslot" i]
-##img[alt^="enakslot"]
 ##img[alt^="ENJOYQQ" i]
 ##img[alt^="enterslots" i]
 ##img[alt^="entertogel" i]
-##img[alt^="eqn388"]
+##img[alt^="eqn388" i]
 ##img[alt^="EraPlay88" i]
-##img[alt^="Eraplay88" i]
 ##img[alt^="ESIAPOKER" i]
 ##img[alt^="FAIRQQ" i]
 ##img[alt^="FASTBET" i]
@@ -12619,7 +12594,6 @@
 ##img[alt^="Gacor128" i]
 ##img[alt^="Gacor25" i]
 ##img[alt^="Gacor88" i]
-##img[alt^="gacor88" i]
 ##img[alt^="GADISQQ" i]
 ##img[alt^="GADUNSLOT" i]
 ##img[alt^="Game Poker Online" i]
@@ -12637,9 +12611,7 @@
 ##img[alt^="GIATQQ" i]
 ##img[alt^="gilaslot" i]
 ##img[alt^="GITARPOKER" i]
-##img[alt^="gitarpoker" i]
 ##img[alt^="GITARTOGEL" i]
-##img[alt^="gitartogel" i]
 ##img[alt^="goldenpoker" i]
 ##img[alt^="GOLDENQQ" i]
 ##img[alt^="GUDANGPOKER" i]
@@ -12676,7 +12648,6 @@
 ##img[alt^="ID88.Com" i]
 ##img[alt^="IDN POKER ONLINE" i]
 ##img[alt^="IDN Poker" i]
-##img[alt^="Idn Poker" i]
 ##img[alt^="IDNCASH" i]
 ##img[alt^="IDNGG" i]
 ##img[alt^="IDNGOAL" i]
@@ -12735,7 +12706,6 @@
 ##img[alt^="JAWAPOKER88" i]
 ##img[alt^="jayabet" i]
 ##img[alt^="JAYAPOKER" i]
-##img[alt^="jayapoker" i]
 ##img[alt^="JELASPOKER" i]
 ##img[alt^="JEMPOLQQ" i]
 ##img[alt^="jendralpoker" i]
@@ -12744,7 +12714,6 @@
 ##img[alt^="JOINDOMINO" i]
 ##img[alt^="JOINPKV" i]
 ##img[alt^="JOKERBET888" i]
-##img[alt^="jokerbet888" i]
 ##img[alt^="JOKERNET88" i]
 ##img[alt^="josbet" i]
 ##img[alt^="jpdewa" i]
@@ -12753,10 +12722,8 @@
 ##img[alt^="JUARAPOKER" i]
 ##img[alt^="judi bola online" i]
 ##img[alt^="Judi bola" i]
-##img[alt^="judi bola" i]
 ##img[alt^="judi online terpercaya" i]
 ##img[alt^="Judi Online" i]
-##img[alt^="judi online" i]
 ##img[alt^="judi poker online" i]
 ##img[alt^="judi slot online" i]
 ##img[alt^="Judi Togel Online" i]
@@ -12767,9 +12734,6 @@
 ##img[alt^="JURAGANQQ" i]
 ##img[alt^="Kaiko Slot" i]
 ##img[alt^="KAIKOSLOT" i]
-##img[alt^="KaikoSlot" i]
-##img[alt^="Kaikoslot" i]
-##img[alt^="kaikoslot" i]
 ##img[alt^="Kakak Dewa" i]
 ##img[alt^="KAMPUSBET" i]
 ##img[alt^="KANTINQQ" i]
@@ -12843,8 +12807,9 @@
 ##img[alt^="LUDOQQ" i]
 ##img[alt^="Lumbung138" i]
 ##img[alt^="LUMBUNG4D GACOR" i]
-##img[alt^="Lust Goddess"]
+##img[alt^="Lust Goddess" i]
 ##img[alt^="Luxury 111" i]
+##img[alt^="luxury 111" i]
 ##img[alt^="luxury 138" i]
 ##img[alt^="LUXURY POKER88" i]
 ##img[alt^="luxury111" i]
@@ -12854,9 +12819,7 @@
 ##img[alt^="Macau Dewa" i]
 ##img[alt^="MACAU442" i]
 ##img[alt^="MACAUBET" i]
-##img[alt^="MacauBet" i]
 ##img[alt^="MacauDewa" i]
-##img[alt^="Macaudewa" i]
 ##img[alt^="Macauslot188" i]
 ##img[alt^="MADU99" i]
 ##img[alt^="mahadewa88" i]
@@ -12865,7 +12828,6 @@
 ##img[alt^="MAHKOTAQQ" i]
 ##img[alt^="Main Cuan Slot" i]
 ##img[alt^="MAINCUAN" i]
-##img[alt^="maincuan" i]
 ##img[alt^="MAINDOMINO99" i]
 ##img[alt^="mainhoki" i]
 ##img[alt^="MAINQQ" i]
@@ -12873,11 +12835,9 @@
 ##img[alt^="Makauqq" i]
 ##img[alt^="Mandala Toto" i]
 ##img[alt^="MANDALATOTO" i]
-##img[alt^="mandalatoto" i]
 ##img[alt^="MANDIRIQQ" i]
 ##img[alt^="ManiaQQ" i]
 ##img[alt^="MANSION77" i]
-##img[alt^="mansion77" i]
 ##img[alt^="mantul138" i]
 ##img[alt^="MARIOQQ" i]
 ##img[alt^="MASTERDOMINO88" i]
@@ -12901,13 +12861,12 @@
 ##img[alt^="Megasloto" i]
 ##img[alt^="Megasloto188" i]
 ##img[alt^="MEGATANGKAS" i]
-##img[alt^="Megatangkas" i]
 ##img[alt^="MEJAHOKI" i]
 ##img[alt^="MEJAQQ" i]
 ##img[alt^="mejasakong" i]
 ##img[alt^="mejavip" i]
 ##img[alt^="MEMBERQQ" i]
-##img[alt^="MemekMonyet"]
+##img[alt^="MemekMonyet" i]
 ##img[alt^="MEMORIQQ" i]
 ##img[alt^="MENANGQQ" i]
 ##img[alt^="MENUQQ" i]
@@ -12928,7 +12887,6 @@
 ##img[alt^="mpojackpot" i]
 ##img[alt^="MPOSport" i]
 ##img[alt^="MTXTOTO" i]
-##img[alt^="Mtxtoto" i]
 ##img[alt^="MULAIQQ" i]
 ##img[alt^="Mulia77" i]
 ##img[alt^="MURAHQQ" i]
@@ -12989,8 +12947,6 @@
 ##img[alt^="PELANGIQQ" i]
 ##img[alt^="Penta Slot" i]
 ##img[alt^="PENTASLOT" i]
-##img[alt^="Pentaslot" i]
-##img[alt^="pentaslot" i]
 ##img[alt^="percaya4d" i]
 ##img[alt^="permainan judi online" i]
 ##img[alt^="PERMATABET88" i]
@@ -13005,7 +12961,6 @@
 ##img[alt^="Pojokpoker" i]
 ##img[alt^="Poker Ace" i]
 ##img[alt^="Poker Bola" i]
-##img[alt^="poker bola" i]
 ##img[alt^="poker indonesia" i]
 ##img[alt^="Poker JayaBet" i]
 ##img[alt^="Poker Jingga" i]
@@ -13021,7 +12976,6 @@
 ##img[alt^="poker8m" i]
 ##img[alt^="pokerajaib" i]
 ##img[alt^="POKERBOYA" i]
-##img[alt^="pokerboya" i]
 ##img[alt^="pokercip" i]
 ##img[alt^="POKEREMAS" i]
 ##img[alt^="Pokerhebat" i]
@@ -13060,10 +13014,8 @@
 ##img[alt^="QQ828" i]
 ##img[alt^="QQ882" i]
 ##img[alt^="QQ8889" i]
-##img[alt^="qq8889" i]
 ##img[alt^="QQ998" i]
 ##img[alt^="QQANGPAO" i]
-##img[alt^="QQangpao" i]
 ##img[alt^="QQasiabet" i]
 ##img[alt^="QQCALO" i]
 ##img[alt^="QQDewa" i]
@@ -13103,10 +13055,7 @@
 ##img[alt^="REMIPOKER" i]
 ##img[alt^="Resmidomino" i]
 ##img[alt^="RGOBET" i]
-##img[alt^="rgobet" i]
 ##img[alt^="RGOCASINO" i]
-##img[alt^="rgocasino" i]
-##img[alt^="RGOCASINO"]
 ##img[alt^="rimbatoto" i]
 ##img[alt^="rivalqq" i]
 ##img[alt^="RONALDO4D" i]
@@ -13159,7 +13108,6 @@
 ##img[alt^="senyumqq" i]
 ##img[alt^="sepakbola.cc" i]
 ##img[alt^="SEPAKBOLACC" i]
-##img[alt^="sepakbolacc" i]
 ##img[alt^="SERVERPKV" i]
 ##img[alt^="sexysloto" i]
 ##img[alt^="SHINCHANPOKER" i]
@@ -13187,12 +13135,11 @@
 ##img[alt^="Situs Togel Terpercaya" i]
 ##img[alt^="situs togel" i]
 ##img[alt^="SITUS303" i]
-##img[alt^="Slot Bandar"]
+##img[alt^="Slot Bandar" i]
 ##img[alt^="slot casino mpobos" i]
 ##img[alt^="slot demo gratis" i]
 ##img[alt^="Slot Deposit" i]
 ##img[alt^="Slot Gacor" i]
-##img[alt^="slot gacor" i]
 ##img[alt^="slot game" i]
 ##img[alt^="Slot MPO" i]
 ##img[alt^="slot online termurah" i]
@@ -13200,9 +13147,8 @@
 ##img[alt^="slot online" i]
 ##img[alt^="slot188" i]
 ##img[alt^="Slot25" i]
-##img[alt^="SLOT258"]
+##img[alt^="SLOT258" i]
 ##img[alt^="SLOT7000" i]
-##img[alt^="SLOT7000"]
 ##img[alt^="Slotasiabet" i]
 ##img[alt^="slotguru" i]
 ##img[alt^="SLOTKING69" i]
@@ -13226,7 +13172,6 @@
 ##img[alt^="SUNDUL99" i]
 ##img[alt^="superdomino" i]
 ##img[alt^="SUPERITCSLOT" i]
-##img[alt^="SUPERITCSLOT"]
 ##img[alt^="superitslot" i]
 ##img[alt^="SURYAQQ" i]
 ##img[alt^="TAIPANQQ" i]
@@ -13243,13 +13188,11 @@
 ##img[alt^="texas poker" i]
 ##img[alt^="Texaspoker" i]
 ##img[alt^="TEXASPOKERCC" i]
-##img[alt^="texaspokercc" i]
 ##img[alt^="TEXASQQ" i]
 ##img[alt^="TIKETQQ" i]
 ##img[alt^="Togel Domino" i]
 ##img[alt^="togel online terpercaya" i]
 ##img[alt^="Togel Online" i]
-##img[alt^="togel online" i]
 ##img[alt^="Togel SGP" i]
 ##img[alt^="togel singapore" i]
 ##img[alt^="togel terbesar" i]
@@ -13261,10 +13204,7 @@
 ##img[alt^="Toto Togel" i]
 ##img[alt^="TOTO717" i]
 ##img[alt^="TOTO88" i]
-##img[alt^="toto88" i]
-##img[alt^="TOTO88"]
 ##img[alt^="TOTOBET" i]
-##img[alt^="totobet" i]
 ##img[alt^="totojitu" i]
 ##img[alt^="totomaniac" i]
 ##img[alt^="totowin" i]
@@ -13279,7 +13219,6 @@
 ##img[alt^="UtamaBet" i]
 ##img[alt^="vegas811" i]
 ##img[alt^="VEGAS88" i]
-##img[alt^="Vegas88" i]
 ##img[alt^="video bokep online" i]
 ##img[alt^="Vimax Asli" i]
 ##img[alt^="VIP BONUS LIVE" i]
@@ -13301,8 +13240,6 @@
 ##img[alt^="WEDEQQ" i]
 ##img[alt^="Wg77" i]
 ##img[alt^="WIGOBET" i]
-##img[alt^="Wigobet" i]
-##img[alt^="WIGOBET"]
 ##img[alt^="Win25" i]
 ##img[alt^="WIN4D" i]
 ##img[alt^="WINNIPOKER" i]
@@ -102370,6 +102307,7 @@ zzzyk.com###Tinfo
 ||airpr.com^$third-party
 ||airshedcoart.com^
 ||airshedmammets.qpon^
+||airsick32.com^
 ||airtable.com/internal/
 ||airthsmoshavcalles.qpon^
 ||airtightmodification.com^
@@ -134052,6 +133990,7 @@ zzzyk.com###Tinfo
 ||khnelupohxpvd.website^
 ||khocclzjcykbk.site^
 ||khodjawhosen.qpon^
+||khpsfhwwdzly.com^
 ||khqwwvhgjoiab.site^
 ||khrkiqbylwyoo.online^
 ||khrxilqpinlvr.store^
@@ -134634,6 +134573,7 @@ zzzyk.com###Tinfo
 ||kpcjuowdeivnl.site^
 ||kpdslyrkdctow.website^
 ||kpebymehzstjw.website^
+||kpeirpqmdtumy.site^
 ||kpfbksehrvell.space^
 ||kphjjanyryoih.site^
 ||kphllpsnaqgrc.website^
@@ -143799,6 +143739,7 @@ zzzyk.com###Tinfo
 ||okeeblr.com^
 ||okeebobbedancre.cyou^
 ||okey-online.com/prg/daten/datenbanken/banner
+||okflsgmvtpmmy.website^
 ||okhwpomwoo.in^
 ||okhzwjshcpqjz.site^
 ||okigapxooygky.site^
@@ -146140,6 +146081,7 @@ zzzyk.com###Tinfo
 ||perfumed-development.com^
 ||perfumedsecret.com^
 ||perfumedstretch.com^
+||perhsentinepukeka.qpon^
 ||perigshfnon.com^
 ||perilastronaut.com^
 ||perileffects.com^
@@ -146856,6 +146798,7 @@ zzzyk.com###Tinfo
 ||pixlr.com/fad/
 ||pixoctopus.pixnet.net^
 ||piyeaztpdsmaj.space^
+||piyjmdcabrxpo.online^
 ||pizhmagod.org^$third-party
 ||pizinegxgdrgx.store^
 ||pizzadak.cyou^
@@ -156060,6 +156003,7 @@ zzzyk.com###Tinfo
 ||slacklovely.com^
 ||slacklygrewt.shop^
 ||slahpxqb6wto.com^
+||slajoioyhw.com^
 ||slakinskewly.qpon^
 ||slamactress.com^
 ||slanderchristian.com^
@@ -162926,6 +162870,7 @@ zzzyk.com###Tinfo
 ||ucksefztiyvnx.site^
 ||uclitpakrzbkn.online^
 ||uclwrnnpjaomk.site^
+||ucnovextjoeym.site^
 ||ucnwhhtaadaqp.site^
 ||ucookie.com.tr^
 ||ucoz.*/cgi/uutils.fcg?*&r=
