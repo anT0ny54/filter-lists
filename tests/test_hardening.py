@@ -1,4 +1,4 @@
-"""Regression tests for the maintenance audit (BUILDER_VERSION stays 7.6.0).
+"""Tests for the hardening added in later maintenance passes.
 
 Each class pins one defect that was reproduced against the previous code.
 """
