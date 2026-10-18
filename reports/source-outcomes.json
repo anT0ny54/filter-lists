@@ -1378,9 +1378,9 @@
    }
   },
   {
-   "generated_at": "2026-10-18T00:15:56.616665+00:00",
+   "generated_at": "2026-10-18T07:59:50.342408+00:00",
    "status": "success",
-   "build_id": "b04cc0dc44242928f7b34c681990ac1d65f3ee63f34d14c4c00de9e6454a13fb",
+   "build_id": "f8a83ead45271e97699ed35350ae6b8cc71733e8233aad50ff2d7bb3d0d24e9a",
    "outcomes": {
     "https://easylist-downloads.adblockplus.org/abpindo-minified.txt": true,
     "https://easylist-downloads.adblockplus.org/abpvn-minified.txt": true,
