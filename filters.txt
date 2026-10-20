@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-d2288d2bb068
-! Last updated: 2026-10-20 12:30:56 UTC
+! Version: v7.6.0-97857015492d
+! Last updated: 2026-10-20 12:31:38 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: d2288d2bb0689220f3f30a084ea0d9eb572ca6da12531053cc6aa9c12fdabe62
+! Build-ID: 97857015492de3de155198511dd40d2f7ffc15d4e6d3f48b9b38d0b1fe32c775
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 175587
+! Total rules: 175580
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -23310,7 +23310,6 @@
 @@||exoclick.com^$domain=pemersatufun.site
 @@||exosrv.com/video-slider.js$domain=xfreehd.com
 @@||expansion.com$generichide
-@@||exponential.com^*/tags.js$domain=yellowbridge.com
 @@||extraconfidencial.com/js/*$object
 @@||extractpics.com^$generichide
 @@||extraimage.co^$generichide
@@ -26450,7 +26449,6 @@
 @@||stravers.live^$~third-party
 @@||stream-us-east-1.getpublica.com/cl/*.m3u8?i=$domain=klowdtv.com,xmlhttprequest
 @@||stream.googleapiscdn.com^$generichide
-@@||stream4free.live^$generichide
 @@||streamc.xyz/ad_header.js$domain=streamc.xyz,script
 @@||streamlive.to^$generichide
 @@||streamlord.com^$generichide
@@ -26816,7 +26814,6 @@
 @@||unpkg.com/vue-recaptcha@*/dist/vue-recaptcha.js$domain=vidoza.net
 @@||unpkg.com^$domain=vidsrc.stream,script
 @@||uobsoe.com^
-@@||up-load.io^$generichide
 @@||upaiyun.com/libs/$domain=xddxsw.net,script
 @@||upaiyun.com^*.js$domain=cilimao.co|cilimao.one
 @@||updown.*/js/jquery-$domain=updown.cam|updown.icu,script
@@ -26853,7 +26850,6 @@
 @@||usercentrics.eu^$domain=paketshop.myhermes.de
 @@||usercentrics.eu^$domain=rts.ch
 @@||usercentrics.eu^$domain=villeroy-boch.fr
-@@||userload.co/adpopup.js$script
 @@||usersdrive.com/aclib.js
 @@||usgamer.net/static/scripts/AdsLoad.js
 @@||ut.pubmatic.com/geo?pubid=$domain=zeenews.india.com
@@ -27222,7 +27218,6 @@
 @@||yandex.ru/wy/rss.xml$document
 @@||yandex.st/share/share.js$domain=66.ru|calculatewater.ru|ktk.kz|splav.ru|vnukovo.ru|yadi.sk|gama-gama.ru|foxtrot.com.ua|radiorecord.ru|xn--80aneaaefcxzcih6g1e.xn--p1ai|24auto.ru|calculatewater.ru|novoeradio.by|pikucha.ru|realty.dmir.ru|transport.mos.ru|yandex.com|yandex.ru
 @@||yandex.st/swfobject^
-@@||yandexcdn.com/ad/api/popunder.js$script
 @@||yantuchina.com/gg/tmp/hong.gif
 @@||yaplakal.com/html/static/$image,~third-party
 @@||yastatic.net/*/share.js$domain=alpinabook.ru
@@ -27255,7 +27250,6 @@
 @@||yieldlove.com/v2/yieldlove.js$domain=whatismyip.com,script
 @@||yimg.com/*/*.css
 @@||yimg.com/*/css/
-@@||yimg.com/dy/ads/native.js$domain=animedao.to,script
 @@||yimg.com/rq/darla/*/g-r-min.js$domain=yahoo.com
 @@||yimg.com/ss/rapid-3.*.js$domain=hk.yahoo.com|tw.yahoo.com
 @@||yimg.jp/combo?*/ad/
@@ -61894,6 +61888,7 @@ katitube.com##li > a[href][target="_blank"]
 katmoviehd.cc,learncomputerscienceonline.com##.widget_fbw_id
 katowice24.info##.share__socials > li[class^="share__social"]:not(.share__social--solid)
 katu.com##div[class^="DisplayAdvert"]
+katu.com,komonews.com##div[class*="_taboolaDeeperDive"]
 katuru.com##.ui-block-b:has(script:not([src]))
 katuru2ch.blog12.fc2.com##.more_ad
 katzen-forum.net##.js-replyNewMessageContainer > article[class="message message--post"]:has(h4 > span:contains(Werbung))
@@ -62933,7 +62928,6 @@ kommersant.ru,slippedisc.com##.subscription_popup
 kommersant.uk##.advertising--col
 kommersant.uk##.content-article-actions__column--social
 kommersant.uk##main > section + div.container:has(> article.subscription__form)
-komonews.com##div[class*="_taboolaDeeperDive"]
 komonews.com##div[class^="TaboolaVideoReel_"]
 komonews.com##div[data-slot-label^="DisplayAd"]
 komoot.com,komoot.de###banner_portal_container
@@ -172344,7 +172338,6 @@ zzzyk.com###Tinfo
 ||yagtyjaefiecu.online^
 ||yah3ph65tc.com^
 ||yahgansprugslisa.cfd^
-||yahoo-homepage.html-load.com^
 ||yahoo.co.jp/js/s_retargeting.js
 ||yahoo.com/_td_api/beacon/
 ||yahoo.com/beacon/
