@@ -88,6 +88,40 @@ class OutcomeHistoryTests(unittest.TestCase):
             self._record(root, "2026-10-02T00:00:00+00:00", False, "failed")
             self.assertEqual(len(load_outcomes(root / "source-outcomes.json", root / "history")), 2)
 
+    def test_recording_compacts_legacy_same_day_entries(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "source-outcomes.json"
+            path.write_text(json.dumps({"schema": 1, "runs": [
+                {"generated_at": "2026-10-01T01:00:00+00:00", "status": "success", "build_id": "a",
+                 "outcomes": {URL: True, "https://example.test/old": False}},
+                {"generated_at": "2026-10-01T02:00:00+00:00", "status": "failed", "build_id": "b",
+                 "outcomes": {URL: False, "https://example.test/new": True}},
+                {"generated_at": "2026-10-02T01:00:00+00:00", "status": "success", "build_id": "c",
+                 "outcomes": {URL: True}},
+            ]}))
+            record_outcomes(path, history_dir=None, generated_at="2026-10-03T00:00:00+00:00",
+                            status="success", build_id="d", results=[{"url": URL, "status": "ok"}])
+            runs = json.loads(path.read_text())["runs"]
+            self.assertEqual([r["generated_at"][:10] for r in runs], ["2026-10-01", "2026-10-02", "2026-10-03"])
+            self.assertEqual(runs[0]["build_id"], "b")  # newest identity for the day
+            self.assertEqual(runs[0]["status"], "failed")
+            self.assertEqual(runs[0]["outcomes"], {
+                URL: False, "https://example.test/old": False, "https://example.test/new": True})
+
+    def test_outcome_history_is_bounded_to_120_days(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "source-outcomes.json"
+            from datetime import datetime, timedelta, timezone
+            start = datetime(2026, 1, 1, tzinfo=timezone.utc)
+            for offset in range(125):
+                when = (start + timedelta(days=offset)).isoformat()
+                record_outcomes(path, history_dir=None, generated_at=when,
+                                status="success", build_id=str(offset), results=[{"url": URL, "status": "ok"}])
+            runs = json.loads(path.read_text())["runs"]
+            self.assertEqual(len(runs), 120)
+            self.assertEqual(runs[0]["generated_at"][:10], "2026-01-06")
+            self.assertEqual(runs[-1]["generated_at"][:10], "2026-05-05")
+
     def test_failed_report_records_outcomes_but_not_history(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -126,7 +160,7 @@ class EnforcedRejectionStatusTests(unittest.TestCase):
                                  max_include_depth=5, max_download_bytes=1 << 20, max_total_download_bytes=1 << 20,
                                  max_total_sources=10, total_timeout_seconds=10, history_retention=10,
                                  anomaly_detection={"enabled": False, "fail_on_warning": False}, **overrides)
-        stats = {"root_requested": 1, "root_successful": 1, "root_failed": 0, "included_references": 0,
+        stats = {"root_requested": 1, "root_successful": 1, "root_failed": 0, "included_requested": 0, "included_references": 0,
                  "results": [{"url": URL, "depth": 0, "status": "ok", "bytes": 10, "path": "/f.txt", "sha256": "a" * 64}], "failures": [],
                  "source_limit_reached": False, "timed_out": False, "budget_exhausted": False}
         rule_stats = {"input_lines": 1000, "accepted_lines": 1, "rejected_lines": 999, "duplicate_lines": 0, "unique_rules": 1,
