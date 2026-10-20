@@ -133,6 +133,15 @@ class NormalizeTests(unittest.TestCase):
         rule = "example.com##div { display: none }"
         self.assertEqual(normalize_rule(rule), rule)
 
+    def test_inline_style_block_requires_at_least_one_declaration(self):
+        for rule in (
+            "example.com##div { ; }",
+            "example.com##div { ;; }",
+            "example.com##div {    ;   }",
+        ):
+            with self.subTest(rule=rule):
+                self.assertIsNone(normalize_rule(rule))
+
     def test_inline_style_hex_colors_use_css_valid_lengths(self):
         for color in ("#123", "#1234", "#123456", "#12345678"):
             rule = f"example.com##div {{ background-color: {color} }}"

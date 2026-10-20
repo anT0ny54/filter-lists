@@ -439,6 +439,52 @@ class FetchTests(unittest.TestCase):
                 )
         self.assertTrue(stats["source_limit_reached"])
 
+    def test_include_cycle_at_source_limit_does_not_count_as_explosion(self):
+        url = "https://example.com/root"
+
+        def fake_download(_url, output, _timeout, _max_download_bytes):
+            output.write_text(
+                f"!#include {url}\n||root.example^\n! enough padding for validation\n",
+                encoding="utf-8",
+            )
+            return True, "", output.stat().st_size
+
+        with tempfile.TemporaryDirectory() as tmp, patch.object(fetch, "download", side_effect=fake_download):
+            files, stats = collect_sources(
+                [url], Path(tmp), time.monotonic(), 1, lambda _: None,
+                total_timeout=10, max_include_depth=5, max_download_bytes=1024,
+                max_total_download_bytes=1024, max_total_sources=1,
+            )
+
+        self.assertEqual(len(files), 1)
+        self.assertFalse(stats["source_limit_reached"])
+        self.assertEqual((stats["successful"], stats["failed"], stats["requested"]), (1, 0, 1))
+        self.assertEqual([item["url"] for item in stats["results"]], [url])
+
+    def test_source_limit_marks_only_unvisited_include_after_a_cycle(self):
+        root = "https://example.com/root"
+        child = "https://example.com/child"
+
+        def fake_download(_url, output, _timeout, _max_download_bytes):
+            output.write_text(
+                f"!#include {root}\n!#include {child}\n||root.example^\n! enough padding for validation\n",
+                encoding="utf-8",
+            )
+            return True, "", output.stat().st_size
+
+        with tempfile.TemporaryDirectory() as tmp, patch.object(fetch, "download", side_effect=fake_download):
+            _, stats = collect_sources(
+                [root], Path(tmp), time.monotonic(), 1, lambda _: None,
+                total_timeout=10, max_include_depth=5, max_download_bytes=1024,
+                max_total_download_bytes=1024, max_total_sources=1,
+            )
+
+        results = {item["url"]: item for item in stats["results"]}
+        self.assertTrue(stats["source_limit_reached"])
+        self.assertEqual(results[root]["status"], "ok")
+        self.assertEqual(results[child]["reason"], "source-limit")
+        self.assertEqual(stats["failed"], 1)
+
 
 class FetchSchedulingTests(unittest.TestCase):
     def test_include_order_is_deterministic_under_source_limit(self):

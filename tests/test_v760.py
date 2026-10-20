@@ -6,7 +6,7 @@ from pathlib import Path
 
 from _helpers import load_script, setup_merge_root
 import config
-from health import build_source_reputation, load_outcomes, record_outcomes, set_outcome_status
+from health import _compact_daily_runs, build_source_reputation, load_outcomes, record_outcomes, set_outcome_status
 from report import evaluate_source_quality, write_report
 
 URL = "https://example.test/a"
@@ -87,6 +87,31 @@ class OutcomeHistoryTests(unittest.TestCase):
             self.assertEqual(len(load_outcomes(root / "source-outcomes.json", root / "history")), 1)
             self._record(root, "2026-10-02T00:00:00+00:00", False, "failed")
             self.assertEqual(len(load_outcomes(root / "source-outcomes.json", root / "history")), 2)
+
+    def test_malformed_timestamps_remain_separate_reputation_observations(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "source-outcomes.json").write_text(json.dumps({"schema": 1, "runs": [
+                {"generated_at": "", "status": "failed", "build_id": "a", "outcomes": {URL: False}},
+                {"generated_at": "not-a-date", "status": "success", "build_id": "b", "outcomes": {URL: True}},
+            ]}))
+            rep = build_source_reputation(
+                root / "history", [{"url": URL, "status": "ok"}],
+                generated_at="2026-10-04T00:00:00+00:00",
+            )[URL]
+        self.assertEqual((rep["observations"], rep["successes"], rep["failures"]), (3, 2, 1))
+
+    def test_daily_compaction_keeps_invalid_dates_separate(self):
+        runs = [
+            {"generated_at": "2026-99-99T00:00:00+00:00", "outcomes": {URL: False}},
+            {"generated_at": "not-a-date", "outcomes": {URL: True}},
+            {"generated_at": "2026-10-01T01:00:00+00:00", "outcomes": {URL: False}},
+            {"generated_at": "2026-10-01T02:00:00+00:00", "outcomes": {URL: True}},
+        ]
+        compacted = _compact_daily_runs(runs)
+        self.assertEqual(len(compacted), 3)
+        self.assertEqual([run["generated_at"] for run in compacted].count("2026-99-99T00:00:00+00:00"), 1)
+        self.assertEqual([run["generated_at"] for run in compacted].count("not-a-date"), 1)
 
     def test_recording_compacts_legacy_same_day_entries(self):
         with tempfile.TemporaryDirectory() as tmp:
