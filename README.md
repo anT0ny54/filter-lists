@@ -183,7 +183,7 @@ Do not edit `filters.txt` or `sources.txt` directly; they are generated artifact
 Requirements:
 
 - Python 3.12+
-- `curl`
+- `curl` 8.4.0 or newer
 - PyYAML (`pip install -r requirements.txt`)
 
 Run:
@@ -264,7 +264,7 @@ The repository test suite covers:
 
 Download success does not mean a source contributes rules, so each build also evaluates rule yield per source. The **effective rejection rate** is the share of rule lines (input lines minus comments, blanks, and directives) that the strict-ABP profile rejected. With the shipped policy, sources of at least 100 lines at or above 30% are reported as `warning` and at or above 90% as `critical` in `reports/latest.json` (`source_quality`) and in the build log. They are advisory unless `source_quality.fail_on_critical: true`.
 
-Snapshot from the newest report (`reports/latest.json`, generated 2026-10-20): 32/32 root sources OK, 231,105 input lines, 201,116 accepted, 175,589 unique rules, overall rejection rate 12.98%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.52% effective rejection rate).
+Snapshot from the newest report (`reports/latest.json`, generated 2026-10-20): 32/32 root sources OK, 231,110 input lines, 201,121 accepted, 175,580 unique rules, overall rejection rate 12.98%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.52% effective rejection rate).
 
 | Source | Input lines | Accepted | Rejection rate* | Main rejection reasons |
 |---|---:|---:|---:|---|
@@ -273,7 +273,6 @@ Snapshot from the newest report (`reports/latest.json`, generated 2026-10-20): 3
 | AdGuard Turkish | 6,828 | 5,269 | 22.83% | `ubo-only-syntax` (785), `invalid-cosmetic-rule` (469) |
 | AdGuard Russian | 7,715 | 6,062 | 21.43% | `unknown-option` (840), `ubo-only-syntax` (633) |
 | AdGuard French | 4,934 | 4,009 | 18.75% | `unknown-option` (633), `ubo-only-syntax` (237) |
-
 *The table's rejection rate is the plain share of all input lines rejected (comments included). The quality gate uses effective rejection rate, excluding comments, blanks and directives; AdGuard Ukrainian's effective rate is 34.52%.
 
 Most EasyList-family sources reject under 5% of lines (mostly comments). Rejection of AdGuard/uBO-only syntax is intentional under the strict-ABP policy. Figures change with every upstream update; consult `reports/latest.json`.

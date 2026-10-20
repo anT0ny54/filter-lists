@@ -6,11 +6,13 @@ All notable changes to Filter-Lists are documented here. The format follows [Kee
 
 ## [Unreleased]
 
-### Audit pass (2026-10-20; 252 tests, all passing; version unchanged at 7.6.0)
+### Audit pass (2026-10-20; 252 tests discovered; 240 passed and 12 curl-gated tests skipped under curl 7.88.1; version unchanged at 7.6.0)
 
 Every project file except the intentionally excluded `filters.txt` payload was read or fully parsed before changes were made; the existing report JSON files were also parsed and checked for structural validity.
 
 #### Fixed
+- **Documentation/report drift** (`README.md`, `CHANGELOG.md`): the source-quality snapshot now matches `reports/latest.json` generated 2026-10-20T12:31:38Z (231,110 input lines, 201,121 accepted, 175,580 unique rules, 12.98% overall rejection), and the README now states the existing curl >= 8.4.0 runtime requirement.
+- **Network-transfer test portability** (`tests/_helpers.py`, `tests/test_fetch.py`, `tests/test_merge.py`): tests that require curl's unknown-length `--max-filesize` behavior are skipped with a clear reason on curl < 8.4.0 instead of failing after the builder's intentional security gate.
 - **False source-limit failures on include cycles** (`scripts/fetch.py`): already-visited include targets could trigger the total-source limit when the visited set reached its cap. The traversal now checks canonical identities before applying the cap and only reports truly unvisited targets as source-limit failures.
 - **Collapsed malformed reputation timestamps** (`scripts/health.py`): missing or invalid timestamps were all treated as the same empty-day bucket during reputation scoring, contrary to daily compaction's behavior. Valid ISO timestamps are normalized to UTC, while each malformed/undated run remains a separate observation.
 - **Empty ABP inline-style blocks** (`scripts/normalize.py`): declaration blocks containing only semicolons or whitespace were accepted despite containing no property/value declaration. They are now rejected while valid declarations and optional trailing semicolons remain accepted.
@@ -26,7 +28,7 @@ Every project file except the intentionally excluded `filters.txt` payload was r
 - Defensive `getattr(config, "source_quality", None)` in `merge.py`; `BuildConfig` always defines it. Test stubs now provide the field.
 
 #### Changed (optimization / cleanup)
-- `fetch.py`: filter already-visited canonical include targets before applying source-limit handling, preventing duplicate/cyclic references from creating false failures.
+- `fetch.py`: already-visited canonical include targets are filtered before source-limit handling and carried forward through `unvisited_next`, preventing duplicate/cyclic references from creating false failures.
 - `health.py`: use one strict ISO timestamp-to-UTC-day helper for both history compaction and reputation aggregation.
 - `normalize.py`: avoid repeated declaration-block slicing/stripping and redundant trailing-whitespace stripping for already-cleaned cosmetic bodies.
 - `normalize.py`: the plain-option name set is precomputed once instead of rebuilt for every option of every network rule.
@@ -37,7 +39,7 @@ Every project file except the intentionally excluded `filters.txt` payload was r
 - `fetch.py`: scan beyond the initial download sample when checking for an empty payload and buffer a bounded HTML probe to avoid missing error markers split across chunk boundaries; keep binary rejection active.
 - `report.py`: stage each source's rules, reasons, counters and digest locally until the file has been read and hashed successfully; streamline duplicate counting to operate on per-file sets.
 - `merge.py`: fail the build and avoid staging/publishing output if any local source cannot be fully analyzed.
-- README source-quality snapshot refreshed to `reports/latest.json` generated 2026-10-20 (231,105 input lines, 201,116 accepted, 175,589 unique rules, 12.98% overall rejection).
+- README source-quality snapshot refreshed to `reports/latest.json` generated 2026-10-20T12:31:38Z (231,110 input lines, 201,121 accepted, 175,580 unique rules, 12.98% overall rejection).
 
 #### Added
 - Regression coverage for self-including sources at the source cap, cycles with genuinely new children, malformed/undated reputation timestamps, invalid-day compaction, and declarationless inline-style blocks.
