@@ -6,19 +6,6 @@ All notable changes to Filter-Lists are documented here. The format follows [Kee
 
 ## [Unreleased]
 
-### Audit follow-up (2026-10-20, third pass; 256 tests discovered; all non-skipped tests passed, 12 curl-gated tests skipped; version unchanged at 7.6.0)
-
-Every project file was read in full before judgement; generated artifacts were parsed and checked for consistency only.
-
-#### Fixed
-- **Unreachable regex prefix** (`scripts/parser.py`): `DIRECTIVE_RE` carried a `^\s*` anchor that could never match because `classify()` strips the line and guards with `value.startswith("!#")` before matching. The anchor was removed; behavior is unchanged and all tests pass.
-- **Inconsistent configuration error labels** (`scripts/config.py`): the `history.retention`, `anomaly_detection.min_lines`, and `source_quality.min_lines` validation errors lacked the `policies.yaml: ` prefix used by every other configuration diagnostic. They now fail with uniform messages.
-- **README source-quality snapshot drift** (`README.md`): the snapshot cited the 2026-10-20T12:31:38Z report, but the shipped `reports/latest.json` is from the 2026-10-20T14:13:39Z build (231,174 input lines, 201,181 accepted, 175,631 unique rules, 12.97% rejection; AdGuard Social Media row refreshed to 31,098 / 22,036 with 7,375 `ubo-only-syntax` rejections).
-
-#### Verified, deliberately not changed
-- The `end` alternative in `DIRECTIVE_RE` is retained: `!#end` is part of the documented directive contract (README and `docs/SYNTAX-POLICY.md`), despite not being a standard ABP preprocessor directive and having no test coverage.
-- `scripts/config.py` still parses `policies.yaml` up to three times per process; caching `_load_policy` remains rejected because the test suite swaps `POLICY_FILE` and monkeypatches `_load_policy` in-process while clearing only the public loader caches.
-
 ### Audit pass (2026-10-20; 252 tests discovered; 240 passed and 12 curl-gated tests skipped under curl 7.88.1; version unchanged at 7.6.0)
 
 Every project file except the intentionally excluded `filters.txt` payload was read or fully parsed before changes were made; the existing report JSON files were also parsed and checked for structural validity.
@@ -77,3 +64,18 @@ Every script, document, configuration file, workflow, and test module was read i
 
 #### Re-verified
 - README and CHANGELOG claims still match the code (32 enabled root sources, limits/policy table, curl >= 8.4.0 requirement, report schema 5, policy schema 3 / source schema 1). No documentation drift found; the README gained only a one-line note that the other `scripts/` modules are import-only building blocks.
+
+
+### Audit pass (2026-10-20, third pass; version unchanged at 7.6.0)
+
+Every source file (scripts, tests, docs, configurations, workflows, README) was read in full before judgement; generated artifacts (`filters.txt`, `reports/*.json`) were treated as outputs and verified only through their consumers.
+
+#### Fixed
+- **Validator count message** (`scripts/validate.py`): a missing `! Total rules:` header was reported as `[COUNT] declared None, found N`; it now reports `[COUNT] missing '! Total rules:' header`.
+
+#### Verified, deliberately not changed
+- No dead code found: every helper flagged by a whole-project reference scan has live internal call sites or is reachable from an entry point.
+- `fetch.py` `record_unattempted()` rebuilds its reported-URL set exactly once per build (single terminal call site), so no quadratic behavior exists.
+- `config.py` discards the validated rule-policy dict in `load_config()`; the recomputation is served once per process by `load_rule_policy()`'s cache, and deeper caching of `_load_policy` remains rejected as in the first pass (tests swap `POLICY_FILE` in-process).
+- The duplicate URL parse in `fetch.py` (`download()` and `_public_address_for_url()`) was left as-is: the saving is one `urlsplit` per request inside security-sensitive SSRF handling.
+- Version/schema consistency re-verified: builder 7.6.0, report schema 5, policy schema 3, source schema 1, 32 enabled root sources (33 registry entries minus the disabled AdGuard Annoyances) matching the 32 URLs in `sources.txt`.
