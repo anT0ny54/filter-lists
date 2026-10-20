@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-5ecb6a2bdb8d
-! Last updated: 2026-10-20 15:21:35 UTC
+! Version: v7.6.0-02984b42198f
+! Last updated: 2026-10-20 15:53:37 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 5ecb6a2bdb8dac45a473c504db7ed4368d0647c14be847d036a1f46bb4f49f97
+! Build-ID: 02984b42198f217549e2dfe37b12e485b93d881250a82edf6d49f55be2d57335
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 175646
+! Total rules: 175654
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -26592,6 +26592,8 @@
 @@||th-sjy.com^$generichide
 @@||thdstatic.com/experiences/local-ad/$domain=homedepot.com
 @@||the-sun.com/wp-content/uploads/
+@@||thealloha.club^$subdocument,third-party
+@@||thealloha.club^$~third-party
 @@||theatlantic.com^$generichide
 @@||thebookee.net^$generichide
 @@||thechive.files.wordpress.com/*?quality=*&strip=info
@@ -98270,6 +98272,7 @@ zzzyk.com###Tinfo
 ||1worldsync.com/log?
 ||1x6666.com/img/
 ||1x6arks9.xyz^
+||1xhutg27xghu8mhl6lnvh.cfd^
 ||1xulomppkrwcr8zni6yz.cfd^
 ||1y55vfy87.com^
 ||1zdywcgmlt.com^
@@ -114870,6 +114873,7 @@ zzzyk.com###Tinfo
 ||czcqkmijvsbvo.online^
 ||czdclraxaacmq.online^
 ||czejbzaiwlgjq.online^
+||czejcgnayfcpg.space^
 ||czeqgnnrivwmp.space^
 ||czernik.org^
 ||czeuvjzicvhng.site^
@@ -133735,6 +133739,7 @@ zzzyk.com###Tinfo
 ||jqbhtv.icu^
 ||jqcebapfvycrv.site^
 ||jqchmauxbwkru.online^
+||jqcyyl951zf93u58btj.rest^
 ||jqdhcjqfxmyjn.space^
 ||jqdjqblbwrryg.website^
 ||jqdphtvtvyvwd.online^
@@ -151804,6 +151809,7 @@ zzzyk.com###Tinfo
 ||rabc1.iteye.com^
 ||rabidgeoff.com^
 ||rabidlyrfree.cfd^
+||rabtrilabebonnie.qpon^
 ||raceamen.com^
 ||racedinvict.com^
 ||racemeyowden.com^
@@ -159168,7 +159174,6 @@ zzzyk.com###Tinfo
 ||static.doubleclick.net^
 ||static.doyouhike.net/partner/
 ||static.drimify.com/wp-content/themes/*/assets/cookieconsent/
-||static.dzeninfra.ru/s3/zen-apps/*-browser-switch-trap.
 ||static.elpais.com/dist/resources/js/*/ENP-outbrain.js
 ||static.emol.cl/*/publicidadNAC.min.js
 ||static.emol.cl/emol50/js/economicos*.min.js
@@ -163552,6 +163557,7 @@ zzzyk.com###Tinfo
 ||ttknlsfqmtqoe.online^
 ||ttks.tw/js/otherad.
 ||ttkxny.com^
+||ttkyzfbioobak.space^
 ||ttlouwaejtqlb.online^
 ||ttmmbknqrdsrs.website^
 ||ttmyihhtxzkuo.website^
@@ -167502,6 +167508,7 @@ zzzyk.com###Tinfo
 ||vpeebbq.com^
 ||vpfjruhgzfjy.com^
 ||vpgelznfmsmzy.space^
+||vphcbereqtnlb.space^
 ||vpico.com^
 ||vpipi.com^
 ||vpipi.com^$domain=pornolab-zerkalo.appspot.com|pornolab.biz|pornolab.cc|pornolab.lib|pornolab.net
@@ -174589,6 +174596,7 @@ zzzyk.com###Tinfo
 ||zmk852tp7.com^
 ||zmkevvbrymylo.top^
 ||zmkpximmigltq.website^
+||zmmidkfvtocsp.website^
 ||zmnhtaoilzrin.space^
 ||zmonei.com^
 ||zmqjwpuftbdsj.site^
