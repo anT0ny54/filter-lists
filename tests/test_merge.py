@@ -298,6 +298,18 @@ class MergeMainE2ETests(unittest.TestCase):
         report = json.loads(merge.REPORT.read_text(encoding="utf-8"))
         self.assertEqual(report["status"], "failed")
 
+    def test_main_success_ratio_threshold_uses_unrounded_value(self):
+        # 15999/20000 = 0.79995 rounds to 0.8; the health gate must compare
+        # the unrounded ratio against the 0.8 threshold, not the rounded one.
+        stats = {"root_requested": 20000, "root_successful": 15999, "required": [],
+                 "results": [], "failures": [], "source_limit_reached": False, "timed_out": False}
+        self.config = SimpleNamespace(**{**self.config.__dict__, "minimum_success_ratio": 0.8})
+        self.assertEqual(self._run(source_stats=stats), 1)
+        self.assertFalse(merge.OUTPUT.exists())
+        report = json.loads(merge.REPORT.read_text(encoding="utf-8"))
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(report["sources"]["success_ratio"], 0.8)
+
     def test_main_anomaly_enforced_failure_marks_report_failed_and_does_not_archive(self):
         anomaly = {"enabled": True, "baseline": "old-build", "count": 1, "critical_count": 1, "warning_count": 0, "items": [{"severity": "critical"}], "enforced_failure": True}
         self.assertEqual(self._run(anomaly=anomaly), 1)

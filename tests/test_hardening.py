@@ -16,7 +16,7 @@ from _helpers import load_script, run_validate, setup_config_root  # noqa: E402 
 import config
 import fetch
 from config import BUILDER_VERSION, config_fingerprint, load_config, source_manifest_sha256
-from normalize import normalize_rule, normalize_rule_with_reason, rejection_reason, rule_sort_key
+from normalize import normalize_rule, normalize_rule_with_reason, rejection_reason, rule_sort_key, uses_restricted_abp_feature
 from parser import classify, clean_line
 from health import history_reports
 from report import write_report
@@ -266,6 +266,31 @@ class SubmitFailureReservationTests(unittest.TestCase):
         self.assertTrue(failure[0]["reason"].startswith("submit-failed"), failure[0]["reason"])
         success = [r for r in stats["results"] if r["status"] == "ok"]
         self.assertEqual([r["url"] for r in success], ["https://b.example/two.txt"])
+
+
+class RestrictedFeatureScopeTests(unittest.TestCase):
+    """Only a real parsed option (or a #$# snippet) is a restricted feature.
+
+    Regression: the raw substring scan flagged any line containing
+    `$header=`/`$addheader=`, including cosmetic selector bodies and
+    escaped-dollar pattern text that carry no such option.
+    """
+
+    def test_cosmetic_selector_mentioning_header_option_is_not_restricted(self):
+        line = 'example.com##div[data-x="$header=1"]'
+        self.assertFalse(uses_restricted_abp_feature(line))
+        self.assertNotEqual(rejection_reason(line, trusted_abp_features=False), "abp-security-restricted-feature")
+
+    def test_escaped_dollar_header_text_in_network_pattern_is_not_restricted(self):
+        line = r"||a.example\$header=b^"
+        self.assertFalse(uses_restricted_abp_feature(line))
+        self.assertNotEqual(rejection_reason(line, trusted_abp_features=False), "abp-security-restricted-feature")
+
+    def test_real_header_options_and_snippets_stay_restricted(self):
+        for line in ("||a.com^$header=x", "||a.com^$script,HEADER=x", "a.com#$#abort-on-property-read x"):
+            with self.subTest(line=line):
+                self.assertTrue(uses_restricted_abp_feature(line))
+                self.assertEqual(rejection_reason(line, trusted_abp_features=False), "abp-security-restricted-feature")
 
 
 class DnsPinCacheTests(unittest.TestCase):
