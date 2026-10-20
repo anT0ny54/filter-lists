@@ -86,7 +86,7 @@ The builder currently enforces the following:
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`.
 - **Strict configuration validation:** unknown keys in `policies.yaml` (including every `rules:` switch) and `sources.yaml`, wrong value types, and a mismatched policy `version`/`profile` fail the build immediately with a clean `[ERROR] Configuration` message, before any download starts.
 - **Authoritative source registry:** `sources.yaml` is the only source registry; `sources.txt` is generated as a URL-only compatibility mirror.
-- **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally. Before a request is scheduled, its worst-case byte allocation is reserved against the remaining global budget and the transfer is limited to that allocation. Transferred bytes count against the budget for accepted, rejected, and partially failed transfers; once no unreserved budget remains, pending sources are queued as budget-exhausted.
+- **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally. Before a request is scheduled, its worst-case byte allocation is reserved against the remaining global budget and the transfer is limited to that allocation. The fetcher requests identity encoding and does not auto-decompress response bodies, so compressed payloads cannot expand past the byte cap; a server that ignores identity encoding is rejected based on its `Content-Encoding` response header. Curl 8.4.0 or newer is required for size-limit enforcement on responses with unknown length; older versions are rejected before any network request. Transferred bytes count against the budget for accepted, rejected, and partially failed transfers; once no unreserved budget remains, pending sources are queued as budget-exhausted.
 - **Correct source health:** the health ratio is calculated from configured root sources; nested includes cannot inflate it.
 - **Required-source gates:** configured required root sources must succeed.
 - **SSRF protection:** source/include targets are resolved before connection, non-public addresses are blocked, DNS answers are validated and pinned for curl, proxy environment variables are bypassed, and redirects are validated hop-by-hop.
@@ -238,7 +238,10 @@ The repository test suite covers:
 - staged-output publication and failed-report baseline handling
 - per-source quality gate and failed-run source-outcome history
 - download validation (binary data, HTML/error pages, empty files)
-- download-byte accounting and per-request reservations across rejected responses and partial transfer failures
+- download-byte accounting and per-request reservations across rejected responses and partial transfer failures, including chunked bodies with unknown size
+- compressed response rejection when servers ignore identity encoding
+- valid CSS hex color lengths in inline-style declarations
+- explicit zero-port preservation in DNS resolution and connection pinning
 - malformed inline-style brace rejection (unbalanced braces, trailing text after a style block)
 - duplicate metadata-header rejection (`Total rules`, `Build-ID`, `Source manifest SHA-256`, `Version`) in the generated-list validator
 - `allow_abp_remove_action` honoured in every declaration position
