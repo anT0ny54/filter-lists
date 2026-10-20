@@ -334,5 +334,39 @@ class MergeMainE2ETests(unittest.TestCase):
         self.assertEqual(report["sources"]["required_failed"], [config.sources[0].url])
 
 
+class StagedCommitTests(unittest.TestCase):
+    def setUp(self):
+        self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
+        self._original_output = merge.OUTPUT
+        self.addCleanup(setattr, merge, "OUTPUT", self._original_output)
+        self.out = Path(self._tmpdir.name) / "filters.txt"
+        self.out.write_text("previous\n", encoding="utf-8")
+        merge.OUTPUT = self.out
+
+    def test_failed_replace_unlinks_staged_temp_file(self):
+        staged = Path(self._tmpdir.name) / "filters.staged.tmp"
+        staged.write_text("new\n", encoding="utf-8")
+        original_replace = merge.os.replace
+
+        def failing_replace(source, target):
+            if Path(source) == staged:
+                raise OSError("simulated disk-full replace")
+            return original_replace(source, target)
+
+        with patch.object(merge.os, "replace", side_effect=failing_replace):
+            with self.assertRaises(OSError):
+                merge.commit_output(staged)
+        self.assertFalse(staged.exists())
+        self.assertEqual(self.out.read_text(encoding="utf-8"), "previous\n")
+
+    def test_successful_replace_keeps_existing_behavior(self):
+        staged = Path(self._tmpdir.name) / "filters.staged.tmp"
+        staged.write_text("new\n", encoding="utf-8")
+        merge.commit_output(staged)
+        self.assertFalse(staged.exists())
+        self.assertEqual(self.out.read_text(encoding="utf-8"), "new\n")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
