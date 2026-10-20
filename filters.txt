@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-be24ecbb79f0
-! Last updated: 2026-10-20 12:00:32 UTC
+! Version: v7.6.0-d2288d2bb068
+! Last updated: 2026-10-20 12:30:56 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: be24ecbb79f083862e46a0a80f693530f8e4d385ea2e69490f721f813c063deb
+! Build-ID: d2288d2bb0689220f3f30a084ea0d9eb572ca6da12531053cc6aa9c12fdabe62
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 175589
+! Total rules: 175587
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -11663,7 +11663,6 @@
 ##a[href^="https://snowdayonline.xyz/"]
 ##a[href^="https://social-plugins.line.me/lineit/share?text="]
 ##a[href^="https://social-plugins.line.me/lineit/share?url="]
-##a[href^="https://source.com.ng/r/?t="]
 ##a[href^="https://srv.clickfuse.com/"]
 ##a[href^="https://stardomcoit.com/"]
 ##a[href^="https://startgaming.net/tienda/"][href*="?offer_id="]
@@ -12041,7 +12040,6 @@
 ##div[aria-label="Ads"]
 ##div[class$="-adlabel"]
 ##div[class$="_scrollable-doc"][id]
-##div[class*="ads-header"]
 ##div[class*="cookiesAnnounce-"]
 ##div[class*="relap"][class*="-rec-item"]
 ##div[class*="spklw"][data-type="ad"]
