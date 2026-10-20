@@ -266,7 +266,7 @@ The repository test suite covers:
 
 Download success does not mean a source contributes rules, so each build also evaluates rule yield per source. The **effective rejection rate** is the share of rule lines (input lines minus comments, blanks, and directives) that the strict-ABP profile rejected. With the shipped policy, sources of at least 100 lines at or above 30% are reported as `warning` and at or above 90% as `critical` in `reports/latest.json` (`source_quality`) and in the build log. They are advisory unless `source_quality.fail_on_critical: true`.
 
-Snapshot from the newest report (`reports/latest.json`, generated 2026-10-20T14:13:39Z): 32/32 root sources OK, 231,174 input lines, 201,181 accepted, 175,631 unique rules, overall rejection rate 12.97%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.52% effective rejection rate).
+Snapshot from the newest report (`reports/latest.json`, generated 2026-10-20T14:52:12Z): 32/32 root sources OK, 231,190 input lines, 201,193 accepted, 175,643 unique rules, overall rejection rate 12.98%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.52% effective rejection rate).
 
 | Source | Input lines | Accepted | Rejection rate* | Main rejection reasons |
 |---|---:|---:|---:|---|

@@ -79,3 +79,22 @@ Every source file (scripts, tests, docs, configurations, workflows, README) was 
 - `config.py` discards the validated rule-policy dict in `load_config()`; the recomputation is served once per process by `load_rule_policy()`'s cache, and deeper caching of `_load_policy` remains rejected as in the first pass (tests swap `POLICY_FILE` in-process).
 - The duplicate URL parse in `fetch.py` (`download()` and `_public_address_for_url()`) was left as-is: the saving is one `urlsplit` per request inside security-sensitive SSRF handling.
 - Version/schema consistency re-verified: builder 7.6.0, report schema 5, policy schema 3, source schema 1, 32 enabled root sources (33 registry entries minus the disabled AdGuard Annoyances) matching the 32 URLs in `sources.txt`.
+
+### Audit pass (2026-10-20, fourth pass; version unchanged at 7.6.0)
+
+Every script, document, configuration, workflow, generated report, and test module was read or fully parsed before judgement.
+
+#### Fixed
+- **Terminal-`$` exemption hole** (`scripts/normalize.py`): `_normalize_line()` skipped its empty-option-section rejection for network rules starting with `/` or `@@/`, so `/foo$` and `@@/foo$` were accepted as literal patterns containing `$`. Well-formed regex filters end with `/` and never trigger the terminal-`$` guard, so the exemption admitted only malformed rules. Every network rule ending in `$` is now rejected, matching the documented "terminal `$` = empty option section" policy. Verified compatible with the pinned regex-filter, terminal-`$` reason-agreement, fuzz, and corpus tests.
+
+#### Changed (optimization / cleanup)
+- `parser.py`: removed the unreachable `^\s*` prefix from `HTML_RE` (`classify()` always receives an already-stripped line).
+
+#### Documentation
+- README source-quality snapshot refreshed to `reports/latest.json` generated 2026-10-20T14:52:12Z (231,190 input lines, 201,193 accepted, 175,643 unique rules, 12.98% overall rejection); the previous snapshot cited a stale 14:13:39Z report.
+
+#### Verified, deliberately not changed
+- `parser.py` `"#" in value` pre-check is a deliberate C-level fast gate for `COSMETIC_RE.search`, not dead code.
+- `_option_list_reason()` lacks the `document`+`addheader` exception of the main option loop, but rules affected by the difference are rejected either way and the pipeline and `rejection_reason()` agree with each other (both call the same validator); changing it would churn reason strings the regression suite fuzzes for agreement.
+- `valid_addheader()` accepts empty content (`x-foo:`); no test pins either behavior and the strict-ABP grammar reference for empty header values was not verifiable offline, so behavior is preserved.
+- `fetch.py` still makes separate validation/include/parse passes per file; folding them would churn byte-accounting code the budget/accounting tests pin, for marginal I/O gain at 32 sources.
