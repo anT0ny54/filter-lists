@@ -212,7 +212,13 @@ def stage_output(final_rules: list[str], build_id: str, *, manifest_sha256: str,
 
 
 def commit_output(staged: Path) -> None:
-    os.replace(staged, OUTPUT)
+    try:
+        os.replace(staged, OUTPUT)
+    except Exception:
+        # A failed replace (e.g. disk full) must not leak the staged temp
+        # file into the repository directory.
+        staged.unlink(missing_ok=True)
+        raise
 
 
 def main() -> int:
