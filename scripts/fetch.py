@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import concurrent.futures
+from functools import lru_cache
 import ipaddress
 import re
 import socket
@@ -24,6 +25,39 @@ INCLUDE_RE = re.compile(r"^\s*!#include\s+(.+?)\s*$", re.I)
 # getaddrinfo round-trips dominated per-request setup. Resolution failures
 # are cached too — within one build they are treated as sticky.
 _ADDRESS_PIN_CACHE: dict[tuple[str, int], tuple[str | None, str]] = {}
+
+
+def _curl_size_limit_status_from_output(version_output: str) -> tuple[bool, str]:
+    """Check whether curl enforces --max-filesize on unknown-size streams."""
+    first_line = version_output.splitlines()[0] if version_output.splitlines() else ""
+    match = re.match(r"^curl\s+(\d+)\.(\d+)\.(\d+)(?:\s|$)", first_line)
+    if not match:
+        return False, "curl-version-unrecognized"
+    version = tuple(int(part) for part in match.groups())
+    if version < (8, 4, 0):
+        rendered = ".".join(str(part) for part in version)
+        return False, f"curl-version-too-old: {rendered}; curl >= 8.4.0 is required for safe download-size limits"
+    return True, ""
+
+
+@lru_cache(maxsize=1)
+def _curl_stream_size_limit_status() -> tuple[bool, str]:
+    """Require curl 8.4+, which enforces --max-filesize on unknown-size streams."""
+    try:
+        process = subprocess.Popen(
+            ["curl", "--version"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+        )
+        try:
+            version_output, _ = process.communicate(timeout=5)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.communicate()
+            return False, "curl-version-check-timeout"
+    except (OSError, subprocess.SubprocessError) as exc:
+        return False, f"curl-version-check-failed: {exc}"
+    if process.returncode:
+        return False, "curl-version-check-failed"
+    return _curl_size_limit_status_from_output(version_output)
 
 
 # `\b` keeps `<header`/`<htmlfoo` from matching. The status-line branch needs
@@ -48,7 +82,7 @@ def _public_address_for_url(url: str) -> tuple[str | None, str]:
         parsed = urlsplit(url)
         if parsed.scheme not in {"http", "https"} or not parsed.hostname:
             return None, "invalid-fetch-url"
-        port = parsed.port or (443 if parsed.scheme == "https" else 80)
+        port = parsed.port if parsed.port is not None else (443 if parsed.scheme == "https" else 80)
         host = parsed.hostname
     except ValueError as exc:
         return None, f"invalid-fetch-url: {exc}"
@@ -112,6 +146,28 @@ def _resolve_arg(host: str, port: int, address: str) -> str:
     return f"{host}:{port}:{address}"
 
 
+def _response_content_encodings(headers: Path) -> list[str]:
+    """Return Content-Encoding values from the final HTTP response block."""
+    try:
+        raw = headers.read_text(encoding="iso-8859-1", errors="replace")
+    except OSError:
+        return []
+    # curl normally writes one response header block because redirect
+    # following is disabled. Select the final block for interim responses.
+    blocks = re.split(r"\r?\n\r?\n", raw)
+    for block in reversed(blocks):
+        lines = block.splitlines()
+        if not lines or not lines[0].upper().startswith("HTTP/"):
+            continue
+        encodings: list[str] = []
+        for line in lines[1:]:
+            key, separator, value = line.partition(":")
+            if separator and key.strip().lower() == "content-encoding":
+                encodings.append(value.strip().lower())
+        return encodings
+    return []
+
+
 def _redirect_location(headers: Path) -> str | None:
     try:
         raw = headers.read_text(encoding="iso-8859-1", errors="replace")
@@ -146,7 +202,6 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
     including a partial body removed after a transfer failure.
     """
     timeout = max(1, int(timeout))
-    deadline = time.monotonic() + timeout
     current_url = canonical_url(url)
     redirects = 0
     transferred_bytes = 0
@@ -162,6 +217,12 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
         return False, reason, transferred_bytes
 
     try:
+        curl_supported, curl_error = _curl_stream_size_limit_status()
+        if not curl_supported:
+            return fail(curl_error)
+        # The local curl capability check is outside the network deadline.
+        deadline = time.monotonic() + timeout
+
         while True:
             remaining = int(deadline - time.monotonic())
             if remaining <= 0:
@@ -170,7 +231,7 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
             try:
                 parsed = urlsplit(current_url)
                 host = parsed.hostname
-                port = parsed.port or (443 if parsed.scheme == "https" else 80)
+                port = parsed.port if parsed.port is not None else (443 if parsed.scheme == "https" else 80)
                 if not host or parsed.scheme not in {"http", "https"}:
                     return fail("invalid-fetch-url")
             except ValueError as exc:
@@ -190,11 +251,17 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
 
             connect_timeout = min(20, remaining)
             command = [
-                "curl", "--fail", "--silent", "--show-error", "--compressed",
+                "curl", "--fail", "--silent", "--show-error",
                 "--retry", str(CURL_RETRIES), "--retry-connrefused",
                 "--retry-max-time", str(remaining),
                 "--connect-timeout", str(connect_timeout), "--max-time", str(remaining),
                 "--max-filesize", str(remaining_bytes),
+                # `--compressed` makes curl decompress after checking the
+                # encoded Content-Length, so a tiny gzip response can expand
+                # far beyond `--max-filesize`. Request identity encoding and
+                # never auto-decompress: output bytes then remain bounded, and
+                # a server that ignores this request fails text validation.
+                "--header", "Accept-Encoding: identity",
                 "--noproxy", "*",
                 "--proto", "=http,https",
                 "--max-redirs", "0",
@@ -240,6 +307,10 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
                     return fail("redirect-invalid-url")
                 current_url = canonical_url(next_url)
                 continue
+
+            encodings = _response_content_encodings(headers)
+            if any(encoding != "identity" for encoding in encodings):
+                return fail("unsupported-content-encoding")
 
             transferred_bytes += _file_size(output)
             return True, "", transferred_bytes

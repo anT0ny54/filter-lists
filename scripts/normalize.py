@@ -71,7 +71,7 @@ ABP_HEADER_NAME_RE = re.compile(r"^[!#$%&'*+.^_`|~0-9A-Za-z-]+$")
 ABP_ADDHEADER_NAME_RE = re.compile(r"^(?:x-[!#$%&'*+.^_`|~0-9A-Za-z-]+|set-cookie)$", re.I)
 ABP_PRINTABLE_ASCII_RE = re.compile(r"^[\x20-\x7e]*$")
 ABP_CSS_VALUE_RE = re.compile(
-    r"^(?:#[0-9a-f]{3,8}|[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?"
+    r"^(?:#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})|[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?"
     r"(?:cm|mm|q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|"
     r"svw|svh|lvw|lvh|dvw|dvh|%|fr)?|inherit|initial|none|revert|revert-layer|"
     r"unset|currentcolor|absolute|all|auto|block|both|clip|collapse|contain|"
