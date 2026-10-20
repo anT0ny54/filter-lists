@@ -6,6 +6,19 @@ All notable changes to Filter-Lists are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Audit follow-up (2026-10-20, third pass; 256 tests discovered; all non-skipped tests passed, 12 curl-gated tests skipped; version unchanged at 7.6.0)
+
+Every project file was read in full before judgement; generated artifacts were parsed and checked for consistency only.
+
+#### Fixed
+- **Unreachable regex prefix** (`scripts/parser.py`): `DIRECTIVE_RE` carried a `^\s*` anchor that could never match because `classify()` strips the line and guards with `value.startswith("!#")` before matching. The anchor was removed; behavior is unchanged and all tests pass.
+- **Inconsistent configuration error labels** (`scripts/config.py`): the `history.retention`, `anomaly_detection.min_lines`, and `source_quality.min_lines` validation errors lacked the `policies.yaml: ` prefix used by every other configuration diagnostic. They now fail with uniform messages.
+- **README source-quality snapshot drift** (`README.md`): the snapshot cited the 2026-10-20T12:31:38Z report, but the shipped `reports/latest.json` is from the 2026-10-20T14:13:39Z build (231,174 input lines, 201,181 accepted, 175,631 unique rules, 12.97% rejection; AdGuard Social Media row refreshed to 31,098 / 22,036 with 7,375 `ubo-only-syntax` rejections).
+
+#### Verified, deliberately not changed
+- The `end` alternative in `DIRECTIVE_RE` is retained: `!#end` is part of the documented directive contract (README and `docs/SYNTAX-POLICY.md`), despite not being a standard ABP preprocessor directive and having no test coverage.
+- `scripts/config.py` still parses `policies.yaml` up to three times per process; caching `_load_policy` remains rejected because the test suite swaps `POLICY_FILE` and monkeypatches `_load_policy` in-process while clearing only the public loader caches.
+
 ### Audit pass (2026-10-20; 252 tests discovered; 240 passed and 12 curl-gated tests skipped under curl 7.88.1; version unchanged at 7.6.0)
 
 Every project file except the intentionally excluded `filters.txt` payload was read or fully parsed before changes were made; the existing report JSON files were also parsed and checked for structural validity.
