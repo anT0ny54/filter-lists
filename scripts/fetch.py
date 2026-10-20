@@ -704,7 +704,7 @@ def collect_sources(
                 current = []
                 break
 
-            current = next_batch
+            current = unvisited_next
 
     stats["visited"] = len(visited)
     # `requested` is the complete success+failure accounting, including
