@@ -85,6 +85,40 @@ def load_outcomes(outcomes_path: Path | None, history_dir: Path | None = None) -
     return seeded
 
 
+def _compact_daily_runs(runs: list[dict]) -> list[dict]:
+    """Collapse legacy or out-of-order entries to one conservative entry per UTC day.
+
+    The newest run supplies identity/status. Outcomes are combined with AND so
+    an earlier failure for a URL cannot be hidden by a later same-day success.
+    Entries without a usable ISO date are retained separately rather than all
+    being accidentally merged into one undated bucket.
+    """
+    ordered = sorted(runs, key=lambda r: str(r.get("generated_at", "")))
+    compacted: list[dict] = []
+    by_day: dict[str, int] = {}
+    for run in ordered:
+        timestamp = str(run.get("generated_at", ""))
+        day = timestamp[:10]
+        if len(day) != 10 or day[4:5] != "-" or day[7:8] != "-":
+            compacted.append(run)
+            continue
+        index = by_day.get(day)
+        if index is None:
+            by_day[day] = len(compacted)
+            compacted.append(run)
+            continue
+        previous = compacted[index]
+        merged = {url: bool(previous.get("outcomes", {}).get(url, True)) and bool(ok)
+                  for url, ok in run.get("outcomes", {}).items()}
+        for url, ok in previous.get("outcomes", {}).items():
+            merged.setdefault(url, bool(ok))
+        newest = dict(run)
+        newest["outcomes"] = merged
+        compacted[index] = newest
+    compacted.sort(key=lambda r: str(r.get("generated_at", "")))
+    return compacted
+
+
 def record_outcomes(
     outcomes_path: Path,
     *,
@@ -104,20 +138,11 @@ def record_outcomes(
     the report's generated_at.
     """
     runs = load_outcomes(outcomes_path, history_dir)
-    entry = _entry(generated_at, status, build_id, results)
-    day = generated_at[:10]
-    if runs and str(runs[-1].get("generated_at", ""))[:10] == day:
-        previous = runs[-1]
-        merged = {url: bool(previous["outcomes"].get(url, True)) and ok
-                  for url, ok in entry["outcomes"].items()}
-        for url, ok in previous["outcomes"].items():
-            merged.setdefault(url, bool(ok))
-        entry["outcomes"] = merged
-        runs[-1] = entry
-    else:
-        runs.append(entry)
-    runs.sort(key=lambda r: str(r.get("generated_at", "")))
-    runs = runs[-MAX_STORED_RUNS:]
+    runs.append(_entry(generated_at, status, build_id, results))
+    # Also normalize pre-existing files written before daily compaction was
+    # introduced. This prevents old same-day duplicates from consuming the
+    # rolling retention window forever.
+    runs = _compact_daily_runs(runs)[-MAX_STORED_RUNS:]
     outcomes_path.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary = tempfile.mkstemp(prefix="outcomes.", suffix=".tmp", dir=outcomes_path.parent)
     try:
