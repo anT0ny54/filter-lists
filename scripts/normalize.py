@@ -358,9 +358,7 @@ def valid_option(
     name = name.lower()
     if not value:
         return False
-    if name == "addheader" and is_exception:
-        return False
-    if name == "header" and is_exception:
+    if name in {"header", "addheader"} and is_exception:
         return False
     if name == "header" and not policy["allow_abp_header"]:
         return False
