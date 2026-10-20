@@ -549,10 +549,11 @@ def _normalize_line(line: str, limit: int, policy: dict[str, bool], trusted_abp_
         return None, classification, None
     if classification.kind == "cosmetic":
         return normalize_cosmetic(line, policy), classification, None
-    # A terminal, unescaped `$` on a normal network filter is an empty
-    # option section, not a valid pattern. Regex filters are handled by
-    # split_options and may legitimately contain `$`.
-    if line.endswith("$") and not line.startswith(("/", "@@/")):
+    # A terminal, unescaped `$` is an empty option section, not a valid
+    # pattern. Well-formed regex filters end in `/`, so no accepted rule
+    # legitimately ends with `$`; the old `/`-prefix exemption admitted
+    # rules like `/foo$` as literal patterns containing `$`.
+    if line.endswith("$"):
         _, reason = _normalize_network_with_reason(line, policy)
         return None, classification, reason or "invalid-network-rule"
     normalized, reason = _normalize_network_with_reason(line, policy)

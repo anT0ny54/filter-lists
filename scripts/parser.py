@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 DIRECTIVE_RE = re.compile(r"^!#(?:if|else|endif|include|safari|end)\b", re.I)
 HOSTS_RE = re.compile(r"^(?:0\.0\.0\.0|127\.0\.0\.1|::1)(?:\s+|$)")
-HTML_RE = re.compile(r"^\s*(?:<!doctype\b|<html\b|<head\b|<body\b)", re.I)
+HTML_RE = re.compile(r"(?:<!doctype\b|<html\b|<head\b|<body\b)", re.I)
 # Includes engine-specific separators (AdGuard `#%#`/`#$?#`, `#@$#`, ...) so they
 # are classified as cosmetic and then rejected by normalization, instead of
 # leaking through as bogus network filters.
