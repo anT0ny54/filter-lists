@@ -55,11 +55,11 @@ class ParserFastPathTests(unittest.TestCase):
 
 
 class DownloadValidationTests(unittest.TestCase):
-    def _check(self, data: bytes):
+    def _check(self, data: bytes, max_bytes=1024 * 1024):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "list.txt"
             path.write_bytes(data)
-            return validate_download(path, 1024 * 1024, reject_html_error_pages=True)
+            return validate_download(path, max_bytes, reject_html_error_pages=True)
 
     def test_http_1x_error_status_line_is_rejected(self):
         for body in (b"HTTP/1.1 404 Not Found\n\nnope nope nope nope", b"HTTP/2 500\n\nerror body here....."):
@@ -71,6 +71,26 @@ class DownloadValidationTests(unittest.TestCase):
 
     def test_whitespace_only_is_empty(self):
         self.assertEqual(self._check(b" \n" * 20), (False, "empty"))
+
+    def test_large_leading_whitespace_does_not_make_nonempty_list_empty(self):
+        self.assertEqual(
+            self._check(b" " * 65536 + b"||example.com^\n"),
+            (True, ""),
+        )
+
+    def test_html_error_page_after_large_whitespace_prefix_is_rejected(self):
+        body = b" " * 65536 + b"<!doctype html><html><title>Access denied</title></html>"
+        self.assertEqual(self._check(body), (False, "html-or-error-page"))
+
+    def test_whitespace_only_across_multiple_chunks_is_empty(self):
+        self.assertEqual(self._check(b" \n" * 33000), (False, "empty"))
+
+    def test_html_error_marker_split_at_chunk_boundary_is_rejected(self):
+        # The first two bytes of the marker land at the end of the first 1 MiB
+        # remainder chunk; the rest arrives in the next chunk.
+        prefix = b" " * (65536 + 1024 * 1024 - 2)
+        body = prefix + b"<!doctype html><html><title>Access denied</title></html>"
+        self.assertEqual(self._check(body, max_bytes=2 * 1024 * 1024), (False, "html-or-error-page"))
 
     def test_nul_beyond_first_chunk_is_binary(self):
         self.assertEqual(self._check(b"||a.example^\n" * 6000 + b"\x00"), (False, "binary-data"))

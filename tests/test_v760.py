@@ -113,6 +113,35 @@ class OutcomeHistoryTests(unittest.TestCase):
         self.assertEqual([run["generated_at"] for run in compacted].count("2026-99-99T00:00:00+00:00"), 1)
         self.assertEqual([run["generated_at"] for run in compacted].count("not-a-date"), 1)
 
+    def test_extreme_iso_offsets_that_overflow_utc_are_retained_as_undated(self):
+        # These are parseable ISO datetimes but converting to UTC would go
+        # outside Python's supported year range. They must not crash sorting.
+        runs = [
+            {"generated_at": "0001-01-01T00:00:00+23:59", "outcomes": {URL: False}},
+            {"generated_at": "9999-12-31T23:59:59-23:59", "outcomes": {URL: True}},
+            {"generated_at": "2026-10-20T00:15:00+00:00", "outcomes": {URL: True}},
+        ]
+        compacted = _compact_daily_runs(runs)
+        self.assertEqual(len(compacted), 3)
+        self.assertEqual({run["generated_at"] for run in compacted}, {run["generated_at"] for run in runs})
+
+    def test_daily_compaction_orders_different_offsets_by_utc_instant(self):
+        # 02:00 +02:00 is 00:00 UTC, earlier than 00:15 UTC despite its
+        # lexicographically later timestamp. Keep the newest run identity,
+        # while combining outcomes conservatively so the failure is retained.
+        runs = [
+            {"generated_at": "2026-10-20T02:00:00+02:00", "status": "old-instant-failure",
+             "build_id": "earlier", "outcomes": {URL: False}},
+            {"generated_at": "2026-10-20T00:15:00+00:00", "status": "newer-instant-success",
+             "build_id": "later", "outcomes": {URL: True}},
+        ]
+        compacted = _compact_daily_runs(runs)
+        self.assertEqual(len(compacted), 1)
+        self.assertEqual(compacted[0]["generated_at"], "2026-10-20T00:15:00+00:00")
+        self.assertEqual(compacted[0]["build_id"], "later")
+        self.assertEqual(compacted[0]["status"], "newer-instant-success")
+        self.assertEqual(compacted[0]["outcomes"], {URL: False})
+
     def test_recording_compacts_legacy_same_day_entries(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "source-outcomes.json"

@@ -249,6 +249,29 @@ class MergeMainE2ETests(unittest.TestCase):
         self.assertNotIn("build-old-0.json", kept)
         self.assertNotIn("build-old-1.json", kept)
 
+    def test_history_retention_normalizes_different_utc_offsets(self):
+        merge.REPORT.parent.mkdir(parents=True, exist_ok=True)
+        merge.HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+        (merge.HISTORY_DIR / "build-offset-old.json").write_text(json.dumps({
+            "status": "success", "generated_at": "2026-10-20T02:00:00+02:00",
+            "build_id": "offset-old",
+        }), encoding="utf-8")
+        (merge.HISTORY_DIR / "build-utc-newer.json").write_text(json.dumps({
+            "status": "success", "generated_at": "2026-10-20T00:15:00+00:00",
+            "build_id": "utc-newer",
+        }), encoding="utf-8")
+        merge.REPORT.write_text(json.dumps({
+            "status": "success", "generated_at": "2026-10-20T00:10:00+00:00",
+            "build_id": "current-build",
+        }), encoding="utf-8")
+
+        merge.archive_successful_report("current-build", retention=2)
+
+        kept = {path.name for path in merge.HISTORY_DIR.glob("*.json")}
+        self.assertIn("build-utc-newer.json", kept)
+        self.assertTrue(any(name.startswith("build-current-build-") for name in kept))
+        self.assertNotIn("build-offset-old.json", kept)
+
     def test_main_success_writes_output_report_and_history(self):
         self.assertEqual(self._run(), 0)
         self.assertTrue(merge.OUTPUT.is_file())

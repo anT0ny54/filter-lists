@@ -315,6 +315,32 @@ class MergeRegressionTests(unittest.TestCase):
         self.assertEqual(len(archived), 1)
         self.assertIn("2026-01-01T01", json.loads(archived[0].read_text())["generated_at"])
 
+    def test_file_analysis_error_fails_build_without_publishing_partial_output(self):
+        config_obj = SimpleNamespace(**{
+            **self.base_config.__dict__,
+            "fail_if_zero_sources": False,
+        })
+        rule_stats = {
+            "input_lines": 2, "accepted_lines": 0, "rejected_lines": 2,
+            "duplicate_lines": 0, "unique_rules": 0, "rejection_rate": 1.0,
+            "rejection_reasons": {"read-error": 2},
+            "per_file": [{
+                "path": str(merge.CUSTOM_RULES), "input_lines": 2,
+                "accepted_lines": 0, "rejected_lines": 2,
+                "duplicate_lines": 0, "unique_rules": 0, "rejection_rate": 1.0,
+                "rejection_reasons": {"read-error": 2}, "error": "simulated read failure",
+            }],
+        }
+        with patch.object(merge, "load_config", return_value=config_obj), \
+             patch.object(merge, "collect_sources", return_value=([], dict(self.empty_source_stats))), \
+             patch.object(merge, "analyze_files", return_value=({"||partial.example^"}, rule_stats)):
+            self.assertEqual(merge.main(), 1)
+
+        self.assertFalse(merge.OUTPUT.exists())
+        report = json.loads(merge.REPORT.read_text(encoding="utf-8"))
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(report["rules"]["rejection_reasons"], {"read-error": 2})
+
 
 class SplitOptionsRegressionTests(unittest.TestCase):
     def test_single_dollar_before_trailing_slash_still_splits(self):
@@ -446,6 +472,48 @@ class UnreadableFileRecordTests(unittest.TestCase):
         self.assertEqual(record["rejection_reasons"], {"read-error": 1})
         self.assertIn("error", record)
         self.assertEqual(stats["rejection_reasons"], {"read-error": 1})
+
+    def test_mid_read_error_discards_partial_rules(self):
+        from report import analyze_files
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "source.txt"
+            path.write_text("placeholder", encoding="utf-8")
+            original_open = Path.open
+
+            class FailsAfterTwoLines:
+                def __enter__(self):
+                    self.lines = iter(("||first.example^\n", "||second.example^\n"))
+                    return self
+
+                def __exit__(self, exc_type, exc, traceback):
+                    return False
+
+                def __iter__(self):
+                    return self
+
+                def __next__(self):
+                    try:
+                        return next(self.lines)
+                    except StopIteration:
+                        raise OSError("simulated mid-read failure") from None
+
+            def failing_open(target, *args, **kwargs):
+                if target == path:
+                    return FailsAfterTwoLines()
+                return original_open(target, *args, **kwargs)
+
+            with patch.object(Path, "open", new=failing_open):
+                rules, stats = analyze_files([path], max_rule_length=1000)
+
+        self.assertEqual(rules, set())
+        self.assertEqual(stats["accepted_lines"], 0)
+        self.assertEqual(stats["rejected_lines"], 2)
+        self.assertEqual(stats["rejection_reasons"], {"read-error": 2})
+        record = stats["per_file"][0]
+        self.assertEqual(record["accepted_lines"], 0)
+        self.assertEqual(record["rejection_rate"], 1.0)
+        self.assertIn("simulated mid-read failure", record["error"])
 
 
 if __name__ == "__main__":
