@@ -13,6 +13,7 @@ from _helpers import load_script, setup_merge_root  # noqa: E402
 
 merge = load_script("merge.py", "merge")
 fetch = importlib.import_module("fetch")
+from config import DEFAULT_SOURCE_QUALITY  # noqa: E402
 from normalize import normalize_rule  # noqa: E402
 
 
@@ -134,6 +135,7 @@ class MergeMainE2ETests(unittest.TestCase):
             total_timeout_seconds=10,
             anomaly_detection={"enabled": False, "fail_on_warning": False},
             history_retention=10,
+            source_quality=dict(DEFAULT_SOURCE_QUALITY),
         )
 
     def test_main_real_local_http_fetch_and_analysis(self):
@@ -172,6 +174,7 @@ class MergeMainE2ETests(unittest.TestCase):
                     total_timeout_seconds=30,
                     anomaly_detection={"enabled": False, "fail_on_warning": False},
                     history_retention=10,
+                    source_quality=dict(DEFAULT_SOURCE_QUALITY),
                 )
                 (merge.ROOT / "sources.yaml").write_text(
                     "sources:\n  - name: local-fixture\n    url: " + source_url + "\n    category: test\n    priority: 1\n    required: true\n",

@@ -13,7 +13,7 @@ sys.path.insert(0, str(SCRIPTS))
 import config
 import fetch
 import normalize
-from config import canonical_url
+from config import DEFAULT_SOURCE_QUALITY, canonical_url
 from fetch import collect_sources, validate_download
 from normalize import normalize_rule
 
@@ -260,12 +260,12 @@ class MergeRegressionTests(unittest.TestCase):
             total_timeout_seconds=10,
             anomaly_detection={"enabled": False, "fail_on_warning": False},
             history_retention=10,
+            source_quality=dict(DEFAULT_SOURCE_QUALITY),
         )
         self.empty_source_stats = {
             "root_requested": 0,
             "root_successful": 0,
             "root_failed": 0,
-            "included_requested": 0,
             "included_references": 0,
             "results": [],
             "failures": [],
@@ -375,6 +375,77 @@ class NetworkReasonConsistencyTests(unittest.TestCase):
                 msg=f"reason mismatch for line: {line!r}",
             )
         self.assertGreater(checked, 0)
+
+
+class RejectionReasonAgreementTests(unittest.TestCase):
+    """rejection_reason() and the in-pipeline reason must never disagree."""
+
+    def test_public_reason_matches_pipeline_reason_on_fuzzed_rules(self):
+        import random
+        rng = random.Random(0xA11CE)
+        tokens = [
+            "||", "@@", "a.com", "^", "$", "script", "~script", "third-party", "domain=a.com",
+            "domain=bad_d", "document", "addheader=response:x-a:b", "header=x", "bogus",
+            "removeparam=x", "|", "*", "/", ",", " ", "csp=default-src 'none'", "~document",
+            "+js(", "##", ".ad", "#?#", ":style(", "#$#", "#?@#", "#%#",
+        ]
+        for _ in range(20000):
+            line = "".join(rng.choice(tokens) for _ in range(rng.randrange(1, 8)))
+            rule, reason = normalize.normalize_rule_with_reason(line)
+            if rule is None:
+                self.assertEqual(reason, normalize.rejection_reason(line), msg=repr(line))
+
+    def test_document_with_addheader_keeps_its_real_reason(self):
+        # `document` is allowed beside addheader on a blocking rule, so a rule
+        # rejected for another reason must not be blamed on `document`.
+        rule = "||a.com^$document,addheader=response:x-a:b,script,script"
+        self.assertEqual(normalize.rejection_reason(rule), "duplicate-option")
+
+    def test_network_text_resembling_procedural_syntax_is_not_ubo_only(self):
+        # The procedural-operator gate applies to cosmetic bodies only.
+        self.assertEqual(normalize.rejection_reason("||a b:style(x)^"), "invalid-network-rule")
+
+    def test_terminal_dollar_reason_is_consistent(self):
+        for line in ("||a.example^$", "||a b$"):
+            with self.subTest(line=line):
+                rule, reason = normalize.normalize_rule_with_reason(line)
+                self.assertIsNone(rule)
+                self.assertEqual(reason, normalize.rejection_reason(line))
+
+
+class HeaderBlockParsingTests(unittest.TestCase):
+    def _headers(self, text):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        path = Path(tmp.name) / "h"
+        path.write_text(text, encoding="iso-8859-1")
+        return path
+
+    def test_interim_response_block_does_not_hide_final_headers(self):
+        path = self._headers(
+            "HTTP/1.1 100 Continue\r\n\r\n"
+            "HTTP/1.1 302 Found\r\nLocation: /next\r\nContent-Encoding: GZIP\r\n\r\n"
+        )
+        self.assertEqual(fetch._redirect_location(path), "/next")
+        self.assertEqual(fetch._response_content_encodings(path), ["gzip"])
+
+    def test_missing_header_file_is_empty_not_an_error(self):
+        missing = Path(tempfile.gettempdir()) / "filter-lists-no-such-headers"
+        self.assertIsNone(fetch._redirect_location(missing))
+        self.assertEqual(fetch._response_content_encodings(missing), [])
+
+
+class UnreadableFileRecordTests(unittest.TestCase):
+    def test_unreadable_file_is_recorded_as_fully_rejected(self):
+        from report import analyze_files
+        missing = Path(tempfile.gettempdir()) / "filter-lists-no-such-source.txt"
+        rules, stats = analyze_files([missing], max_rule_length=1000)
+        self.assertEqual(rules, set())
+        record = stats["per_file"][0]
+        self.assertEqual(record["rejection_rate"], 1.0)
+        self.assertEqual(record["rejection_reasons"], {"read-error": 1})
+        self.assertIn("error", record)
+        self.assertEqual(stats["rejection_reasons"], {"read-error": 1})
 
 
 if __name__ == "__main__":

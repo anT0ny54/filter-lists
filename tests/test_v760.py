@@ -126,7 +126,7 @@ class EnforcedRejectionStatusTests(unittest.TestCase):
                                  max_include_depth=5, max_download_bytes=1 << 20, max_total_download_bytes=1 << 20,
                                  max_total_sources=10, total_timeout_seconds=10, history_retention=10,
                                  anomaly_detection={"enabled": False, "fail_on_warning": False}, **overrides)
-        stats = {"root_requested": 1, "root_successful": 1, "root_failed": 0, "included_requested": 0, "included_references": 0,
+        stats = {"root_requested": 1, "root_successful": 1, "root_failed": 0, "included_references": 0,
                  "results": [{"url": URL, "depth": 0, "status": "ok", "bytes": 10, "path": "/f.txt", "sha256": "a" * 64}], "failures": [],
                  "source_limit_reached": False, "timed_out": False, "budget_exhausted": False}
         rule_stats = {"input_lines": 1000, "accepted_lines": 1, "rejected_lines": 999, "duplicate_lines": 0, "unique_rules": 1,
