@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-f0ae19549cb2
-! Last updated: 2026-10-20 14:13:38 UTC
+! Version: v7.6.0-771c9bef162f
+! Last updated: 2026-10-20 14:38:24 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: f0ae19549cb21ed9d3a6e20ab5ddc20d36dc4d6222acb5698b4f2c23415959f2
+! Build-ID: 771c9bef162fb92de8228dacb2be9bf32a01c49a2a7cf47b1d60e89480139cad
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 175631
+! Total rules: 175643
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -42016,7 +42016,6 @@ dagbladet.no,elbil24.no,kk.no,seher.no,sol.no###am-branding
 dagelijksekost.een.be##.dish-sponsors
 dagelijksestandaard.nl,puna.nl,sportbookies.nl,viraal.nl,wielrennenuptodate.nl##.raw-html-component
 dagens.com,english.nv.ua,jenkemmag.com,jewishinsider.com,largus.fr,masterduelmeta.com,merriam-webster.com,oncenoticias.digital,panet.com,presstv.ir##.social-link
-dagospia.com##.sponsored-article
 dahahizli160.live###ads-inside-main
 dahahizli160.live###video-player-ads
 dahe.cn###adArea1
@@ -92885,7 +92884,7 @@ vk.com,vk.ru#?#[role="feed"] > article:-abp-has(> [data-post-id] [href*="utm_sou
 vk.com,vk.ru#?#[role="feed"] > article:-abp-has(> [data-post-id] a[rel]:-abp-contains(onelink.me/))
 vk.com,vk.ru#?#[role="feed"] > article:-abp-has(> [data-post-id] a[rel][href*="utm_campaign"])
 vk.com,vk.ru#?#[role="feed"] > article:-abp-has([aria-label="Реклама от автора"])
-vk.com,vk.ru,vkvideo.ru##.vkuiBanner__host
+vk.com,vk.ru,vkvideo.ru,~id.vk.ru##.vkuiBanner__host
 vk.sportsbull.jp##.banner-area
 vk.sportsbull.jp##.sec-bannerArea
 vk.sportsbull.jp##.social-fixed-btn
@@ -114301,6 +114300,7 @@ zzzyk.com###Tinfo
 ||crxcr2.com^
 ||crxcra.com^
 ||crxeakhm.com^
+||crxfiwpgihbnq.site^
 ||crxs.me/service/assets/core-state.
 ||crxsoukcwwpip.space^
 ||cry.ru/sexclub/
@@ -120320,6 +120320,7 @@ zzzyk.com###Tinfo
 ||eluateatelo.cyou^
 ||eluniversal.com.co/mcm/publicidad/dfp-sb/publicidad_internas_*.js
 ||eluqvijxickdj.space^
+||elusionsmatter.cfd^
 ||elutessheavednude.cyou^
 ||elutokvgaclme.space^
 ||elvetcautela.cfd^
@@ -129329,6 +129330,7 @@ zzzyk.com###Tinfo
 ||hotsoz.com^
 ||hotstar.com^*/midroll?
 ||hottercensorbeaker.com^
+||hotterpareusunshent.cfd^
 ||hottiecopygjedost.cfd^
 ||hottlegigglesrickey.cyou^
 ||hottmatchy.com^
@@ -131220,6 +131222,7 @@ zzzyk.com###Tinfo
 ||imputerpolecat.com^
 ||impypetara.qpon^
 ||imqeuqfbttsyd.site^
+||imrardazbyhxf.site^
 ||imriphvynan.com^
 ||imrworldwide.com^
 ||imrxppcgretqu.website^
@@ -139975,6 +139978,7 @@ zzzyk.com###Tinfo
 ||mentionideablit.com^
 ||mentisnervusoxalite.cfd^
 ||menu.mt.co.kr/starnews/images/banner/banner_starpoll_install.png
+||menyverse.qpon^
 ||menziecansos.cfd^
 ||mephcelyzolkf.space^
 ||mepirtedic.com^
@@ -140578,6 +140582,7 @@ zzzyk.com###Tinfo
 ||mitvoppwqjiqo.space^
 ||mivugyezcnuqs.website^
 ||miwifi.com^*ads/
+||miwukkkudamua.online^
 ||miwxoqcbiswmx.com^
 ||mix.tj/preroll/
 ||mixadvert.com^$third-party
@@ -148356,6 +148361,7 @@ zzzyk.com###Tinfo
 ||plmwsl.com^
 ||plmxrxtntdbrr.space^
 ||plnawpchhuryv.online^
+||plnipszioekun.site^
 ||plnkvbrdjzdl.com^
 ||plocap.com^
 ||ploceglider.cfd^
@@ -157119,6 +157125,7 @@ zzzyk.com###Tinfo
 ||sinwardcyclope.qpon^
 ||sinwhezjcvvch.online^
 ||siouanswamispurin.cyou^
+||siozsbrddxofg.online^
 ||sipesglug.com^
 ||sipingdustmen.cyou^
 ||sippansy.com^
@@ -161943,6 +161950,7 @@ zzzyk.com###Tinfo
 ||tijd.be/ad/
 ||tikemainpin.cyou^
 ||tikhomira.link^
+||tikhomira.link^$third-party
 ||tikkasennit.cyou^
 ||tiktakz.xyz^
 ||tiktok-fly.com^
@@ -166744,6 +166752,7 @@ zzzyk.com###Tinfo
 ||viasmadempne.shop^
 ||viatechonline.com^
 ||vibemundialfm.com.br/wp-content/uploads/*/anuncio-
+||viblanckupwuk.site^
 ||vibnpoar.com^
 ||vibrantscale.com^
 ||vibrateanytime.com^
@@ -172638,6 +172647,7 @@ zzzyk.com###Tinfo
 ||ydtfvwvmeojpx.site^
 ||ydthvtwluaaml.net^
 ||ydtokixknbrye.online^
+||ydtqgboeaqpbhr.com^
 ||yduxbkmeboovj.website^
 ||ydwekhadydlnz.space^
 ||ydwqtpzowsxil.online^
@@ -174443,6 +174453,7 @@ zzzyk.com###Tinfo
 ||zjosweqiruoaz.website^
 ||zjpmswrjggpxe.site^
 ||zjptg.com^
+||zjpupdcsxktzm.online^
 ||zjqbxcdwwtvtt.site^
 ||zjskecnjpgdcm.online^
 ||zjspxohftdmow.site^
@@ -174744,6 +174755,7 @@ zzzyk.com###Tinfo
 ||zowcdcnlpcxla.online^
 ||zowgaqrpttwzx.site^
 ||zowieamid.com^
+||zowqtrzrgtiyl.space^
 ||zoxyxrmbk.com^
 ||zoykzjawyjjle.top^
 ||zoyqmdjtfiddp.site^
