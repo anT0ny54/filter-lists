@@ -250,7 +250,8 @@ def main() -> int:
         provenance = {"source_manifest_sha256": source_manifest_sha256(config), "source_registry": "sources.yaml", "source_registry_sha256": hashlib.sha256((ROOT / "sources.yaml").read_bytes()).hexdigest(), "builder": f"Filter-Lists v{BUILDER_VERSION}", "policy_sha256": hashlib.sha256((ROOT / "policies.yaml").read_bytes()).hexdigest()}
         failed_root_urls = {x["url"] for x in source_stats.get("results", []) if x.get("status") == "failed" and x.get("depth") == 0}
         source_stats["required_failed"] = [u for u in source_stats["required"] if u in failed_root_urls]
-        source_stats["success_ratio"] = round(source_stats["root_successful"] / source_stats["root_requested"], 4) if source_stats["root_requested"] else 0.0
+        raw_success_ratio = source_stats["root_successful"] / source_stats["root_requested"] if source_stats["root_requested"] else 0.0
+        source_stats["success_ratio"] = round(raw_success_ratio, 4)
         source_stats["health_basis"] = "root sources only; nested !#include sources are reported separately"
         source_stats["health_threshold"] = config.minimum_success_ratio
         zero_source_failure = (
@@ -258,7 +259,7 @@ def main() -> int:
         )
         success_ratio_failure = (
             source_stats["root_requested"] > 0
-            and source_stats["success_ratio"] < config.minimum_success_ratio
+            and raw_success_ratio < config.minimum_success_ratio
         )
         unhealthy = (
             zero_source_failure

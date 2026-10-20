@@ -68,7 +68,6 @@ OPTION_LIST_RE = re.compile(r"^~?[A-Za-z0-9_-]+(?:=[^,]*)?(?:,~?[A-Za-z0-9_-]+(?
 # Options that ABP restricts to custom filters or vetted lists. They are only
 # honoured for sources marked `trusted_abp_features: true`.
 RESTRICTED_OPTIONS = frozenset({"header", "addheader"})
-RESTRICTED_RAW_RE = re.compile(r"\$(?:header|addheader)=", re.I)
 
 ABP_HEADER_NAME_RE = re.compile(r"^[!#$%&'*+.^_`|~0-9A-Za-z-]+$")
 ABP_ADDHEADER_NAME_RE = re.compile(r"^(?:x-[!#$%&'*+.^_`|~0-9A-Za-z-]+|set-cookie)$", re.I)
@@ -177,9 +176,11 @@ def is_overbroad_pattern(pattern_body: str, options: list[str]) -> bool:
 def uses_restricted_abp_feature(line: str, classification=None) -> bool:
     """True if `line` needs a source trusted for ABP security-sensitive features.
 
-    The previous check only matched `$header=` / `$addheader=` as the *first*
-    option, so `||x^$script,header=...` slipped through untrusted sources.
-    Options are now located with the real option parser.
+    The check used to match `$header=` / `$addheader=` anywhere in the raw
+    line, so `||x^$script,header=...` slipped through untrusted sources while
+    cosmetic selectors merely mentioning that text were mislabelled as
+    restricted. Options are located with the real option parser, which is the
+    single authority for both cases.
 
     Comments, directives and blank lines never carry a feature, even when the
     text mentions `$header=` or `#$#`; flagging them mislabelled ordinary
@@ -189,9 +190,9 @@ def uses_restricted_abp_feature(line: str, classification=None) -> bool:
     kind = (classification or classify(line)).kind
     if kind in {"comment", "directive", "blank"}:
         return False
-    if "#$#" in line or RESTRICTED_RAW_RE.search(line):
+    if "#$#" in line:
         return True
-    if "$" not in line or kind != "network":
+    if kind != "network" or "$" not in line:
         return False
     _, options = split_options(line)
     return any(option.split("=", 1)[0].casefold() in RESTRICTED_OPTIONS for option in options)
@@ -552,7 +553,7 @@ def _normalize_line(line: str, limit: int, policy: dict[str, bool], trusted_abp_
         return normalize_cosmetic(line, policy), classification, None
     # A terminal, unescaped `$` on a normal network filter is an empty
     # option section, not a valid pattern. Regex filters are handled by
-    # normalize_network/split_options and may legitimately contain `$`.
+    # split_options and may legitimately contain `$`.
     if line.endswith("$") and not line.startswith(("/", "@@/")):
         _, reason = _normalize_network_with_reason(line, policy)
         return None, classification, reason or "invalid-network-rule"
