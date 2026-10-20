@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-DIRECTIVE_RE = re.compile(r"^\s*!#(?:if|else|endif|include|safari|end)\b", re.I)
+DIRECTIVE_RE = re.compile(r"^!#(?:if|else|endif|include|safari|end)\b", re.I)
 HOSTS_RE = re.compile(r"^(?:0\.0\.0\.0|127\.0\.0\.1|::1)(?:\s+|$)")
 HTML_RE = re.compile(r"^\s*(?:<!doctype\b|<html\b|<head\b|<body\b)", re.I)
 # Includes engine-specific separators (AdGuard `#%#`/`#$?#`, `#@$#`, ...) so they

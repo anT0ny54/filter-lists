@@ -375,7 +375,7 @@ def load_config() -> BuildConfig:
     if not isinstance(history, dict):
         raise ValueError("policies.yaml: history must be an object")
     _reject_unknown_keys(history, POLICY_SECTION_KEYS["history"], "policies.yaml: history")
-    history_retention = _positive_int(history.get("retention", 10), "history.retention")
+    history_retention = _positive_int(history.get("retention", 10), "policies.yaml: history.retention")
 
     anomaly = policy.get("anomaly_detection", {})
     if not isinstance(anomaly, dict):
@@ -392,7 +392,7 @@ def load_config() -> BuildConfig:
         "max_bytes_change_ratio": byte_change,
         "max_rule_count_change_ratio": rule_change,
         "max_rejection_rate_change": rejection_change,
-        "min_lines": _positive_int(anomaly.get("min_lines", DEFAULT_ANOMALY_MIN_LINES), "anomaly_detection.min_lines"),
+        "min_lines": _positive_int(anomaly.get("min_lines", DEFAULT_ANOMALY_MIN_LINES), "policies.yaml: anomaly_detection.min_lines"),
         "fail_on_warning": _strict_bool(anomaly.get("fail_on_warning", False), "policies.yaml: anomaly_detection.fail_on_warning"),
     }
     quality = policy.get("source_quality", {})
@@ -405,7 +405,7 @@ def load_config() -> BuildConfig:
         raise ValueError("policies.yaml: source_quality requires 0 <= warn_rejection_rate <= critical_rejection_rate <= 1")
     quality_config = {
         "enabled": _strict_bool(quality.get("enabled", True), "policies.yaml: source_quality.enabled"),
-        "min_lines": _positive_int(quality.get("min_lines", DEFAULT_SOURCE_QUALITY["min_lines"]), "source_quality.min_lines"),
+        "min_lines": _positive_int(quality.get("min_lines", DEFAULT_SOURCE_QUALITY["min_lines"]), "policies.yaml: source_quality.min_lines"),
         "warn_rejection_rate": warn_rate,
         "critical_rejection_rate": critical_rate,
         "fail_on_critical": _strict_bool(quality.get("fail_on_critical", False), "policies.yaml: source_quality.fail_on_critical"),
