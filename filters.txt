@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-fff8604ca8a8
-! Last updated: 2026-10-20 05:32:14 UTC
+! Version: v7.6.0-2752b463c8cf
+! Last updated: 2026-10-20 05:56:01 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: fff8604ca8a8db64c1754da25452ebc01b16ee44863a305c410428660dbfeba4
+! Build-ID: 2752b463c8cfeec1a0d292c33c4d170190be59846ef292986540d18c478637d0
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 175451
+! Total rules: 175456
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -100935,6 +100935,7 @@ zzzyk.com###Tinfo
 ||acirurknejixq.website^
 ||acjs.aliyun.com^
 ||ackcdn.net^
+||ackevenusher.com^
 ||ackkagqqqvdwh.online^
 ||ackprovided.com^
 ||acktontables.com^
@@ -107288,6 +107289,7 @@ zzzyk.com###Tinfo
 ||beveyckzdzheo.site^
 ||bevwcymvettup.space^
 ||bewailindigestionunhappy.com^
+||bewaredsainte.cyou^
 ||bewhidare.com^
 ||bewitchedcarry.pro^
 ||beworkfangagoulan.qpon^
@@ -135859,6 +135861,7 @@ zzzyk.com###Tinfo
 ||kumvrxoewxdsr.online^
 ||kumysbeachy.cfd^
 ||kunailxx.com^
+||kunkursparm.qpon^
 ||kunner.wiesentbote.de^
 ||kunpeng-sc.csdnimg.cn/?timestamp=$domain=blog.csdn.net,subdocument
 ||kunststoffweb.de/_g/_ads/
@@ -139828,6 +139831,7 @@ zzzyk.com###Tinfo
 ||mellowwatch.pro^
 ||melodic-mess.com^
 ||melodramaticquery.com^
+||meloidsandron.qpon^
 ||meloshounder.com^
 ||melosthosnarc.cfd^
 ||meltingpristaw.qpon^
@@ -151214,7 +151218,6 @@ zzzyk.com###Tinfo
 ||qualitydestructionhouse.com^
 ||qualitymedianetwork.de^$third-party
 ||qualitymortify.com^
-||qualtrics.com/sie/$script,third-party
 ||quamashsaltest.cyou^
 ||quant.jp^$third-party
 ||quanta-wave.com^
@@ -157384,6 +157387,7 @@ zzzyk.com###Tinfo
 ||slopershoji.cyou^
 ||sloppedneckful.qpon^
 ||sloshesbracker.cfd^
+||slotedembelif.qpon^
 ||sloto.live^
 ||slotsmiling.com^
 ||slottensuccah.cyou^
@@ -173528,6 +173532,7 @@ zzzyk.com###Tinfo
 ||yyuaksepmz.com^
 ||yyutfzv.com^
 ||yyvvkczsfrlkn.online^
+||yyvwhkydulefq.space^
 ||yywflujrcwrcrio.net^
 ||yywkaozqywjqux.com^
 ||yywz123.com/file/A*.js
