@@ -2,7 +2,7 @@
 
 **Filter-Lists** is a deterministic, compatibility-first filter-list compiler. It fetches configured upstream lists, resolves bounded `!#include` graphs, normalizes and deduplicates rules, applies a strict Adblock Plus (ABP) compatibility policy, validates the generated output, and publishes build metadata with deterministic hashes and provenance.
 
-**Current builder:** `v7.6.0`  
+**Current builder:** `v7.6.0`
 **Output profile:** `strict-abp`
 
 The project is designed around one principle: **prefer a predictable, portable filter list over accepting engine-specific syntax that may behave differently across blockers.**
@@ -91,14 +91,14 @@ The builder currently enforces the following:
 - **Required-source gates:** configured required root sources must succeed.
 - **SSRF protection:** source/include targets are resolved before connection, non-public addresses are blocked, DNS answers are validated and pinned for curl, proxy environment variables are bypassed, and redirects are validated hop-by-hop.
 - **Deadline-aware fetching:** downloads receive only the remaining build deadline; retries are bounded and permanent 4xx failures are not retried.
-- **Canonical source identity:** scheme/host/path normalization and fragment removal are used for source identity and include-cycle detection.
+- **Canonical source identity:** scheme/host/path normalization and fragment removal are used for source identity and include-cycle detection. Already-visited include targets are ignored before the source cap is evaluated, so an include cycle cannot falsely trigger the global source limit; only genuinely new canonical targets count toward that cap.
 - **Deterministic rule output and identity:** normalization, sorting, deduplication, and Build-ID generation are deterministic. `filters.txt` also contains a `Last updated` timestamp, while `reports/latest.json` records `generated_at` and `build_seconds`; those operational fields intentionally vary between runs.
 - **Full Build-ID validation:** `validate.py` recomputes the build identity from the active configuration and normalized rules.
 - **Strict grammar validation:** malformed options, unsupported procedural syntax, unsafe inline styles, malformed regex envelopes, control characters, and over-limit rules are rejected.
 - **Detailed diagnostics:** rejection reasons, per-source statistics, SHA-256 hashes, fetch failures, and anomaly information are retained. Network-rule rejection reasons come from one validator, so the reason recorded in a report is always the same one `rejection_reason()` returns.
 - **Bounded default concurrency:** the builder uses ten download workers by default — the ceiling implied by the shipped download budget (`max_total_download_bytes // max_download_bytes` = 500 MiB // 50 MiB), since the build is network-bound well before it is CPU-bound (override with the `FILTER_LISTS_WORKERS` environment variable); effective concurrency is additionally capped by the configured global download budget and the reservations required by active transfers.
 - **Historical reports:** only *successful* reports are archived under `reports/history/` as anomaly baselines, kept chronologically up to the configured retention limit. A newer run with the same Build-ID replaces the older archived report, so retention counts distinct builds. Failed builds are never archived there. A slim per-source baseline (`reports/baseline.json`, carrying only the fields anomaly detection compares) is written alongside each archive; when selecting a baseline the builder prefers the current report, then the slim baseline, and only then scans the full history files.
-- **Source reputation:** per-URL success rate, consecutive failures, and a `poor`/`watch`/`good`/`excellent` label are computed from `reports/source-outcomes.json`, which records the per-source fetch outcome of **every** run, including failed builds. Consecutive runs on the same UTC day are compacted into a single stored entry (a source's outcome for the day is the AND of that day's runs, so a failure is never hidden by a later same-day success, and the entry keeps the newest run's identity); up to 120 day-entries are retained. One observation is counted per source per UTC day; a day counts as a success only if every run that day succeeded, so rebuilds cannot overweight a day and failures are not hidden. The first run after upgrading seeds the file from retained successful reports. The report lists reputation only for the sources of the current run, so a disabled source disappears from it (its history is kept in case it is re-enabled).
+- **Source reputation:** per-URL success rate, consecutive failures, and a `poor`/`watch`/`good`/`excellent` label are computed from `reports/source-outcomes.json`, which records the per-source fetch outcome of **every** run, including failed builds. Consecutive runs on the same UTC day are compacted into a single stored entry (a source's outcome for the day is the AND of that day's runs, so a failure is never hidden by a later same-day success, and the entry keeps the newest run's identity); up to 120 day-entries are retained. One observation is counted per source per UTC day; a day counts as a success only if every run that day succeeded, so rebuilds cannot overweight a day and failures are not hidden. Valid ISO timestamps are normalized to UTC; malformed or missing timestamps stay as separate observations instead of collapsing into one undated bucket. The first run after upgrading seeds the file from retained successful reports. The report lists reputation only for the sources of the current run, so a disabled source disappears from it (its history is kept in case it is re-enabled).
 - **Source quality gate:** `source_quality` in `policies.yaml` flags sources whose rule lines (comments, blanks and directives excluded) are mostly rejected, recorded in the report and logged as `[WARN]`. Optional `fail_on_critical` makes critical sources fail the build.
 - **Safe anomaly handling:** warning-level anomalies are advisory by default; critical anomalies fail the build. Anomalies compare each source against the previous *successful* report; sources that failed in that report are not used as a baseline.
 - **Safe publication:** `filters.txt` is staged to a temporary file and only replaced after the report and anomaly checks pass, so a rejected build leaves the last good list in place.
@@ -227,7 +227,7 @@ The repository test suite covers:
 - network options and option validation
 - cosmetic and extended-CSS rules
 - ABP header/addheader/snippet/inline-style/remove features
-- nested includes and canonical include-cycle detection
+- nested includes, canonical include-cycle detection, and source-limit accounting that distinguishes cycles from unseen children
 - source-health and required-source accounting
 - global source/download limits and deadlines
 - stable report record ordering and Build-ID generation
@@ -242,7 +242,7 @@ The repository test suite covers:
 - compressed response rejection when servers ignore identity encoding
 - valid CSS hex color lengths in inline-style declarations
 - explicit zero-port preservation in DNS resolution and connection pinning
-- malformed inline-style brace rejection (unbalanced braces, trailing text after a style block)
+- malformed inline-style rejection (unbalanced braces, trailing text after a style block, and blocks with no declarations)
 - duplicate metadata-header rejection (`Total rules`, `Build-ID`, `Source manifest SHA-256`, `Version`) in the generated-list validator
 - `allow_abp_remove_action` honoured in every declaration position
 - BOM/whitespace cleaning: BOM-prefixed rules, HTML error pages and first-line includes, plus a BOM fuzz idempotency check
