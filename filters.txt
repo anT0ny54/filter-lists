@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-94c74de6529a
-! Last updated: 2026-10-20 04:36:46 UTC
+! Version: v7.6.0-57448f193cb8
+! Last updated: 2026-10-20 04:39:15 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 94c74de6529a6bcd886947a4018b68731e5c9332770cb2ab4dbb0b8a2b3acea6
+! Build-ID: 57448f193cb8fe4924c493cf3cc46172f916be7f55ae251e4203de24b73a2601
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 175429
+! Total rules: 175436
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -18924,7 +18924,7 @@
 20minutes.fr###mbrs-social-share-container
 20minutes.fr##.socialbar > li:not([data-social="save"])
 20minutes.fr##.toolbar-menu-item-share
-20minutes.fr,apahotel.com,avtocod.ru,haber61.net,halktv.com.tr,lefigaro.fr,picwish.com,snkrdunk.com,type.jp,victorysportsnews.com,whosampled.com,yamareco.com,yenicaggazetesi.com.tr,yeniduzen.com,yenihaberden.com###app-banner
+20minutes.fr,apahotel.com,avtocod.ru,haber61.net,haberler.com,halktv.com.tr,lefigaro.fr,picwish.com,snkrdunk.com,type.jp,victorysportsnews.com,whosampled.com,yamareco.com,yenicaggazetesi.com.tr,yeniduzen.com,yenihaberden.com###app-banner
 20minutos.es##.ad-fixed
 20minutos.es##.axds > div.henneoHB
 20minutos.es##.axds-lane
@@ -40350,6 +40350,8 @@ coincierge.de##.su-button
 coincodex.com##.download-coincodex-app
 coincodex.com##.side-col div[class][style]:has(> a[target="_blank"] > img)
 coincodex.com##.StickyBottom
+coincodex.com##app-root > app-placeholder-debug + div:not([class*="-"])
+coincodex.com##app-sidebar-skyscraper
 coincodex.com##app-sidebar-subscribe
 coindesk.com##.document-body > div.flex:has(> div[data-module-name="newsletter-article-sign-up-module"])
 coindesk.com##.grid > div.order-2:has(> div.flex > div.uppercase > a[href="/newsletters"])
@@ -49017,7 +49019,6 @@ fily.co.jp##a[href^="https://apps.apple.com/jp/app/"] > img[width="720"][height=
 fimfiction.net##.sponsor-reminder
 fin-calc.org.ua##.ad-page
 fin.do##div[class^="AcceptCookies"]
-fin.land.naver.com##div#content[class^="PCLayout-"] div[data-sentry-component="FloatingCenterBanner"]:has(a[href^="https://blog.naver.com/land_admin/"])
 final-fantasy.cc#@#.ad_left
 finalclap.com###aff_tuto_com
 finalfantasyxiv.com##.l__blogsocial
@@ -61587,6 +61588,7 @@ kakijun.com##.cgrid-ga
 kakijun.jp###header1 > div[style="float:right;font-size:14px;line-height:16px;margin-right:10px;"]
 kakijun.jp###kakijun_books
 kakijun.jp##.gadcenter
+kako-mon.com,lee.hpplus.jp##.sns-buttons-wrap
 kako.5ch.io##div[style^="position: relative;width: 100%;height: 250px;"]
 kako.5ch.io,roote.ekispert.net##div[style="width: 300px; height: 250px;"]
 kako.futakuro.com##body > iframe[src^="https://chobit.cc/embed/"]
@@ -84750,6 +84752,8 @@ spectrumlocalnews.com##.article-app-prompt
 speed.rbbtoday.com##.random-banner
 speedfly.cn###share-s
 speedguide.net##body > div[style="position:relative; margin:auto; padding: 0px; width:728px; height:100px; text-align:center;"]
+speedof.me##.api-ad-footer
+speedof.me##.background-container > :is(div,section)[class*="-"][class*=" "]:not([id]):not([aria-label]):not([style]):not([role]):not([class*="menu"],[class*="content"],[class*="progress"],[class*="footer"])
 speedof.me##.cc-consent-toast
 speedpan.com###float-window
 speedtest.cn##.advertisingSpace
@@ -112883,6 +112887,7 @@ zzzyk.com###Tinfo
 ||coinavtxfsbin.site^
 ||coincheck.com/images/affiliates/
 ||coincierge.de/wp-content/plugins/floating-banner/
+||coincodex.com/*.php?t=$domain=coincodex.com,script
 ||coincodex.com/*/position/ccx_pos-min$script
 ||coinersdisring.shop^
 ||coinkolik.com/wp-content/uploads/*/paribu-970x250-bitcoin.gif
@@ -127385,6 +127390,7 @@ zzzyk.com###Tinfo
 ||gxqcdnbbribw.com^
 ||gxqfgqhllmhhx.space^
 ||gxqzz.7766.org^
+||gxrzabyhreybz.online^
 ||gxteysujhcypg.online^
 ||gxtihgivnpgei.online^
 ||gxvdzkmvwmgua.online^
@@ -153578,6 +153584,7 @@ zzzyk.com###Tinfo
 ||rnmentoftheusys.org^
 ||rnmreusbdsmyc.space^
 ||rnmvycnfkeinl.website^
+||rnngcjenfumyn.site^
 ||rnobijyojinek.website^
 ||rnoliuuhsrqjc.site^
 ||rnopankivhjyn.site^
