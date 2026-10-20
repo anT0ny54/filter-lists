@@ -33,4 +33,4 @@ Successful builds are copied to `reports/history/` as `build-<build_id>-<generat
 
 ## Source outcome history
 
-`reports/source-outcomes.json` (`{"schema": 1, "runs": [...]}`) stores, for every run including failed ones, `generated_at`, `status`, `build_id`, and a `{url: ok}` map. The newest 120 runs are kept. It is the only input to `source_reputation` besides the current run; if it does not exist yet it is seeded from retained successful reports. Reputation counts one observation per source per UTC day, and a day is a success only if every run that day fetched the source successfully.
+`reports/source-outcomes.json` (`{"schema": 1, "runs": [...]}`) stores, for every run including failed ones, `generated_at`, `status`, `build_id`, and a `{url: ok}` map. At most 120 UTC-day entries are kept (legacy duplicate entries for the same day are compacted on the next write). It is the only input to `source_reputation` besides the current run; if it does not exist yet it is seeded from retained successful reports. Reputation counts one observation per source per UTC day, and a day is a success only if every run that day fetched the source successfully.
