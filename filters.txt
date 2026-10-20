@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-771c9bef162f
-! Last updated: 2026-10-20 14:52:12 UTC
+! Version: v7.6.0-5ecb6a2bdb8d
+! Last updated: 2026-10-20 15:21:35 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 771c9bef162fb92de8228dacb2be9bf32a01c49a2a7cf47b1d60e89480139cad
+! Build-ID: 5ecb6a2bdb8dac45a473c504db7ed4368d0647c14be847d036a1f46bb4f49f97
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 175643
+! Total rules: 175646
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -14024,7 +14024,6 @@
 .spmailtechnol.com/q/$image
 .spmailtechnolo.com/q/$image
 .sprss002.html$domain=moeero-library.com
-.srnky.com^
 .st/ads/
 .su/clk.js|
 .substackcdn.com/open?$image
@@ -16624,7 +16623,6 @@
 /nb/fl.js
 /nb/frot_lud.js$script
 /nbk/frnd_ld.js
-/neads.$domain=~neads.io|~neads.co
 /needsharebutton.min.css
 /nendAdLoader.
 /netcat/modules/banner/*
@@ -19828,7 +19826,7 @@
 46matome.net###more > table[border="0"]
 46matome.net##.kaerebalink-footer + br + div[style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;"]
 46matome.net,46room.blog.jp,abc-by.com,aoyagi-coffee.hatenablog.com,dn-voice.info,geek.sc,keyakizaka46matomemory.net,kusoneko.blogspot.com,minto.tech,moognyk.jp,mupon.net,nmbschedule.blog.fc2.com,ogeji.hatenablog.com,p2y.jp,tcg-bloglife.com,xn--eckybzahmsm43ab5g5336c9iug.com,xn--mck5e585m.com##.kaerebalink-box
-46matome.net,blog.jp,blog.livedoor.jp,doorblog.jp,youblog.jp##.plugin-memo:has(> div.side > a[href^="https://hb.afl.rakuten.co.jp"][target="_blank"])
+46matome.net,blog.jp,blog.livedoor.jp,doorblog.jp,kasemato.net,youblog.jp##.plugin-memo:has(> div.side > a[href^="https://hb.afl.rakuten.co.jp"][target="_blank"])
 46matome.net,keyakizaka46matomemory.net###more > a[href^="https://hb.afl.rakuten.co.jp"]
 46matome.net,keyakizaka46matomemory.net###more > b:not(:contains(まとめもり～))
 46matome.net,keyakizaka46matomemory.net##.article-body-more > div[style="padding: 10px; margin-bottom: 10px; border: 1px solid #333333;"]:has(> iframe ~ iframe)
@@ -19931,7 +19929,7 @@
 4k69.com,8kporner.com,avporner.com##ul.right-part > li:has(> a[target="_blank"])
 4k8ktv.jp##.widget_text:first-child
 4ka.net##.as-center-468px
-4ka.net,anke.jp,banner-hiroba.com,chirashi-guide.com,cobwebs.jp,dacelo.space,gurum.biz,haijin-boys.com,hospita.jp,motivation-up.com,natsukimemo.com,office-hack.com,otonasalone.jp,shin-shouhin.com,starblog.jp,travelbook.co.jp,uma-x.jp##.adsense
+4ka.net,anke.jp,banner-hiroba.com,chirashi-guide.com,cobwebs.jp,dacelo.space,gurum.biz,haijin-boys.com,hospita.jp,motivation-up.com,natsukimemo.com,office-hack.com,otonasalone.jp,shin-shouhin.com,starblog.jp,statresearch.jp,travelbook.co.jp,uma-x.jp##.adsense
 4kdownload.com##.popup-discount--wrapper
 4kdownload.com##div[class^="PromoBlock_subscribeForm"]
 4kdownload.com,a101.ru,archivlyx.com,asiaticesports.com,bungie.net,capgemini.com,centpart.ru,centreforaviation.com,certik.com,dappcdn.com,easyprint.com,footshop.ua,julia.comune.roma.it,kupujemprodajem.com,msspalert.com,scmagazine.com,scworld.com,stat.fi,tickmill.com,tunemymusic.com,xn--80aaig9ahr.xn--c1avg,yf.com.tr,zalando-lounge.be,zalando-lounge.de##div[class^="CookieConsent_"]
@@ -35725,7 +35723,7 @@ blog.jp,blog.livedoor.jp,doorblog.jp,jisaka.com,livedoor.blog,ske48matome.net##.
 blog.jp,blog.livedoor.jp,doorblog.jp,ldblog.jp,ske48matoeme.com##.plugin-memo:has(> div.side > script[src$="/rakuten_widget.js"])
 blog.jp,blog.livedoor.jp,dreamlog.jp##.plugin-memo:has(> div.side > div > script[src*="//adm.shinobi.jp"])
 blog.jp,blog.livedoor.jp,youblog.jp##.plugin-memo:has(> div.side > ins.widget-banner)
-blog.jp,pachinkolist.com##.plugin-memo:has(> div.side > center > ins.adsbygoogle)
+blog.jp,kasemato.net,pachinkolist.com##.plugin-memo:has(> div.side > center > ins.adsbygoogle)
 blog.jp.square-enix.com###bannerList li:not(:has(a[href*="/nier"]))
 blog.kilo.ai,bulten.mserdark.com,thegamebusiness.com##div[class*="pubInvertedTheme-"] > .pencraft.pc-flexDirection-column.pc-justifyContent-center:has(form[action="/api/v1/free?nojs=true"])
 blog.knowbe4.com##.blog-sidebar > div.row-fluid-wrapper:has(.widget-type-cta)
@@ -58614,6 +58612,8 @@ info-chunithm.sega.jp##.chuniSNS
 info-clipper.com###pubBando
 info-comp.ru###secondary > div.widget:has(> div.textwidget div#vk_groups)
 info-maimai.sega.jp,monogatari-series.com##.SNS
+info-war.gr,merrittherald.com,openbook.gr,political.gr,pulpitandpen.org,sjever.hr,sportmarketing.pl###sgpb-popup-dialog-main-div-wrapper
+info-war.gr,merrittherald.com,openbook.gr,political.gr,pulpitandpen.org,sjever.hr,sportmarketing.pl##.sgpb-popup-overlay
 info.city.tsu.mie.jp##.AdBnrList
 info.credly.com###hs-web-interactives-top-anchor
 info.elblag.pl,mierzeja.com,radiowroclawkultura.pl,speedtest.pl,synonim.net,wsensie.pl###rodo
@@ -61684,6 +61684,7 @@ kanasoku.info##.headline_middle
 kanasoku.info##ifarticlebodymore > div[align="center"] > table
 kanav.ad##div[class^="img-ad"]
 kandatasokuho.com###main-fit-wrapper > font[size="1"]
+kandatasokuho.com##.amaquick-box ~ a[href^="https://link.amazon/"]
 kandatasokuho.com##.main-body > div > div[align="left"] > font[size="1"]
 kandatasokuho.com##.main-body > div#inner-contents ~ a[href="https://2ch.sc/"]
 kandatasokuho.com##.main-body > div#inner-contents ~ a[href="https://open2ch.net/"]
@@ -61832,9 +61833,7 @@ kasegeru.blog.jp##.article-body-inner > a[href^="https://www.amazon.co.jp/gp/"]
 kasegeru.blog.jp##a[rel="sponsored noopener"]
 kasegeru.blog.jp##div[style^="border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 8px; max-width: 500px;"]
 kasemato.net###more > span[style="color: rgb(255, 0, 0);"]
-kasemato.net##.sidewrapper:has(> .side > a[href^="https://hb.afl.rakuten.co.jp/"])
 kasemato.net##.sidewrapper:has(> .side > center > a[rel~="sponsored"])
-kasemato.net##.sidewrapper:has(> .side > center > ins.adsbygoogle)
 kasemato.net##.t_h
 kasemato.net##.t_h ~ .twitter-tweet
 kashi-mo.com##.rectangle_bnr
@@ -66161,6 +66160,7 @@ m.ynet.co.il##iframe[src*=".youtube.com/subscribe_embed?"]
 m.yonhapnewstv.co.kr##button[data-modal='modal-share']
 m.youku.com##body > [style="width: 100px; height: 100px; position: fixed; top: auto; right: 0px; bottom: 0px; left: auto; z-index: 188;"]:not([class]):not([id])
 m.youtube.com##.mobile-topbar-header-sign-in-button
+m.youtube.com##.scwnr-content > lazy-list > yt-video-metadata-carousel-view-model[aria-label]:has(button-view-model > a[href^="https://ytkids.app.goo.gl/"])
 m.youtube.com##lazy-list > ad-slot-renderer
 m.youtube.com##ytm-button-renderer.icon-share_arrow
 m.youtube.com##ytm-paid-content-overlay-renderer
@@ -79656,6 +79656,7 @@ radsport-news.com###LayoutBannerXXL
 radsport-news.com##.LayoutPromotionAds
 radyodinle.com###adds
 raenonx.cc##.main_ads-content + div
+raenonx.cc##.w-full.overflow-hidden.outline-transparent > div[style^="height:"]
 raenonx.cc##.z-popup-ultimate
 raenonx.cc##div[class="flex flex-col place-content-center place-items-center text-center w-full h-\[100px\]"]
 raenonx.cc##div[style="display: flex; justify-content: center; align-items: center; position: relative;"] > iframe
@@ -85145,6 +85146,7 @@ sportmail.ru##div[id^="notification"]
 sportmail.ru##div[id^="trg-b-"]
 sportmail.ru##div[style^="min-height:"]:has(> div[data-rb-slot]:first-child)
 sportmarketing.pl##.flex.md\:items-center > div.inline-flex.items-center
+sportmarketing.pl##a[href^="https://www.sportmarketing.pl/newsletter/"]
 sportmaster.ru##.sm-cookie-agreement
 sportmaster.ru##.sm-cookie-agreement-old
 sportmk.ru##.good__top
@@ -90441,14 +90443,14 @@ turkifsa100.com,turkifsa73.com,turkifsa74.com,turkifsa75.com,turkifsa76.com,turk
 turkifsa100.com,turkifsa73.com,turkifsa74.com,turkifsa75.com,turkifsa76.com,turkifsa77.com,turkifsa78.com,turkifsa79.com,turkifsa80.com,turkifsa81.com,turkifsa82.com,turkifsa83.com,turkifsa84.com,turkifsa85.com,turkifsa86.com,turkifsa87.com,turkifsa88.com,turkifsa89.com,turkifsa90.com,turkifsa93.com,turkifsa98.com,turkifsa99.com##div[class]:has(> a:is([href^="https://cutt.ly/"],[href="https://denemebonusumi.com/"]))
 turkifsa100.com,turkifsa73.com,turkifsa74.com,turkifsa75.com,turkifsa76.com,turkifsa77.com,turkifsa78.com,turkifsa79.com,turkifsa80.com,turkifsa81.com,turkifsa82.com,turkifsa83.com,turkifsa84.com,turkifsa85.com,turkifsa86.com,turkifsa87.com,turkifsa88.com,turkifsa89.com,turkifsa90.com,turkifsa93.com,turkifsa98.com,turkifsa99.com##div[class][style^="min-height:"][style*="calc("]
 turkifsa100.com,turkifsa73.com,turkifsa74.com,turkifsa75.com,turkifsa76.com,turkifsa77.com,turkifsa78.com,turkifsa79.com,turkifsa80.com,turkifsa81.com,turkifsa82.com,turkifsa83.com,turkifsa84.com,turkifsa85.com,turkifsa86.com,turkifsa87.com,turkifsa88.com,turkifsa89.com,turkifsa90.com,turkifsa93.com,turkifsa98.com,turkifsa99.com##video + div.absolute
-turkifsa25.art,turkifsa31.art##.ad-banner-frame
-turkifsa25.art,turkifsa31.art##div[class]:has(> a:is([href^="https://cutt.ly/"],[href="https://denemebonusumi.com/"]))
-turkifsa25.art,turkifsa31.art##div[class][style^="min-height:"][style*="calc("]
-turkifsa25.art,turkifsa31.art##video + div.absolute
 turkifsa32.site,turkifsa40.site,turkifsa42.site,turkifsa45.site,turkifsa5.site##.ad-banner-frame
 turkifsa32.site,turkifsa40.site,turkifsa42.site,turkifsa45.site,turkifsa5.site##div[class]:has(> a:is([href^="https://cutt.ly/"],[href="https://denemebonusumi.com/"]))
 turkifsa32.site,turkifsa40.site,turkifsa42.site,turkifsa45.site,turkifsa5.site##div[class][style^="min-height:"][style*="calc("]
 turkifsa32.site,turkifsa40.site,turkifsa42.site,turkifsa45.site,turkifsa5.site##video + div.absolute
+turkifsa98.com##.ad-banner-frame
+turkifsa98.com##div[class]:has(> a:is([href^="https://cutt.ly/"],[href="https://denemebonusumi.com/"]))
+turkifsa98.com##div[class][style^="min-height:"][style*="calc("]
+turkifsa98.com##video + div.absolute
 turkifsaclub.org##.ads-grid
 turkifsaclub.org##main > h3:contains(Sponsor Bannerlar)
 turkifsaclub130.sbs,turkifsaclub131.sbs,turkifsaclub132.sbs,turkifsaclub133.sbs,turkifsaclub134.sbs,turkifsaclub135.sbs,turkifsaclub136.sbs,turkifsaclub137.sbs,turkifsaclub138.sbs,turkifsaclub139.sbs,turkifsaclub140.sbs,turkifsaclub141.sbs,turkifsaclub142.sbs,turkifsaclub143.sbs,turkifsaclub144.sbs,turkifsaclub145.sbs,turkifsaclub146.sbs,turkifsaclub147.sbs,turkifsaclub148.sbs,turkifsaclub149.sbs,turkifsaclub150.sbs,turkifsaclub151.sbs,turkifsaclub152.sbs,turkifsaclub153.sbs,turkifsaclub154.sbs,turkifsaclub155.sbs,turkifsaclub156.sbs,turkifsaclub157.sbs,turkifsaclub158.sbs,turkifsaclub159.sbs,turkifsaclub160.sbs,turkifsaclub161.sbs,turkifsaclub162.sbs,turkifsaclub163.sbs,turkifsaclub164.sbs,turkifsaclub165.sbs,turkifsaclub166.sbs,turkifsaclub167.sbs,turkifsaclub168.sbs,turkifsaclub169.sbs,turkifsaclub170.sbs,turkifsaclub171.sbs,turkifsaclub172.sbs,turkifsaclub173.sbs,turkifsaclub174.sbs,turkifsaclub175.sbs,turkifsaclub176.sbs,turkifsaclub177.sbs,turkifsaclub178.sbs,turkifsaclub179.sbs,turkifsaclub180.sbs,turkifsaclub181.sbs,turkifsaclub182.sbs,turkifsaclub183.sbs,turkifsaclub184.sbs,turkifsaclub185.sbs,turkifsaclub186.sbs,turkifsaclub187.sbs,turkifsaclub189.sbs,turkifsaclub191.sbs,turkifsaclub192.sbs,turkifsaclub193.sbs,turkifsaclub194.sbs,turkifsaclub195.sbs,turkifsaclub196.sbs,turkifsaclub197.sbs,turkifsaclub198.sbs,turkifsaclub199.sbs,turkifsaclub200.sbs,turkifsaclub201.sbs,turkifsaclub202.sbs,turkifsaclub203.sbs,turkifsaclub204.sbs,turkifsaclub205.sbs,turkifsaclub206.sbs,turkifsaclub207.sbs,turkifsaclub208.sbs,turkifsaclub209.sbs,turkifsaclub210.sbs,turkifsaclub211.sbs,turkifsaclub212.sbs,turkifsaclub213.sbs,turkifsaclub214.sbs,turkifsaclub215.sbs,turkifsaclub216.sbs,turkifsaclub217.sbs,turkifsaclub218.sbs##.ads-grid
@@ -90456,10 +90458,6 @@ turkifsaclub130.sbs,turkifsaclub131.sbs,turkifsaclub132.sbs,turkifsaclub133.sbs,
 turkifsahub.com##[class^="block"][aria-label$="Banner"]
 turkifsahub.com##a[href^="https://go.aff.teslaaffilate.com/"]
 turkifsaking.com##a[href^="https://media.madaffiliates.com/"]
-turkifsalar.art##.ad-banner-frame
-turkifsalar.art##div[class]:has(> a:is([href^="https://cutt.ly/"],[href="https://denemebonusumi.com/"]))
-turkifsalar.art##div[class][style^="min-height:"][style*="calc("]
-turkifsalar.art##video + div.absolute
 turkifsalar26.space,turkifsalar27.space,turkifsalar28.space,turkifsalar29.space,turkifsalar30.space,turkifsalar31.space,turkifsalar32.space,turkifsalar33.space,turkifsalar34.space,turkifsalar35.space,turkifsalar36.space,turkifsalar37.space,turkifsalar38.space,turkifsalar39.space,turkifsalar40.space,turkifsalar41.space,turkifsalar42.space,turkifsalar43.space,turkifsalar44.space,turkifsalar45.space,turkifsalar46.space,turkifsalar47.space,turkifsalar48.space,turkifsalar49.space,turkifsalar50.space,turkifsalar51.space,turkifsalar52.space,turkifsalar53.space,turkifsalar54.space,turkifsalar55.space##.ts-pbox
 turkifsalar26.space,turkifsalar27.space,turkifsalar28.space,turkifsalar29.space,turkifsalar30.space,turkifsalar31.space,turkifsalar32.space,turkifsalar33.space,turkifsalar34.space,turkifsalar35.space,turkifsalar36.space,turkifsalar37.space,turkifsalar38.space,turkifsalar39.space,turkifsalar40.space,turkifsalar41.space,turkifsalar42.space,turkifsalar43.space,turkifsalar44.space,turkifsalar45.space,turkifsalar46.space,turkifsalar47.space,turkifsalar48.space,turkifsalar49.space,turkifsalar50.space,turkifsalar51.space,turkifsalar52.space,turkifsalar53.space,turkifsalar54.space,turkifsalar55.space##section[data-slot="video_above_player"]
 turkifsalife68.lat###block-2
@@ -127286,6 +127284,7 @@ zzzyk.com###Tinfo
 ||gumharunslept.cfd^
 ||gummersresow.cyou^
 ||gummierhedera.life^
+||gummosemyases.cyou^
 ||gummy-debt.com^
 ||gummyability.com^
 ||gumpusguato.qpon^
@@ -128490,6 +128489,7 @@ zzzyk.com###Tinfo
 ||hethsminter.com^
 ||hetnu.com^
 ||hetzner.com/_resources/themes/hetzner/dist/initmodal.js
+||heughdonnock.com^
 ||heuquabdvgccd.online^
 ||heuristic95.top^
 ||heusqlhlzmgtg.online^
@@ -147432,6 +147432,7 @@ zzzyk.com###Tinfo
 ||pestilentberrysincere.com^
 ||pestilenttidefilth.org^
 ||pestilenttransaction.com^
+||petaliaunfill.com^
 ||petasmacabletssubport.cfd^
 ||petco.com/wcsstore/PetcoSAS/javascript/SmartBanner.js
 ||petebagniovoraz.cfd^
@@ -160424,6 +160425,7 @@ zzzyk.com###Tinfo
 ||sxrzczawwbv.com^
 ||sxsftevgkwlam.site^
 ||sxspuqxqsdgen.website^
+||sxstpobuwpjgw.website^
 ||sxwifqvoodcxn.space^
 ||sxxiocnjyqhxe.website^
 ||sxyprn.*/js/fad.json
@@ -164848,6 +164850,7 @@ zzzyk.com###Tinfo
 ||umwzmbhdifptd.online^
 ||umxqlmhdlbvfw.online^
 ||umyeon.com^
+||umzhpqqxemjaq.space^
 ||umzkjponcxpvn.online^
 ||umzzknnizcbnd.online^
 ||un.ubaike.cn^
