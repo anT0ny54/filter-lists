@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-57448f193cb8
-! Last updated: 2026-10-20 04:39:15 UTC
+! Version: v7.6.0-0f083256d363
+! Last updated: 2026-10-20 05:09:07 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 57448f193cb8fe4924c493cf3cc46172f916be7f55ae251e4203de24b73a2601
+! Build-ID: 0f083256d363e5df4d1fab9af74bdd39f3a0e19576fc302e5bf2724179e6f999
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 175436
+! Total rules: 175449
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -48321,6 +48321,7 @@ fanyi.baidu.com##.trans-side-ad-wrap
 fanyi.baidu.com,longzhu.com##.banner-wrap
 fanyi.youdao.com##.banner
 fanyi.youdao.com##.dict-download-guide
+fanzade.com##.fz-article-youtube-cta
 fap-nation.com###block-2
 fap-nation.com##.pleasant-look
 fap-nation.com##.pleasant-look-archive-top
@@ -55840,6 +55841,7 @@ helpdeskgeek.com,mintpressnews.cn,mintpressnews.com,mintpressnews.es,mintpressne
 helpdeskgeek.com,nato.int##.subscription-box
 helper-employer.com##div[class^="mantine-"][style^="display:"]
 helpnetsecurity.com##.bar
+helpnetsecurity.com##.share-source
 helpster.de##.h5v-ad
 helpsupport.blog.fc2.com##.button[href^="https://amzn.to/"]
 helpx.adobe.com##.feedbackV2-target.fixed
@@ -78642,6 +78644,7 @@ prosleduetmedia.com##.donate
 proson.gr##.ros
 proson.gr##.sponsor-teasers
 prospect.org##.newspack-popup__content-wrapper .newspack-newsletters-subscribe
+prospect.org##.wp-block-group[style="padding-top:var(--wp--preset--spacing--20);padding-bottom:var(--wp--preset--spacing--20)"]
 prospectmagazine.co.uk###piano_ribbon_collapsible_container
 prospects.ac.uk##.content-call-to-action
 prospektangebote.de##.corner-popup
@@ -108737,6 +108740,7 @@ zzzyk.com###Tinfo
 ||bp.blogspot.com/*.gif$domain=nung2hdd.com|nanamovies.me
 ||bp.blogspot.com/*banner$domain=~aow.vn,image
 ||bp.blogspot.com^$domain=shpargalkablog.ru,image
+||bp44bqnvdb.com^
 ||bp491h5z7wvpgl367mtefgbmzrmvq3oh.cfd^
 ||bp8mct71pn.com^
 ||bpauszxiaozwb.site^
@@ -111785,6 +111789,7 @@ zzzyk.com###Tinfo
 ||christies.com/js/LoadFastSignUp.js
 ||chromaprotestmelch.cyou^
 ||chromeba.net/wp-content/uploads/
+||chromylviewy.com^
 ||chronicairliner.com^
 ||chrwxvdfrkwan.space^
 ||chryvast.com^
@@ -125759,6 +125764,7 @@ zzzyk.com###Tinfo
 ||githubusercontent.com^$domain=vk.com
 ||gitlab.bloblohub.com^
 ||gitoku.com^
+||gitoninmegrel.com^
 ||gitoxgmnnauiz.space^
 ||givawknyjaexj.online^
 ||givbctdfqxoec.site^
@@ -129412,6 +129418,7 @@ zzzyk.com###Tinfo
 ||hrmlljmrwuusm.website^
 ||hrmwxu.com^
 ||hrnliywumxxp.com^
+||hrnpiriuokgol.website^
 ||hrogrpee.de^
 ||hrpbmvgbihfac.site^
 ||hrqecm0d.xyz^
@@ -132161,6 +132168,7 @@ zzzyk.com###Tinfo
 ||itcleffaom.com^
 ||itcojnlsswzwt.site^
 ||itcslocgtbamh.site^
+||itdcizejjqwes.website^
 ||itefntyjnozqb.site^
 ||iteiqzzmzawtu.online^
 ||itemci.com/adblock/adblock.
@@ -142350,6 +142358,7 @@ zzzyk.com###Tinfo
 ||nbtyuiecxaamnn.com^
 ||nbufgllosxslp.site^
 ||nbuipljbiahdp.website^
+||nbuvharullxpn.site^
 ||nbvcsyjsoojpd.online^
 ||nbvetzyqt.icu^
 ||nbvlkenmkihrl.website^
@@ -144594,6 +144603,7 @@ zzzyk.com###Tinfo
 ||ofnpsvob.com^
 ||ofoltekbn.com^
 ||ofphxmkvkpdro.site^
+||ofpnjkbiudjsd.site^
 ||ofppahlkiz.com^
 ||ofpqmenz.in^
 ||ofpwwzlrf5l7wqbn1if7.cfd^
@@ -151239,6 +151249,7 @@ zzzyk.com###Tinfo
 ||qubhjnodheizn.site^
 ||qubisticss.com^
 ||qubitproducts.com^$third-party
+||quboqnokatcvu.space^
 ||qucxwvt.com^
 ||qudbmtsluirkx.site^
 ||queachycorer.com^
@@ -167041,6 +167052,7 @@ zzzyk.com###Tinfo
 ||vkiqovvfivibd.space^
 ||vkj9mko5efuminb135m.cfd^
 ||vkjiwgmipziva.space^
+||vklaelkgewwbt.website^
 ||vkljfmykgnd.com^
 ||vklljvwyybry.top^
 ||vklstream.com/ads/$domain=phim.xxxmeo.com,subdocument
@@ -172385,6 +172397,7 @@ zzzyk.com###Tinfo
 ||ybtdxfqdnwzly.space^
 ||ybtevzivkqolm.website^
 ||ybtyvbzvxpvex.store^
+||ybuwtgpqxscop.website^
 ||ybycgilqhqyib.website^
 ||ybzdctapkjfaj.website^
 ||ybzeafuujc.com^
