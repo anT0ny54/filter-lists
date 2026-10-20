@@ -20,12 +20,15 @@ Every project file except the intentionally excluded `filters.txt` payload was r
 - **Offset-sensitive run ordering** (`scripts/health.py`): timestamps were sorted as strings, which could choose the wrong daily run identity when ISO timestamps used different UTC offsets. History and same-day compaction now compare normalized UTC instants while retaining conservative failure-wins outcome merging; UTC conversion overflow is treated as an undated entry rather than crashing history processing.
 - **Large whitespace-prefixed downloads** (`scripts/fetch.py`): download validation judged a file empty when its first 64 KiB were whitespace, even when valid rules followed. Validation now scans the remaining file for content and NUL bytes, and checks a bounded content probe so padded HTML error markers split across read boundaries remain rejected.
 - **Partial source reads** (`scripts/report.py`, `scripts/merge.py`): rules parsed before a mid-read I/O error could leak into the aggregate result, and a build could otherwise publish the remaining partial list. Per-file analysis now commits rules and counters only after the read and hash succeed; any source-analysis read error fails the build and preserves the previous `filters.txt`.
+- **Misattributed restricted-feature rejections** (`scripts/normalize.py`): the raw `$header=`/`$addheader=` substring scan ran over whole lines, so cosmetic selectors merely containing that text (and network patterns with escaped-`$` text) were rejected as `abp-security-restricted-feature` from untrusted sources despite carrying no restricted option. The check now relies solely on the real option parser; real `header=`/`addheader=` options and `#$#` snippets are still gated exactly as before. Covered by `RestrictedFeatureScopeTests`.
+- **Health-gate rounding** (`scripts/merge.py`): the root-source success ratio was rounded to 4 decimals before the threshold comparison, which could mask a marginally failing ratio (0.79995 rounds to 0.8 and passes an 0.8 threshold). The comparison now uses the unrounded ratio; the reported value stays rounded. Covered by `test_main_success_ratio_threshold_uses_unrounded_value`.
 
 #### Removed
 - Dead `normalize_network()` wrapper (no remaining callers) and the duplicated option-checking block in `_rejection_reason()`.
 - Redundant `rule.strip()` in the network validator (callers already pass cleaned lines).
 - Redundant `included_requested` field in fetch statistics (always equal to `included_references`, never read). It disappears from `reports/latest.json` on the next build.
 - Defensive `getattr(config, "source_quality", None)` in `merge.py`; `BuildConfig` always defines it. Test stubs now provide the field.
+- Dead `RESTRICTED_RAW_RE` pre-filter in `normalize.py` (superseded by the option-parser check) and a stale comment referencing the removed `normalize_network()`.
 
 #### Changed (optimization / cleanup)
 - `fetch.py`: already-visited canonical include targets are filtered before source-limit handling and carried forward through `unvisited_next`, preventing duplicate/cyclic references from creating false failures.
