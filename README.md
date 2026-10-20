@@ -198,6 +198,8 @@ python3 scripts/benchmark.py --repeats 3
 python3 scripts/differential.py
 ```
 
+The remaining modules in `scripts/` are import-only building blocks; `merge.sh`, `validate.py`, `benchmark.py`, and `differential.py` are the entry points.
+
 `benchmark.py` repeats its small fixture `--multiplier` times (default 5000) so the reported lines/second is stable. It benchmarks both per-line normalization and a representative merge workload (normalize → deduplicate → deterministic sort); pass `--skip-merge` to run only the normalization benchmark. `differential.py` is skipped unless `FILTER_ENGINE_CMD` is set; the command must contain the `{input}` placeholder or the script exits with status 2. Each fixture runs with a 300 s timeout, and a timeout counts as a failure.
 
 `scripts/publish.sh` is for CI; it commits and pushes, so do not run it in a working copy you care about.

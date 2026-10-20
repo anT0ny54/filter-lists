@@ -49,3 +49,18 @@ Every project file except the intentionally excluded `filters.txt` payload was r
 - Regression tests for reason agreement (fuzzed), `document` + `addheader` reasons, terminal-`$` reasons, interim-response header blocks, and unreadable-source records.
 - Regression tests for offset-aware and out-of-range timestamp handling, archive-retention ordering across UTC offsets, whitespace-prefixed downloads with chunk-split HTML markers, transactional handling of mid-read errors, and stopping publication after analysis errors.
 
+
+
+### Audit follow-up (2026-10-20, second pass; 256 tests discovered; all non-skipped tests passed, 12 curl-gated tests skipped; version unchanged at 7.6.0)
+
+Every script, document, configuration file, workflow, and test module was read in full before judgement; generated artifacts (`reports/*.json`, `filters.txt`) were sampled for consistency only.
+
+#### Changed (optimization / cleanup)
+- **Duplicate exception gates** (`scripts/normalize.py`): the two exception-only checks for `$header`/`$addheader` in `valid_option()` were merged into a single set-membership branch. No behavior change; the existing header/addheader coverage (`test_merge.py`, `test_audit.py`, `test_regressions.py`) still passes.
+
+#### Verified, deliberately not changed
+- `scripts/config.py` still parses `policies.yaml` up to three times per process; caching `_load_policy` was rejected because tests legitimately swap `POLICY_FILE` and monkeypatch `_load_policy` in-process.
+- `scripts/fetch.py` `_ADDRESS_PIN_CACHE` is mutated from worker threads; safe under CPython (worst case a duplicate DNS lookup), with `test_hardening.py::DnsPinCacheTests` pinning the current semantics.
+
+#### Re-verified
+- README and CHANGELOG claims still match the code (32 enabled root sources, limits/policy table, curl >= 8.4.0 requirement, report schema 5, policy schema 3 / source schema 1). No documentation drift found; the README gained only a one-line note that the other `scripts/` modules are import-only building blocks.
