@@ -86,6 +86,12 @@ def _strict_bool(value, field: str) -> bool:
     raise ValueError(f"{field} must be a boolean")
 
 
+def _strict_str(value, field: str) -> str:
+    if isinstance(value, str):
+        return value.strip()
+    raise ValueError(f"{field} must be a string")
+
+
 def _strict_int(value, field: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
         raise ValueError(f"{field} must be an integer")
@@ -222,10 +228,12 @@ def _load_policy() -> dict:
     unknown = sorted(set(data) - POLICY_TOP_LEVEL_KEYS, key=str)
     if unknown:
         raise ValueError(f"policies.yaml: unknown top-level keys: {', '.join(map(str, unknown))}")
-    if "version" in data and data["version"] != POLICY_SCHEMA_VERSION:
-        raise ValueError(
-            f"policies.yaml: unsupported version {data['version']!r} (expected {POLICY_SCHEMA_VERSION})"
-        )
+    if "version" in data:
+        version = _strict_int(data["version"], "policies.yaml: version")
+        if version != POLICY_SCHEMA_VERSION:
+            raise ValueError(
+                f"policies.yaml: unsupported version {version!r} (expected {POLICY_SCHEMA_VERSION})"
+            )
     if "profile" in data and data["profile"] != PROFILE_NAME:
         raise ValueError(
             f"policies.yaml: unsupported profile {data['profile']!r} (this builder implements {PROFILE_NAME!r})"
@@ -254,20 +262,29 @@ def _rule_policy(policy: dict) -> dict[str, bool]:
         for key, default in RULE_POLICY_DEFAULTS.items()
     }
     # Cosmetic sub-features are unreachable when the cosmetic gate itself is
-    # off (_normalize_line returns before normalize_cosmetic runs), so a
-    # config that disables cosmetics but enables snippets/extended-css is
-    # contradictory and must fail loudly instead of being silently masked.
+    # off (_normalize_line returns before normalize_cosmetic runs). The remove
+    # action is also unreachable when inline-style rules are disabled. Reject
+    # these contradictory combinations instead of silently masking switches.
+    dependent: list[str] = []
     if not merged["allow_abp_cosmetic"]:
-        dependent = [
-            name for name in ("allow_abp_snippets", "allow_extended_css")
-            if merged[name]
-        ]
-        if dependent:
-            raise ValueError(
-                "policies.yaml: rules."
-                + ", rules.".join(dependent)
-                + " have no effect unless rules.allow_abp_cosmetic is true"
-            )
+        dependent.extend(
+            name for name in (
+                "allow_abp_snippets", "allow_extended_css",
+                "allow_abp_inline_styles", "allow_abp_remove_action",
+            ) if merged[name]
+        )
+    elif not merged["allow_abp_inline_styles"] and merged["allow_abp_remove_action"]:
+        dependent.append("allow_abp_remove_action")
+    if dependent:
+        if not merged["allow_abp_cosmetic"]:
+            explanation = "have no effect unless rules.allow_abp_cosmetic is true"
+        else:
+            explanation = "has no effect unless rules.allow_abp_inline_styles is true"
+        raise ValueError(
+            "policies.yaml: rules."
+            + ", rules.".join(dependent)
+            + f" {explanation}"
+        )
     return merged
 
 
@@ -288,10 +305,12 @@ def load_config() -> BuildConfig:
     if not isinstance(source_data, dict):
         raise ValueError("sources.yaml: top level must be an object")
     _reject_unknown_keys(source_data, SOURCES_TOP_LEVEL_KEYS, "sources.yaml")
-    if "version" in source_data and source_data["version"] != SOURCE_SCHEMA_VERSION:
-        raise ValueError(
-            f"sources.yaml: unsupported version {source_data['version']!r} (expected {SOURCE_SCHEMA_VERSION})"
-        )
+    if "version" in source_data:
+        version = _strict_int(source_data["version"], "sources.yaml: version")
+        if version != SOURCE_SCHEMA_VERSION:
+            raise ValueError(
+                f"sources.yaml: unsupported version {version!r} (expected {SOURCE_SCHEMA_VERSION})"
+            )
     raw_sources = source_data.get("sources")
     if not isinstance(raw_sources, list):
         raise ValueError("sources.yaml: 'sources' must be a list")
@@ -305,8 +324,12 @@ def load_config() -> BuildConfig:
         # A misspelled `required`/`enabled` would otherwise be ignored and
         # silently turn a health gate off.
         _reject_unknown_keys(item, SOURCE_ITEM_KEYS, f"sources.yaml: source #{index + 1}")
-        name = str(item.get("name", "")).strip()
-        url = str(item.get("url", "")).strip()
+        name = _strict_str(item.get("name", ""), f"sources.yaml: source #{index + 1}.name")
+        url = _strict_str(item.get("url", ""), f"sources.yaml: source #{index + 1}.url")
+        category = _strict_str(
+            item.get("category", "uncategorized"),
+            f"sources.yaml: source #{index + 1}.category",
+        )
         if not name or not valid_url(url):
             raise ValueError(f"sources.yaml: invalid source #{index + 1}: {name or url}")
         url = canonical_url(url)
@@ -329,7 +352,7 @@ def load_config() -> BuildConfig:
         sources.append(Source(
             name=name,
             url=url,
-            category=str(item.get("category", "uncategorized")),
+            category=category or "uncategorized",
             enabled=enabled,
             priority=priority,
             required=required,

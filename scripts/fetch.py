@@ -180,13 +180,21 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
             if resolution_error:
                 return fail(resolution_error if redirects == 0 else f"redirect-{resolution_error}")
 
+            # Redirect response bodies count toward the source's reserved
+            # budget too. Reduce the per-hop limit by bytes already observed so
+            # an otherwise valid redirect chain cannot consume the full limit
+            # once per hop.
+            remaining_bytes = max_download_bytes - transferred_bytes
+            if remaining_bytes <= 0:
+                return fail("download-size-limit-exceeded")
+
             connect_timeout = min(20, remaining)
             command = [
                 "curl", "--fail", "--silent", "--show-error", "--compressed",
                 "--retry", str(CURL_RETRIES), "--retry-connrefused",
                 "--retry-max-time", str(remaining),
                 "--connect-timeout", str(connect_timeout), "--max-time", str(remaining),
-                "--max-filesize", str(max_download_bytes),
+                "--max-filesize", str(remaining_bytes),
                 "--noproxy", "*",
                 "--proto", "=http,https",
                 "--max-redirs", "0",

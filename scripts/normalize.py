@@ -294,6 +294,12 @@ def valid_inline_style(body: str, allow_remove: bool = True) -> bool:
     if "{" not in body or not body.endswith("}"):
         return False
     selector, declarations = body.rsplit("{", 1)
+    # The body may contain exactly one opening and closing brace, which frame
+    # the declaration block. Without this check, a malformed rule like
+    # `div { color: red } { display: none }` passes by treating the first block
+    # as part of the selector.
+    if any(brace in selector or brace in declarations[:-1] for brace in ("{", "}")):
+        return False
     if not selector.strip() or not declarations[:-1].strip():
         return False
     declarations = declarations[:-1].strip()
