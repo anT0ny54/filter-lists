@@ -164,7 +164,9 @@ class RulePolicyRegressionTests(unittest.TestCase):
                 "rules:\n"
                 "  allow_abp_cosmetic: false\n"
                 "  allow_abp_snippets: false\n"
-                "  allow_extended_css: false\n",
+                "  allow_extended_css: false\n"
+                "  allow_abp_inline_styles: false\n"
+                "  allow_abp_remove_action: false\n",
                 "example.com##.ad",
             )
         )
@@ -189,6 +191,14 @@ class RulePolicyRegressionTests(unittest.TestCase):
                 "  allow_extended_css: true\n",
                 "example.com##.ad",
             )
+
+    def test_remove_action_cannot_be_enabled_without_inline_styles(self):
+        setup_config_root(self, config, policies_yaml=(
+            "rules:\n  allow_abp_inline_styles: false\n"
+            "  allow_abp_remove_action: true\n"
+        ))
+        with self.assertRaisesRegex(ValueError, "allow_abp_inline_styles"):
+            config.load_config()
 
     def test_yaml_can_allow_ubo_only_cosmetic_forms(self):
         self.assertEqual(

@@ -101,6 +101,71 @@ class FetchSecurityTests(unittest.TestCase):
         self.assertEqual(transferred, len(body))
         self.assertFalse(output.exists())
 
+    def test_redirect_bodies_share_the_per_source_byte_budget(self):
+        calls = []
+        redirect_body = b"r" * 40
+        final_body = b"||example.com^\n!! enough padding for validation\n"
+        responses = [
+            type("Proc", (), {"returncode": 0, "stdout": "302", "stderr": ""})(),
+            type("Proc", (), {"returncode": 0, "stdout": "200", "stderr": ""})(),
+        ]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "source.txt"
+            headers = output.with_suffix(output.suffix + ".headers")
+
+            def fake_run(command, **kwargs):
+                calls.append(command)
+                proc = responses.pop(0)
+                if proc.stdout == "302":
+                    output.write_bytes(redirect_body)
+                    headers.write_text(
+                        "HTTP/1.1 302 Found\r\n"
+                        "Location: https://example.org/final\r\n\r\n",
+                        encoding="iso-8859-1",
+                    )
+                else:
+                    output.write_bytes(final_body)
+                    headers.write_text("HTTP/1.1 200 OK\r\n\r\n", encoding="iso-8859-1")
+                return proc
+
+            with patch.object(fetch, "_public_address_for_url", return_value=("93.184.216.34", "")), \
+                 patch.object(fetch.subprocess, "run", side_effect=fake_run):
+                ok, reason, transferred = fetch.download("http://example.com/start", output, 10, 100)
+
+        self.assertTrue(ok, reason)
+        self.assertEqual(transferred, len(redirect_body) + len(final_body))
+        self.assertEqual(calls[0][calls[0].index("--max-filesize") + 1], "100")
+        self.assertEqual(calls[1][calls[1].index("--max-filesize") + 1], str(100 - len(redirect_body)))
+
+    def test_redirect_that_consumes_budget_stops_before_next_request(self):
+        calls = []
+        response = type("Proc", (), {"returncode": 0, "stdout": "302", "stderr": ""})()
+
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "source.txt"
+            headers = output.with_suffix(output.suffix + ".headers")
+
+            def fake_run(command, **kwargs):
+                calls.append(command)
+                output.write_bytes(b"x" * 40)
+                headers.write_text(
+                    "HTTP/1.1 302 Found\r\n"
+                    "Location: https://example.org/final\r\n\r\n",
+                    encoding="iso-8859-1",
+                )
+                return response
+
+            with patch.object(fetch, "_public_address_for_url", return_value=("93.184.216.34", "")), \
+                 patch.object(fetch.subprocess, "run", side_effect=fake_run):
+                ok, reason, transferred = fetch.download("http://example.com/start", output, 10, 40)
+
+        self.assertFalse(ok)
+        self.assertEqual(reason, "download-size-limit-exceeded")
+        self.assertEqual(transferred, 40)
+        self.assertEqual(len(calls), 1)
+        self.assertFalse(output.exists())
+
     def test_public_redirect_is_followed_one_hop_at_a_time(self):
         calls = []
         responses = [

@@ -133,5 +133,15 @@ class NormalizeTests(unittest.TestCase):
         rule = "example.com##div { display: none }"
         self.assertEqual(normalize_rule(rule), rule)
 
+    def test_multiple_or_nested_style_blocks_are_rejected(self):
+        for rule in (
+            "example.com##div { color: red } { display: none }",
+            "example.com##div { color: red { display: none }",
+            "example.com##div } { display: none }",
+            "example.com##div { display: none; content: }",
+        ):
+            with self.subTest(rule=rule):
+                self.assertIsNone(normalize_rule(rule))
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

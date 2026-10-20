@@ -96,6 +96,11 @@ class PolicyFileValidationTests(unittest.TestCase):
     def test_matching_profile_and_version_are_accepted(self):
         self.assertEqual(self._load("version: 3\nprofile: strict-abp\n")["profile"], "strict-abp")
 
+    def test_boolean_and_float_schema_versions_are_rejected(self):
+        for version in ("true", "3.0"):
+            with self.subTest(version=version), self.assertRaisesRegex(ValueError, "version must be an integer"):
+                self._load(f"version: {version}\nprofile: strict-abp\n")
+
     def test_default_success_ratio_matches_shipped_policy(self):
         import yaml
         import config

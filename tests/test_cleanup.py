@@ -25,6 +25,24 @@ class SourcesVersionTests(unittest.TestCase):
         self.assertTrue(self._load(f"version: {config.SOURCE_SCHEMA_VERSION}\n{body}").sources)
         self.assertTrue(self._load(body).sources)
 
+    def test_boolean_and_float_schema_versions_are_rejected(self):
+        for version in ("true", "1.0"):
+            with self.subTest(version=version), self.assertRaisesRegex(ValueError, "version must be an integer"):
+                self._load(f"version: {version}\nsources: []\n")
+
+    def test_non_string_source_fields_are_rejected(self):
+        cases = {
+            "name": "sources:\n  - name: 123\n    url: https://a.test/l.txt\n",
+            "url": "sources:\n  - name: a\n    url: 123\n",
+            "category": (
+                "sources:\n  - name: a\n    url: https://a.test/l.txt\n"
+                "    category: 123\n"
+            ),
+        }
+        for field, body in cases.items():
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, f"{field} must be a string"):
+                self._load(body)
+
 
 class RejectionPathTests(unittest.TestCase):
     LINES = [

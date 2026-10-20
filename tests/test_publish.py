@@ -13,7 +13,7 @@ import unittest
 from pathlib import Path
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "publish.sh"
-GENERATED = ["filters.txt", "reports/history", "reports/source-outcomes.json"]
+GENERATED = ["filters.txt", "reports/baseline.json", "reports/history", "reports/source-outcomes.json"]
 GUARDS = ["scripts/", "sources.yaml"]
 ENV = {
     **os.environ,
@@ -50,6 +50,7 @@ class PublishRetryTests(unittest.TestCase):
         write(seed, "filters.txt", "old\n")
         write(seed, "reports/history/old-1.json", "{}\n")
         write(seed, "reports/history/old-2.json", "{}\n")
+        write(seed, "reports/baseline.json", '{"build":"old"}\n')
         git(seed, "add", "-A")
         git(seed, "commit", "-q", "-m", "seed")
         git(seed, "push", "-q", str(self.remote), "main")
@@ -74,6 +75,7 @@ class PublishRetryTests(unittest.TestCase):
         (self.runner / "reports/history/old-1.json").unlink()  # retention pruning
         write(self.runner, "reports/history/new-3.json", "{}\n")
         write(self.runner, "reports/source-outcomes.json", "{\"runs\": []}\n")
+        write(self.runner, "reports/baseline.json", '{"build":"new"}\n')
 
     def _publish(self, *, guards=True, extra_env=None, paths=None):
         cmd = ["bash", str(SCRIPT), "-m", "chore: publish"]
@@ -96,6 +98,7 @@ class PublishRetryTests(unittest.TestCase):
         proc = self._publish()
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertEqual(self._remote_show("filters.txt"), "new\n")
+        self.assertEqual(self._remote_show("reports/baseline.json"), '{"build":"new"}\n')
 
     def test_nothing_to_publish_is_a_noop(self):
         before = self._remote_count()
