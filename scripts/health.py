@@ -28,6 +28,39 @@ OUTCOMES_SCHEMA = 1
 MAX_STORED_RUNS = 120
 
 
+def _utc_timestamp(timestamp: object) -> datetime | None:
+    """Parse an ISO timestamp and normalize it to UTC, or return ``None``."""
+    value = str(timestamp or "")
+    if value.endswith("Z"):
+        value = value[:-1] + "+00:00"
+    try:
+        parsed = datetime.fromisoformat(value)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        # UTC normalization can overflow at datetime.min/max for extreme but
+        # syntactically valid offsets, so keep it inside the same guard.
+        return parsed.astimezone(timezone.utc)
+    except (OverflowError, ValueError):
+        return None
+
+
+def timestamp_sort_key(timestamp: object) -> tuple[int, datetime | str, str]:
+    """Sort malformed timestamps first, then valid timestamps by UTC instant.
+
+    Bad/undated history entries remain distinct and age out before valid runs.
+    Lexicographically sorting ISO strings is insufficient when their UTC
+    offsets differ: a locally later clock reading may be an earlier instant.
+    """
+    raw = str(timestamp or "")
+    parsed = _utc_timestamp(raw)
+    return (0, raw, raw) if parsed is None else (1, parsed, raw)
+
+
+def _run_sort_key(run: dict) -> tuple[int, datetime | str, str]:
+    """Apply timestamp_sort_key to a stored report/outcome run."""
+    return timestamp_sort_key(run.get("generated_at", ""))
+
+
 def history_reports(history_dir: Path, limit: int = 30) -> list[dict]:
     reports = []
     for path in history_dir.glob("*.json"):
@@ -37,7 +70,7 @@ def history_reports(history_dir: Path, limit: int = 30) -> list[dict]:
                 reports.append(data)
         except (OSError, ValueError):
             continue
-    reports.sort(key=lambda item: item.get("generated_at", ""), reverse=True)
+    reports.sort(key=_run_sort_key, reverse=True)
     return reports[:limit]
 
 
@@ -81,20 +114,14 @@ def load_outcomes(outcomes_path: Path | None, history_dir: Path | None = None) -
             str(report.get("build_id", "")),
             report.get("sources", {}).get("results", []),
         ))
-    seeded.sort(key=lambda r: r["generated_at"])
+    seeded.sort(key=_run_sort_key)
     return seeded
 
 
 def _utc_day(timestamp: object) -> str | None:
     """Return an ISO timestamp's UTC calendar day, or None if it is malformed."""
-    value = str(timestamp or "")
-    try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-    if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc).date().isoformat()
+    parsed = _utc_timestamp(timestamp)
+    return parsed.date().isoformat() if parsed is not None else None
 
 
 def _compact_daily_runs(runs: list[dict]) -> list[dict]:
@@ -105,7 +132,7 @@ def _compact_daily_runs(runs: list[dict]) -> list[dict]:
     Entries without a usable ISO date are retained separately rather than all
     being accidentally merged into one undated bucket.
     """
-    ordered = sorted(runs, key=lambda r: str(r.get("generated_at", "")))
+    ordered = sorted(runs, key=_run_sort_key)
     compacted: list[dict] = []
     by_day: dict[str, int] = {}
     for run in ordered:
@@ -127,7 +154,7 @@ def _compact_daily_runs(runs: list[dict]) -> list[dict]:
         newest = dict(run)
         newest["outcomes"] = merged
         compacted[index] = newest
-    compacted.sort(key=lambda r: str(r.get("generated_at", "")))
+    compacted.sort(key=_run_sort_key)
     return compacted
 
 
@@ -220,7 +247,7 @@ def build_source_reputation(
     runs = load_outcomes(outcomes_path, history_dir)
     now = generated_at or datetime.now(timezone.utc).isoformat()
     runs.append(_entry(now, "current", "", current_results))
-    runs.sort(key=lambda r: str(r.get("generated_at", "")))
+    runs.sort(key=_run_sort_key)
 
     days: dict[str, dict[str, bool]] = {}
     for index, run in enumerate(runs):

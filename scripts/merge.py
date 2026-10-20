@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from config import BUILDER_VERSION, CUSTOM_RULES, ROOT, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
 from fetch import collect_sources  # noqa: E402
-from health import default_outcomes_path, history_reports, set_outcome_status  # noqa: E402
+from health import default_outcomes_path, history_reports, set_outcome_status, timestamp_sort_key  # noqa: E402
 from normalize import rule_sort_key  # noqa: E402
 from policy import PROFILE_DESCRIPTION  # noqa: E402
 from report import analyze_files, write_report  # noqa: E402
@@ -129,7 +129,7 @@ def archive_successful_report(build_id: str, *, retention: int = 10) -> None:
     # Keep retention based on generated_at, not filenames: build IDs are hashes.
     successful = [(generated_at, path) for generated_at, _, status, path in archived
                   if status == "success" and path not in removed]
-    successful.sort(key=lambda item: (item[0], item[1].name), reverse=True)
+    successful.sort(key=lambda item: (*timestamp_sort_key(item[0]), item[1].name), reverse=True)
 
     for _, path in successful[retention:]:
         try:
@@ -300,6 +300,21 @@ def main() -> int:
             if detail:
                 item.update({k: v for k, v in detail.items() if k != "path"})
         source_stats["content_hash_algorithm"] = "sha256"
+        analysis_errors = [item for item in rule_stats.get("per_file", []) if item.get("error")]
+        if analysis_errors:
+            for item in analysis_errors:
+                log(f"[ERROR] File analysis failed: {item.get('path', '<unknown>')} — {item['error']}")
+            # A partial list is not a safe build artifact. analyze_files keeps
+            # rules from failed files out of its result, but publishing the
+            # remaining sources would still silently omit a source that could
+            # not be read to completion. Preserve the last good filters.txt.
+            write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats,
+                         elapsed_seconds=time.monotonic()-started, source_urls=source_urls,
+                         build_id=fingerprint, previous_report=previous_report,
+                         anomaly_policy=config.anomaly_detection, provenance=provenance,
+                         source_metadata=source_metadata, history_dir=HISTORY_DIR,
+                         status="failed", source_quality_policy=config.source_quality)
+            return 1
         final_rules = sorted(rules, key=rule_sort_key)
         build_id = hashlib.sha256((fingerprint + "\n" + "\n".join(final_rules)).encode()).hexdigest()
         staged = stage_output(final_rules, build_id, manifest_sha256=provenance["source_manifest_sha256"], source_count=len(source_urls))

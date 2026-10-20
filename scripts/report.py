@@ -48,36 +48,67 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
     if custom_rules and custom_rules.exists():
         paths.append(custom_rules)
     for path in paths:
+        # Stage each file's parsing results locally and merge them only after
+        # reading and hashing both succeed. Otherwise a mid-stream I/O error
+        # could leave a partially parsed source in the output rules.
         local_rules: set[str] = set()
         local_reasons: Counter[str] = Counter()
-        local_accepted = local_rejected = local_duplicates = local_lines = 0
-        # Constant for the whole file; previously re-evaluated (twice) per line.
+        local_accepted = local_rejected = local_lines = 0
         trusted = path in trusted_paths or path == custom_rules
         try:
             with path.open(encoding="utf-8", errors="replace") as source:
                 for raw in source:
-                    local_lines += 1; input_lines += 1
-                    rule, reason = normalize_rule_with_reason(raw.rstrip("\r\n"), max_rule_length=max_rule_length, trusted_abp_features=trusted, rule_policy=rule_policy)
+                    local_lines += 1
+                    rule, reason = normalize_rule_with_reason(
+                        raw.rstrip("\r\n"), max_rule_length=max_rule_length,
+                        trusted_abp_features=trusted, rule_policy=rule_policy,
+                    )
                     if rule is None:
-                        rejected += 1; local_rejected += 1
-                        reasons[reason] += 1; local_reasons[reason] += 1
+                        local_rejected += 1
+                        local_reasons[reason] += 1
                     else:
-                        accepted += 1; local_accepted += 1; local_rules.add(rule)
-                        # One hash lookup instead of `in` followed by `add`.
-                        before = len(rules)
-                        rules.add(rule)
-                        if len(rules) == before:
-                            duplicates += 1; local_duplicates += 1
+                        local_accepted += 1
+                        local_rules.add(rule)
             # Downloaded sources are already hashed once during fetch (see
             # fetch.collect_sources). Reuse that digest instead of re-reading
             # and re-hashing the same file a second time here; only files
             # without a known digest (e.g. custom-rules.txt) get hashed now.
             file_hash = known_hashes.get(path) or sha256_file(path)
-            per_file.append(_file_record(path, local_lines, local_accepted, local_rejected, local_duplicates, len(local_rules), local_reasons, sha256=file_hash))
         except OSError as exc:
-            reasons["read-error"] += 1; rejected += 1; local_rejected += 1
-            per_file.append(_file_record(path, local_lines, local_accepted, local_rejected, local_duplicates, len(local_rules), {"read-error": 1}, error=str(exc)))
-    return rules, {"input_lines": input_lines, "accepted_lines": accepted, "rejected_lines": rejected, "duplicate_lines": duplicates, "unique_rules": len(rules), "rejection_rate": round(rejected / input_lines, 6) if input_lines else 0.0, "rejection_reasons": dict(sorted(reasons.items())), "per_file": per_file}
+            # A failed file is rejected as a unit: none of its partially read
+            # rules enter the global set. Preserve one diagnostic for an empty
+            # unreadable file, while keeping known partial lines fully rejected.
+            failed_lines = max(1, local_lines)
+            input_lines += local_lines
+            rejected += failed_lines
+            reasons["read-error"] += failed_lines
+            per_file.append(_file_record(
+                path, local_lines, 0, failed_lines, 0, 0,
+                {"read-error": failed_lines}, error=str(exc),
+            ))
+            continue
+
+        # Accepted duplicates include repeated rules within this file and
+        # rules already committed by an earlier source. Computing this once
+        # avoids a global-set membership/length check on every accepted line.
+        local_duplicates = local_accepted - len(local_rules) + len(local_rules & rules)
+        input_lines += local_lines
+        accepted += local_accepted
+        rejected += local_rejected
+        duplicates += local_duplicates
+        reasons.update(local_reasons)
+        rules.update(local_rules)
+        per_file.append(_file_record(
+            path, local_lines, local_accepted, local_rejected, local_duplicates,
+            len(local_rules), local_reasons, sha256=file_hash,
+        ))
+    rejection_rate = round(rejected / input_lines, 6) if input_lines else (1.0 if reasons.get("read-error") else 0.0)
+    return rules, {
+        "input_lines": input_lines, "accepted_lines": accepted,
+        "rejected_lines": rejected, "duplicate_lines": duplicates,
+        "unique_rules": len(rules), "rejection_rate": rejection_rate,
+        "rejection_reasons": dict(sorted(reasons.items())), "per_file": per_file,
+    }
 
 
 def _ratio_change(current: float, previous: float) -> float:

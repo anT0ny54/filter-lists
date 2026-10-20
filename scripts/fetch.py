@@ -336,11 +336,33 @@ def validate_download(
                 sample.decode("utf-8", errors="ignore")
             ):
                 return False, "html-or-error-page"
-            if not sample.strip():
-                return False, "empty"
+
+            # Do not equate a whitespace-only *sample* with an empty file.
+            # Large but otherwise valid lists can contain more than 64 KiB of
+            # leading whitespace; scan the remainder before deciding emptiness.
+            has_content = bool(sample.strip())
+            # When the initial sample is all whitespace, keep a bounded probe
+            # starting at the first non-whitespace byte. This also handles an
+            # HTML/error marker split across the 1 MiB read boundary.
+            html_probe = bytearray() if not has_content and reject_html_error_pages else None
+            probe_limit = 65536
             for chunk in iter(lambda: handle.read(1024 * 1024), b""):
                 if b"\x00" in chunk:
                     return False, "binary-data"
+                if not has_content:
+                    first_content = chunk.lstrip()
+                    if first_content:
+                        has_content = True
+                        if html_probe is not None:
+                            html_probe.extend(first_content[:probe_limit])
+                elif html_probe is not None and len(html_probe) < probe_limit:
+                    html_probe.extend(chunk[:probe_limit - len(html_probe)])
+            if not has_content:
+                return False, "empty"
+            if html_probe is not None and HTML_ERROR_PAGE_RE.search(
+                html_probe.decode("utf-8", errors="ignore")
+            ):
+                return False, "html-or-error-page"
         return True, ""
     except OSError as exc:
         return False, str(exc)
