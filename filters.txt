@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-0f083256d363
-! Last updated: 2026-10-20 05:10:17 UTC
+! Version: v7.6.0-fff8604ca8a8
+! Last updated: 2026-10-20 05:32:14 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 0f083256d363e5df4d1fab9af74bdd39f3a0e19576fc302e5bf2724179e6f999
+! Build-ID: fff8604ca8a8db64c1754da25452ebc01b16ee44863a305c410428660dbfeba4
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 175449
+! Total rules: 175451
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -138909,6 +138909,7 @@ zzzyk.com###Tinfo
 ||mahaldenaryfrit.qpon^
 ||mahalhep.qpon^
 ||mahallastaboy.com^
+||mahantdominuspedros.cfd^
 ||maharashtrasamrat.com/media/2025-03/240x400-veryical-rectangle.jpg
 ||mahassvibccui.store^
 ||mahatroo.com^
@@ -146924,6 +146925,7 @@ zzzyk.com###Tinfo
 ||pconline.com.cn/jrzcz/*/intf
 ||pconline.com.cn/js/ad_
 ||pconline.com.cn/js/ivy.js
+||pcpbzqghreucy.space^
 ||pcpro100.info/wp-content/themes/pcpro100/images/top-ban.gif
 ||pcpsbdikueqle.online^
 ||pcsauvntjwrxm.website^
