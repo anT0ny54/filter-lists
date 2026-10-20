@@ -98,7 +98,9 @@ def main() -> int:
         # than crashing with a traceback.
         errors.append(f"[ENCODING] not valid UTF-8: {exc.reason} at byte {exc.start}")
 
-    if declared_total != len(seen):
+    if declared_total is None:
+        errors.append("[COUNT] missing '! Total rules:' header")
+    elif declared_total != len(seen):
         errors.append(f"[COUNT] declared {declared_total}, found {len(seen)} unique rules")
     if declared_build_id is None:
         errors.append("[BUILD-ID] missing or invalid")
