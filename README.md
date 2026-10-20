@@ -206,7 +206,7 @@ A live build requires network access to the configured upstream lists. The build
 
 ## 🤖 Automation
 
-- **`update.yml`** runs daily at 03:17 UTC, on manual dispatch, and on pushes to `main` that touch `sources.yaml`, `custom-rules.txt`, `policies.yaml`, `scripts/**`, `tests/**`, `requirements.txt`, or the workflow itself. It runs the test suite, builds, validates, asserts report invariants (schema, builder version, source health, anomalies), then publishes `filters.txt`, `sources.txt`, `reports/latest.json`, `reports/history/`, and `reports/source-outcomes.json` only if they changed. If the build fails, only `reports/source-outcomes.json` is published (nothing else) so failures still count toward source reputation.
+- **`update.yml`** runs daily at 03:17 UTC, on manual dispatch, and on pushes to `main` that touch `sources.yaml`, `custom-rules.txt`, `policies.yaml`, `scripts/**`, `tests/**`, `requirements.txt`, or the workflow itself. It runs the test suite, builds, validates, asserts report invariants (schema, builder version, source health, anomalies), then publishes `filters.txt`, `sources.txt`, `reports/latest.json`, `reports/baseline.json`, `reports/history/`, and `reports/source-outcomes.json` only if they changed. If the build fails, only `reports/source-outcomes.json` is published (nothing else) so failures still count toward source reputation.
 - **`validate.yml`** runs on pull requests that touch the same paths (plus `.github/workflows/**`) and on manual dispatch: byte-compile, test suite, benchmark, and the optional differential test. It never publishes.
 - **`Keep-Alive.yml`** runs on the 1st and 15th of each month at 03:47 UTC (and manually) and rewrites `.github/keep-alive.txt` with a timestamp so scheduled workflows are not disabled for repository inactivity.
 - **`scripts/publish.sh`** is the only code that pushes from CI (both `update.yml` steps and `Keep-Alive.yml` use it). The workflows check out `main` once and push minutes later, so a human push in between makes a plain `git push` fail as a non-fast-forward. `publish.sh` handles that:
@@ -260,17 +260,17 @@ The repository test suite covers:
 
 Download success does not mean a source contributes rules, so each build also evaluates rule yield per source. The **effective rejection rate** is the share of rule lines (input lines minus comments, blanks, and directives) that the strict-ABP profile rejected. With the shipped policy, sources of at least 100 lines at or above 30% are reported as `warning` and at or above 90% as `critical` in `reports/latest.json` (`source_quality`) and in the build log. They are advisory unless `source_quality.fail_on_critical: true`.
 
-Snapshot from the newest retained report (`reports/latest.json`, generated 2026-10-17, AdGuard Annoyances already disabled): 32/32 root sources OK, 228,955 input lines, 199,020 accepted, 173,754 unique rules, overall rejection rate 13.07%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`).
+Snapshot from the newest report (`reports/latest.json`, generated 2026-10-19): 32/32 root sources OK, 230,119 input lines, 200,164 accepted, 174,777 unique rules, overall rejection rate 13.02%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.52% effective rejection rate).
 
-| Source | Input lines | Accepted | Rejection rate | Main reasons |
+| Source | Input lines | Accepted | Rejection rate* | Main rejection reasons |
 |---|---:|---:|---:|---|
-| AdGuard Ukrainian | 5,538 | 3,616 | 34.52% | `unknown-option` (1,770), `ubo-only-syntax` (122) |
-| AdGuard Social Media | 30,979 | 21,944 | 29.16% | `ubo-only-syntax` (7,352), `unknown-option` (674) |
-| AdGuard Turkish | 6,825 | 5,266 | 22.84% | `ubo-only-syntax` (785), `invalid-cosmetic-rule` (469) |
-| AdGuard Russian | 7,691 | 6,040 | 21.47% | `unknown-option` (836), `ubo-only-syntax` (633) |
-| AdGuard French | 4,948 | 4,028 | 18.59% | `unknown-option` (628), `ubo-only-syntax` (237) |
+| AdGuard Ukrainian | 5,539 | 3,616 | 34.72% | `unknown-option` (1,770), `ubo-only-syntax` (122) |
+| AdGuard Social Media | 31,010 | 21,969 | 29.16% | `ubo-only-syntax` (7,359), `unknown-option` (676) |
+| AdGuard Turkish | 6,827 | 5,268 | 22.84% | `ubo-only-syntax` (785), `invalid-cosmetic-rule` (469) |
+| AdGuard Russian | 7,704 | 6,049 | 21.48% | `unknown-option` (841), `ubo-only-syntax` (632) |
+| AdGuard French | 4,932 | 4,008 | 18.73% | `unknown-option` (632), `ubo-only-syntax` (237) |
 
-The rejection rate here is the plain share of all input lines (comments included); the quality gate uses the effective rate, which excludes comments, blanks and directives, so its figures differ slightly (AdGuard Ukrainian: 34.52% effective).
+*The table's rejection rate is the plain share of all input lines rejected (comments included). The quality gate uses effective rejection rate, excluding comments, blanks and directives; AdGuard Ukrainian's effective rate is 34.52%.
 
 Most EasyList-family sources reject under 5% of lines (mostly comments). Rejection of AdGuard/uBO-only syntax is intentional under the strict-ABP policy. Figures change with every upstream update; consult `reports/latest.json`.
 
