@@ -17,6 +17,9 @@ from config import DEFAULT_SOURCE_QUALITY  # noqa: E402
 from normalize import normalize_rule  # noqa: E402
 
 
+from _helpers import curl_stream_limits_available
+
+
 class ABPStrictTests(unittest.TestCase):
     def test_network_exception_is_preserved(self):
         rule = "@@||Example.COM^$SCRIPT,domain=example.com|~ads.example.com"
@@ -138,6 +141,7 @@ class MergeMainE2ETests(unittest.TestCase):
             source_quality=dict(DEFAULT_SOURCE_QUALITY),
         )
 
+    @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_main_real_local_http_fetch_and_analysis(self):
         with tempfile.TemporaryDirectory(prefix="filter-merge-http-") as server_dir:
             server_root = Path(server_dir)

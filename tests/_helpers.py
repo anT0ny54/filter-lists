@@ -1,4 +1,6 @@
 """Shared test helpers (loaders, validate.main() runner, merge tmp-root fixture)."""
+import re
+import subprocess
 import contextlib
 import importlib.util
 import io
@@ -79,3 +81,19 @@ def setup_config_root(testcase, config_module, *, sources_yaml=None, policies_ya
     (root / "policies.yaml").write_text(
         policies_yaml if policies_yaml is not None else "limits: {}\n", encoding="utf-8")
     return root
+
+
+def curl_stream_limits_available() -> bool:
+    """True when the installed curl supports safe unknown-length size limits."""
+    try:
+        proc = subprocess.run(
+            ["curl", "--version"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            timeout=5,
+        )
+        match = re.match(r"^curl\s+(\d+)\.(\d+)\.(\d+)", proc.stdout or "")
+        return bool(match) and tuple(int(part) for part in match.groups()) >= (8, 4, 0)
+    except Exception:
+        return False

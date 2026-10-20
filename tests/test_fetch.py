@@ -16,6 +16,9 @@ from config import canonical_url
 from fetch import collect_sources, include_urls, validate_download
 
 
+from _helpers import curl_stream_limits_available
+
+
 class FetchSecurityTests(unittest.TestCase):
     def test_private_literal_is_blocked_before_curl(self):
         address, reason = fetch._public_address_for_url("http://127.0.0.1:8080/list.txt")
@@ -85,6 +88,7 @@ class FetchSecurityTests(unittest.TestCase):
         finally:
             fetch._ADDRESS_PIN_CACHE.pop(("example.test", 0), None)
 
+    @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_download_preserves_an_explicit_zero_port_in_dns_pin(self):
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp) / "source.txt"
@@ -103,6 +107,7 @@ class FetchSecurityTests(unittest.TestCase):
 
         self.assertTrue(ok, reason)
 
+    @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_encoded_response_is_not_decompressed_past_download_budget(self):
         expanded = b"||example.com^\n" + (b"x" * (2 * 1024 * 1024))
         encoded = gzip.compress(expanded)
@@ -142,6 +147,7 @@ class FetchSecurityTests(unittest.TestCase):
             thread.join(timeout=5)
             server.server_close()
 
+    @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_chunked_response_is_stopped_at_download_budget(self):
         payload = b"x" * (256 * 1024)
 
@@ -180,6 +186,7 @@ class FetchSecurityTests(unittest.TestCase):
             thread.join(timeout=5)
             server.server_close()
 
+    @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_redirect_to_private_address_is_rejected_before_second_request(self):
         calls = []
         response = type("Proc", (), {"returncode": 0, "stdout": "302", "stderr": ""})()
@@ -213,6 +220,7 @@ class FetchSecurityTests(unittest.TestCase):
         self.assertIn("--noproxy", calls[0])
         self.assertNotIn("--location", calls[0])
 
+    @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_failed_transfer_reports_bytes_from_deleted_partial_output(self):
         body = b"||example.com^\npartial transfer body"
         response = type(
@@ -237,6 +245,7 @@ class FetchSecurityTests(unittest.TestCase):
         self.assertEqual(transferred, len(body))
         self.assertFalse(output.exists())
 
+    @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_redirect_bodies_share_the_per_source_byte_budget(self):
         calls = []
         redirect_body = b"r" * 40
@@ -274,6 +283,7 @@ class FetchSecurityTests(unittest.TestCase):
         self.assertEqual(calls[0][calls[0].index("--max-filesize") + 1], "100")
         self.assertEqual(calls[1][calls[1].index("--max-filesize") + 1], str(100 - len(redirect_body)))
 
+    @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_redirect_that_consumes_budget_stops_before_next_request(self):
         calls = []
         response = type("Proc", (), {"returncode": 0, "stdout": "302", "stderr": ""})()
@@ -302,6 +312,7 @@ class FetchSecurityTests(unittest.TestCase):
         self.assertEqual(len(calls), 1)
         self.assertFalse(output.exists())
 
+    @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_public_redirect_is_followed_one_hop_at_a_time(self):
         calls = []
         responses = [
@@ -369,6 +380,7 @@ class FetchTests(unittest.TestCase):
     def test_nested_include_is_resolved(self):
         self.assertEqual(include_urls(self.root / "main.txt", self.base + "/main.txt"), [self.base + "/child.txt"])
 
+    @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_root_health_is_separate_from_nested_sources(self):
         started = time.monotonic()
         with self.allow_local_fixture_fetch():
@@ -425,6 +437,7 @@ class FetchTests(unittest.TestCase):
             2,
         )
 
+    @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_global_source_limit_stops_include_explosion(self):
         started = time.monotonic()
         with self.allow_local_fixture_fetch():
@@ -568,6 +581,7 @@ class FetchBudgetWaveTests(unittest.TestCase):
     def allow_local_fixture_fetch(self):
         return patch.object(fetch, "_public_address_for_url", return_value=("127.0.0.1", ""))
 
+    @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_global_budget_queues_sources_instead_of_marking_them_failed(self):
         # Use unique paths that all resolve to the same fixture, while the
         # global budget allows only two 1-byte-sized reservations at once.
