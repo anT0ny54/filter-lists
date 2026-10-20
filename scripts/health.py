@@ -85,6 +85,18 @@ def load_outcomes(outcomes_path: Path | None, history_dir: Path | None = None) -
     return seeded
 
 
+def _utc_day(timestamp: object) -> str | None:
+    """Return an ISO timestamp's UTC calendar day, or None if it is malformed."""
+    value = str(timestamp or "")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc).date().isoformat()
+
+
 def _compact_daily_runs(runs: list[dict]) -> list[dict]:
     """Collapse legacy or out-of-order entries to one conservative entry per UTC day.
 
@@ -98,8 +110,8 @@ def _compact_daily_runs(runs: list[dict]) -> list[dict]:
     by_day: dict[str, int] = {}
     for run in ordered:
         timestamp = str(run.get("generated_at", ""))
-        day = timestamp[:10]
-        if len(day) != 10 or day[4:5] != "-" or day[7:8] != "-":
+        day = _utc_day(timestamp)
+        if day is None:
             compacted.append(run)
             continue
         index = by_day.get(day)
@@ -211,11 +223,14 @@ def build_source_reputation(
     runs.sort(key=lambda r: str(r.get("generated_at", "")))
 
     days: dict[str, dict[str, bool]] = {}
-    for run in runs:
-        day = str(run.get("generated_at", ""))[:10]  # "" (undated) sorts first
+    for index, run in enumerate(runs):
+        day = _utc_day(run.get("generated_at", ""))
+        # Keep each malformed/undated run as its own oldest observation. A
+        # shared empty-string key would collapse unrelated runs together.
+        bucket = day if day is not None else f"\0undated:{index:08d}"
         for url, ok in run["outcomes"].items():
             per_day = days.setdefault(url, {})
-            per_day[day] = per_day.get(day, True) and bool(ok)
+            per_day[bucket] = per_day.get(bucket, True) and bool(ok)
 
     result = {}
     for url, per_day in days.items():

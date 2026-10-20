@@ -453,21 +453,33 @@ def collect_sources(
                 break
 
             if len(visited) >= max_total_sources:
-                stats["source_limit_reached"] = True
-                record_unattempted(current, "source-limit")
+                # Includes may point back to an already visited source. Such
+                # cycles have been handled; they must not turn a complete
+                # traversal into a false source-limit failure.
+                unvisited = []
+                seen_current: set[str] = set()
+                for url, depth in current:
+                    key = canonical_url(url)
+                    if key not in visited and key not in seen_current and valid_url(key):
+                        seen_current.add(key)
+                        unvisited.append((key, depth))
+                if unvisited:
+                    stats["source_limit_reached"] = True
+                    record_unattempted(unvisited, "source-limit")
                 current = []
                 break
 
             batch: list[tuple[str, int]] = []
             deferred_by_source_limit: list[tuple[str, int]] = []
             for url, depth in current:
-                if len(visited) >= max_total_sources:
-                    deferred_by_source_limit.append((url, depth))
-                    continue
                 key = canonical_url(url)
-                if key not in visited and valid_url(key):
-                    visited.add(key)
-                    batch.append((key, depth))
+                if key in visited or not valid_url(key):
+                    continue
+                if len(visited) >= max_total_sources:
+                    deferred_by_source_limit.append((key, depth))
+                    continue
+                visited.add(key)
+                batch.append((key, depth))
             if not batch:
                 if deferred_by_source_limit:
                     stats["source_limit_reached"] = True
@@ -659,7 +671,12 @@ def collect_sources(
                 record_unattempted(pending, "global-download-budget-exhausted")
                 current = []
                 break
-            if deferred_by_source_limit or (len(visited) >= max_total_sources and next_batch):
+            unvisited_next: list[tuple[str, int]] = []
+            for url, depth in next_batch:
+                # `discovered` already canonicalizes keys, as does `visited`.
+                if url not in visited and valid_url(url):
+                    unvisited_next.append((url, depth))
+            if deferred_by_source_limit or (len(visited) >= max_total_sources and unvisited_next):
                 stats["source_limit_reached"] = True
                 record_unattempted(pending, "source-limit")
                 current = []

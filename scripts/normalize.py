@@ -303,9 +303,12 @@ def valid_inline_style(body: str, allow_remove: bool = True) -> bool:
     # as part of the selector.
     if any(brace in selector or brace in declarations[:-1] for brace in ("{", "}")):
         return False
-    if not selector.strip() or not declarations[:-1].strip():
+    if not selector.strip():
         return False
     declarations = declarations[:-1].strip()
+    if not declarations:
+        return False
+    declaration_count = 0
     for declaration in declarations.split(";"):
         declaration = declaration.strip()
         if not declaration:
@@ -317,18 +320,20 @@ def valid_inline_style(body: str, allow_remove: bool = True) -> bool:
         value = value.strip()
         if not name or name.startswith("--") or not CSS_PROPERTY_RE.fullmatch(name):
             return False
+        declaration_count += 1
         if name.lower() == "remove":
             if not allow_remove or value.lower() != "true":
                 return False
             continue
         if not ABP_CSS_VALUE_RE.fullmatch(value):
             return False
-    return True
+    return declaration_count > 0
 
 
 def has_inline_style(body: str) -> bool:
     """ABP inline styles are a selector followed by one trailing `{...}` block."""
-    return "{" in body and body.rstrip().endswith("}")
+    # Callers already strip cosmetic bodies, so another rstrip() is redundant.
+    return "{" in body and body.endswith("}")
 
 
 def valid_option(
