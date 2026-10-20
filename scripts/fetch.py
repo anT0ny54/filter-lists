@@ -29,7 +29,8 @@ _ADDRESS_PIN_CACHE: dict[tuple[str, int], tuple[str | None, str]] = {}
 
 def _curl_size_limit_status_from_output(version_output: str) -> tuple[bool, str]:
     """Check whether curl enforces --max-filesize on unknown-size streams."""
-    first_line = version_output.splitlines()[0] if version_output.splitlines() else ""
+    lines = version_output.splitlines()
+    first_line = lines[0] if lines else ""
     match = re.match(r"^curl\s+(\d+)\.(\d+)\.(\d+)(?:\s|$)", first_line)
     if not match:
         return False, "curl-version-unrecognized"
@@ -44,20 +45,17 @@ def _curl_size_limit_status_from_output(version_output: str) -> tuple[bool, str]
 def _curl_stream_size_limit_status() -> tuple[bool, str]:
     """Require curl 8.4+, which enforces --max-filesize on unknown-size streams."""
     try:
-        process = subprocess.Popen(
-            ["curl", "--version"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+        process = subprocess.run(
+            ["curl", "--version"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True, timeout=5,
         )
-        try:
-            version_output, _ = process.communicate(timeout=5)
-        except subprocess.TimeoutExpired:
-            process.kill()
-            process.communicate()
-            return False, "curl-version-check-timeout"
+    except subprocess.TimeoutExpired:
+        return False, "curl-version-check-timeout"
     except (OSError, subprocess.SubprocessError) as exc:
         return False, f"curl-version-check-failed: {exc}"
     if process.returncode:
         return False, "curl-version-check-failed"
-    return _curl_size_limit_status_from_output(version_output)
+    return _curl_size_limit_status_from_output(process.stdout)
 
 
 # `\b` keeps `<header`/`<htmlfoo` from matching. The status-line branch needs
@@ -146,17 +144,23 @@ def _resolve_arg(host: str, port: int, address: str) -> str:
     return f"{host}:{port}:{address}"
 
 
-def _response_content_encodings(headers: Path) -> list[str]:
-    """Return Content-Encoding values from the final HTTP response block."""
+def _header_blocks(headers: Path) -> list[list[str]]:
+    """Return the dumped response-header blocks as lists of lines, newest last.
+
+    curl normally writes one block because redirect following is disabled, but
+    an interim response such as ``100 Continue`` can add an earlier one, so the
+    callers walk the blocks backwards.
+    """
     try:
         raw = headers.read_text(encoding="iso-8859-1", errors="replace")
     except OSError:
         return []
-    # curl normally writes one response header block because redirect
-    # following is disabled. Select the final block for interim responses.
-    blocks = re.split(r"\r?\n\r?\n", raw)
-    for block in reversed(blocks):
-        lines = block.splitlines()
+    return [block.splitlines() for block in re.split(r"\r?\n\r?\n", raw)]
+
+
+def _response_content_encodings(headers: Path) -> list[str]:
+    """Return Content-Encoding values from the final HTTP response block."""
+    for lines in reversed(_header_blocks(headers)):
         if not lines or not lines[0].upper().startswith("HTTP/"):
             continue
         encodings: list[str] = []
@@ -169,16 +173,8 @@ def _response_content_encodings(headers: Path) -> list[str]:
 
 
 def _redirect_location(headers: Path) -> str | None:
-    try:
-        raw = headers.read_text(encoding="iso-8859-1", errors="replace")
-    except OSError:
-        return None
-    # curl normally writes one response header block here because redirect
-    # following is disabled. Walk the blocks backwards for robustness against
-    # an interim response such as 100 Continue.
-    blocks = re.split(r"\r?\n\r?\n", raw)
-    for block in reversed(blocks):
-        for line in reversed(block.splitlines()):
+    for lines in reversed(_header_blocks(headers)):
+        for line in reversed(lines):
             if line.lower().startswith("location:"):
                 return line.split(":", 1)[1].strip() or None
     return None
@@ -672,7 +668,6 @@ def collect_sources(
             current = next_batch
 
     stats["visited"] = len(visited)
-    stats["included_requested"] = stats["included_references"]
     # `requested` is the complete success+failure accounting, including
     # queued sources that could not be attempted because of a global limit.
     stats["requested"] = stats["successful"] + stats["failed"]

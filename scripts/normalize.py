@@ -55,6 +55,9 @@ UBO_PROCEDURAL_RE = re.compile(
     re.I,
 )
 ALLOWED_COSMETIC_SEPARATORS = frozenset({"##", "#@#", "#?#", "#$#"})
+# Option names that take no `=value`. Precomputed: the option loops run once
+# per option of every network rule, and the union used to be rebuilt each time.
+PLAIN_OPTION_NAMES = frozenset(TYPE_OPTIONS | SIMPLE_OPTIONS)
 # Precompiled: these run once per input line (hundreds of thousands per build).
 WHITESPACE_RE = re.compile(r"\s")
 XPATH_RE = re.compile(r":xpath\(", re.I)
@@ -377,13 +380,13 @@ def valid_option(
 def _option_list_reason(options: list[str], is_exception: bool, policy: dict[str, bool]) -> str | None:
     """First rejection reason in an option list, or None if all options validate.
 
-    Mirrors the per-option checks of ``_rejection_reason()`` so callers can
-    explain a rejection without re-validating the whole rule.
+    Used for rules whose pattern is empty (options only), where the option
+    list is the only thing left to explain.
     """
     for option in options:
         option_name = option.split("=", 1)[0].casefold()
         bare_name = option_name[1:] if option_name.startswith("~") else option_name
-        allowed = VALUE_OPTIONS if "=" in option else TYPE_OPTIONS | SIMPLE_OPTIONS
+        allowed = VALUE_OPTIONS if "=" in option else PLAIN_OPTION_NAMES
         if bare_name not in allowed and policy["reject_unknown_options"]:
             return "unknown-option"
         if not valid_option(option, is_exception, policy):
@@ -400,7 +403,7 @@ def _normalize_network_with_reason(rule: str, policy: dict[str, bool]) -> tuple[
     re-validates a rejected rule a second time just to explain it.
     """
     is_exception = rule.startswith("@@")
-    pattern, options = split_options(rule.strip())
+    pattern, options = split_options(rule)
     pattern_body = pattern[2:] if pattern.startswith("@@") else pattern
     if is_overbroad_pattern(pattern_body, options):
         return None, "overbroad-pattern"
@@ -422,7 +425,7 @@ def _normalize_network_with_reason(rule: str, policy: dict[str, bool]) -> tuple[
     for option in options:
         option_name = option.split("=", 1)[0].casefold()
         bare_name = option_name[1:] if option_name.startswith("~") else option_name
-        allowed = VALUE_OPTIONS if "=" in option else TYPE_OPTIONS | SIMPLE_OPTIONS
+        allowed = VALUE_OPTIONS if "=" in option else PLAIN_OPTION_NAMES
         if bare_name not in allowed and policy["reject_unknown_options"]:
             return None, "unknown-option"
         # ABP explicitly permits $addheader rules to target top-level
@@ -459,12 +462,6 @@ def _normalize_network_with_reason(rule: str, policy: dict[str, bool]) -> tuple[
         ):
             return None, "invalid-option-or-network-rule"
     return ("@@" if is_exception else "") + pattern_body + "$" + ",".join(sorted(normalized, key=str.casefold)), None
-
-
-def normalize_network(rule: str, rule_policy: dict[str, bool] | None = None) -> str | None:
-    policy = load_rule_policy() if rule_policy is None else rule_policy
-    normalized, _reason = _normalize_network_with_reason(rule, policy)
-    return normalized
 
 
 
@@ -552,7 +549,8 @@ def _normalize_line(line: str, limit: int, policy: dict[str, bool], trusted_abp_
     # option section, not a valid pattern. Regex filters are handled by
     # normalize_network/split_options and may legitimately contain `$`.
     if line.endswith("$") and not line.startswith(("/", "@@/")):
-        return None, classification, None
+        _, reason = _normalize_network_with_reason(line, policy)
+        return None, classification, reason or "invalid-network-rule"
     normalized, reason = _normalize_network_with_reason(line, policy)
     return normalized, classification, reason
 
@@ -635,7 +633,10 @@ def _rejection_reason(line, limit, policy, trusted_abp_features, c) -> str:
         return "extended-css-disabled"
     if "#?@#" in line and policy["reject_ubo_extended_exceptions"]:
         return "ubo-only-syntax"
-    if policy["reject_ubo_procedural"] and UBO_PROCEDURAL_RE.search(line):
+    # The procedural-operator gate only ever applies to cosmetic bodies
+    # (normalize_cosmetic); a network rule containing such text is not rejected
+    # for it, so it must not be explained that way either.
+    if c.kind == "cosmetic" and policy["reject_ubo_procedural"] and UBO_PROCEDURAL_RE.search(line):
         return "ubo-only-syntax"
     if c.kind == "cosmetic":
         # `#?@#` is policy-allowed when reject_ubo_extended_exceptions is off;
@@ -661,34 +662,7 @@ def _rejection_reason(line, limit, policy, trusted_abp_features, c) -> str:
         if XPATH_RE.search(line) and "#?#" not in line:
             return "extended-css-selector-requires-#?#"
         return "invalid-cosmetic-rule"
-    pattern, options = split_options(line)
-    if is_overbroad_pattern(pattern[2:] if pattern.startswith("@@") else pattern, options):
-        return "overbroad-pattern"
-    if "$" in line:
-        if options:
-            names = []
-            for option in options:
-                name = option.split("=", 1)[0].strip().lower()
-                if name.startswith("~"):
-                    name = name[1:]
-                names.append(name)
-                if (
-                    "=" in option
-                    and name not in VALUE_OPTIONS
-                    and policy["reject_unknown_options"]
-                ):
-                    return "unknown-option"
-                if (
-                    "=" not in option
-                    and name not in TYPE_OPTIONS
-                    and name not in SIMPLE_OPTIONS
-                    and policy["reject_unknown_options"]
-                ):
-                    return "unknown-option"
-                if not valid_option(option, line.startswith("@@"), policy):
-                    return "invalid-option-value" if "=" in option else "context-invalid-option"
-            if policy["reject_duplicate_options"] and len(names) != len(set(names)):
-                return "duplicate-option"
-        if normalize_network(line, policy) is None:
-            return "invalid-option-or-network-rule"
-    return "invalid-network-rule"
+    # Single source of truth: the same validator the build pipeline uses, so
+    # rejection_reason() can never disagree with the reason recorded in reports.
+    _, reason = _normalize_network_with_reason(line, policy)
+    return reason or "invalid-network-rule"

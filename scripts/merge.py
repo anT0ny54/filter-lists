@@ -15,6 +15,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from config import BUILDER_VERSION, CUSTOM_RULES, ROOT, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
+from fetch import collect_sources  # noqa: E402
+from health import default_outcomes_path, history_reports, set_outcome_status  # noqa: E402
+from normalize import rule_sort_key  # noqa: E402
+from policy import PROFILE_DESCRIPTION  # noqa: E402
+from report import analyze_files, write_report  # noqa: E402
 
 OUTPUT = ROOT / "filters.txt"
 REPORT = ROOT / "reports" / "latest.json"
@@ -40,12 +45,6 @@ def _workers() -> int:
     if value < 1:
         raise ValueError("FILTER_LISTS_WORKERS must be >= 1")
     return value
-
-from fetch import collect_sources  # noqa: E402
-from report import analyze_files, write_report  # noqa: E402
-from policy import PROFILE_DESCRIPTION  # noqa: E402
-from health import default_outcomes_path, history_reports, set_outcome_status  # noqa: E402
-from normalize import rule_sort_key  # noqa: E402
 
 
 def log(message: str) -> None:
@@ -283,7 +282,7 @@ def main() -> int:
             if source_stats.get("source_limit_reached"):
                 log("[ERROR] Global source traversal limit was reached before all queued sources completed")
             stats = {"input_lines": 0, "accepted_lines": 0, "rejected_lines": 0, "duplicate_lines": 0, "unique_rules": 0, "rejection_reasons": {}}
-            write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=fingerprint, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="failed", source_quality_policy=getattr(config, "source_quality", None))
+            write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=fingerprint, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="failed", source_quality_policy=config.source_quality)
             return 1
         # Reuse the per-source digest fetch.collect_sources already computed
         # instead of hashing every downloaded file a second time in analyze_files.
@@ -304,7 +303,7 @@ def main() -> int:
         final_rules = sorted(rules, key=rule_sort_key)
         build_id = hashlib.sha256((fingerprint + "\n" + "\n".join(final_rules)).encode()).hexdigest()
         staged = stage_output(final_rules, build_id, manifest_sha256=provenance["source_manifest_sha256"], source_count=len(source_urls))
-        write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="success", source_quality_policy=getattr(config, "source_quality", None))
+        write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="success", source_quality_policy=config.source_quality)
         data = json.loads(REPORT.read_text(encoding="utf-8"))
         quality = data.get("source_quality", {})
         for item in quality.get("items", []):

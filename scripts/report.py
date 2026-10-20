@@ -21,6 +21,18 @@ from policy import PROFILE_NAME
 SCHEMA_VERSION = 5
 
 
+def _file_record(path: Path, lines: int, accepted: int, rejected: int, duplicates: int, unique: int, reasons, **extra: Any) -> dict[str, Any]:
+    """One per-file statistics record (shared by the normal and read-error paths)."""
+    # A file that could not be read at all counts as fully rejected.
+    default_rate = 1.0 if "error" in extra else 0.0
+    return {
+        "path": str(path), "input_lines": lines, "accepted_lines": accepted,
+        "rejected_lines": rejected, "duplicate_lines": duplicates, "unique_rules": unique,
+        "rejection_rate": round(rejected / lines, 6) if lines else default_rate,
+        "rejection_reasons": dict(sorted(reasons.items())), **extra,
+    }
+
+
 def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_rule_length: int | None = None, known_hashes: dict[Path, str] | None = None, trusted_paths: set[Path] | None = None) -> tuple[set[str], dict]:
     rules: set[str] = set()
     accepted = rejected = duplicates = input_lines = 0
@@ -61,10 +73,10 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
             # and re-hashing the same file a second time here; only files
             # without a known digest (e.g. custom-rules.txt) get hashed now.
             file_hash = known_hashes.get(path) or sha256_file(path)
-            per_file.append({"path": str(path), "input_lines": local_lines, "accepted_lines": local_accepted, "rejected_lines": local_rejected, "duplicate_lines": local_duplicates, "unique_rules": len(local_rules), "rejection_rate": round(local_rejected / local_lines, 6) if local_lines else 0.0, "rejection_reasons": dict(sorted(local_reasons.items())), "sha256": file_hash})
+            per_file.append(_file_record(path, local_lines, local_accepted, local_rejected, local_duplicates, len(local_rules), local_reasons, sha256=file_hash))
         except OSError as exc:
             reasons["read-error"] += 1; rejected += 1; local_rejected += 1
-            per_file.append({"path": str(path), "input_lines": local_lines, "accepted_lines": local_accepted, "rejected_lines": local_rejected, "duplicate_lines": local_duplicates, "unique_rules": len(local_rules), "rejection_rate": round(local_rejected / local_lines, 6) if local_lines else 1.0, "rejection_reasons": {"read-error": 1}, "error": str(exc)})
+            per_file.append(_file_record(path, local_lines, local_accepted, local_rejected, local_duplicates, len(local_rules), {"read-error": 1}, error=str(exc)))
     return rules, {"input_lines": input_lines, "accepted_lines": accepted, "rejected_lines": rejected, "duplicate_lines": duplicates, "unique_rules": len(rules), "rejection_rate": round(rejected / input_lines, 6) if input_lines else 0.0, "rejection_reasons": dict(sorted(reasons.items())), "per_file": per_file}
 
 
