@@ -6,6 +6,17 @@ All notable changes to Filter-Lists are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Whole-repo audit pass (2026-10-20, fifth pass; 258 tests discovered, all passed, 12 curl-gated tests skipped; version unchanged at 7.6.0)
+
+Every script, configuration, workflow, document, and test module was read in full before judgement (`filters.txt` payload excluded); generated report JSONs were verified through their consumers and the report-history metadata (newest entry `2026-10-20T14:52:12Z`) matches the README source-quality snapshot.
+
+#### Fixed
+- **Staged temp-file leak on publish failure** (`scripts/merge.py`): `commit_output()` left the staged `filters.*.tmp` file behind when `os.replace` failed (e.g. disk full). The temp file is now unlinked before the error propagates, matching `stage_output()`'s existing cleanup discipline. Success paths are unchanged.
+
+#### Verified, deliberately not changed
+- No dead code or conflicts found anywhere in the read tree; every helper has live call sites or is reachable from an entry point. README, workflows, policies, docs, and tests cross-check clean (builder 7.6.0, report schema 5, policy schema 3, source schema 1, 32 enabled root sources, cron schedules, guard pathspecs, limits table).
+- Left as-is with reasons documented inline: `health.py` parses `source-outcomes.json` twice per build (churn-heavy to dedupe against pinned public signatures); `config.py` deliberately re-validates/re-parses `policies.yaml` up to 3x per process so the `lru_cache` scope and `POLICY_FILE` test swapping keep working; `_helpers.curl_stream_limits_available()` deliberately duplicates the curl version probe for test isolation; the read-error accounting edge (rejected=1 with input_lines=0 on a zero-length unreadable file) is guarded and pinned by `UnreadableFileRecordTests`.
+
 ### Audit pass (2026-10-20; 252 tests discovered; 240 passed and 12 curl-gated tests skipped under curl 7.88.1; version unchanged at 7.6.0)
 
 Every project file except the intentionally excluded `filters.txt` payload was read or fully parsed before changes were made; the existing report JSON files were also parsed and checked for structural validity.
