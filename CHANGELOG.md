@@ -6,7 +6,7 @@ All notable changes to Filter-Lists are documented here. The format follows [Kee
 
 ## [Unreleased]
 
-### Audit pass (2026-10-20; 243 tests, all passing; version unchanged at 7.6.0)
+### Audit pass (2026-10-20; 252 tests, all passing; version unchanged at 7.6.0)
 
 Every project file except the intentionally excluded `filters.txt` payload was read or fully parsed before changes were made; the existing report JSON files were also parsed and checked for structural validity.
 
@@ -15,6 +15,9 @@ Every project file except the intentionally excluded `filters.txt` payload was r
 - **Collapsed malformed reputation timestamps** (`scripts/health.py`): missing or invalid timestamps were all treated as the same empty-day bucket during reputation scoring, contrary to daily compaction's behavior. Valid ISO timestamps are normalized to UTC, while each malformed/undated run remains a separate observation.
 - **Empty ABP inline-style blocks** (`scripts/normalize.py`): declaration blocks containing only semicolons or whitespace were accepted despite containing no property/value declaration. They are now rejected while valid declarations and optional trailing semicolons remain accepted.
 - **Conflicting rejection reasons** (`scripts/normalize.py`): `rejection_reason()` re-implemented the network-option checks in a different order from the pipeline, so it disagreed with the reason recorded in reports (for example `unknown-option` vs `invalid-option-or-network-rule`, and `context-invalid-option` for `$document` combined with `addheader=`). It also blamed uBO procedural operators on network rules that are never rejected for them. Both paths now use the single `_normalize_network_with_reason()` validator; a 400,000-input differential fuzz found 0 remaining disagreements.
+- **Offset-sensitive run ordering** (`scripts/health.py`): timestamps were sorted as strings, which could choose the wrong daily run identity when ISO timestamps used different UTC offsets. History and same-day compaction now compare normalized UTC instants while retaining conservative failure-wins outcome merging; UTC conversion overflow is treated as an undated entry rather than crashing history processing.
+- **Large whitespace-prefixed downloads** (`scripts/fetch.py`): download validation judged a file empty when its first 64 KiB were whitespace, even when valid rules followed. Validation now scans the remaining file for content and NUL bytes, and checks a bounded content probe so padded HTML error markers split across read boundaries remain rejected.
+- **Partial source reads** (`scripts/report.py`, `scripts/merge.py`): rules parsed before a mid-read I/O error could leak into the aggregate result, and a build could otherwise publish the remaining partial list. Per-file analysis now commits rules and counters only after the read and hash succeed; any source-analysis read error fails the build and preserves the previous `filters.txt`.
 
 #### Removed
 - Dead `normalize_network()` wrapper (no remaining callers) and the duplicated option-checking block in `_rejection_reason()`.
@@ -30,9 +33,14 @@ Every project file except the intentionally excluded `filters.txt` payload was r
 - `fetch.py`: header parsing shared by `_redirect_location()` and `_response_content_encodings()` via `_header_blocks()`; the curl version probe uses `subprocess.run`.
 - `report.py`: the per-file record is built by one helper instead of two near-identical literals.
 - `merge.py`: all imports moved to the top of the module.
-- README source-quality snapshot refreshed to `reports/latest.json` generated 2026-10-20 (230,865 input lines, 200,880 accepted, 175,449 unique rules, 12.99% overall rejection).
+- `health.py` / `merge.py`: share normalized UTC timestamp ordering for history, daily outcomes, and archive retention rather than sorting offset-bearing ISO strings lexically; treat UTC-conversion overflow as an undated timestamp.
+- `fetch.py`: scan beyond the initial download sample when checking for an empty payload and buffer a bounded HTML probe to avoid missing error markers split across chunk boundaries; keep binary rejection active.
+- `report.py`: stage each source's rules, reasons, counters and digest locally until the file has been read and hashed successfully; streamline duplicate counting to operate on per-file sets.
+- `merge.py`: fail the build and avoid staging/publishing output if any local source cannot be fully analyzed.
+- README source-quality snapshot refreshed to `reports/latest.json` generated 2026-10-20 (231,105 input lines, 201,116 accepted, 175,589 unique rules, 12.98% overall rejection).
 
 #### Added
 - Regression coverage for self-including sources at the source cap, cycles with genuinely new children, malformed/undated reputation timestamps, invalid-day compaction, and declarationless inline-style blocks.
 - Regression tests for reason agreement (fuzzed), `document` + `addheader` reasons, terminal-`$` reasons, interim-response header blocks, and unreadable-source records.
+- Regression tests for offset-aware and out-of-range timestamp handling, archive-retention ordering across UTC offsets, whitespace-prefixed downloads with chunk-split HTML markers, transactional handling of mid-read errors, and stopping publication after analysis errors.
 
