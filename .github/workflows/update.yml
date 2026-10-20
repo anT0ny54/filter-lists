@@ -116,7 +116,7 @@ jobs:
             --guard sources.yaml --guard custom-rules.txt --guard policies.yaml \
             --guard scripts/ --guard tests/ --guard requirements.txt \
             --guard .github/workflows/update.yml \
-            -- filters.txt reports/latest.json reports/history reports/source-outcomes.json sources.txt
+            -- filters.txt reports/latest.json reports/baseline.json reports/history reports/source-outcomes.json sources.txt
 
       # A failed build never publishes filters.txt, but its per-source fetch
       # outcomes must still be kept so repeated failures count against a
