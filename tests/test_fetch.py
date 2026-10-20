@@ -1,4 +1,5 @@
 import functools
+import gzip
 import http.server
 import shutil
 import sys
@@ -43,6 +44,141 @@ class FetchSecurityTests(unittest.TestCase):
             address, reason = fetch._public_address_for_url("http://example.test/list.txt")
         self.assertIsNone(address)
         self.assertEqual(reason, "blocked-non-public-address")
+
+    def test_curl_stream_size_limit_version_gate(self):
+        version_cases = [
+            ("curl 8.3.0 (x86_64-pc-linux-gnu)", False),
+            ("curl 8.4.0 (x86_64-pc-linux-gnu)", True),
+            ("curl unknown-version", False),
+        ]
+        for output, expected_supported in version_cases:
+            with self.subTest(output=output):
+                supported, _ = fetch._curl_size_limit_status_from_output(output)
+                self.assertEqual(supported, expected_supported)
+
+    def test_download_fails_closed_when_curl_cannot_enforce_stream_size_limits(self):
+        reason = "curl-version-too-old: 8.3.0; curl >= 8.4.0 is required for safe download-size limits"
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "source.txt"
+            with patch.object(fetch, "_curl_stream_size_limit_status", return_value=(False, reason)), \
+                 patch.object(fetch, "_public_address_for_url") as resolve, \
+                 patch.object(fetch.subprocess, "run") as run:
+                ok, actual_reason, transferred = fetch.download(
+                    "http://example.test/list.txt", output, 10, 1024
+                )
+        self.assertFalse(ok)
+        self.assertEqual(actual_reason, reason)
+        self.assertEqual(transferred, 0)
+        resolve.assert_not_called()
+        run.assert_not_called()
+        self.assertFalse(output.exists())
+
+    def test_dns_resolution_preserves_an_explicit_zero_port(self):
+        fetch._ADDRESS_PIN_CACHE.pop(("example.test", 0), None)
+        try:
+            with patch.object(fetch.socket, "getaddrinfo", return_value=[
+                (fetch.socket.AF_INET, fetch.socket.SOCK_STREAM, 6, "", ("93.184.216.34", 0)),
+            ]) as resolver:
+                address, reason = fetch._public_address_for_url("http://example.test:0/list.txt")
+            self.assertEqual((address, reason), ("93.184.216.34", ""))
+            resolver.assert_called_once_with("example.test", 0, type=fetch.socket.SOCK_STREAM)
+        finally:
+            fetch._ADDRESS_PIN_CACHE.pop(("example.test", 0), None)
+
+    def test_download_preserves_an_explicit_zero_port_in_dns_pin(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "source.txt"
+            headers = output.with_suffix(output.suffix + ".headers")
+            response = type("Proc", (), {"returncode": 0, "stdout": "200", "stderr": ""})()
+
+            def fake_run(command, **kwargs):
+                output.write_text("||example.com^\n! enough padding for validation\n", encoding="utf-8")
+                headers.write_text("HTTP/1.1 200 OK\r\n\r\n", encoding="iso-8859-1")
+                self.assertIn("example.test:0:93.184.216.34", command)
+                return response
+
+            with patch.object(fetch, "_public_address_for_url", return_value=("93.184.216.34", "")), \
+                 patch.object(fetch.subprocess, "run", side_effect=fake_run):
+                ok, reason, _ = fetch.download("http://example.test:0/list.txt", output, 10, 1024)
+
+        self.assertTrue(ok, reason)
+
+    def test_encoded_response_is_not_decompressed_past_download_budget(self):
+        expanded = b"||example.com^\n" + (b"x" * (2 * 1024 * 1024))
+        encoded = gzip.compress(expanded)
+        observed_accept_encoding = []
+
+        class GzipHandler(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                observed_accept_encoding.append(self.headers.get("Accept-Encoding"))
+                self.send_response(200)
+                # Deliberately ignore the client's identity preference to model
+                # a misconfigured or hostile server.
+                self.send_header("Content-Encoding", "gzip")
+                self.send_header("Content-Length", str(len(encoded)))
+                self.end_headers()
+                self.wfile.write(encoded)
+
+            def log_message(self, *_args):
+                pass
+
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), GzipHandler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                output = Path(tmp) / "encoded.txt"
+                url = f"http://example.test:{server.server_port}/feed"
+                with patch.object(fetch, "_public_address_for_url", return_value=("127.0.0.1", "")):
+                    ok, reason, transferred = fetch.download(url, output, 10, 16 * 1024)
+                self.assertFalse(ok)
+                self.assertEqual(reason, "unsupported-content-encoding")
+                self.assertEqual(observed_accept_encoding, ["identity"])
+                self.assertEqual(transferred, len(encoded))
+                self.assertLess(transferred, 16 * 1024)
+                self.assertFalse(output.exists())
+        finally:
+            server.shutdown()
+            thread.join(timeout=5)
+            server.server_close()
+
+    def test_chunked_response_is_stopped_at_download_budget(self):
+        payload = b"x" * (256 * 1024)
+
+        class ChunkedHandler(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                self.send_response(200)
+                self.send_header("Transfer-Encoding", "chunked")
+                self.end_headers()
+                for offset in range(0, len(payload), 1024):
+                    chunk = payload[offset:offset + 1024]
+                    try:
+                        self.wfile.write(f"{len(chunk):x}\r\n".encode("ascii") + chunk + b"\r\n")
+                        self.wfile.flush()
+                    except (BrokenPipeError, ConnectionResetError):
+                        break
+
+            def log_message(self, *_args):
+                pass
+
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), ChunkedHandler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                output = Path(tmp) / "chunked.txt"
+                url = f"http://example.test:{server.server_port}/feed"
+                with patch.object(fetch, "_public_address_for_url", return_value=("127.0.0.1", "")):
+                    ok, reason, transferred = fetch.download(url, output, 10, 16 * 1024)
+                self.assertFalse(ok, reason)
+                self.assertIn("size", reason.lower())
+                self.assertNotIn("curl-version-too-old", reason)
+                self.assertLessEqual(transferred, 16 * 1024)
+                self.assertFalse(output.exists())
+        finally:
+            server.shutdown()
+            thread.join(timeout=5)
+            server.server_close()
 
     def test_redirect_to_private_address_is_rejected_before_second_request(self):
         calls = []
