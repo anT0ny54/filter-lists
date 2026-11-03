@@ -91,10 +91,11 @@ def archive_successful_report(build_id: str, *, retention: int = 10) -> None:
         raise ValueError("history retention must be >= 1")
     HISTORY_DIR.mkdir(parents=True, exist_ok=True)
 
-    data = json.loads(REPORT.read_text(encoding="utf-8"))
+    payload = REPORT.read_bytes()
+    data = json.loads(payload)
     generated_at = str(data.get("generated_at", ""))
     timestamp_slug = re.sub(r"[^0-9A-Za-z]+", "-", generated_at).strip("-")[:48] or "unknown-time"
-    report_digest = hashlib.sha256(REPORT.read_bytes()).hexdigest()[:12]
+    report_digest = hashlib.sha256(payload).hexdigest()[:12]
 
     # Build IDs are deterministic configuration/output identities, while
     # generated_at distinguishes repeated successful runs. Include both so a
@@ -137,9 +138,14 @@ def archive_successful_report(build_id: str, *, retention: int = 10) -> None:
                 log(f"[WARN] Could not remove duplicate report {path.name}: {exc}")
 
     # Keep retention based on generated_at, not filenames: build IDs are hashes.
+    # Two stable passes keep the filename tiebreak ascending while timestamps
+    # order descending: a single reverse=True sort would also flip the
+    # filename order for equal timestamps, making pruning depend on the
+    # glob's filesystem-dependent enumeration order.
     successful = [(generated_at, path) for generated_at, _, status, path in archived
                   if status == "success" and path not in removed]
-    successful.sort(key=lambda item: (*timestamp_sort_key(item[0]), item[1].name), reverse=True)
+    successful.sort(key=lambda item: item[1].name)
+    successful.sort(key=lambda item: timestamp_sort_key(item[0]), reverse=True)
 
     for _, path in successful[retention:]:
         try:

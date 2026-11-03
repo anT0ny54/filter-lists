@@ -158,9 +158,9 @@ def _header_blocks(headers: Path) -> list[list[str]]:
     return [block.splitlines() for block in re.split(r"\r?\n\r?\n", raw)]
 
 
-def _response_content_encodings(headers: Path) -> list[str]:
+def _response_content_encodings_from(blocks: list[list[str]]) -> list[str]:
     """Return Content-Encoding values from the final HTTP response block."""
-    for lines in reversed(_header_blocks(headers)):
+    for lines in reversed(blocks):
         if not lines or not lines[0].upper().startswith("HTTP/"):
             continue
         encodings: list[str] = []
@@ -172,12 +172,20 @@ def _response_content_encodings(headers: Path) -> list[str]:
     return []
 
 
-def _redirect_location(headers: Path) -> str | None:
-    for lines in reversed(_header_blocks(headers)):
+def _response_content_encodings(headers: Path) -> list[str]:
+    return _response_content_encodings_from(_header_blocks(headers))
+
+
+def _redirect_location_from(blocks: list[list[str]]) -> str | None:
+    for lines in reversed(blocks):
         for line in reversed(lines):
             if line.lower().startswith("location:"):
                 return line.split(":", 1)[1].strip() or None
     return None
+
+
+def _redirect_location(headers: Path) -> str | None:
+    return _redirect_location_from(_header_blocks(headers))
 
 
 def _file_size(path: Path) -> int:
@@ -290,8 +298,12 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
             except ValueError:
                 return fail("invalid-http-status")
 
+            # Parse the dumped header blocks once per hop; the redirect and
+            # content-encoding checks below both walk them.
+            blocks = _header_blocks(headers)
+
             if status in REDIRECT_STATUSES:
-                location = _redirect_location(headers)
+                location = _redirect_location_from(blocks)
                 discard_partial()
                 if not location:
                     return fail("redirect-missing-location")
@@ -304,7 +316,7 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
                 current_url = canonical_url(next_url)
                 continue
 
-            encodings = _response_content_encodings(headers)
+            encodings = _response_content_encodings_from(blocks)
             if any(encoding != "identity" for encoding in encodings):
                 return fail("unsupported-content-encoding")
 

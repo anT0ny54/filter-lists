@@ -79,6 +79,7 @@ def default_outcomes_path(history_dir: Path) -> Path:
 
 
 def _entry(generated_at: str, status: str, build_id: str, results: list[dict]) -> dict:
+    """Build a stored run entry, ignoring malformed per-source records."""
     return {
         "generated_at": generated_at,
         "status": status,
@@ -86,9 +87,17 @@ def _entry(generated_at: str, status: str, build_id: str, results: list[dict]) -
         "outcomes": {
             item["url"]: item.get("status") == "ok"
             for item in results
-            if item.get("url")
+            if isinstance(item, dict) and isinstance(item.get("url"), str) and item["url"]
         },
     }
+
+
+def _remove_temporary(path: str | Path) -> None:
+    """Best-effort cleanup that never masks the write/replace exception."""
+    try:
+        Path(path).unlink(missing_ok=True)
+    except OSError:
+        pass
 
 
 def load_outcomes(outcomes_path: Path | None, history_dir: Path | None = None) -> list[dict]:
@@ -100,19 +109,27 @@ def load_outcomes(outcomes_path: Path | None, history_dir: Path | None = None) -
     if outcomes_path is not None and outcomes_path.is_file():
         try:
             data = json.loads(outcomes_path.read_text(encoding="utf-8"))
-            runs = data.get("runs", []) if isinstance(data, dict) else []
-            return [r for r in runs if isinstance(r, dict) and isinstance(r.get("outcomes"), dict)]
+            runs = data.get("runs") if isinstance(data, dict) else None
+            if isinstance(runs, list):
+                return [r for r in runs if isinstance(r, dict) and isinstance(r.get("outcomes"), dict)]
+            # Valid JSON is not necessarily a valid outcomes document. Treat a
+            # malformed container like a missing file and bootstrap from the
+            # retained successful reports below instead of crashing on it.
         except (OSError, ValueError):
             pass
     if history_dir is None or not history_dir.is_dir():
         return []
     seeded = []
     for report in history_reports(history_dir, MAX_STORED_RUNS):
+        sources = report.get("sources")
+        results = sources.get("results", []) if isinstance(sources, dict) else []
+        if not isinstance(results, list):
+            results = []
         seeded.append(_entry(
             str(report.get("generated_at", "")),
             "success",
             str(report.get("build_id", "")),
-            report.get("sources", {}).get("results", []),
+            results,
         ))
     seeded.sort(key=_run_sort_key)
     return seeded
@@ -191,7 +208,7 @@ def record_outcomes(
         os.chmod(temporary, 0o644)
         os.replace(temporary, outcomes_path)
     except Exception:
-        Path(temporary).unlink(missing_ok=True)
+        _remove_temporary(temporary)
         raise
 
 
@@ -209,8 +226,11 @@ def set_outcome_status(outcomes_path: Path, generated_at: str, status: str) -> b
         data = json.loads(outcomes_path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return False
+    runs = data.get("runs") if isinstance(data, dict) else None
+    if not isinstance(runs, list):
+        return False
     changed = False
-    for run in data.get("runs", []) if isinstance(data, dict) else []:
+    for run in runs:
         if isinstance(run, dict) and run.get("generated_at") == generated_at and run.get("status") != status:
             run["status"] = status
             changed = True
@@ -223,7 +243,7 @@ def set_outcome_status(outcomes_path: Path, generated_at: str, status: str) -> b
             os.chmod(temporary, 0o644)
             os.replace(temporary, outcomes_path)
         except Exception:
-            Path(temporary).unlink(missing_ok=True)
+            _remove_temporary(temporary)
             raise
     return changed
 

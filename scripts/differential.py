@@ -21,15 +21,23 @@ def main() -> int:
         # and "pass" without ever seeing the fixture.
         print("ERROR: FILTER_ENGINE_CMD must contain the {input} placeholder")
         return 2
+    # Parse the adapter once and execute it directly. A shell is unnecessary
+    # here and would expose the harness to shell expansion/metacharacter
+    # behavior that the adapter contract does not define.
+    try:
+        base_args = shlex.split(command)
+    except ValueError as exc:
+        print(f"ERROR: invalid FILTER_ENGINE_CMD: {exc}")
+        return 2
     fixtures = sorted(CORPUS.glob("*.txt"))
     if not fixtures:
         print("No corpus fixtures found")
         return 0
     failures = 0
     for fixture in fixtures:
-        rendered = command.replace("{input}", shlex.quote(str(fixture)))
+        args = [part.replace("{input}", str(fixture)) for part in base_args]
         try:
-            proc = subprocess.run(rendered, shell=True, text=True, capture_output=True, timeout=ENGINE_TIMEOUT)
+            proc = subprocess.run(args, text=True, capture_output=True, timeout=ENGINE_TIMEOUT)
         except subprocess.TimeoutExpired:
             failures += 1
             print(f"[FAIL] {fixture.name}: engine timed out after {ENGINE_TIMEOUT}s")

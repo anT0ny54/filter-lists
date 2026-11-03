@@ -359,8 +359,8 @@ def load_config() -> BuildConfig:
             trusted_abp_features=trusted,
         ))
 
-    sources.sort(key=lambda s: (s.priority, s.name.casefold(), s.name, s.url))
     sources = [s for s in sources if s.enabled]
+    sources.sort(key=lambda s: (s.priority, s.name.casefold(), s.name, s.url))
 
     health = policy.get("source_health", {})
     if not isinstance(health, dict):
