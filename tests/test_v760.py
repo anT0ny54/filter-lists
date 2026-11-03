@@ -3,8 +3,10 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from _helpers import load_script, setup_merge_root
+import health
 import config
 from health import _compact_daily_runs, build_source_reputation, load_outcomes, record_outcomes, set_outcome_status
 from report import evaluate_source_quality, write_report
@@ -58,6 +60,57 @@ class OutcomeHistoryTests(unittest.TestCase):
     def _record(self, root, when, ok, status="success"):
         record_outcomes(root / "source-outcomes.json", history_dir=root / "history", generated_at=when,
                         status=status, build_id="b", results=[{"url": URL, "status": "ok" if ok else "failed"}])
+
+
+    def test_malformed_outcome_container_bootstraps_from_valid_history(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            history = root / "history"
+            history.mkdir()
+            (history / "legacy.json").write_text(json.dumps({
+                "status": "success",
+                "generated_at": "2026-10-01T00:00:00+00:00",
+                "build_id": "legacy",
+                "sources": "not-an-object",
+            }), encoding="utf-8")
+            path = root / "source-outcomes.json"
+            path.write_text(json.dumps({"schema": 1, "runs": 42}), encoding="utf-8")
+
+            loaded = load_outcomes(path, history)
+            self.assertEqual(len(loaded), 1)
+            self.assertEqual(loaded[0]["build_id"], "legacy")
+            self.assertEqual(loaded[0]["outcomes"], {})
+            self.assertFalse(set_outcome_status(path, "2026-10-01T00:00:00+00:00", "failed"))
+
+    def test_outcome_cleanup_failure_does_not_mask_original_persistence_error(self):
+        original_unlink = Path.unlink
+
+        def failing_cleanup(path, *args, **kwargs):
+            if path.name.startswith("outcomes.") and path.suffix == ".tmp":
+                raise OSError("simulated cleanup failure")
+            return original_unlink(path, *args, **kwargs)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root / "source-outcomes.json"
+            with patch.object(health.os, "replace", side_effect=OSError("original replace failure")), \
+                 patch.object(Path, "unlink", new=failing_cleanup):
+                with self.assertRaisesRegex(OSError, "original replace failure"):
+                    record_outcomes(
+                        path, history_dir=None, generated_at="2026-10-01T00:00:00+00:00",
+                        status="success", build_id="b", results=[{"url": URL, "status": "ok"}],
+                    )
+
+            # Exercise the status-update writer too; it shares the same cleanup
+            # helper and must preserve its original replace exception.
+            path.write_text(json.dumps({"schema": 1, "runs": [{
+                "generated_at": "2026-10-01T00:00:00+00:00", "status": "success",
+                "build_id": "b", "outcomes": {URL: True},
+            }]}), encoding="utf-8")
+            with patch.object(health.os, "replace", side_effect=OSError("status replace failure")), \
+                 patch.object(Path, "unlink", new=failing_cleanup):
+                with self.assertRaisesRegex(OSError, "status replace failure"):
+                    set_outcome_status(path, "2026-10-01T00:00:00+00:00", "failed")
 
     def test_failed_runs_persist_and_count(self):
         with tempfile.TemporaryDirectory() as tmp:
