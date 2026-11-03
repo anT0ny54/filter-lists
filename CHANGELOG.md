@@ -6,6 +6,21 @@ All notable changes to Filter-Lists are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Whole-repo audit pass (2026-11-03, second pass; 264 tests discovered, all passed; version unchanged at 7.6.0)
+
+Every project file except the intentionally excluded `filters.txt` payload was read in full; all report JSON files were parsed in full. The latest report (`2026-11-03T10:48:44Z`) records 32/32 successful root sources and 171,159 unique rules.
+
+#### Fixed
+- **Report/output status consistency** (`scripts/merge.py`): the combined list is now staged only after report generation and anomaly/source-quality gates pass. A failure while writing the report no longer leaves a staged list behind; partial report writes are downgraded when outcome-history persistence fails. A failed final publish now marks both `reports/latest.json` and the matching run-level source outcome as failed while preserving the previous `filters.txt`.
+- **Post-publish archive handling** (`scripts/merge.py`): a history-archive failure is logged as a warning rather than returning a failed build after the new list and successful report have already been committed. Retention now skips valid JSON arrays/scalars as well as unreadable or malformed archive files instead of aborting on `.get()`.
+
+#### Updated
+- **Temporary-file cleanup** (`scripts/merge.py`): cleanup failures are now warning-only and cannot mask the original staging/publish error or prevent the failed run outcome from being updated. Added regression coverage for cleanup failure and non-object report archives.
+- **README behavior notes** (`README.md`): documented archive-file skipping, failed-report/publication handling, and best-effort temporary cleanup; re-verified that the existing November 3 source-quality snapshot still matches `reports/latest.json`.
+
+#### Verified, deliberately not changed
+- No further safely removable dead code or conflicting configuration/workflow behavior was found. The report snapshots, policy/source registries, README, and workflow publish paths were cross-checked. `filters.txt` remained excluded from review as requested.
+
 ### Whole-repo audit pass (2026-10-20, fifth pass; 258 tests discovered, all passed, 12 curl-gated tests skipped; version unchanged at 7.6.0)
 
 Every script, configuration, workflow, document, and test module was read in full before judgement (`filters.txt` payload excluded); generated report JSONs were verified through their consumers and the report-history metadata (newest entry `2026-10-20T14:52:12Z`) matches the README source-quality snapshot.
