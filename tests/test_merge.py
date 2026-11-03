@@ -204,7 +204,8 @@ class MergeMainE2ETests(unittest.TestCase):
         self.assertEqual(report["sources"]["results"][0]["status"], "ok")
         self.assertEqual(len(report["sources"]["results"]), 2)
 
-    def _run(self, *, source_stats=None, rules=None, rule_stats=None, anomaly=None):
+    def _run(self, *, source_stats=None, rules=None, rule_stats=None, anomaly=None,
+             report_writer=None):
         source_stats = source_stats or {
             "root_requested": 1, "root_successful": 1,
             "results": [{"url": self.config.sources[0].url, "status": "ok", "depth": 0, "path": "/fixture.txt", "bytes": 10}],
@@ -225,7 +226,7 @@ class MergeMainE2ETests(unittest.TestCase):
                     merge.REPORT.write_text(json.dumps(data), encoding="utf-8")
                 writer = write_with_anomaly
             else:
-                writer = merge.write_report
+                writer = report_writer or merge.write_report
             with patch.object(merge, "write_report", side_effect=writer):
                 return merge.main()
 
@@ -252,6 +253,51 @@ class MergeMainE2ETests(unittest.TestCase):
         self.assertTrue(any(name.startswith("build-new-build-") for name in kept))
         self.assertNotIn("build-old-0.json", kept)
         self.assertNotIn("build-old-1.json", kept)
+
+    def test_history_archive_skips_non_object_json_entries(self):
+        merge.REPORT.parent.mkdir(parents=True, exist_ok=True)
+        merge.HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+        (merge.HISTORY_DIR / "list.json").write_text("[1, 2]", encoding="utf-8")
+        (merge.HISTORY_DIR / "scalar.json").write_text("7", encoding="utf-8")
+        merge.REPORT.write_text(json.dumps({
+            "status": "success",
+            "generated_at": "2026-11-03T10:00:00+00:00",
+            "build_id": "new-build",
+            "sources": {"results": []},
+        }), encoding="utf-8")
+
+        merge.archive_successful_report("new-build", retention=10)
+
+        self.assertTrue((merge.HISTORY_DIR / "list.json").is_file())
+        self.assertTrue((merge.HISTORY_DIR / "scalar.json").is_file())
+        self.assertTrue(any(p.name.startswith("build-new-build-") for p in merge.HISTORY_DIR.glob("*.json")))
+        self.assertTrue(merge.BASELINE_FILE.is_file())
+
+    def test_report_cleanup_error_does_not_skip_outcome_status_update(self):
+        generated_at = "2026-11-03T10:00:00+00:00"
+        merge.REPORT.write_text(json.dumps({
+            "status": "success", "build_id": "current-build", "generated_at": generated_at,
+        }), encoding="utf-8")
+        outcomes_path = merge.REPORT.parent / "source-outcomes.json"
+        outcomes_path.write_text(json.dumps({"schema": 1, "runs": [{
+            "status": "success", "build_id": "current-build", "generated_at": generated_at,
+            "outcomes": {"https://example.test/list": True},
+        }]}), encoding="utf-8")
+        report_temp = merge.REPORT.with_suffix(merge.REPORT.suffix + ".tmp")
+        original_unlink = Path.unlink
+
+        def failing_report_cleanup(path, *args, **kwargs):
+            if path == report_temp:
+                raise OSError("simulated cleanup failure")
+            return original_unlink(path, *args, **kwargs)
+
+        with patch.object(Path, "unlink", new=failing_report_cleanup):
+            merge.mark_report_failed("current-build")
+
+        report = json.loads(merge.REPORT.read_text(encoding="utf-8"))
+        outcomes = json.loads(outcomes_path.read_text(encoding="utf-8"))
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(outcomes["runs"][0]["status"], "failed")
 
     def test_history_retention_normalizes_different_utc_offsets(self):
         merge.REPORT.parent.mkdir(parents=True, exist_ok=True)
@@ -290,6 +336,72 @@ class MergeMainE2ETests(unittest.TestCase):
             path.name.startswith(f"build-{report['build_id']}-")
             for path in merge.HISTORY_DIR.glob("*.json")
         ))
+
+    def test_main_report_write_failure_does_not_stage_or_publish_output(self):
+        merge.OUTPUT.write_text("previous\n", encoding="utf-8")
+        source_stats = {
+            "root_requested": 1, "root_successful": 1,
+            "results": [{"url": self.config.sources[0].url, "status": "ok",
+                         "depth": 0, "path": "/fixture.txt", "bytes": 10}],
+            "failures": [], "source_limit_reached": False, "timed_out": False,
+        }
+        rule_stats = {
+            "input_lines": 1, "accepted_lines": 1, "rejected_lines": 0,
+            "duplicate_lines": 0, "unique_rules": 1, "rejection_reasons": {},
+            "per_file": [],
+        }
+        with patch.object(merge, "load_config", return_value=self.config), \
+             patch.object(merge, "collect_sources", return_value=([], source_stats)), \
+             patch.object(merge, "analyze_files", return_value=({"||example.com^"}, rule_stats)), \
+             patch.object(merge.shutil, "which", return_value="/usr/bin/curl"), \
+             patch.object(merge, "write_report", side_effect=OSError("simulated report write failure")), \
+             patch.object(merge, "stage_output") as stage_output:
+            self.assertEqual(merge.main(), 1)
+
+        stage_output.assert_not_called()
+        self.assertEqual(merge.OUTPUT.read_text(encoding="utf-8"), "previous\n")
+
+    def test_main_partial_report_write_failure_is_downgraded(self):
+        original_write_report = merge.write_report
+
+        def write_then_fail(*args, **kwargs):
+            original_write_report(*args, **kwargs)
+            raise OSError("simulated outcome-history write failure")
+
+        self.assertEqual(self._run(report_writer=write_then_fail), 1)
+        report = json.loads(merge.REPORT.read_text(encoding="utf-8"))
+        self.assertEqual(report["status"], "failed")
+        outcomes = json.loads((merge.REPORT.parent / "source-outcomes.json").read_text(encoding="utf-8"))
+        self.assertEqual(outcomes["runs"][-1]["status"], "failed")
+        self.assertFalse(merge.OUTPUT.exists())
+
+    def test_main_publish_failure_marks_report_and_outcomes_failed(self):
+        merge.OUTPUT.write_text("previous\n", encoding="utf-8")
+        original_replace = merge.os.replace
+
+        def fail_output_replace(source, target):
+            if Path(target) == merge.OUTPUT:
+                raise OSError("simulated disk-full publish failure")
+            return original_replace(source, target)
+
+        with patch.object(merge.os, "replace", side_effect=fail_output_replace):
+            self.assertEqual(self._run(), 1)
+
+        self.assertEqual(merge.OUTPUT.read_text(encoding="utf-8"), "previous\n")
+        self.assertEqual(list(merge.OUTPUT.parent.glob("filters.*.tmp")), [])
+        report = json.loads(merge.REPORT.read_text(encoding="utf-8"))
+        self.assertEqual(report["status"], "failed")
+        outcomes = json.loads((merge.REPORT.parent / "source-outcomes.json").read_text(encoding="utf-8"))
+        self.assertEqual(outcomes["runs"][-1]["status"], "failed")
+
+    def test_history_archive_failure_is_nonfatal_after_successful_publish(self):
+        with patch.object(merge, "archive_successful_report",
+                          side_effect=OSError("simulated history archive failure")):
+            self.assertEqual(self._run(), 0)
+
+        self.assertTrue(merge.OUTPUT.is_file())
+        report = json.loads(merge.REPORT.read_text(encoding="utf-8"))
+        self.assertEqual(report["status"], "success")
 
     def test_main_source_health_failure_does_not_publish_output(self):
         failed = {"root_requested": 1, "root_successful": 0, "results": [{"url": self.config.sources[0].url, "status": "failed", "depth": 0, "path": "/fixture.txt", "reason": "HTTP 500"}], "failures": [{"url": self.config.sources[0].url, "depth": 0, "reason": "HTTP 500"}], "source_limit_reached": False, "timed_out": False}
