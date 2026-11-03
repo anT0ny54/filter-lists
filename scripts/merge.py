@@ -51,6 +51,14 @@ def log(message: str) -> None:
     print(message, flush=True)
 
 
+def remove_temporary(path: Path, description: str) -> None:
+    """Best-effort cleanup that never masks the failure being handled."""
+    try:
+        path.unlink(missing_ok=True)
+    except OSError as exc:
+        log(f"[WARN] Could not remove temporary {description} {path.name}: {exc}")
+
+
 def load_previous_report() -> dict | None:
     if REPORT.is_file():
         try:
@@ -104,6 +112,8 @@ def archive_successful_report(build_id: str, *, retention: int = 10) -> None:
         try:
             existing = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
+            continue
+        if not isinstance(existing, dict):
             continue
         archived.append((
             str(existing.get("generated_at", "")),
@@ -205,7 +215,7 @@ def stage_output(final_rules: list[str], build_id: str, *, manifest_sha256: str,
         # (it is served as a static file), like any file written by open().
         os.chmod(temporary, 0o644)
     except Exception:
-        Path(temporary).unlink(missing_ok=True)
+        remove_temporary(Path(temporary), "staged output")
         raise
     log(f">> Unique strict ABP rules: {len(final_rules)}")
     return Path(temporary)
@@ -216,9 +226,60 @@ def commit_output(staged: Path) -> None:
         os.replace(staged, OUTPUT)
     except Exception:
         # A failed replace (e.g. disk full) must not leak the staged temp
-        # file into the repository directory.
-        staged.unlink(missing_ok=True)
+        # file into the repository directory or mask the original error.
+        remove_temporary(staged, "staged output")
         raise
+
+
+def mark_report_failed(build_id: str, *, previous_generated_at: str | None = None,
+                       only_if_new: bool = False) -> None:
+    """Downgrade the current report and its run outcome after a rejected build.
+
+    `write_report()` persists a successful report before the final output is
+    committed so policy checks can inspect it. Any failure after that point
+    must not leave a success status behind for an output that was not
+    published.
+    """
+    try:
+        data = json.loads(REPORT.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        if not only_if_new or REPORT.exists():
+            log(f"[WARN] Could not read report to mark build failed: {exc}")
+        return
+    if not isinstance(data, dict) or data.get("build_id") != build_id:
+        return
+    generated_at = str(data.get("generated_at", ""))
+    if only_if_new and generated_at == (previous_generated_at or ""):
+        return
+
+    data["status"] = "failed"
+    temporary = REPORT.with_suffix(REPORT.suffix + ".tmp")
+    try:
+        temporary.write_text(
+            json.dumps(data, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        temporary.replace(REPORT)
+    except OSError as exc:
+        log(f"[WARN] Could not mark latest report failed: {exc}")
+    finally:
+        # Cleanup failure must not skip the source-outcome status correction.
+        remove_temporary(temporary, "report")
+
+    try:
+        set_outcome_status(default_outcomes_path(HISTORY_DIR), generated_at, "failed")
+    except Exception as exc:
+        log(f"[WARN] Could not mark source outcomes failed: {exc}")
+
+
+def latest_report_generated_at() -> str | None:
+    """Return the current report timestamp, if a readable report exists."""
+    try:
+        data = json.loads(REPORT.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    value = data.get("generated_at") if isinstance(data, dict) else None
+    return value if isinstance(value, str) else None
 
 
 def main() -> int:
@@ -324,25 +385,52 @@ def main() -> int:
             return 1
         final_rules = sorted(rules, key=rule_sort_key)
         build_id = hashlib.sha256((fingerprint + "\n" + "\n".join(final_rules)).encode()).hexdigest()
-        staged = stage_output(final_rules, build_id, manifest_sha256=provenance["source_manifest_sha256"], source_count=len(source_urls))
-        write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=build_id, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="success", source_quality_policy=config.source_quality)
-        data = json.loads(REPORT.read_text(encoding="utf-8"))
+        previous_generated_at = latest_report_generated_at()
+        try:
+            write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats,
+                         elapsed_seconds=time.monotonic()-started, source_urls=source_urls,
+                         build_id=build_id, previous_report=previous_report,
+                         anomaly_policy=config.anomaly_detection, provenance=provenance,
+                         source_metadata=source_metadata, history_dir=HISTORY_DIR,
+                         status="success", source_quality_policy=config.source_quality)
+        except Exception as exc:
+            mark_report_failed(build_id, previous_generated_at=previous_generated_at,
+                               only_if_new=True)
+            log(f"[ERROR] Could not write build report: {exc}")
+            return 1
+        try:
+            data = json.loads(REPORT.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            mark_report_failed(build_id)
+            log(f"[ERROR] Could not read completed build report: {exc}")
+            return 1
         quality = data.get("source_quality", {})
         for item in quality.get("items", []):
             log(f"[WARN] Source quality ({item.get('severity')}): {item.get('name') or item.get('url')} rejected {item.get('effective_rejection_rate', 0):.1%} of rule lines ({item.get('accepted_lines')}/{item.get('rule_lines')} accepted)")
         if data.get("anomalies", {}).get("enforced_failure", False) or quality.get("enforced_failure", False):
-            staged.unlink(missing_ok=True)  # keep the previous good filters.txt intact
-            data["status"] = "failed"
-            tmp_report = REPORT.with_suffix(REPORT.suffix + ".tmp")
-            tmp_report.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-            tmp_report.replace(REPORT)
-            # Keep the run-level status in the outcome history consistent
-            # with the report that was just downgraded to "failed".
-            set_outcome_status(default_outcomes_path(HISTORY_DIR), str(data.get("generated_at", "")), "failed")
+            mark_report_failed(build_id)
             log("[ERROR] Anomaly or source-quality policy rejected this build")
             return 1
-        commit_output(staged)
-        archive_successful_report(build_id, retention=config.history_retention)
+        staged = None
+        try:
+            staged = stage_output(final_rules, build_id,
+                                  manifest_sha256=provenance["source_manifest_sha256"],
+                                  source_count=len(source_urls))
+            commit_output(staged)
+        except Exception as exc:
+            mark_report_failed(build_id)
+            log(f"[ERROR] Could not publish filters.txt: {exc}")
+            return 1
+        finally:
+            if staged is not None:
+                remove_temporary(staged, "staged output")
+        try:
+            archive_successful_report(build_id, retention=config.history_retention)
+        except Exception as exc:
+            # The list and latest report are already committed successfully;
+            # archival failure is recoverable because latest.json remains the
+            # next build's anomaly baseline.
+            log(f"[WARN] Could not archive successful report: {exc}")
     return 0
 
 
