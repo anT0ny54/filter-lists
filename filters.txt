@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-44cdf2c1cb80
-! Last updated: 2026-11-03 14:51:11 UTC
+! Version: v7.6.0-4cde839b18bd
+! Last updated: 2026-11-03 14:51:58 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 44cdf2c1cb8037d9c01b607764a7e670e06a006f0bcef234bfdba41b83af7943
+! Build-ID: 4cde839b18bd4a7614c5b73dbc693d385ef5f330c3b3e3b6054abe83e1ae1406
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 171201
+! Total rules: 171198
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -20125,7 +20125,6 @@
 4tube.com##img[src][style][width]
 4tube.com,aosmark.com,aporntv.com,camwhores.biz,camwhores.tv,eteenporn.com,gsmarena.com,hentaigasm.com,livacha.com,pornformance.com,porngun.net,pornhills.com,rat.xxx,wordlegame.org##.adv
 4umods.com###enmods-adblock-notice
-4umods.com,enmods.com##.enmods-ad-slot
 4uso-anime.com,a-onstore.jp,cs.furyu.jp,lotte.co.jp,np-labo.com,pairs.lv,yoku-mite.care##.sns_wrap
 4vlada.com###block-reklamaheader
 4wank.com##.related-videos > center:contains(Advertisement)
@@ -47156,6 +47155,7 @@ enmimaquinafunciona.com##.intro-top
 enmimaquinafunciona.com##.snippet-parragraph > a[style^="display: inline-block; float: left;"] > img
 enmimaquinafunciona.com##div[style="display: flex; justify-content: center; align-items: center;"] > a
 enmimaquinafunciona.com,iteramos.com##.intro-top > .mh-280
+enmods.com##.enmods-ad-slot
 ennaharonline.com##.adus
 ennaharonline.com##.big-ad2
 enno.jp,gogo.gs,sirabetter.com##.ad3
@@ -73434,7 +73434,6 @@ nikvesti.com##a[href="//mfc.mk.ua"] > img
 nim.ru##.widget.banner
 nim.ru,superagronom.com,zoneofgames.ru##a.branding
 nin.rs##.bnr
-nine.com.au###desktop-header-ads
 nine.com.au##div[class*="__InfoShare-"]
 nine.com.au##div[class^="sc-"]:not([id]):has(> div[id^="adspot-"] + small[style="--text-color: var(--color-text-secondary);"])
 nine.com.au##main > div[class]:has(> h3 > a[href*="newsletter=true"])
@@ -84281,7 +84280,6 @@ skysmart.ru##cms-blocks-layout-promotion-banners-container
 skysmart.ru##skysmart-articles-material-share
 skysmart.ru##ssm-articles-another-product-banner
 skysmart.ru##ssm-articles-content-promo-slot:not(:has(.mc-comments))
-skysports.com###floated-mpu
 skysports.com##.sdc-site-share
 skysports.com##div[data-ad-format="mpu"]
 skysports.com##div[data-format="leaderboard"]
@@ -137322,7 +137320,6 @@ zzzyk.com###Tinfo
 ||lzmvhfpfxidbv.website^
 ||lznomkovxtesn.site^
 ||lznpaqtbynhke.site^
-||lzopmoas.in^
 ||lzoqkmi1y31n892ovon9kfx.oelup71j7mpj6ch4u.cyou^
 ||lzpiozkcngklw.site^
 ||lzpymucz.com^

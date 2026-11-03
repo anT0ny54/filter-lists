@@ -1,8 +1,8 @@
 {
   "schema": 5,
   "status": "success",
-  "generated_at": "2026-11-03T14:51:11.545711+00:00",
-  "build_id": "44cdf2c1cb8037d9c01b607764a7e670e06a006f0bcef234bfdba41b83af7943",
+  "generated_at": "2026-11-03T14:51:58.940594+00:00",
+  "build_id": "4cde839b18bd4a7614c5b73dbc693d385ef5f330c3b3e3b6054abe83e1ae1406",
   "sources": {
     "results": [
       {
@@ -242,11 +242,11 @@
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt",
         "status": "ok",
-        "bytes": 2439711,
-        "input_lines": 49494,
-        "unique_rules": 40620,
-        "rejection_rate": 0.171496,
-        "sha256": "01271e1440cd11ab5d79e85cb0204cdd93933a25e0228b9b2dff8513b3dbb114"
+        "bytes": 2439317,
+        "input_lines": 49483,
+        "unique_rules": 40611,
+        "rejection_rate": 0.171493,
+        "sha256": "be64c188baebf31579f5fb5221432a2b66ded69679a0314f8135c86c2254f453"
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt",
