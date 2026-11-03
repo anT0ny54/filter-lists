@@ -86,7 +86,7 @@ The builder currently enforces the following:
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`.
 - **Strict configuration validation:** unknown keys in `policies.yaml` (including every `rules:` switch) and `sources.yaml`, wrong value types, and a mismatched policy `version`/`profile` fail the build immediately with a clean `[ERROR] Configuration` message, before any download starts.
 - **Authoritative source registry:** `sources.yaml` is the only source registry; `sources.txt` is generated as a URL-only compatibility mirror.
-- **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally. Before a request is scheduled, its worst-case byte allocation is reserved against the remaining global budget and the transfer is limited to that allocation. The fetcher requests identity encoding and does not auto-decompress response bodies, so compressed payloads cannot expand past the byte cap; a server that ignores identity encoding is rejected based on its `Content-Encoding` response header. Curl 8.4.0 or newer is required for size-limit enforcement on responses with unknown length; older versions are rejected before any network request. Transferred bytes count against the budget for accepted, rejected, and partially failed transfers; once no unreserved budget remains, pending sources are queued as budget-exhausted.
+- **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally. Before a request is scheduled, its worst-case byte allocation is reserved against the remaining global budget and the transfer is limited to that allocation. The fetcher requests identity encoding and does not auto-decompress response bodies, so compressed payloads cannot expand past the byte cap; a server that ignores identity encoding is rejected based on its `Content-Encoding` response header. Response headers are parsed once per redirect hop. Curl 8.4.0 or newer is required for size-limit enforcement on responses with unknown length; older versions are rejected before any network request. Transferred bytes count against the budget for accepted, rejected, and partially failed transfers; once no unreserved budget remains, pending sources are queued as budget-exhausted.
 - **Correct source health:** the health ratio is calculated from configured root sources; nested includes cannot inflate it.
 - **Required-source gates:** configured required root sources must succeed.
 - **SSRF protection:** source/include targets are resolved before connection, non-public addresses are blocked, DNS answers are validated and pinned for curl, proxy environment variables are bypassed, and redirects are validated hop-by-hop.
@@ -258,7 +258,7 @@ The repository test suite covers:
 - rejection-reason agreement between the build pipeline and `rejection_reason()` (fuzzed), header-block parsing, and unreadable-source records
 - regression tests
 - race-safe publishing (`publish.sh`) against a real bare remote: moved branch, generated-file conflicts, pruned history files, stale build inputs, repeated races, non-retryable failures including hook declines
-- optional external-engine differential testing
+- optional external-engine differential testing executed directly as an argument vector, without invoking a shell
 - repeatable parser benchmark
 
 
@@ -266,13 +266,13 @@ The repository test suite covers:
 
 Download success does not mean a source contributes rules, so each build also evaluates rule yield per source. The **effective rejection rate** is the share of rule lines (input lines minus comments, blanks, and directives) that the strict-ABP profile rejected. With the shipped policy, sources of at least 100 lines at or above 30% are reported as `warning` and at or above 90% as `critical` in `reports/latest.json` (`source_quality`) and in the build log. They are advisory unless `source_quality.fail_on_critical: true`.
 
-Snapshot from the newest report (`reports/latest.json`, generated 2026-11-03T10:48:44Z): 32/32 root sources OK, 225,556 input lines, 195,359 accepted, 171,159 unique rules, overall rejection rate 13.39%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.43% effective rejection rate).
+Snapshot from the newest report (`reports/latest.json`, generated 2026-11-03T14:57:06Z): 32/32 root sources OK, 225,658 input lines, 195,446 accepted, 171,204 unique rules, overall rejection rate 13.39%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.43% effective rejection rate).
 
 | Source | Input lines | Accepted | Rejection rate* | Main rejection reasons |
 |---|---:|---:|---:|---|
 | AdGuard Ukrainian | 5,550 | 3,628 | 34.63% | `unknown-option` (1,769), `ubo-only-syntax` (122) |
-| AdGuard Social Media | 31,308 | 22,187 | 29.13% | `ubo-only-syntax` (7,407), `unknown-option` (679) |
-| AdGuard Turkish | 6,839 | 5,275 | 22.87% | `ubo-only-syntax` (784), `invalid-cosmetic-rule` (475) |
+| AdGuard Social Media | 31,324 | 22,197 | 29.14% | `ubo-only-syntax` (7,410), `unknown-option` (680) |
+| AdGuard Turkish | 6,847 | 5,277 | 22.93% | `ubo-only-syntax` (784), `invalid-cosmetic-rule` (477) |
 | AdGuard Russian | 7,823 | 6,150 | 21.39% | `unknown-option` (857), `ubo-only-syntax` (635) |
 | AdGuard French | 5,002 | 4,055 | 18.93% | `unknown-option` (655), `ubo-only-syntax` (237) |
 *The table's rejection rate is the plain share of all input lines rejected (comments included). The quality gate uses effective rejection rate, excluding comments, blanks and directives; AdGuard Ukrainian's effective rate is 34.43%.

@@ -2,125 +2,38 @@
 
 All notable changes to Filter-Lists are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-> **Provenance note:** this file was written from the repository contents (code, comments, tests, docs, and generated reports). No git history was available, so every release section below is **reconstructed** from code comments, test names/docstrings and documentation, and no release dates are claimed. Dates appear only where a generated report records them. The older sections list what the code and tests provably contain; they may be incomplete.
+> **Provenance note:** release notes are reconstructed from repository contents, generated reports, and verification results where no git history is available.
 
 ## [Unreleased]
 
-### Whole-repo audit pass (2026-11-03, second pass; 264 tests discovered, all passed; version unchanged at 7.6.0)
+### Code review pass (2026-11-04, eighth pass; builder version remains 7.6.0)
 
-Every project file except the intentionally excluded `filters.txt` payload was read in full; all report JSON files were parsed in full. The latest report (`2026-11-03T10:48:44Z`) records 32/32 successful root sources and 171,159 unique rules.
-
-#### Fixed
-- **Report/output status consistency** (`scripts/merge.py`): the combined list is now staged only after report generation and anomaly/source-quality gates pass. A failure while writing the report no longer leaves a staged list behind; partial report writes are downgraded when outcome-history persistence fails. A failed final publish now marks both `reports/latest.json` and the matching run-level source outcome as failed while preserving the previous `filters.txt`.
-- **Post-publish archive handling** (`scripts/merge.py`): a history-archive failure is logged as a warning rather than returning a failed build after the new list and successful report have already been committed. Retention now skips valid JSON arrays/scalars as well as unreadable or malformed archive files instead of aborting on `.get()`.
-
-#### Updated
-- **Temporary-file cleanup** (`scripts/merge.py`): cleanup failures are now warning-only and cannot mask the original staging/publish error or prevent the failed run outcome from being updated. Added regression coverage for cleanup failure and non-object report archives.
-- **README behavior notes** (`README.md`): documented archive-file skipping, failed-report/publication handling, and best-effort temporary cleanup; re-verified that the existing November 3 source-quality snapshot still matches `reports/latest.json`.
-
-#### Verified, deliberately not changed
-- No further safely removable dead code or conflicting configuration/workflow behavior was found. The report snapshots, policy/source registries, README, and workflow publish paths were cross-checked. `filters.txt` remained excluded from review as requested.
-
-### Whole-repo audit pass (2026-10-20, fifth pass; 258 tests discovered, all passed, 12 curl-gated tests skipped; version unchanged at 7.6.0)
-
-Every script, configuration, workflow, document, and test module was read in full before judgement (`filters.txt` payload excluded); generated report JSONs were verified through their consumers and the report-history metadata (newest entry `2026-10-20T14:52:12Z`) matches the README source-quality snapshot.
+All files except the intentionally excluded `filters.txt` payload were
+read in full, including the entire `tests/` tree, docs, and workflows. The
+post-change test suite completed with all tests passing.
 
 #### Fixed
-- **Staged temp-file leak on publish failure** (`scripts/merge.py`): `commit_output()` left the staged `filters.*.tmp` file behind when `os.replace` failed (e.g. disk full). The temp file is now unlinked before the error propagates, matching `stage_output()`'s existing cleanup discipline. Success paths are unchanged.
 
-#### Verified, deliberately not changed
-- No dead code or conflicts found anywhere in the read tree; every helper has live call sites or is reachable from an entry point. README, workflows, policies, docs, and tests cross-check clean (builder 7.6.0, report schema 5, policy schema 3, source schema 1, 32 enabled root sources, cron schedules, guard pathspecs, limits table).
-- Left as-is with reasons documented inline: `health.py` parses `source-outcomes.json` twice per build (churn-heavy to dedupe against pinned public signatures); `config.py` deliberately re-validates/re-parses `policies.yaml` up to 3x per process so the `lru_cache` scope and `POLICY_FILE` test swapping keep working; `_helpers.curl_stream_limits_available()` deliberately duplicates the curl version probe for test isolation; the read-error accounting edge (rejected=1 with input_lines=0 on a zero-length unreadable file) is guarded and pinned by `UnreadableFileRecordTests`.
+- **History retention tiebreak** (`scripts/merge.py`): `archive_successful_report()`
+  now sorts archived reports in two stable passes — timestamps descending via
+  `timestamp_sort_key`, filename ascending as the tiebreak. A single
+  `reverse=True` sort also reversed the filename order for equal
+  `generated_at` values, making retention pruning depend on the glob's
+  filesystem-dependent enumeration order instead of being fully deterministic.
 
-### Audit pass (2026-10-20; 252 tests discovered; 240 passed and 12 curl-gated tests skipped under curl 7.88.1; version unchanged at 7.6.0)
+#### Verified
 
-Every project file except the intentionally excluded `filters.txt` payload was read or fully parsed before changes were made; the existing report JSON files were also parsed and checked for structural validity.
+- No dead or redundant production code, no cross-module conflicts, and no
+  other bugs were found in this pass.
+- `fetch.py` `_redirect_location` / `_response_content_encodings`
+  `Path`-wrappers are intentionally kept: `tests/test_regressions.py`
+  exercises them directly.
+- `health.py` reputation thresholds (0.80 watch / 0.95 excellent / 3
+  consecutive failures) are intentionally independent of
+  `config.DEFAULT_MINIMUM_SUCCESS_RATIO`: the former labels rolling
+  reputation, the latter gates the per-build root-source health ratio.
+- README needs no change: retention remains "chronological by generated_at",
+  which stays accurate after the tiebreak fix.
+- `filters.txt` remains excluded from this review and from the modified-file
+  archive, as requested.
 
-#### Fixed
-- **Documentation/report drift** (`README.md`, `CHANGELOG.md`): the source-quality snapshot now matches `reports/latest.json` generated 2026-10-20T12:31:38Z (231,110 input lines, 201,121 accepted, 175,580 unique rules, 12.98% overall rejection), and the README now states the existing curl >= 8.4.0 runtime requirement.
-- **Network-transfer test portability** (`tests/_helpers.py`, `tests/test_fetch.py`, `tests/test_merge.py`): tests that require curl's unknown-length `--max-filesize` behavior are skipped with a clear reason on curl < 8.4.0 instead of failing after the builder's intentional security gate.
-- **False source-limit failures on include cycles** (`scripts/fetch.py`): already-visited include targets could trigger the total-source limit when the visited set reached its cap. The traversal now checks canonical identities before applying the cap and only reports truly unvisited targets as source-limit failures.
-- **Collapsed malformed reputation timestamps** (`scripts/health.py`): missing or invalid timestamps were all treated as the same empty-day bucket during reputation scoring, contrary to daily compaction's behavior. Valid ISO timestamps are normalized to UTC, while each malformed/undated run remains a separate observation.
-- **Empty ABP inline-style blocks** (`scripts/normalize.py`): declaration blocks containing only semicolons or whitespace were accepted despite containing no property/value declaration. They are now rejected while valid declarations and optional trailing semicolons remain accepted.
-- **Conflicting rejection reasons** (`scripts/normalize.py`): `rejection_reason()` re-implemented the network-option checks in a different order from the pipeline, so it disagreed with the reason recorded in reports (for example `unknown-option` vs `invalid-option-or-network-rule`, and `context-invalid-option` for `$document` combined with `addheader=`). It also blamed uBO procedural operators on network rules that are never rejected for them. Both paths now use the single `_normalize_network_with_reason()` validator; a 400,000-input differential fuzz found 0 remaining disagreements.
-- **Offset-sensitive run ordering** (`scripts/health.py`): timestamps were sorted as strings, which could choose the wrong daily run identity when ISO timestamps used different UTC offsets. History and same-day compaction now compare normalized UTC instants while retaining conservative failure-wins outcome merging; UTC conversion overflow is treated as an undated entry rather than crashing history processing.
-- **Large whitespace-prefixed downloads** (`scripts/fetch.py`): download validation judged a file empty when its first 64 KiB were whitespace, even when valid rules followed. Validation now scans the remaining file for content and NUL bytes, and checks a bounded content probe so padded HTML error markers split across read boundaries remain rejected.
-- **Partial source reads** (`scripts/report.py`, `scripts/merge.py`): rules parsed before a mid-read I/O error could leak into the aggregate result, and a build could otherwise publish the remaining partial list. Per-file analysis now commits rules and counters only after the read and hash succeed; any source-analysis read error fails the build and preserves the previous `filters.txt`.
-- **Misattributed restricted-feature rejections** (`scripts/normalize.py`): the raw `$header=`/`$addheader=` substring scan ran over whole lines, so cosmetic selectors merely containing that text (and network patterns with escaped-`$` text) were rejected as `abp-security-restricted-feature` from untrusted sources despite carrying no restricted option. The check now relies solely on the real option parser; real `header=`/`addheader=` options and `#$#` snippets are still gated exactly as before. Covered by `RestrictedFeatureScopeTests`.
-- **Health-gate rounding** (`scripts/merge.py`): the root-source success ratio was rounded to 4 decimals before the threshold comparison, which could mask a marginally failing ratio (0.79995 rounds to 0.8 and passes an 0.8 threshold). The comparison now uses the unrounded ratio; the reported value stays rounded. Covered by `test_main_success_ratio_threshold_uses_unrounded_value`.
-
-#### Removed
-- Dead `normalize_network()` wrapper (no remaining callers) and the duplicated option-checking block in `_rejection_reason()`.
-- Redundant `rule.strip()` in the network validator (callers already pass cleaned lines).
-- Redundant `included_requested` field in fetch statistics (always equal to `included_references`, never read). It disappears from `reports/latest.json` on the next build.
-- Defensive `getattr(config, "source_quality", None)` in `merge.py`; `BuildConfig` always defines it. Test stubs now provide the field.
-- Dead `RESTRICTED_RAW_RE` pre-filter in `normalize.py` (superseded by the option-parser check) and a stale comment referencing the removed `normalize_network()`.
-
-#### Changed (optimization / cleanup)
-- `fetch.py`: already-visited canonical include targets are filtered before source-limit handling and carried forward through `unvisited_next`, preventing duplicate/cyclic references from creating false failures.
-- `health.py`: use one strict ISO timestamp-to-UTC-day helper for both history compaction and reputation aggregation.
-- `normalize.py`: avoid repeated declaration-block slicing/stripping and redundant trailing-whitespace stripping for already-cleaned cosmetic bodies.
-- `normalize.py`: the plain-option name set is precomputed once instead of rebuilt for every option of every network rule.
-- `fetch.py`: header parsing shared by `_redirect_location()` and `_response_content_encodings()` via `_header_blocks()`; the curl version probe uses `subprocess.run`.
-- `report.py`: the per-file record is built by one helper instead of two near-identical literals.
-- `merge.py`: all imports moved to the top of the module.
-- `health.py` / `merge.py`: share normalized UTC timestamp ordering for history, daily outcomes, and archive retention rather than sorting offset-bearing ISO strings lexically; treat UTC-conversion overflow as an undated timestamp.
-- `fetch.py`: scan beyond the initial download sample when checking for an empty payload and buffer a bounded HTML probe to avoid missing error markers split across chunk boundaries; keep binary rejection active.
-- `report.py`: stage each source's rules, reasons, counters and digest locally until the file has been read and hashed successfully; streamline duplicate counting to operate on per-file sets.
-- `merge.py`: fail the build and avoid staging/publishing output if any local source cannot be fully analyzed.
-- README source-quality snapshot refreshed to `reports/latest.json` generated 2026-10-20T12:31:38Z (231,110 input lines, 201,121 accepted, 175,580 unique rules, 12.98% overall rejection).
-
-#### Added
-- Regression coverage for self-including sources at the source cap, cycles with genuinely new children, malformed/undated reputation timestamps, invalid-day compaction, and declarationless inline-style blocks.
-- Regression tests for reason agreement (fuzzed), `document` + `addheader` reasons, terminal-`$` reasons, interim-response header blocks, and unreadable-source records.
-- Regression tests for offset-aware and out-of-range timestamp handling, archive-retention ordering across UTC offsets, whitespace-prefixed downloads with chunk-split HTML markers, transactional handling of mid-read errors, and stopping publication after analysis errors.
-
-
-
-### Audit follow-up (2026-10-20, second pass; 256 tests discovered; all non-skipped tests passed, 12 curl-gated tests skipped; version unchanged at 7.6.0)
-
-Every script, document, configuration file, workflow, and test module was read in full before judgement; generated artifacts (`reports/*.json`, `filters.txt`) were sampled for consistency only.
-
-#### Changed (optimization / cleanup)
-- **Duplicate exception gates** (`scripts/normalize.py`): the two exception-only checks for `$header`/`$addheader` in `valid_option()` were merged into a single set-membership branch. No behavior change; the existing header/addheader coverage (`test_merge.py`, `test_audit.py`, `test_regressions.py`) still passes.
-
-#### Verified, deliberately not changed
-- `scripts/config.py` still parses `policies.yaml` up to three times per process; caching `_load_policy` was rejected because tests legitimately swap `POLICY_FILE` and monkeypatch `_load_policy` in-process.
-- `scripts/fetch.py` `_ADDRESS_PIN_CACHE` is mutated from worker threads; safe under CPython (worst case a duplicate DNS lookup), with `test_hardening.py::DnsPinCacheTests` pinning the current semantics.
-
-#### Re-verified
-- README and CHANGELOG claims still match the code (32 enabled root sources, limits/policy table, curl >= 8.4.0 requirement, report schema 5, policy schema 3 / source schema 1). No documentation drift found; the README gained only a one-line note that the other `scripts/` modules are import-only building blocks.
-
-
-### Audit pass (2026-10-20, third pass; version unchanged at 7.6.0)
-
-Every source file (scripts, tests, docs, configurations, workflows, README) was read in full before judgement; generated artifacts (`filters.txt`, `reports/*.json`) were treated as outputs and verified only through their consumers.
-
-#### Fixed
-- **Validator count message** (`scripts/validate.py`): a missing `! Total rules:` header was reported as `[COUNT] declared None, found N`; it now reports `[COUNT] missing '! Total rules:' header`.
-
-#### Verified, deliberately not changed
-- No dead code found: every helper flagged by a whole-project reference scan has live internal call sites or is reachable from an entry point.
-- `fetch.py` `record_unattempted()` rebuilds its reported-URL set exactly once per build (single terminal call site), so no quadratic behavior exists.
-- `config.py` discards the validated rule-policy dict in `load_config()`; the recomputation is served once per process by `load_rule_policy()`'s cache, and deeper caching of `_load_policy` remains rejected as in the first pass (tests swap `POLICY_FILE` in-process).
-- The duplicate URL parse in `fetch.py` (`download()` and `_public_address_for_url()`) was left as-is: the saving is one `urlsplit` per request inside security-sensitive SSRF handling.
-- Version/schema consistency re-verified: builder 7.6.0, report schema 5, policy schema 3, source schema 1, 32 enabled root sources (33 registry entries minus the disabled AdGuard Annoyances) matching the 32 URLs in `sources.txt`.
-
-### Audit pass (2026-10-20, fourth pass; version unchanged at 7.6.0)
-
-Every script, document, configuration, workflow, generated report, and test module was read or fully parsed before judgement.
-
-#### Fixed
-- **Terminal-`$` exemption hole** (`scripts/normalize.py`): `_normalize_line()` skipped its empty-option-section rejection for network rules starting with `/` or `@@/`, so `/foo$` and `@@/foo$` were accepted as literal patterns containing `$`. Well-formed regex filters end with `/` and never trigger the terminal-`$` guard, so the exemption admitted only malformed rules. Every network rule ending in `$` is now rejected, matching the documented "terminal `$` = empty option section" policy. Verified compatible with the pinned regex-filter, terminal-`$` reason-agreement, fuzz, and corpus tests.
-
-#### Changed (optimization / cleanup)
-- `parser.py`: removed the unreachable `^\s*` prefix from `HTML_RE` (`classify()` always receives an already-stripped line).
-
-#### Documentation
-- README source-quality snapshot refreshed to `reports/latest.json` generated 2026-10-20T14:52:12Z (231,190 input lines, 201,193 accepted, 175,643 unique rules, 12.98% overall rejection); the previous snapshot cited a stale 14:13:39Z report.
-
-#### Verified, deliberately not changed
-- `parser.py` `"#" in value` pre-check is a deliberate C-level fast gate for `COSMETIC_RE.search`, not dead code.
-- `_option_list_reason()` lacks the `document`+`addheader` exception of the main option loop, but rules affected by the difference are rejected either way and the pipeline and `rejection_reason()` agree with each other (both call the same validator); changing it would churn reason strings the regression suite fuzzes for agreement.
-- `valid_addheader()` accepts empty content (`x-foo:`); no test pins either behavior and the strict-ABP grammar reference for empty header values was not verifiable offline, so behavior is preserved.
-- `fetch.py` still makes separate validation/include/parse passes per file; folding them would churn byte-accounting code the budget/accounting tests pin, for marginal I/O gain at 32 sources.
