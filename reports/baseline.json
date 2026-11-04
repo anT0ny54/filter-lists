@@ -1,8 +1,8 @@
 {
   "schema": 5,
   "status": "success",
-  "generated_at": "2026-11-03T18:06:10.498485+00:00",
-  "build_id": "093c23e07bfbbcb3fe7923b3bd905f62ccffd4a86f350275a9178a98ac58fe04",
+  "generated_at": "2026-11-04T10:52:50.227858+00:00",
+  "build_id": "48423f3839cba0f8dc10d73e1fb3113409d039850ff34c7ee07ab9ef373abb61",
   "sources": {
     "results": [
       {
@@ -12,16 +12,16 @@
         "input_lines": 4432,
         "unique_rules": 4341,
         "rejection_rate": 0.020532,
-        "sha256": "200ff93f53d7693ec58060f04ca7fa5e794d18fa088191a5a9841b67331d5e9a"
+        "sha256": "0b230212a10779f64ccc1fe28b9fdedd1b92705189d221cdab0dfc4c049d3369"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/abpvn-minified.txt",
         "status": "ok",
-        "bytes": 21625,
-        "input_lines": 468,
-        "unique_rules": 457,
-        "rejection_rate": 0.023504,
-        "sha256": "a94b2d54f038a9a687608a45837554340b98d4428e26b5394cd11ce3c9a97f32"
+        "bytes": 21207,
+        "input_lines": 461,
+        "unique_rules": 450,
+        "rejection_rate": 0.023861,
+        "sha256": "44f989285275ceb20f5e98d07cfcf42311c0afc9688e9c0da2ab93366779ed0e"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/bulgarian_list-minified.txt",
@@ -30,25 +30,25 @@
         "input_lines": 85,
         "unique_rules": 77,
         "rejection_rate": 0.094118,
-        "sha256": "403fd428db7d3eaa57ad82bf5409b6d2b6e92c3053106b7525847c6e763064f2"
+        "sha256": "61f74c15107e8bf96fe968d6d5b673f5ba61f836280ae64fd475a8cc35416d5e"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/easylist-minified.txt",
         "status": "ok",
-        "bytes": 1080928,
-        "input_lines": 43414,
-        "unique_rules": 42709,
-        "rejection_rate": 0.015986,
-        "sha256": "0fab3415f599d5473e2fe13b01d9fca4ba0b41dee21d44c7ce9e4b58515bb3e0"
+        "bytes": 1084485,
+        "input_lines": 43561,
+        "unique_rules": 42854,
+        "rejection_rate": 0.015978,
+        "sha256": "539318e790f1211233a47ff59ca0e54b3b311e28ae0a4b8293c2ce3d064a29b0"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/easylistchina-minified.txt",
         "status": "ok",
-        "bytes": 80641,
-        "input_lines": 2298,
-        "unique_rules": 2277,
-        "rejection_rate": 0.009138,
-        "sha256": "6726ea237ddd57e85c43095b6147f4d500eae980b66b542e12c20c49acaf1854"
+        "bytes": 80861,
+        "input_lines": 2310,
+        "unique_rules": 2289,
+        "rejection_rate": 0.009091,
+        "sha256": "d481df8fd030f2da56df989b03bf149be833ea1057c990a087de730b089fe423"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/easylistdutch-minified.txt",
@@ -57,7 +57,7 @@
         "input_lines": 146,
         "unique_rules": 137,
         "rejection_rate": 0.061644,
-        "sha256": "af5a90b37098616921c6d9405ffa573af683eeb5c6a1144ea5fd855f421602cd"
+        "sha256": "6b9b553320e45450c9ffb9805376dcf234a02e1fd4f66db71f3295542cb554e4"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/easylistgermany-minified.txt",
@@ -66,7 +66,7 @@
         "input_lines": 690,
         "unique_rules": 675,
         "rejection_rate": 0.021739,
-        "sha256": "71ca133c9f2872a0d801e82af1543829b8d5693dc4af5de3b5f68cacebca4301"
+        "sha256": "e4be51c4d6c98fe67fdf2e24e7d2e488498d928708e800934423286f60cf8226"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/easylistitaly-minified.txt",
@@ -75,7 +75,7 @@
         "input_lines": 466,
         "unique_rules": 457,
         "rejection_rate": 0.019313,
-        "sha256": "721a777871ab4b2fbfe6626c2842db8395eb1297f0c6fd012f4087109d6befe0"
+        "sha256": "7c200771e452d48918218080253e4dea0bd6b26fc038b6183c2573e8a6b780e8"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/easylistlithuania-minified.txt",
@@ -84,25 +84,25 @@
         "input_lines": 91,
         "unique_rules": 83,
         "rejection_rate": 0.087912,
-        "sha256": "1682a8124c255322b0620825f7f27ceae2623ff7ce2daa9711ea045ac843b70f"
+        "sha256": "d20809be50b9bb06682d766b1a1f0887d65edc5fc36bd72bc108fbbb80b20798"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/easylistpolish-minified.txt",
         "status": "ok",
-        "bytes": 33499,
+        "bytes": 33493,
         "input_lines": 292,
         "unique_rules": 284,
         "rejection_rate": 0.027397,
-        "sha256": "524e54321e9d896267cbcebd46ef39c190b22190dd5ca7e87c9021d34ea7c2ff"
+        "sha256": "5e391f0e3e084d359861da49dc9206bcc48376841fe84c5138a37145a5b48854"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/easylistportuguese-minified.txt",
         "status": "ok",
-        "bytes": 13368,
-        "input_lines": 253,
-        "unique_rules": 243,
-        "rejection_rate": 0.039526,
-        "sha256": "1dee817019a2f68434824eb2d69699a588262b7d73f0b97c226ac368d17c6b3d"
+        "bytes": 13081,
+        "input_lines": 247,
+        "unique_rules": 237,
+        "rejection_rate": 0.040486,
+        "sha256": "08f873d8ed7f94cd16ce539f83c1c21e2916ebdd1ae8c6dcbecf54efdaf9f98c"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/easylistspanish-minified.txt",
@@ -111,25 +111,25 @@
         "input_lines": 116,
         "unique_rules": 100,
         "rejection_rate": 0.137931,
-        "sha256": "de070787d31dd8157dea4157e43522da4f9b558ee84f00ccccb36d65b518c31e"
+        "sha256": "dfc2f42613d75b7f89ccfeada7002639fd165ccaf53315f3292efcb41c9963fd"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/easyprivacy-minified.txt",
         "status": "ok",
-        "bytes": 128537,
-        "input_lines": 4276,
-        "unique_rules": 4264,
-        "rejection_rate": 0.002572,
-        "sha256": "5528d771adfbc3b0e3be5a157ca7fb3f25592b1644d4f69460a08ea18fd3008f"
+        "bytes": 128794,
+        "input_lines": 4285,
+        "unique_rules": 4273,
+        "rejection_rate": 0.002567,
+        "sha256": "f5e06d66e3280d25bf42934a23cf9a62ad68f65895e62b7c9fbe22b7d3880d81"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/fanboy-social-minified.txt",
         "status": "ok",
-        "bytes": 49292,
-        "input_lines": 662,
-        "unique_rules": 654,
-        "rejection_rate": 0.012085,
-        "sha256": "6023be8272e5e8d6f8379f22f5b5447cfa07b06bf8d7bb29b4f9755712eba47b"
+        "bytes": 49532,
+        "input_lines": 666,
+        "unique_rules": 658,
+        "rejection_rate": 0.012012,
+        "sha256": "e2b79d145529a29ea8e35213471aeab9d4690f787a0a0b83286704f8908e5685"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/indianlist-minified.txt",
@@ -138,7 +138,7 @@
         "input_lines": 659,
         "unique_rules": 651,
         "rejection_rate": 0.01214,
-        "sha256": "ae8d00fbc2bdc206bddbfc00a0b8a6cc85956a71f782ed9189b83124494f22b0"
+        "sha256": "f75ace56ceab124c18565cf10bd62588feff65b7444f4e3ee3e0f5612bd7e1e2"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/israellist-minified.txt",
@@ -147,7 +147,7 @@
         "input_lines": 206,
         "unique_rules": 197,
         "rejection_rate": 0.043689,
-        "sha256": "73e7d669d7a11a2f658a8fb8d378a1c7933e252ca149dfda6fc2295017f9a16f"
+        "sha256": "ef511cf166e4aac2903f7947e4ba36cc54f079e2ff2a1557e2081155cb050541"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/latvianlist-minified.txt",
@@ -156,16 +156,16 @@
         "input_lines": 40,
         "unique_rules": 32,
         "rejection_rate": 0.2,
-        "sha256": "78b829dc95c328f4124dbca11531020c48be258aef2db6c367ff3c9668ce093f"
+        "sha256": "fd61ab0f755967c6962a203c077a7a897f6f4ccf5d419992ab14aa743d21732b"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/liste_fr-minified.txt",
         "status": "ok",
-        "bytes": 68123,
-        "input_lines": 1583,
-        "unique_rules": 1564,
-        "rejection_rate": 0.012003,
-        "sha256": "dbb3dd8cf5136c11be3f6beba5ee23b23b9d262c4688e8bf8315aed6922d52f4"
+        "bytes": 69172,
+        "input_lines": 1623,
+        "unique_rules": 1604,
+        "rejection_rate": 0.011707,
+        "sha256": "fd1a1e83cc97a8b828fab167447c76c0d0eb34c312e1755f8fba6d1859c7fc8c"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/rolist-minified.txt",
@@ -174,61 +174,61 @@
         "input_lines": 108,
         "unique_rules": 98,
         "rejection_rate": 0.083333,
-        "sha256": "8dfb21a5bdf57b66ae84082ab5349c8717476f035eee07c66189b39588fe55ae"
+        "sha256": "b76edcd8b6a952866ddc4524e8fe4490f9ca4d8f2afe89d1a19f3b1ec65b1af4"
       },
       {
         "url": "https://easylist-downloads.adblockplus.org/ruadlist-minified.txt",
         "status": "ok",
-        "bytes": 138546,
-        "input_lines": 2136,
-        "unique_rules": 2063,
-        "rejection_rate": 0.034176,
-        "sha256": "f35e16494be558678b9e424647447e8be22bbff8be8a7b17c7109be5294e77fe"
+        "bytes": 138717,
+        "input_lines": 2139,
+        "unique_rules": 2066,
+        "rejection_rate": 0.034128,
+        "sha256": "5974e21afea437cd32375d018273a36a4b44bbe8725d8a037123311846afa9e3"
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/13_optimized.txt",
         "status": "ok",
-        "bytes": 462007,
-        "input_lines": 6847,
-        "unique_rules": 5276,
-        "rejection_rate": 0.229298,
-        "sha256": "ab4d52d150798a5657e728ff9862e044559cb24d2db7d62d3ff4769abad5cc90"
+        "bytes": 462181,
+        "input_lines": 6848,
+        "unique_rules": 5277,
+        "rejection_rate": 0.229264,
+        "sha256": "fc3cba8ea54e8b10e4716899828a808998c12dfbd0a4afedc9a7b831acb91d22"
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/14_optimized.txt",
         "status": "ok",
-        "bytes": 2021427,
-        "input_lines": 31336,
-        "unique_rules": 22167,
-        "rejection_rate": 0.291294,
-        "sha256": "0e99575ffa057512b92b1ec8264a851a5b985cc3593399d8fb7720ff8ff141a1"
+        "bytes": 2023043,
+        "input_lines": 31354,
+        "unique_rules": 22179,
+        "rejection_rate": 0.291287,
+        "sha256": "5a589ede889dbb292d7b9da8dc3e115ba1650b626b45cb3145346ab4364812a5"
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/16_optimized.txt",
         "status": "ok",
-        "bytes": 212179,
-        "input_lines": 5002,
-        "unique_rules": 4038,
-        "rejection_rate": 0.189324,
-        "sha256": "da00a6e2f5f4f67b1affc36aaf39428e2806d8658d9ee50cb03836fdcefa69c9"
+        "bytes": 213083,
+        "input_lines": 5038,
+        "unique_rules": 4072,
+        "rejection_rate": 0.188368,
+        "sha256": "7c68575db207d4233f93ffb6d4240323d6ba893f0d6070a9a10ffd214c5f5c3e"
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/1_optimized.txt",
         "status": "ok",
-        "bytes": 375801,
+        "bytes": 375729,
         "input_lines": 7824,
         "unique_rules": 6146,
         "rejection_rate": 0.213829,
-        "sha256": "cf2027e943a62b070ce334c3bceb1a9ba31187bbd8abe34eb0ff4a545af70a82"
+        "sha256": "48caef9d21ae3215af3f8648f9c2cd5d69227358dcc518005b48f4775b726fa1"
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/224_optimized.txt",
         "status": "ok",
-        "bytes": 679142,
-        "input_lines": 20967,
-        "unique_rules": 19779,
-        "rejection_rate": 0.056279,
-        "sha256": "f78f10f24c8a327fbffdcd151316a3493919e016af1509893fc08538d2deee15"
+        "bytes": 679355,
+        "input_lines": 20978,
+        "unique_rules": 19790,
+        "rejection_rate": 0.056249,
+        "sha256": "dc4d3477bbc145d9de57691b152b35aa507398bc4c4356b1ff66e4769cedf335"
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/23_optimized.txt",
@@ -242,38 +242,38 @@
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt",
         "status": "ok",
-        "bytes": 2440271,
-        "input_lines": 49513,
-        "unique_rules": 40638,
-        "rejection_rate": 0.17145,
-        "sha256": "e8d2529bdd9e7d28a786b1ebf783f11260824d0db283671bd69cdc8f0d87be84"
+        "bytes": 2439828,
+        "input_lines": 49467,
+        "unique_rules": 40592,
+        "rejection_rate": 0.17167,
+        "sha256": "03aa1597b41283442ec9d477fa8f4dacf51485ecf5fd3336e5fc03d9d91667b4"
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt",
         "status": "ok",
-        "bytes": 613772,
-        "input_lines": 10923,
-        "unique_rules": 10373,
-        "rejection_rate": 0.050169,
-        "sha256": "d4852f43433773df86df706086c27c9b83a4ba27c22d510dfb8bdcd733d3ec47"
+        "bytes": 614771,
+        "input_lines": 10931,
+        "unique_rules": 10381,
+        "rejection_rate": 0.050133,
+        "sha256": "2017b1103e66eac015ac8f68c524165830276b35ce39240939f6ae020500c0d9"
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/6_optimized.txt",
         "status": "ok",
-        "bytes": 278370,
-        "input_lines": 5294,
-        "unique_rules": 4483,
-        "rejection_rate": 0.136759,
-        "sha256": "960335a6291808752fa879c4a768227e6a9f6a42b7b21099b5a409cfea9fe255"
+        "bytes": 278395,
+        "input_lines": 5296,
+        "unique_rules": 4485,
+        "rejection_rate": 0.136707,
+        "sha256": "fd7204b31fda4cf0202bb710b1a1946f8356eb985a1a07c2a2f42228a7289ee5"
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/7_optimized.txt",
         "status": "ok",
-        "bytes": 720626,
-        "input_lines": 12298,
-        "unique_rules": 10496,
-        "rejection_rate": 0.146528,
-        "sha256": "368e393f1ab005891449c33181e519ad2933d5c08b2fee9b2338980ce8acbb63"
+        "bytes": 719747,
+        "input_lines": 12288,
+        "unique_rules": 10489,
+        "rejection_rate": 0.146403,
+        "sha256": "fad9f74a80b83640eb640a683d7e90dfb250a5e95a6547669e676d25df6200e8"
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/8_optimized.txt",
@@ -287,11 +287,11 @@
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/9_optimized.txt",
         "status": "ok",
-        "bytes": 309805,
-        "input_lines": 5758,
-        "unique_rules": 4691,
-        "rejection_rate": 0.184613,
-        "sha256": "23c1caf2207dc8435b67e3b430ceda9c7d17e775f7c334f0c66d16eca9588b29"
+        "bytes": 310067,
+        "input_lines": 5762,
+        "unique_rules": 4695,
+        "rejection_rate": 0.184485,
+        "sha256": "80bf91d48a6767b1f06ee40bdab70e2f538b6d3e7f5d99fc6daf69b08d95a392"
       }
     ]
   }
