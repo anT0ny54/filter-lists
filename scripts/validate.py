@@ -95,6 +95,10 @@ def main() -> int:
         # but it must be reported like every other validation failure rather
         # than crashing with a traceback.
         errors.append(f"[ENCODING] not valid UTF-8: {exc.reason} at byte {exc.start}")
+    except OSError as exc:
+        # A file can disappear or become unreadable after the initial is_file()
+        # check. Report that as a validation failure instead of a traceback.
+        errors.append(f"[IO] could not read filter file: {exc}")
 
     if declared_total is None:
         errors.append("[COUNT] missing '! Total rules:' header")
@@ -103,14 +107,23 @@ def main() -> int:
     if declared_build_id is None:
         errors.append("[BUILD-ID] missing or invalid")
     else:
-        actual_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(sorted(seen, key=rule_sort_key))).encode()).hexdigest()
-        if actual_id != declared_build_id:
-            errors.append("[BUILD-ID] does not match configuration and normalized rules")
+        try:
+            actual_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(sorted(seen, key=rule_sort_key))).encode()).hexdigest()
+        except OSError as exc:
+            errors.append(f"[IO] could not read build inputs: {exc}")
+        else:
+            if actual_id != declared_build_id:
+                errors.append("[BUILD-ID] does not match configuration and normalized rules")
     if declared_source_manifest is None:
         errors.append("[PROVENANCE] source manifest SHA-256 missing or invalid")
     else:
-        if source_manifest_sha256(config) != declared_source_manifest:
-            errors.append("[PROVENANCE] source manifest hash does not match sources.yaml")
+        try:
+            actual_manifest = source_manifest_sha256(config)
+        except OSError as exc:
+            errors.append(f"[IO] could not read source manifest: {exc}")
+        else:
+            if actual_manifest != declared_source_manifest:
+                errors.append("[PROVENANCE] source manifest hash does not match sources.yaml")
     if "version" not in metadata_seen:
         errors.append("[VERSION] missing")
     elif version_hash and declared_build_id and not declared_build_id.startswith(version_hash):

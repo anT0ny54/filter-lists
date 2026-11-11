@@ -316,6 +316,16 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
                 current_url = canonical_url(next_url)
                 continue
 
+            # curl's --fail rejects 4xx/5xx, but it accepts other non-2xx
+            # statuses such as 300 and 304. Never treat those response bodies
+            # as filter-list content. A 206 response is also incomplete unless
+            # we explicitly requested a byte range (which this downloader does
+            # not), so it cannot be accepted as a complete source.
+            if status == 206:
+                return fail("partial-content-response")
+            if not 200 <= status < 300:
+                return fail(f"unexpected-http-status: {status}")
+
             encodings = _response_content_encodings_from(blocks)
             if any(encoding != "identity" for encoding in encodings):
                 return fail("unsupported-content-encoding")
@@ -353,11 +363,15 @@ def validate_download(
             # Large but otherwise valid lists can contain more than 64 KiB of
             # leading whitespace; scan the remainder before deciding emptiness.
             has_content = bool(sample.strip())
-            # When the initial sample is all whitespace, keep a bounded probe
-            # starting at the first non-whitespace byte. This also handles an
-            # HTML/error marker split across the 1 MiB read boundary.
-            html_probe = bytearray() if not has_content and reject_html_error_pages else None
-            probe_limit = 65536
+            # For a non-whitespace sample, retain its bytes and a bounded
+            # continuation so an HTML marker split at the 64 KiB boundary is
+            # still recognized. For a whitespace-only sample, start the probe
+            # at the first content byte even if the leading whitespace spans
+            # multiple 1 MiB chunks.
+            html_probe = (
+                bytearray(sample) if has_content else bytearray()
+            ) if reject_html_error_pages else None
+            probe_limit = len(sample) + 65536 if has_content else 65536
             for chunk in iter(lambda: handle.read(1024 * 1024), b""):
                 if b"\x00" in chunk:
                     return False, "binary-data"
@@ -645,6 +659,18 @@ def collect_sources(
                         stats["budget_exhausted"] = True
                     stats["total_download_bytes"] += size
 
+                    digest = None
+                    if ok:
+                        try:
+                            digest = sha256_file(target)
+                        except OSError as exc:
+                            # A source that was downloaded and validated is not
+                            # usable if its integrity digest cannot be read.
+                            # Convert this into a normal source failure so the
+                            # build reports it instead of aborting the pipeline.
+                            ok = False
+                            error = f"hash-error: {exc}"
+
                     if ok:
                         files.append(target)
                         stats["successful"] += 1
@@ -655,7 +681,7 @@ def collect_sources(
                             "depth": depth,
                             "status": "ok",
                             "bytes": size,
-                            "sha256": sha256_file(target),
+                            "sha256": digest,
                             "path": str(target),
                         })
                         log(f"   [OK] {url[:110]}")

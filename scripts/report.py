@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -55,6 +56,7 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
         local_reasons: Counter[str] = Counter()
         local_accepted = local_rejected = local_lines = 0
         trusted = path in trusted_paths or path == custom_rules
+        failure_reason = "read-error"
         try:
             with path.open(encoding="utf-8", errors="replace") as source:
                 for raw in source:
@@ -73,18 +75,21 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
             # fetch.collect_sources). Reuse that digest instead of re-reading
             # and re-hashing the same file a second time here; only files
             # without a known digest (e.g. custom-rules.txt) get hashed now.
+            failure_reason = "hash-error"
             file_hash = known_hashes.get(path) or sha256_file(path)
         except OSError as exc:
             # A failed file is rejected as a unit: none of its partially read
-            # rules enter the global set. Preserve one diagnostic for an empty
-            # unreadable file, while keeping known partial lines fully rejected.
-            failed_lines = max(1, local_lines)
-            input_lines += local_lines
+            # rules enter the global set. Count only lines actually observed;
+            # an unreadable empty file still has an explicit per-file error
+            # without inventing a synthetic input/rejection line.
+            failed_lines = local_lines
+            input_lines += failed_lines
             rejected += failed_lines
-            reasons["read-error"] += failed_lines
+            if failed_lines:
+                reasons[failure_reason] += failed_lines
             per_file.append(_file_record(
-                path, local_lines, 0, failed_lines, 0, 0,
-                {"read-error": failed_lines}, error=str(exc),
+                path, failed_lines, 0, failed_lines, 0, 0,
+                {failure_reason: failed_lines} if failed_lines else {}, error=str(exc),
             ))
             continue
 
@@ -102,7 +107,7 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
             path, local_lines, local_accepted, local_rejected, local_duplicates,
             len(local_rules), local_reasons, sha256=file_hash,
         ))
-    rejection_rate = round(rejected / input_lines, 6) if input_lines else (1.0 if reasons.get("read-error") else 0.0)
+    rejection_rate = round(rejected / input_lines, 6) if input_lines else 0.0
     return rules, {
         "input_lines": input_lines, "accepted_lines": accepted,
         "rejected_lines": rejected, "duplicate_lines": duplicates,
@@ -117,29 +122,70 @@ def _ratio_change(current: float, previous: float) -> float:
     return abs(current - previous) / abs(previous)
 
 
+def _anomaly_metrics(item: dict) -> tuple[int, int, int, float] | None:
+    """Return validated counters for one source result, or skip malformed data."""
+    integer_fields = ("input_lines", "unique_rules", "bytes")
+    values = [item.get(key) for key in integer_fields]
+    if any(isinstance(value, bool) or not isinstance(value, int) or value < 0 for value in values):
+        return None
+    raw_rejection_rate = item.get("rejection_rate")
+    if isinstance(raw_rejection_rate, bool) or not isinstance(raw_rejection_rate, (int, float)):
+        return None
+    try:
+        rejection_rate = float(raw_rejection_rate)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if not math.isfinite(rejection_rate) or not 0.0 <= rejection_rate <= 1.0:
+        return None
+    input_lines, unique_rules, byte_count = values
+    return input_lines, unique_rules, byte_count, rejection_rate
+
+
 def detect_anomalies(current_results: list[dict], previous_report: dict | None, policy: dict) -> dict:
     # `fail_on_warning` / `enforced_failure` are present on every return path.
     # Previously they were only set once a baseline existed, so the very first
     # build (or anomaly_detection.enabled: false) produced a report without
     # `enforced_failure` and the publish workflow's `is False` assertion failed.
     result = {"enabled": bool(policy.get("enabled", True)), "baseline": "none", "count": 0, "critical_count": 0, "warning_count": 0, "items": [], "fail_on_warning": bool(policy.get("fail_on_warning", False)), "enforced_failure": False}
-    if not result["enabled"] or not previous_report or previous_report.get("status", "success") != "success":
+    if (
+        not result["enabled"]
+        or not isinstance(previous_report, dict)
+        or previous_report.get("status", "success") != "success"
+    ):
         return result
-    previous = previous_report.get("sources", {}).get("results", [])
-    # Only successful previous fetches are a meaningful baseline. A previously
-    # failed source has 0 bytes/lines, which made every recovery look like a
-    # 100% "bytes-change" anomaly.
-    previous_by_url = {item.get("url"): item for item in previous if item.get("url") and item.get("status") == "ok"}
-    result["baseline"] = previous_report.get("build_id") or "previous-report"
+    source_data = previous_report.get("sources")
+    previous = source_data.get("results", []) if isinstance(source_data, dict) else []
+    if not isinstance(previous, list):
+        previous = []
+    # Only successful previous fetches are a meaningful baseline. Ignore
+    # malformed rows so a manually damaged/truncated-but-valid JSON report
+    # cannot abort a new build's anomaly check.
+    previous_by_url = {}
+    for item in previous:
+        if not isinstance(item, dict):
+            continue
+        url = item.get("url")
+        if (
+            not isinstance(url, str)
+            or not url
+            or item.get("status") != "ok"
+            or _anomaly_metrics(item) is None
+        ):
+            continue
+        previous_by_url[url] = item
+    build_id = previous_report.get("build_id")
+    result["baseline"] = build_id if isinstance(build_id, str) and build_id else "previous-report"
     min_lines = int(policy.get("min_lines", DEFAULT_ANOMALY_MIN_LINES)); max_bytes = float(policy.get("max_bytes_change_ratio", DEFAULT_ANOMALY_MAX_BYTES_CHANGE_RATIO)); max_rules = float(policy.get("max_rule_count_change_ratio", DEFAULT_ANOMALY_MAX_RULE_COUNT_CHANGE_RATIO)); max_rejection = float(policy.get("max_rejection_rate_change", DEFAULT_ANOMALY_MAX_REJECTION_RATE_CHANGE))
     for current in current_results:
-        if current.get("status") != "ok": continue
+        if not isinstance(current, dict) or current.get("status") != "ok": continue
         old = previous_by_url.get(current.get("url"))
         if not old: continue
-        current_lines = int(current.get("input_lines", 0)); old_lines = int(old.get("input_lines", 0))
-        current_rules = int(current.get("unique_rules", 0)); old_rules = int(old.get("unique_rules", 0))
-        current_bytes = int(current.get("bytes", 0)); old_bytes = int(old.get("bytes", 0))
-        current_rejection = float(current.get("rejection_rate", 0.0)); old_rejection = float(old.get("rejection_rate", 0.0))
+        current_metrics = _anomaly_metrics(current)
+        old_metrics = _anomaly_metrics(old)
+        if current_metrics is None or old_metrics is None:
+            continue
+        current_lines, current_rules, current_bytes, current_rejection = current_metrics
+        old_lines, old_rules, old_bytes, old_rejection = old_metrics
         if max(current_lines, old_lines) < min_lines: continue
         changes = {"bytes_ratio": round(_ratio_change(current_bytes, old_bytes), 6), "rule_count_ratio": round(_ratio_change(current_rules, old_rules), 6), "rejection_rate_delta": round(abs(current_rejection - old_rejection), 6)}
         reasons = []
