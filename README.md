@@ -270,12 +270,12 @@ The repository test suite covers:
 
 Download success does not mean a source contributes rules, so each build also evaluates rule yield per source. The **effective rejection rate** is the share of rule lines (input lines minus comments, blanks, and directives) that the strict-ABP profile rejected. With the shipped policy, sources of at least 100 lines at or above 30% are reported as `warning` and at or above 90% as `critical` in `reports/latest.json` (`source_quality`) and in the build log. They are advisory unless `source_quality.fail_on_critical: true`.
 
-Snapshot from the newest report (`reports/latest.json`, generated 2026-11-11T03:22:11Z): 32/32 root sources OK, 224,785 input lines, 194,422 accepted, 171,119 unique rules, overall rejection rate 13.51%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.41% effective rejection rate).
+Snapshot from the newest report (`reports/latest.json`, generated 2026-11-11T04:15:34Z): 32/32 root sources OK, 224,689 input lines, 194,326 accepted, 171,163 unique rules, overall rejection rate 13.51%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.41% effective rejection rate).
 
 | Source | Input lines | Accepted | Rejection rate* | Main rejection reasons |
 |---|---:|---:|---:|---|
 | AdGuard Ukrainian | 5,553 | 3,631 | 34.61% | `unknown-option` (1,769), `ubo-only-syntax` (122) |
-| AdGuard Social Media | 31,576 | 22,387 | 29.10% | `ubo-only-syntax` (7,465), `unknown-option` (681) |
+| AdGuard Social Media | 31,577 | 22,388 | 29.10% | `ubo-only-syntax` (7,465), `unknown-option` (681) |
 | AdGuard Turkish | 6,889 | 5,307 | 22.96% | `ubo-only-syntax` (784), `invalid-cosmetic-rule` (488) |
 | AdGuard Russian | 7,858 | 6,177 | 21.39% | `unknown-option` (866), `ubo-only-syntax` (635) |
 | AdGuard French | 5,010 | 4,043 | 19.30% | `unknown-option` (671), `ubo-only-syntax` (240) |
