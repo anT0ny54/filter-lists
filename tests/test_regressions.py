@@ -456,6 +456,13 @@ class HeaderBlockParsingTests(unittest.TestCase):
         self.assertEqual(fetch._redirect_location_from(blocks), "/next")
         self.assertEqual(fetch._response_content_encodings_from(blocks), ["gzip"])
 
+    def test_interim_location_is_not_used_when_final_response_has_none(self):
+        path = self._headers(
+            "HTTP/1.1 100 Continue\r\nLocation: /interim\r\n\r\n"
+            "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n"
+        )
+        self.assertIsNone(fetch._redirect_location_from(fetch._header_blocks(path)))
+
     def test_missing_header_file_is_empty_not_an_error(self):
         missing = Path(tempfile.gettempdir()) / "filter-lists-no-such-headers"
         blocks = fetch._header_blocks(missing)

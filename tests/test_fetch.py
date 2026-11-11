@@ -280,6 +280,52 @@ class FetchSecurityTests(unittest.TestCase):
         self.assertEqual(transferred, len(body))
         self.assertFalse(output.exists())
 
+    def test_retry_attempt_bytes_are_charged_before_the_next_request(self):
+        """A retry must not erase the byte cost of the failed attempt."""
+        attempts = []
+        partial = b"A" * 20
+        unavailable = b"B" * 12
+        final_body = b"||example.com^\n! enough padding for validation\n"
+        responses = [
+            (28, f"200 {len(partial)}", "curl: (28) timed out", partial,
+             "HTTP/1.1 200 OK\r\nContent-Length: 50\r\n\r\n"),
+            (22, f"503 {len(unavailable)}", "curl: (22) server error", unavailable,
+             "HTTP/1.1 503 Service Unavailable\r\nRetry-After: 0\r\n\r\n"),
+            (0, f"200 {len(final_body)}", "", final_body,
+             "HTTP/1.1 200 OK\r\n\r\n"),
+        ]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "source.txt"
+            headers = output.with_suffix(output.suffix + ".headers")
+
+            def fake_run(command, **_kwargs):
+                attempts.append(command)
+                code, stdout, stderr, body, response_headers = responses.pop(0)
+                output.write_bytes(body)
+                headers.write_text(response_headers, encoding="iso-8859-1")
+                return type("Proc", (), {
+                    "returncode": code, "stdout": stdout, "stderr": stderr,
+                })()
+
+            with patch.object(fetch, "_curl_stream_size_limit_status", return_value=(True, "")), \
+                 patch.object(fetch, "_public_address_for_url", return_value=("93.184.216.34", "")), \
+                 patch.object(fetch.subprocess, "run", side_effect=fake_run), \
+                 patch.object(fetch.time, "sleep") as sleep:
+                ok, reason, transferred = fetch.download(
+                    "http://example.test/list.txt", output, 30, 100
+                )
+            self.assertEqual(output.read_bytes(), final_body)
+
+        self.assertTrue(ok, reason)
+        self.assertEqual(transferred, len(partial) + len(unavailable) + len(final_body))
+        self.assertEqual(
+            [command[command.index("--max-filesize") + 1] for command in attempts],
+            ["100", str(100 - len(partial)), str(100 - len(partial) - len(unavailable))],
+        )
+        self.assertTrue(all("--retry" not in command for command in attempts))
+        sleep.assert_called_once_with(1.0)
+
     @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_redirect_bodies_share_the_per_source_byte_budget(self):
         calls = []

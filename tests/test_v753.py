@@ -39,11 +39,16 @@ class ProceduralCosmeticTests(unittest.TestCase):
 class EngineSpecificSeparatorTests(unittest.TestCase):
     def test_adguard_separators_are_not_network_rules(self):
         for rule in ('example.com#%#//scriptlet("x")', 'example.com#@%#//scriptlet("x")',
-                     "example.com#@$#body{a:b}", "example.com#$?#body{a:b}"):
+                     "example.com#$?#body{a:b}"):
             with self.subTest(rule=rule):
                 self.assertEqual(classify(rule).kind, "cosmetic")
                 self.assertIsNone(normalize_rule(rule))
                 self.assertEqual(rejection_reason(rule), "engine-specific-syntax")
+
+    def test_abp_snippet_exception_separator_is_not_adguard_only(self):
+        rule = "example.com#@$#abort-on-property-read x"
+        self.assertEqual(classify(rule).kind, "cosmetic")
+        self.assertEqual(normalize_rule(rule), rule)
 
     def test_hash_comment_is_rejected(self):
         self.assertIsNone(normalize_rule("#domain.example-note(x)"))

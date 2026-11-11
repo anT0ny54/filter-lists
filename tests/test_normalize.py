@@ -7,6 +7,39 @@ from normalize import normalize_rule, normalize_rule_with_reason, rejection_reas
 class NormalizeTests(unittest.TestCase):
     def test_empty_option_delimiter_is_rejected(self):
         self.assertIsNone(normalize_rule("||example.com^$"))
+
+    def test_terminal_escaped_dollar_is_literal_pattern_data(self):
+        rule = r"foo\$"
+        self.assertEqual(normalize_rule(rule), rule)
+        self.assertEqual(normalize_rule_with_reason(rule), (rule, None))
+
+    def test_terminal_dollar_after_even_backslash_run_is_an_empty_delimiter(self):
+        rule = r"foo\\$"
+        self.assertIsNone(normalize_rule(rule))
+        self.assertEqual(normalize_rule_with_reason(rule), (None, "invalid-network-rule"))
+
+    def test_webbundle_request_type_and_inverse_are_supported(self):
+        for rule in ("||example.com^$webbundle", "||example.com^$~webbundle"):
+            with self.subTest(rule=rule):
+                self.assertEqual(normalize_rule(rule), rule)
+
+    def test_abp_forbidden_addheader_names_are_rejected_case_insensitively(self):
+        names = (
+            "x-content-type-options",
+            "x-download-options",
+            "x-frame-options",
+            "x-permitted-cross-domain-policies",
+            "x-powered-by",
+            "x-xss-protection",
+        )
+        for name in names:
+            for candidate in (name, name.upper()):
+                rule = f"||example.com^$addheader={candidate}:value"
+                with self.subTest(header=candidate):
+                    self.assertIsNone(normalize_rule(rule))
+                    self.assertEqual(rejection_reason(rule), "invalid-option-value")
+        allowed = "||example.com^$addheader=X-Example:value"
+        self.assertEqual(normalize_rule(allowed), allowed)
     def test_long_rule_is_rejected(self):
         self.assertIsNone(normalize_rule("||example.com^" + ("x" * 100001)))
 
@@ -206,6 +239,23 @@ class SeparatorScopeTests(unittest.TestCase):
             normalize_rule_with_reason(rule, trusted_abp_features=False),
             (None, "abp-security-restricted-feature"),
         )
+
+    def test_abp_snippet_exception_is_supported_with_or_without_domain(self):
+        for rule in (
+            "example.com#@$#abort-on-property-read x",
+            "#@$#abort-on-property-read x",
+        ):
+            with self.subTest(rule=rule):
+                self.assertEqual(normalize_rule(rule), rule)
+                self.assertEqual(
+                    normalize_rule_with_reason(rule, trusted_abp_features=False),
+                    (rule, None),
+                )
+
+    def test_snippet_exception_cannot_carry_inline_style_block(self):
+        rule = "example.com#@$#div { display: none }"
+        self.assertIsNone(normalize_rule(rule))
+        self.assertEqual(rejection_reason(rule), "invalid-cosmetic-rule")
 
     def test_native_has_stays_valid_on_element_hiding(self):
         rule = "example.com##div:has(> .ad)"
