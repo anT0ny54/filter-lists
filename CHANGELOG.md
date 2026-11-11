@@ -6,27 +6,26 @@ All notable changes to Filter-Lists are documented here. The format follows [Kee
 
 ## [Unreleased]
 
-### Maintenance update (builder version remains 7.6.0)
-
-#### Changed
-
-- `scripts/config.py`: the Build-ID formula is defined once in `build_identity()`. `merge.py` (writes the identity) and `validate.py` (recomputes it) both use it, so the two cannot drift apart. The output is byte-identical.
-- `scripts/fetch.py`: IP-literal detection and the default-port rule are shared helpers instead of repeated inline logic. Two test-only wrappers (`_redirect_location`, `_response_content_encodings`) were removed; tests call the single-parse `_header_blocks` / `*_from` helpers.
-- `scripts/normalize.py` and `scripts/parser.py`: the classifier carries the cosmetic separator, so normalization no longer rescans the line for it. Procedural and extended-CSS pseudo-class checks are skipped when a cosmetic body contains no `(` (every pattern in those regexes requires one).
-- `scripts/normalize.py`: removed always-true `bool(parts)` guards in the domain and sitekey validators, a redundant empty-pattern test, and a duplicated restricted-option set (now `RESTRICTED_OPTIONS`).
-- `scripts/report.py`, `scripts/merge.py`: packed one-line statements split for readability; no behavioural change.
-- `tests/test_v760.py`: removed a redundant in-function import.
+### Maintenance update (2026-11-11; builder version remains 7.6.0)
 
 #### Fixed
 
-- `README.md`: the source-quality snapshot cited a superseded report (`2026-11-11T03:22:11Z`). It now matches `reports/latest.json` (`2026-11-11T04:15:34Z`): 224,689 input lines, 194,326 accepted, 171,163 unique rules. The AdGuard Social Media row was off by one and is corrected.
+- `scripts/normalize.py`: distinguish an escaped terminal `\$` from an unescaped empty option delimiter, using backslash parity consistent with `split_options()`.
+- `scripts/normalize.py`: reject ABP's six explicitly forbidden `addheader=` names (case-insensitively), even when they otherwise match the `x-*` grammar.
+- `scripts/normalize.py` and `scripts/policy.py`: support the ABP `webbundle` request type and its inverse.
+- `scripts/normalize.py` and `scripts/parser.py`: recognize ABP snippet exceptions (`#@$#`), including global exceptions, without applying the trust gate used for snippet execution. Inline-style blocks remain invalid on snippet exceptions.
+- `scripts/fetch.py`: read a redirect `Location` only from the final HTTP response header block; an interim response can no longer supply a stale redirect target when the final response has none.
+- `scripts/fetch.py`: replace curl's opaque in-process retry loop with individually accounted attempts. Bytes received before a timeout or transient HTTP response are charged against the per-source/global byte budgets before a retry; `Retry-After` is honored, and the successful attempt alone remains as the source file.
+- `scripts/fetch.py`: remove a duplicate `root_successful` dictionary key from the source statistics initializer.
+- `README.md`: refresh the source-quality snapshot from `reports/latest.json` (generated `2026-11-11T04:43:00.748304Z`): 224,696 input lines, 194,333 accepted, and 171,170 unique rules.
+- `docs/SYNTAX-POLICY.md` and `docs/COMPATIBILITY.md`: align the documented syntax and restrictions with current ABP request types, snippet exceptions, and `addheader=` rules.
 
 #### Verified
 
-- Full test suite: 280 tests passed.
-- Normalization equivalence: original and modified `normalize_rule`, `normalize_rule_with_reason`, `rejection_reason`, and `classify` produce identical results on 351,187 inputs (shipped rules, the fixture, and deterministic fuzz).
-- `scripts/validate.py filters.txt`: passes with zero errors (Build-ID unchanged).
-- Normalization timing on the shipped rule set: roughly 2% faster (0.726 s to 0.712 s median); within noise on the small benchmark fixture.
-- Python byte-compilation and `pyflakes` on `scripts/` and `tests/`: clean.
+- Regression tests cover escaped/unescaped terminal dollars, `webbundle` and `~webbundle`, forbidden `addheader=` names and casing, global/untrusted snippet exceptions, and interim-response redirect headers.
+- A retry regression test simulates a timed-out partial body followed by HTTP 503 and a successful retry; it verifies all attempt bytes are charged and each next attempt gets only the remaining budget.
+- The second-pass audit read all 69 regular project files except the explicitly excluded generated `filters.txt` payload, parsed all 13 report JSON files, and cross-checked source registry/mirror, report totals, latest/baseline identity, history retention, and daily outcome history.
+- Full unit-test suite: **289 tests passed**. Python byte-compilation, shell syntax checks, and JSON/YAML parsing also passed.
+- The large generated `filters.txt` payload is intentionally excluded from the audit and was not read or validated.
 
 No release or builder-version bump; the current builder remains `7.6.0`.

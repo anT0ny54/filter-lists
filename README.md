@@ -23,17 +23,17 @@ The compiler accepts documented ABP syntax and rejects unsupported engine-specif
 ### Supported
 
 - Network blocking and exception filters.
-- ABP request types and supported inverse types.
+- ABP request types (including `webbundle`) and supported inverse types.
 - `domain=`, `sitekey=`, `csp=`, and ABP `rewrite=`.
 - `header=` response-header matching.
 - `addheader=` header injection, including the documented `document` targeting case.
 - Element hiding: `##` and `#@#`.
 - ABP extended CSS: `#?#`, including supported `:has()`, `:has-text()`, `:-abp-has()`, `:-abp-properties()`, `:-abp-contains()`, `:not()`, and `:xpath()` forms.
-- ABP snippets: `#$#`, with the required domain scope.
+- ABP snippets (`#$#`, domain-scoped) and snippet exceptions (`#@$#`, optionally global).
 - ABP inline CSS declarations under the documented safe property/value grammar. Inline `{...}` blocks are accepted only on `##` and `#?#`.
 - ABP `remove: true`.
 
-Security-sensitive features such as snippets, `header=`, and `addheader=` are policy-gated and should only be enabled for trusted sources. `remove: true` is controlled by the `allow_abp_remove_action` switch in `policies.yaml`; when it is off, a `remove` declaration is rejected wherever it appears in the style block.
+Security-sensitive features such as snippet execution (`#$#`), `header=`, and `addheader=` are policy-gated and should only be enabled for trusted sources. Snippet exceptions (`#@$#`) only disable matching snippets; they do not execute code and are not trust-gated. `remove: true` is controlled by the `allow_abp_remove_action` switch in `policies.yaml`; when it is off, a `remove` declaration is rejected wherever it appears in the style block.
 
 Input lines are trimmed of surrounding whitespace and a leading byte-order mark (BOM, also when whitespace follows it) before classification, so the same line always normalizes to the same rule and re-normalizing a published rule never changes it.
 
@@ -42,7 +42,7 @@ Input lines are trimmed of surrounding whitespace and a leading byte-order mark 
 - uBlock Origin procedural filters such as `##+js(...)`.
 - uBO-only operators such as `:style()`, `:remove()`, `:upward()`, and `:matches-css()`.
 - uBO-only extended-CSS exception syntax `#?@#`.
-- Inline `{...}` style blocks on exception (`#@#`) or snippet (`#$#`) rules.
+- Inline `{...}` style blocks on exception (`#@#`), snippet (`#$#`), or snippet-exception (`#@$#`) rules.
 - ABP extended pseudo-classes (`:-abp-has()`, `:-abp-contains()`, `:-abp-properties()`, `:has-text()`, `:xpath()`) outside `#?#`. Without the extended-CSS separator they are not evaluated by ABP engines.
 - AdGuard-only cosmetic extensions.
 - Non-ABP network options such as `removeparam`, redirect/scriptlet options, and unknown options.
@@ -88,15 +88,15 @@ The builder currently enforces the following:
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`.
 - **Strict configuration validation:** unknown keys in `policies.yaml` (including every `rules:` switch) and `sources.yaml`, wrong value types, and a mismatched policy `version`/`profile` fail the build immediately with a clean `[ERROR] Configuration` message, before any download starts.
 - **Authoritative source registry:** `sources.yaml` is the only source registry; `sources.txt` is generated as a URL-only compatibility mirror.
-- **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally. Before a request is scheduled, its worst-case byte allocation is reserved against the remaining global budget and the transfer is limited to that allocation. The fetcher requests identity encoding and does not auto-decompress response bodies, so compressed payloads cannot expand past the byte cap; a server that ignores identity encoding is rejected based on its `Content-Encoding` response header. Response headers are parsed once per redirect hop. Only final 2xx responses are accepted: supported redirects are validated hop-by-hop, while unsolicited `206 Partial Content` and other non-success statuses (including non-redirect 3xx) are rejected. Curl 8.4.0 or newer is required for size-limit enforcement on responses with unknown length; older versions are rejected before any network request. Transferred bytes count against the budget for accepted, rejected, and partially failed transfers; once no unreserved budget remains, pending sources are queued as budget-exhausted.
+- **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally. Before a request is scheduled, its worst-case byte allocation is reserved against the remaining global budget and the transfer is limited to that allocation. The fetcher requests identity encoding and does not auto-decompress response bodies, so compressed payloads cannot expand past the byte cap; a server that ignores identity encoding is rejected based on its `Content-Encoding` response header. Response headers are parsed once per redirect hop. Only final 2xx responses are accepted: supported redirects are validated hop-by-hop, while unsolicited `206 Partial Content` and other non-success statuses (including non-redirect 3xx) are rejected. Curl 8.4.0 or newer is required for size-limit enforcement on responses with unknown length; older versions are rejected before any network request. Transferred bytes count against the budget for accepted, rejected, partially failed, and retried attempts; each retry is a separate bounded transfer, so an overwritten partial file cannot erase bytes already received. Once no unreserved budget remains, pending sources are queued as budget-exhausted.
 - **Correct source health:** the health ratio is calculated from configured root sources; nested includes cannot inflate it.
 - **Required-source gates:** configured required root sources must succeed.
 - **SSRF protection:** source/include targets are resolved before connection, non-public addresses are blocked, DNS answers are validated and pinned for curl, proxy environment variables are bypassed, and redirects are validated hop-by-hop.
-- **Deadline-aware fetching:** downloads receive only the remaining build deadline; retries are bounded and permanent 4xx failures are not retried.
+- **Deadline-aware fetching:** each transfer attempt receives only the remaining build deadline; retryable timeouts, connection refusals, and transient HTTP statuses (408, 429, 500, 502, 503, 504) are retried with bounded backoff. `Retry-After` is honored, permanent 4xx failures are not retried, and bytes received by failed attempts are charged before another request is allowed.
 - **Canonical source identity:** scheme/host/path normalization and fragment removal are used for source identity and include-cycle detection. Already-visited include targets are ignored before the source cap is evaluated, so an include cycle cannot falsely trigger the global source limit; only genuinely new canonical targets count toward that cap.
 - **Deterministic rule output and identity:** normalization, sorting, deduplication, and Build-ID generation are deterministic. `filters.txt` also contains a `Last updated` timestamp, while `reports/latest.json` records `generated_at` and `build_seconds`; those operational fields intentionally vary between runs.
 - **Full Build-ID validation:** `validate.py` recomputes the build identity from the active configuration and normalized rules.
-- **Separator-aware feature gating:** `#$#` snippets, `header=` and `addheader=` are detected from the parsed rule. Marker text inside a CSS attribute (for example `div[data-x="#$#"]`) is ordinary element hiding and is not treated as a restricted feature.
+- **Separator-aware feature gating:** `#$#` snippet execution, `header=` and `addheader=` are detected from the parsed rule. `#@$#` snippet exceptions are not trust-gated. Marker text inside a CSS attribute (for example `div[data-x="#$#"]`) is ordinary element hiding and is not treated as a restricted feature.
 - **Strict grammar validation:** malformed options, unsupported procedural syntax, unsafe inline styles, malformed regex envelopes, control characters, and over-limit rules are rejected.
 - **Detailed diagnostics:** rejection reasons, per-source statistics, SHA-256 hashes, fetch failures, and anomaly information are retained. Network-rule rejection reasons come from one validator, so the reason recorded in a report is always the same one `rejection_reason()` returns. If a source read or hash operation fails, only lines actually observed are included in aggregate counters; an unreadable empty file still carries a per-file error without a fabricated input/rejection line. A post-download hash read failure is recorded as a failed source instead of aborting the build.
 - **Bounded default concurrency:** the builder uses ten download workers by default — the ceiling implied by the shipped download budget (`max_total_download_bytes // max_download_bytes` = 500 MiB // 50 MiB), since the build is network-bound well before it is CPU-bound (override with the `FILTER_LISTS_WORKERS` environment variable); effective concurrency is additionally capped by the configured global download budget and the reservations required by active transfers.
@@ -170,8 +170,9 @@ To disable a source:
 enabled: false
 ```
 
-ABP security-sensitive features (`#$#` snippets, `header=`, `addheader=`) are rejected from every
-source by default. To allow them for a source you trust, opt in per source:
+ABP security-sensitive features (`#$#` snippet execution, `header=`, `addheader=`) are rejected from every
+source by default. `#@$#` snippet exceptions are not restricted because they do not run code. To allow the
+security-sensitive features for a source you trust, opt in per source:
 
 ```yaml
 trusted_abp_features: true
@@ -231,7 +232,7 @@ The repository test suite covers:
 - normalization idempotency (corpus, fuzz-property and regression inputs)
 - network options and option validation
 - cosmetic and extended-CSS rules
-- ABP header/addheader/snippet/inline-style/remove features
+- ABP header/addheader/snippet/snippet-exception/inline-style/remove features
 - nested includes, canonical include-cycle detection, and source-limit accounting that distinguishes cycles from unseen children
 - source-health and required-source accounting
 - global source/download limits and deadlines
@@ -270,7 +271,7 @@ The repository test suite covers:
 
 Download success does not mean a source contributes rules, so each build also evaluates rule yield per source. The **effective rejection rate** is the share of rule lines (input lines minus comments, blanks, and directives) that the strict-ABP profile rejected. With the shipped policy, sources of at least 100 lines at or above 30% are reported as `warning` and at or above 90% as `critical` in `reports/latest.json` (`source_quality`) and in the build log. They are advisory unless `source_quality.fail_on_critical: true`.
 
-Snapshot from the newest report (`reports/latest.json`, generated 2026-11-11T04:15:34Z): 32/32 root sources OK, 224,689 input lines, 194,326 accepted, 171,163 unique rules, overall rejection rate 13.51%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.41% effective rejection rate).
+Snapshot from the newest report (`reports/latest.json`, generated 2026-11-11T04:43:00.748304Z): 32/32 root sources OK, 224,696 input lines, 194,333 accepted, 171,170 unique rules, overall rejection rate 13.51%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.41% effective rejection rate).
 
 | Source | Input lines | Accepted | Rejection rate* | Main rejection reasons |
 |---|---:|---:|---:|---|
