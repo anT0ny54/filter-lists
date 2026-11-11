@@ -8,15 +8,16 @@ This document is the public compatibility contract for the strict-ABP output, an
 |---|---|---|
 | ABP network | Supported | Canonicalized and validated. |
 | ABP exception | Supported | `@@` form validated with exception-specific options. |
-| ABP request types/inverse types | Supported | Includes current documented type and inverse forms. |
+| ABP request types/inverse types | Supported | Includes current documented forms, including `webbundle` / `~webbundle`. |
 | `domain=` / `sitekey=` | Supported | Values are strictly validated. |
 | `csp=` | Supported | Control characters and empty values rejected. |
 | `rewrite=` | Supported | Only ABP `abp-resource:` resources; domain requirement retained. |
 | `header=` | Supported | ABP header matching grammar; exception rules rejected. |
-| `addheader=` | Supported | Request/response injection; `x-*` / `set-cookie`; `document` targeting supported. |
+| `addheader=` | Supported | Request/response injection; `x-*` / `set-cookie` except ABP's six refused `x-*` names; `document` targeting supported. |
 | Element hiding | Supported | `##` and `#@#`. |
 | ABP extended CSS | Supported | `#?#`, including `:has()`, `:has-text()`, `:-abp-has()`, `:-abp-properties()`, `:-abp-contains()`, `:not()`, `:xpath()`. |
-| ABP snippets | Supported | `#$#` with domain scope; security-sensitive feature. |
+| ABP snippets | Supported | `#$#` with domain scope; code execution is trust-gated. |
+| ABP snippet exceptions | Supported | `#@$#`; optional domain scope, global when omitted; does not execute code or require a privileged source. |
 | Inline CSS styles | Supported | ABP documented safe property/value grammar. |
 | `remove: true` | Supported | ABP remove action. |
 | uBO procedural | Rejected | Prevents engine-specific behavior. |
@@ -39,6 +40,7 @@ ABP's current documentation describes the supported network options and the newe
 | Element hiding | Yes | Yes | Yes | Yes |
 | ABP extended CSS | Yes | Yes | Partial/compatible subsets | Partial/compatible subsets |
 | ABP snippets | Yes, policy-gated | Yes | No/varies | No/varies |
+| ABP snippet exceptions | Yes | Yes | No/varies | No/varies |
 | ABP inline styles | Yes | Yes | Varies | Varies |
 | ABP `remove: true` | Yes | Yes | Varies | Varies |
 | uBO procedural `+js` | No | No | Yes | Partial/varies |
