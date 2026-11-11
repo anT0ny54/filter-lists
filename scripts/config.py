@@ -459,6 +459,16 @@ def source_manifest_sha256(config: BuildConfig) -> str:
     return h.hexdigest()
 
 
+def build_identity(fingerprint: str, sorted_rules) -> str:
+    """Build-ID: SHA-256 of the configuration fingerprint and the sorted rules.
+
+    Shared by merge.py (which writes the identity) and validate.py (which
+    recomputes it), so the formula cannot drift between the two. `sorted_rules`
+    must already be in merge's deterministic output order.
+    """
+    return hashlib.sha256((fingerprint + "\n" + "\n".join(sorted_rules)).encode()).hexdigest()
+
+
 def config_fingerprint(config: BuildConfig) -> str:
     """Hash the source manifest plus policy/custom-rules content for the Build-ID."""
     h = hashlib.sha256()

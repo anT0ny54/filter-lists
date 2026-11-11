@@ -2,7 +2,6 @@
 """Strict generated-list validator."""
 from __future__ import annotations
 
-import hashlib
 import re
 import sys
 from pathlib import Path
@@ -10,7 +9,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
 sys.path.insert(0, str(SCRIPT_DIR))
-from config import BUILDER_VERSION, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
+from config import BUILDER_VERSION, build_identity, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
 from normalize import normalize_rule, rule_sort_key  # noqa: E402
 
 TOTAL_RE = re.compile(r"^! Total rules: ([0-9]+)$")
@@ -108,7 +107,7 @@ def main() -> int:
         errors.append("[BUILD-ID] missing or invalid")
     else:
         try:
-            actual_id = hashlib.sha256((config_fingerprint(config) + "\n" + "\n".join(sorted(seen, key=rule_sort_key))).encode()).hexdigest()
+            actual_id = build_identity(config_fingerprint(config), sorted(seen, key=rule_sort_key))
         except OSError as exc:
             errors.append(f"[IO] could not read build inputs: {exc}")
         else:

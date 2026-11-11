@@ -175,27 +175,38 @@ def detect_anomalies(current_results: list[dict], previous_report: dict | None, 
         previous_by_url[url] = item
     build_id = previous_report.get("build_id")
     result["baseline"] = build_id if isinstance(build_id, str) and build_id else "previous-report"
-    min_lines = int(policy.get("min_lines", DEFAULT_ANOMALY_MIN_LINES)); max_bytes = float(policy.get("max_bytes_change_ratio", DEFAULT_ANOMALY_MAX_BYTES_CHANGE_RATIO)); max_rules = float(policy.get("max_rule_count_change_ratio", DEFAULT_ANOMALY_MAX_RULE_COUNT_CHANGE_RATIO)); max_rejection = float(policy.get("max_rejection_rate_change", DEFAULT_ANOMALY_MAX_REJECTION_RATE_CHANGE))
+    min_lines = int(policy.get("min_lines", DEFAULT_ANOMALY_MIN_LINES))
+    max_bytes = float(policy.get("max_bytes_change_ratio", DEFAULT_ANOMALY_MAX_BYTES_CHANGE_RATIO))
+    max_rules = float(policy.get("max_rule_count_change_ratio", DEFAULT_ANOMALY_MAX_RULE_COUNT_CHANGE_RATIO))
+    max_rejection = float(policy.get("max_rejection_rate_change", DEFAULT_ANOMALY_MAX_REJECTION_RATE_CHANGE))
     for current in current_results:
-        if not isinstance(current, dict) or current.get("status") != "ok": continue
+        if not isinstance(current, dict) or current.get("status") != "ok":
+            continue
         old = previous_by_url.get(current.get("url"))
-        if not old: continue
+        if not old:
+            continue
         current_metrics = _anomaly_metrics(current)
         old_metrics = _anomaly_metrics(old)
         if current_metrics is None or old_metrics is None:
             continue
         current_lines, current_rules, current_bytes, current_rejection = current_metrics
         old_lines, old_rules, old_bytes, old_rejection = old_metrics
-        if max(current_lines, old_lines) < min_lines: continue
+        if max(current_lines, old_lines) < min_lines:
+            continue
         changes = {"bytes_ratio": round(_ratio_change(current_bytes, old_bytes), 6), "rule_count_ratio": round(_ratio_change(current_rules, old_rules), 6), "rejection_rate_delta": round(abs(current_rejection - old_rejection), 6)}
         reasons = []
-        if changes["bytes_ratio"] > max_bytes: reasons.append("bytes-change")
-        if changes["rule_count_ratio"] > max_rules: reasons.append("rule-count-change")
-        if changes["rejection_rate_delta"] > max_rejection: reasons.append("rejection-rate-change")
+        if changes["bytes_ratio"] > max_bytes:
+            reasons.append("bytes-change")
+        if changes["rule_count_ratio"] > max_rules:
+            reasons.append("rule-count-change")
+        if changes["rejection_rate_delta"] > max_rejection:
+            reasons.append("rejection-rate-change")
         if reasons:
             severity = "critical" if (current_rules == 0 or current_lines == 0) else "warning"
             result["items"].append({"url": current.get("url"), "severity": severity, "reasons": reasons, "changes": changes, "previous": {"bytes": old_bytes, "input_lines": old_lines, "unique_rules": old_rules, "rejection_rate": old_rejection, "sha256": old.get("sha256")}, "current": {"bytes": current_bytes, "input_lines": current_lines, "unique_rules": current_rules, "rejection_rate": current_rejection, "sha256": current.get("sha256")}})
-    result["count"] = len(result["items"]); result["critical_count"] = sum(x["severity"] == "critical" for x in result["items"]); result["warning_count"] = result["count"] - result["critical_count"]
+    result["count"] = len(result["items"])
+    result["critical_count"] = sum(x["severity"] == "critical" for x in result["items"])
+    result["warning_count"] = result["count"] - result["critical_count"]
     result["enforced_failure"] = result["critical_count"] > 0 or (result["fail_on_warning"] and result["warning_count"] > 0)
     return result
 

@@ -68,6 +68,18 @@ HTML_ERROR_PAGE_RE = re.compile(
 )
 
 
+def _default_port(scheme: str) -> int:
+    return 443 if scheme == "https" else 80
+
+
+def _ip_literal(host: str) -> ipaddress.IPv4Address | ipaddress.IPv6Address | None:
+    """The parsed address when `host` is an IP literal, else None (a DNS name)."""
+    try:
+        return ipaddress.ip_address(host)
+    except ValueError:
+        return None
+
+
 def _public_address_for_url(url: str) -> tuple[str | None, str]:
     """Resolve a fetch target and reject non-public addresses before curl connects.
 
@@ -80,16 +92,12 @@ def _public_address_for_url(url: str) -> tuple[str | None, str]:
         parsed = urlsplit(url)
         if parsed.scheme not in {"http", "https"} or not parsed.hostname:
             return None, "invalid-fetch-url"
-        port = parsed.port if parsed.port is not None else (443 if parsed.scheme == "https" else 80)
+        port = parsed.port if parsed.port is not None else _default_port(parsed.scheme)
         host = parsed.hostname
     except ValueError as exc:
         return None, f"invalid-fetch-url: {exc}"
 
-    try:
-        literal = ipaddress.ip_address(host)
-    except ValueError:
-        literal = None
-
+    literal = _ip_literal(host)
     if literal is not None:
         if not literal.is_global:
             return None, "blocked-non-public-address"
@@ -172,20 +180,12 @@ def _response_content_encodings_from(blocks: list[list[str]]) -> list[str]:
     return []
 
 
-def _response_content_encodings(headers: Path) -> list[str]:
-    return _response_content_encodings_from(_header_blocks(headers))
-
-
 def _redirect_location_from(blocks: list[list[str]]) -> str | None:
     for lines in reversed(blocks):
         for line in reversed(lines):
             if line.lower().startswith("location:"):
                 return line.split(":", 1)[1].strip() or None
     return None
-
-
-def _redirect_location(headers: Path) -> str | None:
-    return _redirect_location_from(_header_blocks(headers))
 
 
 def _file_size(path: Path) -> int:
@@ -235,7 +235,7 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
             try:
                 parsed = urlsplit(current_url)
                 host = parsed.hostname
-                port = parsed.port if parsed.port is not None else (443 if parsed.scheme == "https" else 80)
+                port = parsed.port if parsed.port is not None else _default_port(parsed.scheme)
                 if not host or parsed.scheme not in {"http", "https"}:
                     return fail("invalid-fetch-url")
             except ValueError as exc:
@@ -273,9 +273,7 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
                 "--write-out", "%{http_code}",
                 "--user-agent", f"filter-lists-builder/{BUILDER_VERSION}",
             ]
-            try:
-                ipaddress.ip_address(host)
-            except ValueError:
+            if _ip_literal(host) is None:
                 command.extend(["--resolve", _resolve_arg(host, port, address)])
             command.extend(["--output", str(output), current_url])
 

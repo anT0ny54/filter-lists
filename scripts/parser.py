@@ -42,6 +42,9 @@ def clean_line(line: str) -> str:
 class LineClassification:
     kind: str
     reason: str | None = None
+    # Leftmost cosmetic marker, set only for `cosmetic` lines. Carried here so
+    # normalization does not rescan the line for the same marker.
+    separator: str | None = None
 
 
 def classify(line: str) -> LineClassification:
@@ -61,8 +64,10 @@ def classify(line: str) -> LineClassification:
         return LineClassification("invalid", "hosts-format")
     if HTML_RE.match(value):
         return LineClassification("invalid", "html-or-error-page")
-    if "#" in value and COSMETIC_RE.search(value):
-        return LineClassification("cosmetic")
+    if "#" in value:
+        match = COSMETIC_RE.search(value)
+        if match:
+            return LineClassification("cosmetic", separator=match.group())
     # A leading single `#` is a hosts-style comment (e.g. `#domain-note`), not
     # an ABP network pattern; without this it slipped through as a "rule".
     if value.startswith("#"):

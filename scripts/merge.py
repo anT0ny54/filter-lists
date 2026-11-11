@@ -14,7 +14,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from config import BUILDER_VERSION, CUSTOM_RULES, ROOT, config_fingerprint, load_config, source_manifest_sha256  # noqa: E402
+from config import (  # noqa: E402
+    BUILDER_VERSION, CUSTOM_RULES, ROOT, build_identity, config_fingerprint,
+    load_config, source_manifest_sha256,
+)
 from fetch import collect_sources  # noqa: E402
 from health import default_outcomes_path, history_reports, set_outcome_status, timestamp_sort_key  # noqa: E402
 from normalize import rule_sort_key  # noqa: E402
@@ -317,7 +320,14 @@ def main() -> int:
         log(f"[ERROR] Configuration: {exc}")
         return 1
     with tempfile.TemporaryDirectory(prefix="filter-lists-") as temp_dir:
-        files, source_stats = collect_sources(source_urls, Path(temp_dir), started, workers, log, total_timeout=config.total_timeout_seconds, max_include_depth=config.max_include_depth, max_download_bytes=config.max_download_bytes, max_total_download_bytes=config.max_total_download_bytes, max_total_sources=config.max_total_sources)
+        files, source_stats = collect_sources(
+            source_urls, Path(temp_dir), started, workers, log,
+            total_timeout=config.total_timeout_seconds,
+            max_include_depth=config.max_include_depth,
+            max_download_bytes=config.max_download_bytes,
+            max_total_download_bytes=config.max_total_download_bytes,
+            max_total_sources=config.max_total_sources,
+        )
         source_stats["required"] = [s.url for s in config.sources if s.required]
         source_metadata = {s.url: {"name": s.name, "category": s.category, "priority": s.priority, "required": s.required, "trusted_abp_features": s.trusted_abp_features} for s in config.sources}
         provenance = {"source_manifest_sha256": source_manifest_sha256(config), "source_registry": "sources.yaml", "source_registry_sha256": hashlib.sha256((ROOT / "sources.yaml").read_bytes()).hexdigest(), "builder": f"Filter-Lists v{BUILDER_VERSION}", "policy_sha256": hashlib.sha256((ROOT / "policies.yaml").read_bytes()).hexdigest()}
@@ -390,7 +400,7 @@ def main() -> int:
                          status="failed", source_quality_policy=config.source_quality)
             return 1
         final_rules = sorted(rules, key=rule_sort_key)
-        build_id = hashlib.sha256((fingerprint + "\n" + "\n".join(final_rules)).encode()).hexdigest()
+        build_id = build_identity(fingerprint, final_rules)
         previous_generated_at = latest_report_generated_at()
         try:
             write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats,
