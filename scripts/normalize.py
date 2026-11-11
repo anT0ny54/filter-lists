@@ -54,7 +54,7 @@ UBO_PROCEDURAL_RE = re.compile(
     r"|watch-attr|others|remove-attr|remove-class)\(",
     re.I,
 )
-ALLOWED_COSMETIC_SEPARATORS = frozenset({"##", "#@#", "#?#", "#$#"})
+ALLOWED_COSMETIC_SEPARATORS = frozenset({"##", "#@#", "#?#", "#$#", "#@$#"})
 # Option names that take no `=value`. Precomputed: the option loops run once
 # per option of every network rule, and the union used to be rebuilt each time.
 PLAIN_OPTION_NAMES = frozenset(TYPE_OPTIONS | SIMPLE_OPTIONS)
@@ -78,6 +78,15 @@ RESTRICTED_OPTIONS = frozenset({"header", "addheader"})
 
 ABP_HEADER_NAME_RE = re.compile(r"^[!#$%&'*+.^_`|~0-9A-Za-z-]+$")
 ABP_ADDHEADER_NAME_RE = re.compile(r"^(?:x-[!#$%&'*+.^_`|~0-9A-Za-z-]+|set-cookie)$", re.I)
+# ABP refuses these names even though they otherwise satisfy its `x-*` rule.
+ABP_FORBIDDEN_ADDHEADER_NAMES = frozenset({
+    "x-content-type-options",
+    "x-download-options",
+    "x-frame-options",
+    "x-permitted-cross-domain-policies",
+    "x-powered-by",
+    "x-xss-protection",
+})
 ABP_PRINTABLE_ASCII_RE = re.compile(r"^[\x20-\x7e]*$")
 ABP_CSS_VALUE_RE = re.compile(
     r"^(?:#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})|[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:e[+-]?\d+)?"
@@ -300,7 +309,11 @@ def valid_addheader(value: str) -> bool:
         kind, header, content = parts
     else:
         return False
-    if kind not in {"request", "response"} or not ABP_ADDHEADER_NAME_RE.fullmatch(header):
+    if (
+        kind not in {"request", "response"}
+        or not ABP_ADDHEADER_NAME_RE.fullmatch(header)
+        or header.casefold() in ABP_FORBIDDEN_ADDHEADER_NAMES
+    ):
         return False
     if not ABP_PRINTABLE_ASCII_RE.fullmatch(content):
         return False
@@ -550,6 +563,23 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None, se
     return f"{domains}{separator}{body}"
 
 
+def _has_unescaped_terminal_dollar(line: str) -> bool:
+    """Return whether a final `$` starts an empty option section.
+
+    A dollar preceded by an odd-length run of backslashes is literal pattern
+    data. Counting the run (rather than using ``endswith("$")``) keeps the
+    terminal delimiter check consistent with ``split_options``.
+    """
+    if not line.endswith("$"):
+        return False
+    backslashes = 0
+    index = len(line) - 2
+    while index >= 0 and line[index] == "\\":
+        backslashes += 1
+        index -= 1
+    return backslashes % 2 == 0
+
+
 def _normalize_line(line: str, limit: int, policy: dict[str, bool], trusted_abp_features: bool):
     """Single normalization pass over an already-stripped line.
 
@@ -580,7 +610,7 @@ def _normalize_line(line: str, limit: int, policy: dict[str, bool], trusted_abp_
     # pattern. Well-formed regex filters end in `/`, so no accepted rule
     # legitimately ends with `$`; the old `/`-prefix exemption admitted
     # rules like `/foo$` as literal patterns containing `$`.
-    if line.endswith("$"):
+    if _has_unescaped_terminal_dollar(line):
         _, reason = _normalize_network_with_reason(line, policy)
         return None, classification, reason or "invalid-network-rule"
     normalized, reason = _normalize_network_with_reason(line, policy)

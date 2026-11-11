@@ -10,7 +10,7 @@ TYPE_OPTIONS = {
     "script", "image", "stylesheet", "object", "xmlhttprequest",
     "subdocument", "ping", "websocket", "webrtc", "document",
     "elemhide", "generichide", "genericblock", "popup", "font",
-    "media", "other",
+    "media", "other", "webbundle",
 }
 # These content types are exception-only or otherwise not negatable in the
 # strict profile, so they are excluded from TYPE_OPTIONS when deriving the
@@ -31,6 +31,7 @@ REWRITE_RESOURCES = {
 PROFILE_NAME = "strict-abp"
 PROFILE_DESCRIPTION = (
     "Strict Adblock Plus syntax, including current ABP network, content, "
-    "header, addheader, snippet, extended-CSS, inline-style, and remove "
+    "header, addheader, snippet and snippet-exception, extended-CSS, "
+    "inline-style, and remove "
     "features; uBO/AdGuard-only syntax remains excluded."
 )

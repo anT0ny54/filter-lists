@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import concurrent.futures
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from functools import lru_cache
 import ipaddress
 import re
@@ -19,6 +21,7 @@ INCLUDE_TIMEOUT = 60
 CURL_RETRIES = 5
 MAX_REDIRECTS = 5
 REDIRECT_STATUSES = {301, 302, 303, 307, 308}
+RETRYABLE_HTTP_STATUSES = {408, 429, 500, 502, 503, 504}
 INCLUDE_RE = re.compile(r"^\s*!#include\s+(.+?)\s*$", re.I)
 # DNS pins are validated once per (host, port) and reused for the whole
 # build: a source and its !#include children typically share a host, and
@@ -181,10 +184,20 @@ def _response_content_encodings_from(blocks: list[list[str]]) -> list[str]:
 
 
 def _redirect_location_from(blocks: list[list[str]]) -> str | None:
+    """Return Location only from the final HTTP response header block.
+
+    An interim response (for example 100 Continue) may carry unrelated
+    headers. Falling back to its Location when the final response has none
+    would make the redirect target ambiguous and could bypass hop validation.
+    """
     for lines in reversed(blocks):
-        for line in reversed(lines):
-            if line.lower().startswith("location:"):
-                return line.split(":", 1)[1].strip() or None
+        if not lines or not lines[0].upper().startswith("HTTP/"):
+            continue
+        for line in reversed(lines[1:]):
+            key, separator, value = line.partition(":")
+            if separator and key.strip().casefold() == "location":
+                return value.strip() or None
+        return None
     return None
 
 
@@ -195,15 +208,36 @@ def _file_size(path: Path) -> int:
         return 0
 
 
+def _retry_delay(headers: Path, fallback: float) -> float:
+    """Honor a final response's Retry-After header, else use exponential backoff."""
+    for lines in reversed(_header_blocks(headers)):
+        if not lines or not lines[0].upper().startswith("HTTP/"):
+            continue
+        for line in lines[1:]:
+            key, separator, value = line.partition(":")
+            if not separator or key.strip().casefold() != "retry-after":
+                continue
+            value = value.strip()
+            if value.isdecimal():
+                return float(value)
+            try:
+                retry_at = parsedate_to_datetime(value)
+                if retry_at.tzinfo is None:
+                    retry_at = retry_at.replace(tzinfo=timezone.utc)
+                return max(0.0, (retry_at - datetime.now(timezone.utc)).total_seconds())
+            except (TypeError, ValueError, OverflowError):
+                return fallback
+        break
+    return fallback
+
+
 def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> tuple[bool, str, int]:
-    """Download one source with bounded retries and SSRF-safe redirects.
+    """Download one source with byte-accounted retries and SSRF-safe redirects.
 
-    Redirects are handled one hop at a time so every destination is validated
-    before the next network connection. curl is run without environment proxy
-    settings and the validated DNS address is pinned with --resolve.
-
-    The returned byte count includes every body observed during the download,
-    including a partial body removed after a transfer failure.
+    Each curl attempt is a separate process so bytes received before a timeout
+    remain charged to the per-source and global budgets even when a later retry
+    overwrites the partial output file. Redirects are still handled one hop at
+    a time, with every destination validated before the next network request.
     """
     timeout = max(1, int(timeout))
     current_url = canonical_url(url)
@@ -216,8 +250,11 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
         transferred_bytes += _file_size(output)
         output.unlink(missing_ok=True)
 
-    def fail(reason: str) -> tuple[bool, str, int]:
-        discard_partial()
+    def fail(reason: str, *, attempt_counted: bool = False) -> tuple[bool, str, int]:
+        if attempt_counted:
+            output.unlink(missing_ok=True)
+        else:
+            discard_partial()
         return False, reason, transferred_bytes
 
     try:
@@ -228,10 +265,6 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
         deadline = time.monotonic() + timeout
 
         while True:
-            remaining = int(deadline - time.monotonic())
-            if remaining <= 0:
-                return fail("global-timeout")
-
             try:
                 parsed = urlsplit(current_url)
                 host = parsed.hostname
@@ -245,91 +278,131 @@ def download(url: str, output: Path, timeout: int, max_download_bytes: int) -> t
             if resolution_error:
                 return fail(resolution_error if redirects == 0 else f"redirect-{resolution_error}")
 
-            # Redirect response bodies count toward the source's reserved
-            # budget too. Reduce the per-hop limit by bytes already observed so
-            # an otherwise valid redirect chain cannot consume the full limit
-            # once per hop.
-            remaining_bytes = max_download_bytes - transferred_bytes
-            if remaining_bytes <= 0:
-                return fail("download-size-limit-exceeded")
+            retry = 0
+            while True:
+                remaining = int(deadline - time.monotonic())
+                if remaining <= 0:
+                    return fail("global-timeout")
 
-            connect_timeout = min(20, remaining)
-            command = [
-                "curl", "--fail", "--silent", "--show-error",
-                "--retry", str(CURL_RETRIES), "--retry-connrefused",
-                "--retry-max-time", str(remaining),
-                "--connect-timeout", str(connect_timeout), "--max-time", str(remaining),
-                "--max-filesize", str(remaining_bytes),
-                # `--compressed` makes curl decompress after checking the
-                # encoded Content-Length, so a tiny gzip response can expand
-                # far beyond `--max-filesize`. Request identity encoding and
-                # never auto-decompress: output bytes then remain bounded, and
-                # a server that ignores this request fails text validation.
-                "--header", "Accept-Encoding: identity",
-                "--noproxy", "*",
-                "--proto", "=http,https",
-                "--max-redirs", "0",
-                "--dump-header", str(headers),
-                "--write-out", "%{http_code}",
-                "--user-agent", f"filter-lists-builder/{BUILDER_VERSION}",
-            ]
-            if _ip_literal(host) is None:
-                command.extend(["--resolve", _resolve_arg(host, port, address)])
-            command.extend(["--output", str(output), current_url])
+                # Every attempt gets only the budget left after all earlier
+                # attempts and redirect bodies. Failed partial responses count
+                # even though curl's next attempt starts a fresh output file.
+                remaining_bytes = max_download_bytes - transferred_bytes
+                if remaining_bytes <= 0:
+                    return fail("download-size-limit-exceeded")
 
-            headers.unlink(missing_ok=True)
-            try:
-                proc = subprocess.run(
-                    command,
-                    text=True,
-                    capture_output=True,
-                    timeout=remaining + 5,
+                connect_timeout = min(20, remaining)
+                command = [
+                    "curl", "--fail", "--silent", "--show-error",
+                    "--connect-timeout", str(connect_timeout), "--max-time", str(remaining),
+                    "--max-filesize", str(remaining_bytes),
+                    # `--compressed` makes curl decompress after checking the
+                    # encoded Content-Length, so a tiny gzip response can
+                    # expand far beyond `--max-filesize`. Request identity
+                    # encoding and never auto-decompress: output bytes then
+                    # remain bounded, and a server that ignores this request
+                    # fails text validation.
+                    "--header", "Accept-Encoding: identity",
+                    "--noproxy", "*",
+                    "--proto", "=http,https",
+                    "--max-redirs", "0",
+                    "--dump-header", str(headers),
+                    "--write-out", "%{http_code} %{size_download}",
+                    "--user-agent", f"filter-lists-builder/{BUILDER_VERSION}",
+                ]
+                if _ip_literal(host) is None:
+                    command.extend(["--resolve", _resolve_arg(host, port, address)])
+                command.extend(["--output", str(output), current_url])
+
+                # curl's internal --retry loop replaces partial output between
+                # attempts, hiding bytes consumed by earlier attempts. Run one
+                # transfer per process so %{size_download} can be charged before
+                # deciding whether another request fits inside the budget.
+                output.unlink(missing_ok=True)
+                headers.unlink(missing_ok=True)
+                try:
+                    proc = subprocess.run(
+                        command,
+                        text=True,
+                        capture_output=True,
+                        timeout=remaining + 5,
+                    )
+                except subprocess.TimeoutExpired:
+                    transferred_bytes += _file_size(output)
+                    output.unlink(missing_ok=True)
+                    return False, "global-timeout", transferred_bytes
+                except OSError as exc:
+                    return fail(str(exc))
+
+                parts = (proc.stdout or "").strip().split()
+                try:
+                    status = int(parts[0]) if parts else 0
+                except ValueError:
+                    status = 0
+                try:
+                    reported_bytes = int(float(parts[1])) if len(parts) > 1 else 0
+                except (ValueError, OverflowError):
+                    reported_bytes = 0
+                # Mocks and older test fixtures may only provide the HTTP code;
+                # the file size is also a safe lower bound on bytes received.
+                attempt_bytes = max(reported_bytes, _file_size(output))
+                transferred_bytes += attempt_bytes
+
+                retryable = (
+                    proc.returncode == 28
+                    or proc.returncode == 7  # --retry-connrefused semantics
+                    or (proc.returncode == 22 and status in RETRYABLE_HTTP_STATUSES)
                 )
-            except (OSError, subprocess.TimeoutExpired) as exc:
-                return fail("global-timeout" if isinstance(exc, subprocess.TimeoutExpired) else str(exc))
+                if proc.returncode and retryable and retry < CURL_RETRIES:
+                    delay = _retry_delay(headers, float(min(1 << retry, 600)))
+                    output.unlink(missing_ok=True)
+                    remaining_after_transfer = deadline - time.monotonic()
+                    if remaining_after_transfer <= delay:
+                        return False, "global-timeout", transferred_bytes
+                    if delay > 0:
+                        time.sleep(delay)
+                    retry += 1
+                    continue
 
-            if proc.returncode:
-                return fail(proc.stderr.strip() or f"curl exit {proc.returncode}")
+                if proc.returncode:
+                    return fail(proc.stderr.strip() or f"curl exit {proc.returncode}", attempt_counted=True)
 
-            try:
-                status = int(proc.stdout.strip() or "0")
-            except ValueError:
-                return fail("invalid-http-status")
+                if not status:
+                    return fail("invalid-http-status", attempt_counted=True)
 
-            # Parse the dumped header blocks once per hop; the redirect and
-            # content-encoding checks below both walk them.
-            blocks = _header_blocks(headers)
+                # Parse the dumped header blocks once per attempt; redirect and
+                # content-encoding checks both inspect the final response block.
+                blocks = _header_blocks(headers)
 
-            if status in REDIRECT_STATUSES:
-                location = _redirect_location_from(blocks)
-                discard_partial()
-                if not location:
-                    return fail("redirect-missing-location")
-                redirects += 1
-                if redirects > MAX_REDIRECTS:
-                    return fail("too-many-redirects")
-                next_url = urljoin(current_url, location)
-                if not valid_url(next_url):
-                    return fail("redirect-invalid-url")
-                current_url = canonical_url(next_url)
-                continue
+                if status in REDIRECT_STATUSES:
+                    location = _redirect_location_from(blocks)
+                    output.unlink(missing_ok=True)
+                    if not location:
+                        return False, "redirect-missing-location", transferred_bytes
+                    redirects += 1
+                    if redirects > MAX_REDIRECTS:
+                        return False, "too-many-redirects", transferred_bytes
+                    next_url = urljoin(current_url, location)
+                    if not valid_url(next_url):
+                        return False, "redirect-invalid-url", transferred_bytes
+                    current_url = canonical_url(next_url)
+                    break
 
-            # curl's --fail rejects 4xx/5xx, but it accepts other non-2xx
-            # statuses such as 300 and 304. Never treat those response bodies
-            # as filter-list content. A 206 response is also incomplete unless
-            # we explicitly requested a byte range (which this downloader does
-            # not), so it cannot be accepted as a complete source.
-            if status == 206:
-                return fail("partial-content-response")
-            if not 200 <= status < 300:
-                return fail(f"unexpected-http-status: {status}")
+                # curl's --fail rejects 4xx/5xx, but it accepts other non-2xx
+                # statuses such as 300 and 304. Never treat those response
+                # bodies as filter-list content. A 206 response is also
+                # incomplete unless a byte range was explicitly requested.
+                if status == 206:
+                    return fail("partial-content-response", attempt_counted=True)
+                if not 200 <= status < 300:
+                    return fail(f"unexpected-http-status: {status}", attempt_counted=True)
 
-            encodings = _response_content_encodings_from(blocks)
-            if any(encoding != "identity" for encoding in encodings):
-                return fail("unsupported-content-encoding")
+                encodings = _response_content_encodings_from(blocks)
+                if any(encoding != "identity" for encoding in encodings):
+                    return fail("unsupported-content-encoding", attempt_counted=True)
 
-            transferred_bytes += _file_size(output)
-            return True, "", transferred_bytes
+                return True, "", transferred_bytes
+            # A redirect starts a new hop with a fresh retry allowance.
     finally:
         headers.unlink(missing_ok=True)
 
