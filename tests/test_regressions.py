@@ -452,13 +452,15 @@ class HeaderBlockParsingTests(unittest.TestCase):
             "HTTP/1.1 100 Continue\r\n\r\n"
             "HTTP/1.1 302 Found\r\nLocation: /next\r\nContent-Encoding: GZIP\r\n\r\n"
         )
-        self.assertEqual(fetch._redirect_location(path), "/next")
-        self.assertEqual(fetch._response_content_encodings(path), ["gzip"])
+        blocks = fetch._header_blocks(path)
+        self.assertEqual(fetch._redirect_location_from(blocks), "/next")
+        self.assertEqual(fetch._response_content_encodings_from(blocks), ["gzip"])
 
     def test_missing_header_file_is_empty_not_an_error(self):
         missing = Path(tempfile.gettempdir()) / "filter-lists-no-such-headers"
-        self.assertIsNone(fetch._redirect_location(missing))
-        self.assertEqual(fetch._response_content_encodings(missing), [])
+        blocks = fetch._header_blocks(missing)
+        self.assertIsNone(fetch._redirect_location_from(blocks))
+        self.assertEqual(fetch._response_content_encodings_from(blocks), [])
 
 
 class UnreadableFileRecordTests(unittest.TestCase):

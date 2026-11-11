@@ -259,7 +259,6 @@ class EnforcedRejectionStatusTests(unittest.TestCase):
 
     def _run_rejected(self, **overrides):
         from types import SimpleNamespace
-        from unittest.mock import patch
         merge = load_script("merge.py", "merge_v760_rejected")
         root = setup_merge_root(self, merge, "version: 1\nsources: []\n")
         src = SimpleNamespace(name="s", url=URL, category="t", priority=1, required=False, enabled=True, trusted_abp_features=False)
