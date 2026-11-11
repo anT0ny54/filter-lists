@@ -6,34 +6,31 @@ All notable changes to Filter-Lists are documented here. The format follows [Kee
 
 ## [Unreleased]
 
-### Code review pass (2026-11-04, eighth pass; builder version remains 7.6.0)
+### Maintenance review, pass 2 (builder version remains 7.6.0)
 
-All files except the intentionally excluded `filters.txt` payload were
-read in full, including the entire `tests/` tree, docs, and workflows. The
-post-change test suite completed with all tests passing.
+Every file in the project was re-read, except the intentionally excluded `filters.txt` payload. The full suite (272 tests) passes. The shipped list validates with 0 errors, and every one of its 170,768 rules normalizes to itself, so the Build-ID and published `filters.txt` are unchanged by this pass.
 
 #### Fixed
 
-- **History retention tiebreak** (`scripts/merge.py`): `archive_successful_report()`
-  now sorts archived reports in two stable passes — timestamps descending via
-  `timestamp_sort_key`, filename ascending as the tiebreak. A single
-  `reverse=True` sort also reversed the filename order for equal
-  `generated_at` values, making retention pruning depend on the glob's
-  filesystem-dependent enumeration order instead of being fully deterministic.
+- **Ordinary element-hiding rules rejected from untrusted sources** (`scripts/normalize.py`): a `#$#` snippet check matched any line containing that text, including inside a CSS attribute. For example, `example.com##div[data-x="#$#"]` was reported as `abp-security-restricted-feature` and dropped from every source without `trusted_abp_features`. Feature detection now uses the parsed cosmetic separator (`cosmetic_separator()`), and the matching snippet, extended-CSS and extended-CSS-disabled rejection reasons use the same separator.
+
+#### Removed
+
+- Duplicated unknown-option test in `_option_list_reason()` and `_normalize_network_with_reason()`; both now call `_is_unknown_option()`.
+- Unreachable `"blank"` entry in `uses_restricted_abp_feature()`.
+- Redundant `import config` inside `test_v753.py`.
+
+#### Changed
+
+- `tests/test_v760.py`: the local variable that shadowed the `config` module is renamed `cfg`.
+- `README.md`: documents separator-aware feature gating.
+
+#### Tests
+
+- `tests/test_normalize.py`: two new cases under `SeparatorScopeTests`. One checks that marker text inside a CSS attribute is not a snippet; one checks that a real `#$#` snippet still requires trust.
 
 #### Verified
 
-- No dead or redundant production code, no cross-module conflicts, and no
-  other bugs were found in this pass.
-- `fetch.py` `_redirect_location` / `_response_content_encodings`
-  `Path`-wrappers are intentionally kept: `tests/test_regressions.py`
-  exercises them directly.
-- `health.py` reputation thresholds (0.80 watch / 0.95 excellent / 3
-  consecutive failures) are intentionally independent of
-  `config.DEFAULT_MINIMUM_SUCCESS_RATIO`: the former labels rolling
-  reputation, the latter gates the per-build root-source health ratio.
-- README needs no change: retention remains "chronological by generated_at",
-  which stays accurate after the tiebreak fix.
-- `filters.txt` remains excluded from this review and from the modified-file
-  archive, as requested.
-
+- Full unit suite: 272 tests, all passing.
+- Shipped `filters.txt`: validates with 0 errors.
+- Structured fuzzing and cross-module symbol scan from the previous pass remain clean.

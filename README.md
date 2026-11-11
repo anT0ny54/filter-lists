@@ -30,7 +30,7 @@ The compiler accepts documented ABP syntax and rejects unsupported engine-specif
 - Element hiding: `##` and `#@#`.
 - ABP extended CSS: `#?#`, including supported `:has()`, `:has-text()`, `:-abp-has()`, `:-abp-properties()`, `:-abp-contains()`, `:not()`, and `:xpath()` forms.
 - ABP snippets: `#$#`, with the required domain scope.
-- ABP inline CSS declarations under the documented safe property/value grammar.
+- ABP inline CSS declarations under the documented safe property/value grammar. Inline `{...}` blocks are accepted only on `##` and `#?#`.
 - ABP `remove: true`.
 
 Security-sensitive features such as snippets, `header=`, and `addheader=` are policy-gated and should only be enabled for trusted sources. `remove: true` is controlled by the `allow_abp_remove_action` switch in `policies.yaml`; when it is off, a `remove` declaration is rejected wherever it appears in the style block.
@@ -42,6 +42,8 @@ Input lines are trimmed of surrounding whitespace and a leading byte-order mark 
 - uBlock Origin procedural filters such as `##+js(...)`.
 - uBO-only operators such as `:style()`, `:remove()`, `:upward()`, and `:matches-css()`.
 - uBO-only extended-CSS exception syntax `#?@#`.
+- Inline `{...}` style blocks on exception (`#@#`) or snippet (`#$#`) rules.
+- ABP extended pseudo-classes (`:-abp-has()`, `:-abp-contains()`, `:-abp-properties()`, `:has-text()`, `:xpath()`) outside `#?#`. Without the extended-CSS separator they are not evaluated by ABP engines.
 - AdGuard-only cosmetic extensions.
 - Non-ABP network options such as `removeparam`, redirect/scriptlet options, and unknown options.
 - Hosts-file syntax.
@@ -94,6 +96,7 @@ The builder currently enforces the following:
 - **Canonical source identity:** scheme/host/path normalization and fragment removal are used for source identity and include-cycle detection. Already-visited include targets are ignored before the source cap is evaluated, so an include cycle cannot falsely trigger the global source limit; only genuinely new canonical targets count toward that cap.
 - **Deterministic rule output and identity:** normalization, sorting, deduplication, and Build-ID generation are deterministic. `filters.txt` also contains a `Last updated` timestamp, while `reports/latest.json` records `generated_at` and `build_seconds`; those operational fields intentionally vary between runs.
 - **Full Build-ID validation:** `validate.py` recomputes the build identity from the active configuration and normalized rules.
+- **Separator-aware feature gating:** `#$#` snippets, `header=` and `addheader=` are detected from the parsed rule. Marker text inside a CSS attribute (for example `div[data-x="#$#"]`) is ordinary element hiding and is not treated as a restricted feature.
 - **Strict grammar validation:** malformed options, unsupported procedural syntax, unsafe inline styles, malformed regex envelopes, control characters, and over-limit rules are rejected.
 - **Detailed diagnostics:** rejection reasons, per-source statistics, SHA-256 hashes, fetch failures, and anomaly information are retained. Network-rule rejection reasons come from one validator, so the reason recorded in a report is always the same one `rejection_reason()` returns.
 - **Bounded default concurrency:** the builder uses ten download workers by default — the ceiling implied by the shipped download budget (`max_total_download_bytes // max_download_bytes` = 500 MiB // 50 MiB), since the build is network-bound well before it is CPU-bound (override with the `FILTER_LISTS_WORKERS` environment variable); effective concurrency is additionally capped by the configured global download budget and the reservations required by active transfers.
@@ -266,15 +269,15 @@ The repository test suite covers:
 
 Download success does not mean a source contributes rules, so each build also evaluates rule yield per source. The **effective rejection rate** is the share of rule lines (input lines minus comments, blanks, and directives) that the strict-ABP profile rejected. With the shipped policy, sources of at least 100 lines at or above 30% are reported as `warning` and at or above 90% as `critical` in `reports/latest.json` (`source_quality`) and in the build log. They are advisory unless `source_quality.fail_on_critical: true`.
 
-Snapshot from the newest report (`reports/latest.json`, generated 2026-11-03T14:57:06Z): 32/32 root sources OK, 225,658 input lines, 195,446 accepted, 171,204 unique rules, overall rejection rate 13.39%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.43% effective rejection rate).
+Snapshot from the newest report (`reports/latest.json`, generated 2026-11-10T11:08:13Z): 32/32 root sources OK, 224,257 input lines, 193,902 accepted, 170,768 unique rules, overall rejection rate 13.54%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.43% effective rejection rate).
 
 | Source | Input lines | Accepted | Rejection rate* | Main rejection reasons |
 |---|---:|---:|---:|---|
 | AdGuard Ukrainian | 5,550 | 3,628 | 34.63% | `unknown-option` (1,769), `ubo-only-syntax` (122) |
-| AdGuard Social Media | 31,324 | 22,197 | 29.14% | `ubo-only-syntax` (7,410), `unknown-option` (680) |
-| AdGuard Turkish | 6,847 | 5,277 | 22.93% | `ubo-only-syntax` (784), `invalid-cosmetic-rule` (477) |
-| AdGuard Russian | 7,823 | 6,150 | 21.39% | `unknown-option` (857), `ubo-only-syntax` (635) |
-| AdGuard French | 5,002 | 4,055 | 18.93% | `unknown-option` (655), `ubo-only-syntax` (237) |
+| AdGuard Social Media | 31,528 | 22,350 | 29.11% | `ubo-only-syntax` (7,458), `unknown-option` (679) |
+| AdGuard Turkish | 6,885 | 5,306 | 22.93% | `ubo-only-syntax` (784), `invalid-cosmetic-rule` (485) |
+| AdGuard Russian | 7,856 | 6,174 | 21.41% | `unknown-option` (866), `ubo-only-syntax` (636) |
+| AdGuard French | 5,102 | 4,138 | 18.89% | `unknown-option` (668), `ubo-only-syntax` (240) |
 *The table's rejection rate is the plain share of all input lines rejected (comments included). The quality gate uses effective rejection rate, excluding comments, blanks and directives; AdGuard Ukrainian's effective rate is 34.43%.
 
 Most EasyList-family sources reject under 5% of lines (mostly comments). Rejection of AdGuard/uBO-only syntax is intentional under the strict-ABP policy. Figures change with every upstream update; consult `reports/latest.json`.
