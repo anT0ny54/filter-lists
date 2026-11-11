@@ -1,7 +1,7 @@
 {
   "schema": 5,
   "status": "success",
-  "generated_at": "2026-11-11T03:19:34.247354+00:00",
+  "generated_at": "2026-11-11T03:22:11.053814+00:00",
   "builder": "Filter-Lists v7.6.0",
   "profile": "strict-abp",
   "build_id": "8b880042216238bd5ea167a58f89d487e6ed39f16832cf06a4ada22970af18f8",
@@ -1180,5 +1180,5 @@
     "fail_on_warning": false,
     "enforced_failure": false
   },
-  "build_seconds": 4.892
+  "build_seconds": 9.152
 }
