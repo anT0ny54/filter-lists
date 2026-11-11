@@ -47,30 +47,28 @@ def main() -> int:
             for number, raw in enumerate(handle, 1):
                 yield number, raw.rstrip("\r\n")
 
+    def note_header(key: str, header: str, number: int) -> None:
+        # Each required header may appear once; a second copy is an error, not an override.
+        if key in metadata_seen:
+            errors.append(f"[METADATA] line {number}: duplicate '{header}' header")
+        metadata_seen.add(key)
+
     try:
         for number, raw in _numbered_lines():
             if m := TOTAL_RE.match(raw):
-                if "total" in metadata_seen:
-                    errors.append(f"[METADATA] line {number}: duplicate '! Total rules:' header")
-                metadata_seen.add("total")
+                note_header("total", "! Total rules:", number)
                 declared_total = int(m.group(1))
                 continue
             if m := BUILD_RE.match(raw):
-                if "build-id" in metadata_seen:
-                    errors.append(f"[METADATA] line {number}: duplicate '! Build-ID:' header")
-                metadata_seen.add("build-id")
+                note_header("build-id", "! Build-ID:", number)
                 declared_build_id = m.group(1)
                 continue
             if m := SOURCE_MANIFEST_RE.match(raw):
-                if "source-manifest" in metadata_seen:
-                    errors.append(f"[METADATA] line {number}: duplicate '! Source manifest SHA-256:' header")
-                metadata_seen.add("source-manifest")
+                note_header("source-manifest", "! Source manifest SHA-256:", number)
                 declared_source_manifest = m.group(1)
                 continue
             if raw.startswith("! Version:"):
-                if "version" in metadata_seen:
-                    errors.append(f"[METADATA] line {number}: duplicate '! Version:' header")
-                metadata_seen.add("version")
+                note_header("version", "! Version:", number)
                 if m := VERSION_RE.match(raw):
                     version_hash = m.group(1)
                 else:

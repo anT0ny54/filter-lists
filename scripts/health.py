@@ -26,6 +26,11 @@ from pathlib import Path
 OUTCOMES_FILENAME = "source-outcomes.json"
 OUTCOMES_SCHEMA = 1
 MAX_STORED_RUNS = 120
+# Rolling-reputation labels. Kept separate from the build-level success gate
+# (config.DEFAULT_MINIMUM_SUCCESS_RATIO) on purpose: these grade a source's history.
+WATCH_SUCCESS_RATIO = 0.80
+EXCELLENT_SUCCESS_RATIO = 0.95
+POOR_CONSECUTIVE_FAILURES = 3
 
 
 def _utc_timestamp(timestamp: object) -> datetime | None:
@@ -98,6 +103,20 @@ def _remove_temporary(path: str | Path) -> None:
         Path(path).unlink(missing_ok=True)
     except OSError:
         pass
+
+
+def _write_json_atomic(path: Path, payload: dict) -> None:
+    """Write `payload` as JSON to `path` via a same-directory temp file and replace."""
+    fd, temporary = tempfile.mkstemp(prefix="outcomes.", suffix=".tmp", dir=path.parent)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
+            json.dump(payload, handle, indent=1, ensure_ascii=False)
+            handle.write("\n")
+        os.chmod(temporary, 0o644)
+        os.replace(temporary, path)
+    except Exception:
+        _remove_temporary(temporary)
+        raise
 
 
 def load_outcomes(outcomes_path: Path | None, history_dir: Path | None = None) -> list[dict]:
@@ -200,16 +219,7 @@ def record_outcomes(
     # rolling retention window forever.
     runs = _compact_daily_runs(runs)[-MAX_STORED_RUNS:]
     outcomes_path.parent.mkdir(parents=True, exist_ok=True)
-    fd, temporary = tempfile.mkstemp(prefix="outcomes.", suffix=".tmp", dir=outcomes_path.parent)
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
-            json.dump({"schema": OUTCOMES_SCHEMA, "runs": runs}, handle, indent=1, ensure_ascii=False)
-            handle.write("\n")
-        os.chmod(temporary, 0o644)
-        os.replace(temporary, outcomes_path)
-    except Exception:
-        _remove_temporary(temporary)
-        raise
+    _write_json_atomic(outcomes_path, {"schema": OUTCOMES_SCHEMA, "runs": runs})
 
 
 def set_outcome_status(outcomes_path: Path, generated_at: str, status: str) -> bool:
@@ -235,16 +245,7 @@ def set_outcome_status(outcomes_path: Path, generated_at: str, status: str) -> b
             run["status"] = status
             changed = True
     if changed:
-        fd, temporary = tempfile.mkstemp(prefix="outcomes.", suffix=".tmp", dir=outcomes_path.parent)
-        try:
-            with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
-                json.dump(data, handle, indent=1, ensure_ascii=False)
-                handle.write("\n")
-            os.chmod(temporary, 0o644)
-            os.replace(temporary, outcomes_path)
-        except Exception:
-            _remove_temporary(temporary)
-            raise
+        _write_json_atomic(outcomes_path, data)
     return changed
 
 
@@ -291,11 +292,11 @@ def build_source_reputation(
             consecutive_failures += 1
         success_rate = successes / total if total else 0.0
         score = round(success_rate * 100, 2)
-        if consecutive_failures >= 3:
+        if consecutive_failures >= POOR_CONSECUTIVE_FAILURES:
             reputation = "poor"
-        elif success_rate < 0.80:
+        elif success_rate < WATCH_SUCCESS_RATIO:
             reputation = "watch"
-        elif success_rate >= 0.95:
+        elif success_rate >= EXCELLENT_SUCCESS_RATIO:
             reputation = "excellent"
         else:
             reputation = "good"

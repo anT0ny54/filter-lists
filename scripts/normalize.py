@@ -60,7 +60,14 @@ ALLOWED_COSMETIC_SEPARATORS = frozenset({"##", "#@#", "#?#", "#$#"})
 PLAIN_OPTION_NAMES = frozenset(TYPE_OPTIONS | SIMPLE_OPTIONS)
 # Precompiled: these run once per input line (hundreds of thousands per build).
 WHITESPACE_RE = re.compile(r"\s")
-XPATH_RE = re.compile(r":xpath\(", re.I)
+# ABP extended pseudo-classes that are only evaluated under the `#?#` separator.
+# Plain `##`/`#@#` hand them to the browser's CSS engine, which does not know
+# them, so the selector is silently dead. `:has()` is native CSS and stays valid.
+EXTENDED_ONLY_PSEUDO_RE = re.compile(r":(?:-abp-(?:has|contains|properties)|has-text|xpath)\(", re.I)
+# ABP inline `{ property: value }` blocks are defined only for element hiding
+# (`##`) and extended CSS (`#?#`). Attaching one to an exception or a snippet
+# has no ABP meaning, so such a rule is rejected instead of being emitted.
+INLINE_STYLE_SEPARATORS = frozenset({"##", "#?#"})
 CSS_PROPERTY_RE = re.compile(r"[A-Za-z_-][A-Za-z0-9_-]*")
 # ABP option-list grammar, used only to locate the option section of a rule
 # that starts with a regex body (see split_options).
@@ -173,6 +180,16 @@ def is_overbroad_pattern(pattern_body: str, options: list[str]) -> bool:
     return not options and not pattern_body.strip("*|^")
 
 
+def cosmetic_separator(line: str) -> str | None:
+    """Separator of a cosmetic rule as the parser sees it (leftmost marker), else None.
+
+    Substring tests such as `"#$#" in line` also match marker text inside a CSS
+    attribute (`div[data-x="#$#"]`), so feature checks must use the separator.
+    """
+    match = COSMETIC_RE.search(line)
+    return match.group() if match else None
+
+
 def uses_restricted_abp_feature(line: str, classification=None) -> bool:
     """True if `line` needs a source trusted for ABP security-sensitive features.
 
@@ -188,10 +205,10 @@ def uses_restricted_abp_feature(line: str, classification=None) -> bool:
     `classification` lets callers reuse a classification they already hold.
     """
     kind = (classification or classify(line)).kind
-    if kind in {"comment", "directive", "blank"}:
+    if kind in {"comment", "directive"}:
         return False
-    if "#$#" in line:
-        return True
+    if kind == "cosmetic":
+        return cosmetic_separator(line) == "#$#"
     if kind != "network" or "$" not in line:
         return False
     _, options = split_options(line)
@@ -381,6 +398,14 @@ def valid_option(
     return False
 
 
+def _is_unknown_option(option: str, policy: dict[str, bool]) -> bool:
+    """True when `option` names nothing ABP defines and unknown options are rejected."""
+    option_name = option.split("=", 1)[0].casefold()
+    bare_name = option_name[1:] if option_name.startswith("~") else option_name
+    allowed = VALUE_OPTIONS if "=" in option else PLAIN_OPTION_NAMES
+    return bare_name not in allowed and policy["reject_unknown_options"]
+
+
 def _option_list_reason(options: list[str], is_exception: bool, policy: dict[str, bool]) -> str | None:
     """First rejection reason in an option list, or None if all options validate.
 
@@ -388,10 +413,7 @@ def _option_list_reason(options: list[str], is_exception: bool, policy: dict[str
     list is the only thing left to explain.
     """
     for option in options:
-        option_name = option.split("=", 1)[0].casefold()
-        bare_name = option_name[1:] if option_name.startswith("~") else option_name
-        allowed = VALUE_OPTIONS if "=" in option else PLAIN_OPTION_NAMES
-        if bare_name not in allowed and policy["reject_unknown_options"]:
+        if _is_unknown_option(option, policy):
             return "unknown-option"
         if not valid_option(option, is_exception, policy):
             return "invalid-option-value" if "=" in option else "context-invalid-option"
@@ -428,9 +450,7 @@ def _normalize_network_with_reason(rule: str, policy: dict[str, bool]) -> tuple[
     )
     for option in options:
         option_name = option.split("=", 1)[0].casefold()
-        bare_name = option_name[1:] if option_name.startswith("~") else option_name
-        allowed = VALUE_OPTIONS if "=" in option else PLAIN_OPTION_NAMES
-        if bare_name not in allowed and policy["reject_unknown_options"]:
+        if _is_unknown_option(option, policy):
             return None, "unknown-option"
         # ABP explicitly permits $addheader rules to target top-level
         # documents with the `document` type even though ordinary `$document`
@@ -496,6 +516,8 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
     # not ordinary cosmetic selectors — and are rejected rather than slipping
     # past validation as cosmetic rules.
     if "{" in body or "}" in body:
+        if separator not in INLINE_STYLE_SEPARATORS:
+            return None
         if not has_inline_style(body):
             return None
         if not policy["allow_abp_inline_styles"]:
@@ -510,15 +532,12 @@ def normalize_cosmetic(rule: str, rule_policy: dict[str, bool] | None = None) ->
     # Extended CSS is deliberately domain-scoped in this strict profile.
     if separator == "#?#" and not domains:
         return None
-    body_lower = body.lower()
-    # ABP documents :has-text() as an alias of :-abp-contains(). Accept it
-    # only in #?# extended-CSS rules; it is not a uBO-only construct.
-    if ":has-text(" in body_lower and separator != "#?#":
+    # :has-text() is an alias of :-abp-contains(), and :xpath() is an ABP
+    # extended-CSS selector (3.13+). None of them is valid outside `#?#`; they
+    # are not uBO-only constructs, so the rule is rejected for the separator.
+    if separator != "#?#" and EXTENDED_ONLY_PSEUDO_RE.search(body):
         return None
     if policy["reject_ubo_procedural"] and UBO_PROCEDURAL_RE.search(body):
-        return None
-    # :xpath() is an ABP extended-CSS selector (3.13+), not uBO syntax.
-    if separator != "#?#" and XPATH_RE.search(body):
         return None
     return f"{domains}{separator}{body}"
 
@@ -541,7 +560,7 @@ def _normalize_line(line: str, limit: int, policy: dict[str, bool], trusted_abp_
             return line, classification, None
         if classification.reason == "html-or-error-page" and not policy["reject_html_error_pages"]:
             return line, classification, None
-    if classification.kind in {"comment", "directive", "blank", "invalid"}:
+    if classification.kind in {"comment", "directive", "invalid"}:
         return None, classification, None
     if classification.kind == "network" and not policy["allow_network_filters"]:
         return None, classification, None
@@ -634,9 +653,9 @@ def _rejection_reason(line, limit, policy, trusted_abp_features, c) -> str:
         return "network-filters-disabled"
     if c.kind == "cosmetic" and not policy["allow_abp_cosmetic"]:
         return "cosmetic-filters-disabled"
-    if "#?#" in line and not policy["allow_extended_css"]:
+    if c.kind == "cosmetic" and cosmetic_separator(line) == "#?#" and not policy["allow_extended_css"]:
         return "extended-css-disabled"
-    if "#?@#" in line and policy["reject_ubo_extended_exceptions"]:
+    if c.kind == "cosmetic" and cosmetic_separator(line) == "#?@#" and policy["reject_ubo_extended_exceptions"]:
         return "ubo-only-syntax"
     # The procedural-operator gate only ever applies to cosmetic bodies
     # (normalize_cosmetic); a network rule containing such text is not rejected
@@ -654,17 +673,15 @@ def _rejection_reason(line, limit, policy, trusted_abp_features, c) -> str:
         ]
         if engine_only:
             return "engine-specific-syntax"
-        if "#$#" in line:
+        separator = cosmetic_separator(line)
+        if separator == "#$#":
             if not line[:line.find("#$#")].strip():
                 return "snippet-domain-required"
             if not policy["allow_abp_snippets"]:
                 return "abp-snippets-disabled"
-        if "#?#" in line:
-            if not line[:line.find("#?#")].strip():
-                return "extended-css-domain-required"
-        if ":has-text(" in line.lower() and "#?#" not in line:
-            return "extended-css-selector-requires-#?#"
-        if XPATH_RE.search(line) and "#?#" not in line:
+        if separator == "#?#" and not line[:line.find("#?#")].strip():
+            return "extended-css-domain-required"
+        if EXTENDED_ONLY_PSEUDO_RE.search(line) and separator != "#?#":
             return "extended-css-selector-requires-#?#"
         return "invalid-cosmetic-rule"
     # Single source of truth: the same validator the build pipeline uses, so
