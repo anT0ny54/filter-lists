@@ -23,9 +23,9 @@ ABP documents `document`, `elemhide`, `generichide`, and `genericblock` as excep
 
 - Element hiding: `##`.
 - Element hiding exceptions: `#@#`.
-- Extended CSS: `#?#`, including ABP `:has()`, `:has-text()`, `:-abp-has()`, `:-abp-properties()`, `:-abp-contains()`, `:not()`, and `:xpath()`.
+- Extended CSS: `#?#`, including ABP `:has()`, `:has-text()`, `:-abp-has()`, `:-abp-properties()`, `:-abp-contains()`, `:not()`, and `:xpath()`. The ABP-specific forms (`:has-text()`, `:-abp-*()`, `:xpath()`) are accepted only with `#?#`; plain `:has()` is native CSS and is accepted on `##` as well.
 - ABP snippets: `#$#`, with a required domain scope.
-- ABP inline CSS declarations on `##` / `#?#` selectors, restricted to ABP's documented safe property/value grammar.
+- ABP inline CSS declarations on `##` / `#?#` selectors only (a `{...}` block on `#@#` or `#$#` is rejected), restricted to ABP's documented safe property/value grammar.
 - ABP `remove: true;` action, gated by the `allow_abp_remove_action` policy switch (rejected in any declaration position when the switch is off).
 
 ABP documents snippets as JavaScript snippet commands and restricts them to custom filters or vetted ABP lists for security. The syntax is therefore implemented, while the project should only enable snippet/header/addheader features for sources that are trusted for those ABP security-sensitive features.
@@ -33,6 +33,8 @@ ABP documents snippets as JavaScript snippet commands and restricts them to cust
 ### Rejected
 
 - uBlock Origin procedural filters such as `##+js(...)`.
+- ABP extended pseudo-classes (`:has-text()`, `:-abp-*()`, `:xpath()`) outside `#?#`.
+- Inline `{...}` style blocks on `#@#` and `#$#` rules.
 - uBO-only procedural/style operators such as `:style()`, `:remove()`, `:upward()`, and `:matches-css()`.
 - AdGuard-only cosmetic separators (`#%#`, `#@%#`, `#@$#`, `#$?#`, `#@$?#`).
 - uBO-only extended-CSS exception form `#?@#`.
