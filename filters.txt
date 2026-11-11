@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-cf687f385180
-! Last updated: 2026-11-11 04:15:34 UTC
+! Version: v7.6.0-0e8cd08ce6d2
+! Last updated: 2026-11-11 04:43:00 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: cf687f385180a51112f3109a7102d554b287c3234418626b49710e4637333ee5
+! Build-ID: 0e8cd08ce6d214498c7c75655183629457ca6d1de3eaae927a7c8144649d0a6c
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 171163
+! Total rules: 171170
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -103769,6 +103769,7 @@ zzzyk.com###Tinfo
 ||aetvellt.net^
 ||aevdbqosjrunt.website^
 ||aexoao7lg6.com^
+||aeyukxzcjxobd.site^
 ||aezbgiyefpqyb.site^
 ||af.bundleunum.com^
 ||af1tsjdta.com^
@@ -121500,6 +121501,7 @@ zzzyk.com###Tinfo
 ||evrlbehgntzaz.online^
 ||evrmwlh0dl.com^
 ||evropidar.org^$third-party
+||evrpzvsplmwzt.site^
 ||evs.icy-lake.kickstarter.com^
 ||evs.sgmt.loom.com^$script
 ||evt-api.ntm.eu^
@@ -129484,6 +129486,7 @@ zzzyk.com###Tinfo
 ||hvyzvahhnolsw.space^
 ||hw1umzhov6q7i8k2vgj1w73b.cfd^
 ||hwbyspodhwjsf.online^
+||hwdfqfdu.com^
 ||hwdlloibdukny.space^
 ||hweaugtougwvv.online^
 ||hweianpqxl.icu^
@@ -135449,6 +135452,7 @@ zzzyk.com###Tinfo
 ||kzwopyeziioee.space^
 ||kzxk7xixz.com^
 ||kzxwkvkvdyzus.online^
+||kzzbdsattavdw.space^
 ||kzzubknnwbtix7g22mkewimpn6gc.cfd^
 ||kzzxfwvwxbfuu.website^
 ||l-iw.de^
@@ -147183,6 +147187,7 @@ zzzyk.com###Tinfo
 ||pppteennal.com^
 ||ppqkvmshwfjvdu.com^
 ||ppqscealbqcii.online^
+||ppqusrmsvpwoq.online^
 ||ppresulesglkd.online^
 ||pprlvdxanzzjl.store^
 ||ppshk.com^*banner/
@@ -162077,6 +162082,7 @@ zzzyk.com###Tinfo
 ||utaten.com/js/user/SidebarFollowAd.js
 ||utavbvaervidi.site^
 ||utdmvlibauwup.online^
+||uterusarchgodardour.cyou^
 ||utfsehrokaczt.site^
 ||utherpsedera.cyou^
 ||utherverse.com^$third-party
@@ -166810,6 +166816,7 @@ zzzyk.com###Tinfo
 ||xhamster2.com*/vast?
 ||xhamster3.com*/vast?
 ||xhayx4v25b.com^
+||xhbtuppqjdgpa.online^
 ||xhcdn.com/site/*/ntvb.gif
 ||xhckbgvd0.com^
 ||xhdxoyupdowfb.space^
