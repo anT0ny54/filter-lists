@@ -3,6 +3,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
@@ -56,6 +57,52 @@ class ValidateSortednessTests(unittest.TestCase):
         exit_code, output = self._run(["||A-rule.example^", "||a-rule.example^"])
         self.assertNotIn("[UNSORTED]", output)
         self.assertEqual(exit_code, 0)
+
+
+class ValidateReadFailureTests(unittest.TestCase):
+    def test_unreadable_filter_file_is_reported_without_traceback(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "filters.txt"
+            path.write_text("! minimally populated fixture\n", encoding="utf-8")
+            original_open = Path.open
+
+            def fail_target_open(candidate, *args, **kwargs):
+                if candidate == path:
+                    raise OSError("simulated permission error")
+                return original_open(candidate, *args, **kwargs)
+
+            with patch.object(Path, "open", new=fail_target_open):
+                exit_code, output = run_validate(validate, path)
+
+        self.assertEqual(exit_code, 1)
+        self.assertIn("[IO] could not read filter file: simulated permission error", output)
+        self.assertNotIn("Traceback", output)
+
+    def test_unreadable_build_input_is_reported_without_traceback(self):
+        config = load_config()
+        build_id = "a" * 64
+        lines = [
+            "! Title: Test",
+            f"! Version: v{BUILDER_VERSION}-{build_id[:12]}",
+            f"! Build-ID: {build_id}",
+            f"! Source manifest SHA-256: {source_manifest_sha256(config)}",
+            "! Total rules: 1",
+            "!",
+            "||read-error.example^",
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "filters.txt"
+            path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            with patch.object(
+                validate,
+                "config_fingerprint",
+                side_effect=OSError("simulated configuration read error"),
+            ):
+                exit_code, output = run_validate(validate, path)
+
+        self.assertEqual(exit_code, 1)
+        self.assertIn("[IO] could not read build inputs: simulated configuration read error", output)
+        self.assertNotIn("Traceback", output)
 
 
 class ValidateMetadataHeaderTests(unittest.TestCase):

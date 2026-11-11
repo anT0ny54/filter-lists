@@ -35,6 +35,43 @@ class ReliabilityTests(unittest.TestCase):
         self.assertTrue(result["enforced_failure"])
 
 
+    def test_malformed_previous_report_shapes_are_ignored(self):
+        for sources in (None, [], {"results": None}, {"results": {"not": "a list"}}):
+            with self.subTest(sources=sources):
+                result = detect_anomalies(
+                    [], {"status": "success", "build_id": "damaged", "sources": sources},
+                    {"enabled": True},
+                )
+                self.assertEqual(result["count"], 0)
+                self.assertEqual(result["baseline"], "damaged")
+
+    def test_malformed_baseline_rows_are_skipped_without_hiding_valid_rows(self):
+        url = "https://example.test/list"
+        good_baseline = {
+            "url": url, "status": "ok", "bytes": 1000, "input_lines": 1000,
+            "unique_rules": 900, "rejection_rate": 0.1,
+        }
+        previous = {"status": "success", "build_id": "old", "sources": {"results": [
+            None,
+            7,
+            {"url": "https://bad.example/list", "status": "ok", "bytes": "not-a-number"},
+            good_baseline,
+            {"url": url, "status": "ok", "bytes": "not-a-number"},
+            {"url": url, "status": "ok", "bytes": True, "input_lines": 1000,
+             "unique_rules": 900, "rejection_rate": 0.1},
+        ]}}
+        current = [{
+            "url": url, "status": "ok", "bytes": 500, "input_lines": 1000,
+            "unique_rules": 900, "rejection_rate": 0.1,
+        }]
+        result = detect_anomalies(current, previous, {
+            "enabled": True, "min_lines": 100, "max_bytes_change_ratio": 0.25,
+            "max_rule_count_change_ratio": 0.75, "max_rejection_rate_change": 0.25,
+        })
+        self.assertEqual(result["count"], 1)
+        self.assertEqual(result["items"][0]["url"], url)
+        self.assertEqual(result["items"][0]["reasons"], ["bytes-change"])
+
     def test_enforced_failure_key_present_without_baseline_or_when_disabled(self):
         # update.yml asserts `enforced_failure is False`; it must exist even on
         # the first build (no baseline) and when detection is disabled.

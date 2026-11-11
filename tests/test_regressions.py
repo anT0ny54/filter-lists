@@ -468,10 +468,31 @@ class UnreadableFileRecordTests(unittest.TestCase):
         rules, stats = analyze_files([missing], max_rule_length=1000)
         self.assertEqual(rules, set())
         record = stats["per_file"][0]
+        self.assertEqual(record["input_lines"], 0)
+        self.assertEqual(record["rejected_lines"], 0)
         self.assertEqual(record["rejection_rate"], 1.0)
-        self.assertEqual(record["rejection_reasons"], {"read-error": 1})
+        self.assertEqual(record["rejection_reasons"], {})
         self.assertIn("error", record)
-        self.assertEqual(stats["rejection_reasons"], {"read-error": 1})
+        self.assertEqual(stats["input_lines"], 0)
+        self.assertEqual(stats["rejected_lines"], 0)
+        self.assertEqual(stats["rejection_rate"], 0.0)
+        self.assertEqual(stats["rejection_reasons"], {})
+
+    def test_hash_error_discards_rules_and_uses_a_distinct_reason(self):
+        from report import analyze_files
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "source.txt"
+            path.write_text("||first.example^\n||second.example^\n", encoding="utf-8")
+            with patch("report.sha256_file", side_effect=OSError("simulated hash failure")):
+                rules, stats = analyze_files([path], max_rule_length=1000)
+
+        self.assertEqual(rules, set())
+        self.assertEqual(stats["input_lines"], 2)
+        self.assertEqual(stats["accepted_lines"], 0)
+        self.assertEqual(stats["rejected_lines"], 2)
+        self.assertEqual(stats["rejection_reasons"], {"hash-error": 2})
+        self.assertIn("simulated hash failure", stats["per_file"][0]["error"])
 
     def test_mid_read_error_discards_partial_rules(self):
         from report import analyze_files
@@ -507,6 +528,7 @@ class UnreadableFileRecordTests(unittest.TestCase):
                 rules, stats = analyze_files([path], max_rule_length=1000)
 
         self.assertEqual(rules, set())
+        self.assertEqual(stats["input_lines"], 2)
         self.assertEqual(stats["accepted_lines"], 0)
         self.assertEqual(stats["rejected_lines"], 2)
         self.assertEqual(stats["rejection_reasons"], {"read-error": 2})

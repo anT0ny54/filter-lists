@@ -85,6 +85,12 @@ class DownloadValidationTests(unittest.TestCase):
     def test_whitespace_only_across_multiple_chunks_is_empty(self):
         self.assertEqual(self._check(b" \n" * 33000), (False, "empty"))
 
+    def test_html_error_marker_split_at_initial_sample_boundary_is_rejected(self):
+        # The body begins with enough whitespace to place the marker's first
+        # bytes at the end of the 64 KiB sample, with the rest in the next read.
+        body = b" " * (65536 - 2) + b"<!doctype html><html><title>Access denied</title></html>"
+        self.assertEqual(self._check(body), (False, "html-or-error-page"))
+
     def test_html_error_marker_split_at_chunk_boundary_is_rejected(self):
         # The first two bytes of the marker land at the end of the first 1 MiB
         # remainder chunk; the rest arrives in the next chunk.

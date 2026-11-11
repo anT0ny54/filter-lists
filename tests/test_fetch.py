@@ -59,6 +59,41 @@ class FetchSecurityTests(unittest.TestCase):
                 supported, _ = fetch._curl_size_limit_status_from_output(output)
                 self.assertEqual(supported, expected_supported)
 
+    def test_non_success_http_statuses_are_rejected(self):
+        body = b"||example.com^\n! response body that must not be accepted\n"
+        cases = [
+            (206, "HTTP/1.1 206 Partial Content\r\n", "partial-content-response"),
+            (300, "HTTP/1.1 300 Multiple Choices\r\n", "unexpected-http-status: 300"),
+            (304, "HTTP/1.1 304 Not Modified\r\n", "unexpected-http-status: 304"),
+        ]
+
+        for status, header, expected_reason in cases:
+            with self.subTest(status=status), tempfile.TemporaryDirectory() as tmp:
+                output = Path(tmp) / "source.txt"
+                headers = output.with_suffix(output.suffix + ".headers")
+                response = type(
+                    "Proc",
+                    (),
+                    {"returncode": 0, "stdout": str(status), "stderr": ""},
+                )()
+
+                def fake_run(_command, **_kwargs):
+                    output.write_bytes(body)
+                    headers.write_text(header + "\r\n", encoding="iso-8859-1")
+                    return response
+
+                with patch.object(fetch, "_curl_stream_size_limit_status", return_value=(True, "")), \
+                     patch.object(fetch, "_public_address_for_url", return_value=("93.184.216.34", "")), \
+                     patch.object(fetch.subprocess, "run", side_effect=fake_run):
+                    ok, reason, transferred = fetch.download(
+                        "http://example.test/list.txt", output, 10, 1024
+                    )
+
+                self.assertFalse(ok)
+                self.assertEqual(reason, expected_reason)
+                self.assertEqual(transferred, len(body))
+                self.assertFalse(output.exists())
+
     def test_download_fails_closed_when_curl_cannot_enforce_stream_size_limits(self):
         reason = "curl-version-too-old: 8.3.0; curl >= 8.4.0 is required for safe download-size limits"
         with tempfile.TemporaryDirectory() as tmp:
@@ -410,6 +445,38 @@ class FetchTests(unittest.TestCase):
         self.assertEqual(stats["included_successful"], 1)
         self.assertEqual(stats["successful"], 2)
         self.assertTrue(all(len(item["sha256"]) == 64 for item in stats["results"]))
+
+    def test_hash_read_failure_is_reported_as_a_source_failure(self):
+        body = "||example.com^\n! enough content to pass source validation\n"
+
+        def fake_download(_url, output, _timeout, _max_download_bytes):
+            output.write_text(body, encoding="utf-8")
+            return True, "", output.stat().st_size
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch.object(fetch, "download", side_effect=fake_download), \
+                 patch.object(fetch, "sha256_file", side_effect=OSError("simulated hash read error")):
+                files, stats = collect_sources(
+                    ["https://example.test/list.txt"],
+                    Path(tmp),
+                    time.monotonic(),
+                    1,
+                    lambda _message: None,
+                    total_timeout=10,
+                    max_include_depth=0,
+                    max_download_bytes=1024,
+                    max_total_download_bytes=1024,
+                    max_total_sources=5,
+                )
+
+            result = stats["results"][0]
+            self.assertEqual(files, [])
+            self.assertEqual(stats["successful"], 0)
+            self.assertEqual(stats["root_failed"], 1)
+            self.assertEqual(result["status"], "failed")
+            self.assertEqual(result["reason"], "hash-error: simulated hash read error")
+            self.assertEqual(result["bytes"], len(body.encode("utf-8")))
+            self.assertFalse(Path(result["path"]).exists())
 
     def test_timeout_accounts_for_unattempted_queued_sources(self):
         original_download = fetch.download
