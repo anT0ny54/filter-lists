@@ -1,16 +1,16 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-0e8cd08ce6d2
-! Last updated: 2026-11-11 04:43:00 UTC
+! Version: v7.6.0-2edcfae1d437
+! Last updated: 2026-11-11 05:40:51 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 0e8cd08ce6d214498c7c75655183629457ca6d1de3eaae927a7c8144649d0a6c
+! Build-ID: 2edcfae1d4372f3971f0992f9cfdc9ab610afedc9e2028c6a1a44fdf1306ec40
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 171170
+! Total rules: 171197
 !
 ! Format: Strict Adblock Plus-compatible syntax
-! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
+! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet and snippet-exception, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
 ! Diagnostics: per-source hashes/statistics and anomaly detection are recorded in reports/latest.json.
 ! Auto-generated. Do not edit directly.
 ! Edit sources.yaml and rebuild.
@@ -101907,6 +101907,7 @@ zzzyk.com###Tinfo
 ||a4bbltm3u2.com^
 ||a4g.com^$third-party
 ||a4j126meg3.com^
+||a4k2h8jii.com^
 ||a4xvv2g18l.com^
 ||a51wzxssu.com^
 ||a57af701b6.1adda2699c.com^
@@ -107328,6 +107329,7 @@ zzzyk.com###Tinfo
 ||bajoiretoxoid.shop^
 ||bajorbriwza.in^
 ||bajrgcgpxk.com^
+||bakalbicarb.rest^
 ||bakersequaled.com^
 ||bakingbeheld.com^
 ||bakirkoydenhaber.com/wp-content/uploads/*/Webp.net-gifmaker-4.gif
@@ -108732,6 +108734,7 @@ zzzyk.com###Tinfo
 ||biribatwinkle.cfd^
 ||birkuqpprfemv.site^
 ||birlikhabergazetesi.com/wp-content/uploads/*/enerya.png
+||birotacours.click^
 ||birrusstunty.qpon^
 ||bisa-aja.my.id^
 ||bisagrewiverns.cyou^
@@ -112155,6 +112158,7 @@ zzzyk.com###Tinfo
 ||certifica.com/cert/hit.dll?
 ||certificate.leningradcenter.ru/Scripts/BanerLC.js
 ||certona.net^
+||cerxwkmeywkdy.online^
 ||cerxxxwjtxebr.site^
 ||ceryldelaine.com^
 ||ces.goaserv.com^
@@ -114235,6 +114239,7 @@ zzzyk.com###Tinfo
 ||coosuclemmus.shop^
 ||coosync.com^
 ||coosynci.com^
+||coothcapling.cyou^
 ||cootlogix.com^
 ||copacet.com^
 ||copensclaude.qpon^
@@ -117250,6 +117255,7 @@ zzzyk.com###Tinfo
 ||dhobiesands.cfd^
 ||dhootiepawed.com^
 ||dhotycontokolhozy.cyou^
+||dhovqdnulcadz.site^
 ||dhpfdaufroers.online^
 ||dhpmovkvy.com^
 ||dhqhmbwnimaph.space^
@@ -120492,6 +120498,7 @@ zzzyk.com###Tinfo
 ||embed.sendtonews.com^$domain=~shmoop.com,third-party
 ||embed.typeform.com/next/embed.js$domain=hush.ca|forbes.com
 ||embed69.org/bw.xml
+||embedararao.click^
 ||embedded.wishpondpages.com/*/?parent_url
 ||embeddedhelpful.com^
 ||embedx.name^
@@ -122110,6 +122117,7 @@ zzzyk.com###Tinfo
 ||fancy-officer.com^
 ||fancyapi.com^
 ||fancydsp.com^
+||fancyotter.me^
 ||fancyprescribeperplex.com^
 ||fancytravelingrid.com^
 ||fancywhim.com^
@@ -125201,6 +125209,7 @@ zzzyk.com###Tinfo
 ||geonimcomm.cyou^
 ||geoodigfrlxto.site^
 ||geoplugin.net^$third-party
+||geordieizchak.cyou^
 ||georgianacaravanscoop.com^
 ||georgianagarrisontired.com^
 ||georgianamortalemployed.com^
@@ -127131,6 +127140,7 @@ zzzyk.com###Tinfo
 ||gwbhpuwndhkot.site^
 ||gwbnsh.net.cn/hd/unicom/ad.html
 ||gwbrjedlctayr.site^
+||gwdkavydmyuf.com^
 ||gwe.go-static.info^
 ||gweducsmotels.com^
 ||gwekhiqtmswhp.website^
@@ -127841,6 +127851,7 @@ zzzyk.com###Tinfo
 ||hdbkome.com^
 ||hdbtop.com^
 ||hdbudbsujobyi.space^
+||hdbvlshiszaoa.space^
 ||hdc.maxli.cn^
 ||hdchina.*/styles/topshow/AD/
 ||hdcvecyv8.com^
@@ -129214,6 +129225,7 @@ zzzyk.com###Tinfo
 ||htintpa.tech^
 ||htirmsdzegmjn.site^
 ||htjchtyeyjluw.site^
+||htjkgmxcg.com^
 ||htjvxemjtdaom.site^
 ||htkyarsmdltca.site^
 ||htkyyevpmjaja.website^
@@ -130712,6 +130724,7 @@ zzzyk.com###Tinfo
 ||immigrantdistantassure.com^
 ||immigrationacre.com^
 ||imminentcawplod.com^
+||immitmalkite.click^
 ||immoderatebreathtaking.com^
 ||immoderatescarsheer.com^
 ||immoralhands.com^
@@ -134306,6 +134319,7 @@ zzzyk.com###Tinfo
 ||kfrvhjpthtddk.site^
 ||kfsniysgbauxo.space^
 ||kfund-media.com/wp-content/uploads/2018/01/580h400_banner_telegram-min.png
+||kfuthotjfeltq.site^
 ||kfvhovjgchgde.website^
 ||kfvtvbihzxkck.website^
 ||kfvv-defender.pro^
@@ -138194,6 +138208,7 @@ zzzyk.com###Tinfo
 ||manai521.com:88/bocai/index.html
 ||manateeacyloin.com^
 ||manconsider.com^
+||mandalamutt.cyou^
 ||mandatorypainter.com^
 ||mandelnieuws.be^*/Sponsors/
 ||mandirpeoplet.com^
@@ -145443,6 +145458,7 @@ zzzyk.com###Tinfo
 ||pdebfoicutkdt.site^
 ||pdeoebbbqpjdv.space^
 ||pdfbook.cn/wp-content/uploads/2017/11/049.jpg
+||pdfdoyrcfev.com^
 ||pdfsearchhq.com^
 ||pdhjdcvjnloyo.com^
 ||pdhkjnndwzwys.site^
@@ -147910,6 +147926,7 @@ zzzyk.com###Tinfo
 ||pteknvcm.com^
 ||ptekuwiny.pro^
 ||ptelastaxo.com^
+||ptelnqutbqhfx.site^
 ||ptengine.com^$third-party
 ||ptengine.jp^$third-party
 ||ptfg.flyertrip.com/static/img/campain/
@@ -148402,6 +148419,7 @@ zzzyk.com###Tinfo
 ||pxsobkyobvsqw.site^
 ||pxtnuoekmucfd.space^
 ||pxtxitotxkkrk.website^
+||pxuxlswadjlfu.space^
 ||pxvoyuez.com^
 ||pxwwxgrjjeggh.website^
 ||py.cn/src/img/pyy/
@@ -149503,6 +149521,7 @@ zzzyk.com###Tinfo
 ||qwfh39851jtfvkurf21hf.com^
 ||qwfmqkysepqin.online^
 ||qwgayltthcval.space^
+||qwgnmethokkkg.site^
 ||qwgruwrtcyxft.store^
 ||qwikln.com^
 ||qwjjfgqlfkmih.site^
@@ -151365,6 +151384,7 @@ zzzyk.com###Tinfo
 ||rmukifaq.in^
 ||rmv8gc43g.com^
 ||rmyhibtadohj.com^
+||rmzjuwxxhocys.site^
 ||rmzsglng.com^
 ||rmzyteljkkeds.website^
 ||rmzzjmbshnjbo.space^
@@ -157295,6 +157315,7 @@ zzzyk.com###Tinfo
 ||sxchbpyobqvxj.site^
 ||sxeimg.com/u/20191108/13082210.gif
 ||sxetpzonjqvzu.site^
+||sxgpxiijzklyi.site^
 ||sxhvutuncarlb.space^
 ||sxijascmyuisl.site^
 ||sxjaywwshzjby.online^
@@ -157581,6 +157602,7 @@ zzzyk.com###Tinfo
 ||tableland06.top^
 ||tableware66.com^
 ||tabloidincapable.com^
+||tabngnhobxpfh.online^
 ||taboola-display.com^
 ||taboola.com/vpaid/
 ||taboola.com^$domain=1fichier.com|espn.com|gamespot.com|popsci.com
@@ -157947,6 +157969,7 @@ zzzyk.com###Tinfo
 ||tcihfguqejvsf.online^
 ||tcjaslvajucmt.online^
 ||tcjuxomrldlyw.site^
+||tckcirzwpwprd.website^
 ||tckejzidujsjj.online^
 ||tckjfyhjjxgdd.site^
 ||tcloudbase.com/access?
@@ -159848,6 +159871,7 @@ zzzyk.com###Tinfo
 ||trigr.co^$third-party
 ||trigs-sockets.com^
 ||trikahrta.com^
+||trilledlorummimbars.cfd^
 ||trimay.ru/?
 ||trimchafegrove.com^
 ||trimreaddrunken.com^
@@ -162994,6 +163018,7 @@ zzzyk.com###Tinfo
 ||vibtrvfiegdpi.site^
 ||vic-m.co^
 ||vicaireresowscohol.cyou^
+||vicbydnnqwzrv.online^
 ||vicesus.com^
 ||viciascapus.shop^
 ||vicingnutate.com^
@@ -165839,6 +165864,7 @@ zzzyk.com###Tinfo
 ||wowrapidly.com^
 ||wowroms.com/images/Banner336x280.gif
 ||woxbnkonxwvrk.site^
+||woxfpmjmlwkba.site^
 ||woyaoq.com/201904100958_5cad4dbac9c5f.png
 ||woyawayluger.qpon^
 ||woyiman.com^
@@ -169130,6 +169156,7 @@ zzzyk.com###Tinfo
 ||ytsa.net^
 ||ytsuptbpkgdq.net^
 ||yttbzswwik.com^
+||ytuxglgoatece.website^
 ||ytvfmhi.com^
 ||ytwhnokypjqsp.online^
 ||ytwshjvqlhlyf.space^
