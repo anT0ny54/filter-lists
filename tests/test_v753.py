@@ -103,7 +103,6 @@ class PolicyFileValidationTests(unittest.TestCase):
 
     def test_default_success_ratio_matches_shipped_policy(self):
         import yaml
-        import config
         shipped = yaml.safe_load((config.ROOT / "policies.yaml").read_text())
         self.assertEqual(config.DEFAULT_MINIMUM_SUCCESS_RATIO, shipped["source_health"]["minimum_success_ratio"])
 

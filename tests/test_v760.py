@@ -263,7 +263,7 @@ class EnforcedRejectionStatusTests(unittest.TestCase):
         merge = load_script("merge.py", "merge_v760_rejected")
         root = setup_merge_root(self, merge, "version: 1\nsources: []\n")
         src = SimpleNamespace(name="s", url=URL, category="t", priority=1, required=False, enabled=True, trusted_abp_features=False)
-        config = SimpleNamespace(sources=(src,), minimum_success_ratio=0.8, fail_if_zero_sources=True, max_rule_length=100000,
+        cfg = SimpleNamespace(sources=(src,), minimum_success_ratio=0.8, fail_if_zero_sources=True, max_rule_length=100000,
                                  max_include_depth=5, max_download_bytes=1 << 20, max_total_download_bytes=1 << 20,
                                  max_total_sources=10, total_timeout_seconds=10, history_retention=10,
                                  anomaly_detection={"enabled": False, "fail_on_warning": False}, **overrides)
@@ -274,7 +274,7 @@ class EnforcedRejectionStatusTests(unittest.TestCase):
                       "rejection_reasons": {}, "per_file": [{"path": "/f.txt", "input_lines": 1000, "accepted_lines": 1,
                       "rejected_lines": 999, "duplicate_lines": 0, "unique_rules": 1, "rejection_rate": 0.999,
                       "rejection_reasons": {"unknown-option": 999}, "sha256": "a" * 64}]}
-        with patch.object(merge, "load_config", return_value=config), \
+        with patch.object(merge, "load_config", return_value=cfg), \
              patch.object(merge, "collect_sources", return_value=([], stats)), \
              patch.object(merge, "analyze_files", return_value=({"||custom.example^"}, rule_stats)), \
              patch.object(merge.shutil, "which", return_value="/usr/bin/curl"):

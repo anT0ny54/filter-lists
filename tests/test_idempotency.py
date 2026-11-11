@@ -1,8 +1,8 @@
-"""Normalization idempotency, consolidated from per-file duplicates.
+"""Normalization idempotency over the curated corpus and a fixed rule list.
 
-Replaces identical checks that used to live in test_corpus.py,
-test_properties.py, test_v70.py and test_v754.py. Every former input is
-preserved: the curated corpus files plus each file's explicit rule list.
+Each rule that normalizes must normalize to itself again. The fixed list
+covers representative shapes (network, exception, cosmetic, regex and IDN)
+that previously lived in several separate test modules.
 """
 import sys
 import unittest

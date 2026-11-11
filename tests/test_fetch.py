@@ -351,28 +351,39 @@ class FetchSecurityTests(unittest.TestCase):
                 self.assertEqual(transferred, output.stat().st_size)
 
 
+def _start_fixture_server():
+    """Serve a tiny main/child include graph on loopback; returns (root, server, thread, base)."""
+    root = Path(tempfile.mkdtemp(prefix="filter-fetch-test-"))
+    (root / "main.txt").write_text("! main\n!#include child.txt\n||example.com^\n", encoding="utf-8")
+    (root / "child.txt").write_text("||child.example^$script\n", encoding="utf-8")
+    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(root))
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    return root, server, thread, f"http://127.0.0.1:{server.server_port}"
+
+
+def _stop_fixture_server(root, server, thread):
+    server.shutdown()
+    thread.join(timeout=5)
+    server.server_close()
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def allow_local_fixture_fetch():
+    return patch.object(fetch, "_public_address_for_url", return_value=("127.0.0.1", ""))
+
+
 class FetchTests(unittest.TestCase):
-    @staticmethod
-    def allow_local_fixture_fetch():
-        return patch.object(fetch, "_public_address_for_url", return_value=("127.0.0.1", ""))
+    allow_local_fixture_fetch = staticmethod(allow_local_fixture_fetch)
 
     @classmethod
     def setUpClass(cls):
-        cls.root = Path(tempfile.mkdtemp(prefix="filter-fetch-test-"))
-        (cls.root / "main.txt").write_text("! main\n!#include child.txt\n||example.com^\n", encoding="utf-8")
-        (cls.root / "child.txt").write_text("||child.example^$script\n", encoding="utf-8")
-        handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(cls.root))
-        cls.server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
-        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
-        cls.thread.start()
-        cls.base = f"http://127.0.0.1:{cls.server.server_port}"
+        cls.root, cls.server, cls.thread, cls.base = _start_fixture_server()
 
     @classmethod
     def tearDownClass(cls):
-        cls.server.shutdown()
-        cls.thread.join(timeout=5)
-        cls.server.server_close()
-        shutil.rmtree(cls.root, ignore_errors=True)
+        _stop_fixture_server(cls.root, cls.server, cls.thread)
 
     def test_canonical_url_drops_fragment(self):
         self.assertEqual(canonical_url("HTTP://Example.COM/a#frag"), "http://example.com/a")
@@ -575,17 +586,22 @@ class FetchSchedulingTests(unittest.TestCase):
 
 
 class FetchBudgetWaveTests(unittest.TestCase):
-    setUpClass = FetchTests.setUpClass
-    tearDownClass = FetchTests.tearDownClass
+    @classmethod
+    def setUpClass(cls):
+        cls.root, cls.server, cls.thread, cls.base = _start_fixture_server()
+
+    @classmethod
+    def tearDownClass(cls):
+        _stop_fixture_server(cls.root, cls.server, cls.thread)
 
     def allow_local_fixture_fetch(self):
-        return patch.object(fetch, "_public_address_for_url", return_value=("127.0.0.1", ""))
+        return allow_local_fixture_fetch()
 
     @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_global_budget_queues_sources_instead_of_marking_them_failed(self):
         # Use unique paths that all resolve to the same fixture, while the
         # global budget allows only two 1-byte-sized reservations at once.
-        urls = [FetchTests.base + f"/child.txt?source={i}" for i in range(5)]
+        urls = [self.base + f"/child.txt?source={i}" for i in range(5)]
         started = time.monotonic()
         with self.allow_local_fixture_fetch():
             with tempfile.TemporaryDirectory() as tmp:
@@ -768,7 +784,7 @@ class FetchBudgetWaveTests(unittest.TestCase):
         with self.allow_local_fixture_fetch():
             with tempfile.TemporaryDirectory() as tmp:
                 _, stats = collect_sources(
-                    [FetchTests.base + "/child.txt"], Path(tmp), started, 32, lambda _: None,
+                    [self.base + "/child.txt"], Path(tmp), started, 32, lambda _: None,
                     total_timeout=30,
                     max_include_depth=0,
                     max_download_bytes=50,

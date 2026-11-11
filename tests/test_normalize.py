@@ -2,7 +2,7 @@ import sys
 import unittest
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from normalize import normalize_rule, rejection_reason
+from normalize import normalize_rule, normalize_rule_with_reason, rejection_reason
 
 class NormalizeTests(unittest.TestCase):
     def test_empty_option_delimiter_is_rejected(self):
@@ -161,6 +161,56 @@ class NormalizeTests(unittest.TestCase):
         ):
             with self.subTest(rule=rule):
                 self.assertIsNone(normalize_rule(rule))
+
+class SeparatorScopeTests(unittest.TestCase):
+    """Inline styles and extended-only pseudo-classes are tied to their separator."""
+
+    def test_inline_style_block_rejected_on_exception_and_snippet_separators(self):
+        for rule in (
+            "example.com#@#div { display: none }",
+            "example.com#$#div { display: none }",
+        ):
+            with self.subTest(rule=rule):
+                self.assertIsNone(normalize_rule(rule))
+                self.assertEqual(rejection_reason(rule), "invalid-cosmetic-rule")
+
+    def test_inline_style_block_still_accepted_on_element_hiding_and_extended_css(self):
+        for rule in (
+            "example.com##div { display: none }",
+            "example.com#?#div:-abp-has(.ad) { display: none }",
+        ):
+            with self.subTest(rule=rule):
+                self.assertEqual(normalize_rule(rule), rule)
+
+    def test_abp_extended_pseudo_classes_require_extended_css_separator(self):
+        for rule in (
+            "example.com##div:-abp-has(.ad)",
+            "example.com##div:-abp-contains(Ad)",
+            "example.com##div:-abp-properties(x)",
+            "example.com#@#div:-abp-has(.ad)",
+        ):
+            with self.subTest(rule=rule):
+                self.assertIsNone(normalize_rule(rule))
+                self.assertEqual(rejection_reason(rule), "extended-css-selector-requires-#?#")
+
+    def test_marker_text_inside_css_attribute_is_not_a_snippet(self):
+        # `#$#` inside an attribute value is not a snippet separator, so an
+        # untrusted source may still use this ordinary element-hiding rule.
+        rule = 'example.com##div[data-x="#$#"]'
+        self.assertEqual(normalize_rule_with_reason(rule, trusted_abp_features=False), (rule, None))
+        self.assertEqual(normalize_rule(rule), rule)
+
+    def test_real_snippet_still_requires_trust(self):
+        rule = "a.com#$#abort-on-property-read x"
+        self.assertEqual(
+            normalize_rule_with_reason(rule, trusted_abp_features=False),
+            (None, "abp-security-restricted-feature"),
+        )
+
+    def test_native_has_stays_valid_on_element_hiding(self):
+        rule = "example.com##div:has(> .ad)"
+        self.assertEqual(normalize_rule(rule), rule)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
