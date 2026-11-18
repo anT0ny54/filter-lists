@@ -42,6 +42,14 @@ def main() -> int:
             failures += 1
             print(f"[FAIL] {fixture.name}: engine timed out after {ENGINE_TIMEOUT}s")
             continue
+        except (OSError, ValueError) as exc:
+            # A configured adapter may not be installed, may not be executable,
+            # or may contain an invalid argument (for example an embedded NUL).
+            # Treat startup errors as an ordinary fixture failure rather than
+            # allowing the optional CI check to terminate with a traceback.
+            failures += 1
+            print(f"[FAIL] {fixture.name}: could not start engine: {exc}")
+            continue
         if proc.returncode == 0:
             print(f"[OK] {fixture.name}")
         else:

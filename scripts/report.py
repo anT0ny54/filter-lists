@@ -58,7 +58,7 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
         trusted = path in trusted_paths or path == custom_rules
         failure_reason = "read-error"
         try:
-            with path.open(encoding="utf-8", errors="replace") as source:
+            with path.open(encoding="utf-8-sig", errors="strict") as source:
                 for raw in source:
                     local_lines += 1
                     rule, reason = normalize_rule_with_reason(
@@ -77,11 +77,14 @@ def analyze_files(files: list[Path], custom_rules: Path | None = None, *, max_ru
             # without a known digest (e.g. custom-rules.txt) get hashed now.
             failure_reason = "hash-error"
             file_hash = known_hashes.get(path) or sha256_file(path)
-        except OSError as exc:
+        except (OSError, UnicodeError) as exc:
             # A failed file is rejected as a unit: none of its partially read
-            # rules enter the global set. Count only lines actually observed;
-            # an unreadable empty file still has an explicit per-file error
-            # without inventing a synthetic input/rejection line.
+            # rules enter the global set. Decode strictly so malformed UTF-8
+            # cannot be silently rewritten to U+FFFD and accepted as a rule.
+            # Count only lines actually observed; an unreadable empty file
+            # still has an explicit per-file error without inventing a line.
+            if isinstance(exc, UnicodeError):
+                failure_reason = "encoding-error"
             failed_lines = local_lines
             input_lines += failed_lines
             rejected += failed_lines

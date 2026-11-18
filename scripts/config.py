@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import hashlib
 import math
+import unicodedata
 from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 import yaml
+from yaml.constructor import ConstructorError
+from yaml.nodes import MappingNode
 
 from policy import PROFILE_NAME
 
@@ -74,6 +77,54 @@ SOURCES_TOP_LEVEL_KEYS = frozenset({"version", "sources"})
 SOURCE_ITEM_KEYS = frozenset({"name", "url", "category", "enabled", "priority", "required", "trusted_abp_features"})
 
 
+class _UniqueKeySafeLoader(yaml.SafeLoader):
+    """Safe YAML loader that rejects duplicate explicit mapping keys.
+
+    PyYAML's default mapping constructor silently keeps the last occurrence,
+    which can override security-sensitive source or policy settings. YAML merge
+    keys retain their standard precedence semantics; only duplicate keys
+    written explicitly in the same mapping are rejected.
+    """
+
+    def construct_mapping(self, node: MappingNode, deep: bool = False) -> dict:
+        if not isinstance(node, MappingNode):
+            raise ConstructorError(
+                "while constructing a mapping", node.start_mark,
+                "expected a mapping node", node.start_mark,
+            )
+
+        seen: set[object] = set()
+        for key_node, _value_node in node.value:
+            if key_node.tag == "tag:yaml.org,2002:merge":
+                continue
+            key = self.construct_object(key_node, deep=deep)
+            try:
+                duplicate = key in seen
+                seen.add(key)
+            except TypeError as exc:
+                raise ConstructorError(
+                    "while constructing a mapping", node.start_mark,
+                    "found an unhashable key", key_node.start_mark,
+                ) from exc
+            if duplicate:
+                raise ConstructorError(
+                    "while constructing a mapping", node.start_mark,
+                    f"found duplicate key {key!r}", key_node.start_mark,
+                )
+
+        self.flatten_mapping(node)
+        return super().construct_mapping(node, deep=deep)
+
+
+def _load_yaml_file(path: Path, label: str) -> object:
+    """Load one trusted project YAML file with duplicate-key protection."""
+    try:
+        data = yaml.load(path.read_text(encoding="utf-8"), Loader=_UniqueKeySafeLoader)
+    except yaml.YAMLError as exc:
+        raise ValueError(f"{label}: invalid YAML: {exc}") from exc
+    return {} if data is None else data
+
+
 def _reject_unknown_keys(section: dict, allowed: frozenset, label: str) -> None:
     unknown = sorted(set(section) - allowed, key=str)
     if unknown:
@@ -86,9 +137,9 @@ def _strict_bool(value, field: str) -> bool:
     raise ValueError(f"{field} must be a boolean")
 
 
-def _strict_str(value, field: str) -> str:
+def _strict_str(value, field: str, *, strip: bool = True) -> str:
     if isinstance(value, str):
-        return value.strip()
+        return value.strip() if strip else value
     raise ValueError(f"{field} must be a string")
 
 
@@ -114,13 +165,15 @@ def canonical_url(url: str) -> str:
     `https://example.com:443/a` have one canonical identity. Hostname and
     scheme case are normalized without retaining credentials or fragments.
     """
-    p = urlsplit(url.strip())
+    if not isinstance(url, str) or not valid_url(url):
+        raise ValueError("invalid URL")
+    p = urlsplit(url)
     scheme = p.scheme.lower()
     hostname = p.hostname.lower() if p.hostname else ""
-    try:
-        port = p.port
-    except ValueError:
-        port = None
+    # Do not silently erase an invalid explicit port. `urlsplit().port`
+    # raises ValueError for non-numeric or out-of-range ports; callers must
+    # reject that URL rather than canonicalizing it to a different endpoint.
+    port = p.port
     if ":" in hostname:
         hostname = f"[{hostname}]"
     if port == {"http": 80, "https": 443}.get(scheme):
@@ -131,6 +184,11 @@ def canonical_url(url: str) -> str:
 
 def valid_url(url: str) -> bool:
     try:
+        # urlsplit() strips or normalizes some ASCII controls on modern
+        # Python versions. Reject controls and whitespace before parsing so
+        # the accepted URL is exactly the URL that will be fetched/logged.
+        if any(c.isspace() or unicodedata.category(c) == "Cc" for c in url):
+            return False
         p = urlsplit(url)
         if p.scheme not in {"http", "https"} or not p.netloc or not p.hostname:
             return False
@@ -144,7 +202,7 @@ def valid_url(url: str) -> bool:
         # An explicit trailing colon is an empty port, not an omitted port.
         if p.netloc.endswith(":"):
             return False
-        return not any(c.isspace() for c in url)
+        return True
     except ValueError:
         return False
 
@@ -220,7 +278,7 @@ RULE_POLICY_DEFAULTS = {
 def _load_policy() -> dict:
     if not POLICY_FILE.is_file():
         raise FileNotFoundError(f"Missing policy file: {POLICY_FILE}")
-    data = yaml.safe_load(POLICY_FILE.read_text(encoding="utf-8")) or {}
+    data = _load_yaml_file(POLICY_FILE, "policies.yaml")
     if not isinstance(data, dict):
         raise ValueError("policies.yaml: top level must be an object")
     # Reject unknown top-level keys so a typo (or a stale, never-read key)
@@ -301,7 +359,7 @@ def load_config() -> BuildConfig:
     # Validate `rules:` now. Previously a bad switch only surfaced as a
     # traceback inside normalize_rule(), after every source was downloaded.
     _rule_policy(policy)
-    source_data = yaml.safe_load(SOURCE_REGISTRY.read_text(encoding="utf-8")) or {}
+    source_data = _load_yaml_file(SOURCE_REGISTRY, "sources.yaml")
     if not isinstance(source_data, dict):
         raise ValueError("sources.yaml: top level must be an object")
     _reject_unknown_keys(source_data, SOURCES_TOP_LEVEL_KEYS, "sources.yaml")
@@ -325,7 +383,7 @@ def load_config() -> BuildConfig:
         # silently turn a health gate off.
         _reject_unknown_keys(item, SOURCE_ITEM_KEYS, f"sources.yaml: source #{index + 1}")
         name = _strict_str(item.get("name", ""), f"sources.yaml: source #{index + 1}.name")
-        url = _strict_str(item.get("url", ""), f"sources.yaml: source #{index + 1}.url")
+        url = _strict_str(item.get("url", ""), f"sources.yaml: source #{index + 1}.url", strip=False)
         category = _strict_str(
             item.get("category", "uncategorized"),
             f"sources.yaml: source #{index + 1}.category",

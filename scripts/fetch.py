@@ -15,6 +15,7 @@ from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 
 from config import BUILDER_VERSION, canonical_url, load_rule_policy, sha256_file, valid_url
+from parser import clean_line
 
 DOWNLOAD_TIMEOUT = 90
 INCLUDE_TIMEOUT = 60
@@ -28,6 +29,18 @@ INCLUDE_RE = re.compile(r"^\s*!#include\s+(.+?)\s*$", re.I)
 # getaddrinfo round-trips dominated per-request setup. Resolution failures
 # are cached too — within one build they are treated as sticky.
 _ADDRESS_PIN_CACHE: dict[tuple[str, int], tuple[str | None, str]] = {}
+# Reject IPv6 transition/translation formats even on Python versions whose
+# ipaddress tables classify some of them as globally reachable. These ranges
+# can carry an embedded IPv4 destination and are not ordinary public unicast
+# endpoints for this fetcher's SSRF policy.
+_NON_PUBLIC_IPV6_NETWORKS = (
+    ipaddress.ip_network("::ffff:0:0/96"),  # IPv4-mapped compatibility form
+    ipaddress.ip_network("64:ff9b::/96"),  # well-known NAT64 prefix
+    ipaddress.ip_network("64:ff9b:1::/48"),  # local-use NAT64 prefix
+    ipaddress.ip_network("2001::/32"),  # Teredo
+    ipaddress.ip_network("2001:20::/28"),  # ORCHIDv2 identifiers are not routable endpoints
+    ipaddress.ip_network("2002::/16"),  # 6to4
+)
 
 
 def _curl_size_limit_status_from_output(version_output: str) -> tuple[bool, str]:
@@ -66,7 +79,10 @@ def _curl_stream_size_limit_status() -> tuple[bool, str]:
 # HTTP/2-style error bodies were detected. A leading BOM (not `\s`) must not
 # hide the page, hence `[\s\ufeff]*`.
 HTML_ERROR_PAGE_RE = re.compile(
-    r"^[\s\ufeff]*(?:<!doctype\b|<html\b|<head\b|HTTP/[0-9.]+\s+[45]\d\d)",
+    # Keep the prefix horizontal: allowing `\s*` here also consumed newlines,
+    # so multiline search retried from every line start and rescanned the
+    # remaining body (quadratic on whitespace-heavy responses).
+    r"^[ \t\r\f\v\ufeff]*(?:<!doctype\b|<html\b|<head\b|HTTP/[0-9.]+\s+[45]\d\d)",
     re.I | re.M,
 )
 
@@ -83,13 +99,31 @@ def _ip_literal(host: str) -> ipaddress.IPv4Address | ipaddress.IPv6Address | No
         return None
 
 
+def _is_public_unicast(address: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
+    """Return whether an address is ordinary public unicast.
+
+    `ipaddress.is_global` alone is insufficient: it is true for multicast
+    addresses, and its special-range tables can vary across Python releases.
+    Explicitly reject reserved/multicast addresses and IPv6 transition,
+    translation, or special-purpose formats that are not routable endpoints.
+    """
+    if not address.is_global or address.is_multicast or address.is_reserved:
+        return False
+    if isinstance(address, ipaddress.IPv6Address):
+        if address.ipv4_mapped is not None:
+            return False
+        if any(address in network for network in _NON_PUBLIC_IPV6_NETWORKS):
+            return False
+    return True
+
+
 def _public_address_for_url(url: str) -> tuple[str | None, str]:
-    """Resolve a fetch target and reject non-public addresses before curl connects.
+    """Resolve a fetch target and reject non-public unicast before curl connects.
 
     The returned address is also pinned with curl --resolve so a DNS answer
-    cannot change between validation and the actual connection. All resolved
-    addresses must be globally routable; mixed public/private DNS answers are
-    rejected rather than choosing a potentially unsafe address.
+    cannot change between validation and the actual connection. Every resolved
+    address must be public unicast; mixed public/unsafe DNS answers are rejected
+    rather than choosing a potentially unsafe address.
     """
     try:
         parsed = urlsplit(url)
@@ -102,7 +136,7 @@ def _public_address_for_url(url: str) -> tuple[str | None, str]:
 
     literal = _ip_literal(host)
     if literal is not None:
-        if not literal.is_global:
+        if not _is_public_unicast(literal):
             return None, "blocked-non-public-address"
         return literal.compressed, ""
 
@@ -135,7 +169,7 @@ def _public_address_for_url(url: str) -> tuple[str | None, str]:
             result = (None, "dns-resolution-invalid-address")
             _ADDRESS_PIN_CACHE[cache_key] = result
             return result
-        if not parsed_candidate.is_global:
+        if not _is_public_unicast(parsed_candidate):
             result = (None, "blocked-non-public-address")
             _ADDRESS_PIN_CACHE[cache_key] = result
             return result
@@ -469,24 +503,27 @@ def include_urls(path: Path, base_url: str) -> list[str]:
     result: list[str] = []
     try:
         # Stream the include scan instead of materializing a potentially
-        # 50 MiB source plus all of its split-line objects at once. `utf-8-sig`
-        # drops a leading BOM so an include on the first line is still found
-        # (the classifier already treats such a line as a directive).
-        with path.open(encoding="utf-8-sig", errors="replace") as source:
+        # 50 MiB source plus all of its split-line objects at once. Use the
+        # classifier's shared cleaner so BOMs after leading whitespace (or on
+        # later lines) are handled exactly as they are during normalization.
+        with path.open(encoding="utf-8-sig", errors="strict") as source:
             for raw in source:
+                raw = clean_line(raw)
                 # Cheap substring gate: nearly every line in a 50 MiB list is
                 # not an include, so skip the regex for all of those.
                 if "!#" not in raw:
                     continue
-                raw = raw.rstrip("\r\n")
                 match = INCLUDE_RE.match(raw)
                 if not match:
                     continue
                 child = urljoin(base_url, match.group(1).strip())
                 if valid_url(child):
                     result.append(canonical_url(child))
-    except OSError:
-        pass
+    except (OSError, UnicodeError):
+        # An unreadable or malformed source is rejected as a whole by the
+        # analyzer. Do not traverse includes discovered before a later decode
+        # error: those child fetches would come from a partially trusted file.
+        return []
     return list(dict.fromkeys(result))
 
 

@@ -35,7 +35,7 @@ def default_max_rule_length() -> int:
 
 
 # Shared control-character gate (network patterns, options, cosmetic bodies).
-CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 # Regex filters may contain ordinary whitespace, but raw control characters
 # (including TAB) are never valid in the ABP regex payload.
 REGEX_CONTROL_RE = re.compile(r"[\x00-\x1f\x7f-\x9f]")
