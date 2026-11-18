@@ -8,7 +8,8 @@ This document is the public compatibility contract for the strict-ABP output, an
 |---|---|---|
 | ABP network | Supported | Canonicalized and validated. |
 | ABP exception | Supported | `@@` form validated with exception-specific options. |
-| ABP request types/inverse types | Supported | Includes current documented forms, including `webbundle` / `~webbundle`. |
+| ABP request types/inverse types | Supported | Every request type, including `font`, `media`, `popup`, and `webbundle`, supports its `~` inverse. |
+| Exception-only options | Supported | `elemhide`, `generichide`, and `genericblock` require `@@`. `document` does too, except with the documented blocking-rule `$addheader=...,document` form. None has a `~` inverse. |
 | `domain=` / `sitekey=` | Supported | Values are strictly validated. |
 | `csp=` | Supported | Control characters and empty values rejected. |
 | `rewrite=` | Supported | Only ABP `abp-resource:` resources; domain requirement retained. |

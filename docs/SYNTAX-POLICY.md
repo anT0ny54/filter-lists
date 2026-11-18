@@ -9,8 +9,9 @@ The implementation covers the current ABP filter language documented by ABP, inc
 ### Accepted network features
 
 - Network blocking and exception filters (`@@`).
-- ABP request types: `script`, `image`, `stylesheet`, `object`, `xmlhttprequest`, `subdocument`, `ping`, `websocket`, `webrtc`, `document`, `elemhide`, `generichide`, `genericblock`, `popup`, `font`, `media`, `other`, and `webbundle`.
-- ABP inverse types supported by the documented grammar, including `~document`, `~elemhide`, and `~other`.
+- ABP request types: `script`, `image`, `stylesheet`, `object`, `xmlhttprequest`, `subdocument`, `ping`, `websocket`, `webrtc`, `font`, `media`, `popup`, `other`, and `webbundle`.
+- Inverse forms of every request type, including `~font`, `~media`, `~popup`, and `~webbundle`.
+- Exception-only options: `document`, `elemhide`, `generichide`, and `genericblock`. These do not have inverse (`~`) forms. `elemhide`, `generichide`, and `genericblock` require an `@@` exception; `document` does too except for ABP's documented `$addheader=...,document` blocking-rule form.
 - `third-party` / `~third-party` and `match-case`.
 - `domain=`, `sitekey=`, `csp=`, and ABP `rewrite=` resources.
 - ABP `header=` response-header matching, with strict header-name/content validation.
