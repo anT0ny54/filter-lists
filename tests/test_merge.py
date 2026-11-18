@@ -47,8 +47,9 @@ class ABPStrictTests(unittest.TestCase):
             "||example.com^$header=x-test=blocked",
             "||example.com^$addheader=response:x-test:enabled",
             "||example.com^$addheader=request:x-test:enabled,document",
-            "||example.com^$~document",
-            "||example.com^$~elemhide",
+            "||example.com^$~font",
+            "||example.com^$~media",
+            "||example.com^$~popup",
         )
         for rule in rules:
             with self.subTest(rule=rule):
@@ -220,10 +221,10 @@ class MergeMainE2ETests(unittest.TestCase):
             if anomaly is not None:
                 original = merge.write_report
                 def write_with_anomaly(*args, **kwargs):
-                    original(*args, **kwargs)
-                    data = json.loads(merge.REPORT.read_text(encoding="utf-8"))
+                    data = original(*args, **kwargs)
                     data["anomalies"] = anomaly
                     merge.REPORT.write_text(json.dumps(data), encoding="utf-8")
+                    return data
                 writer = write_with_anomaly
             else:
                 writer = report_writer or merge.write_report
@@ -444,6 +445,17 @@ class MergeMainE2ETests(unittest.TestCase):
         report = json.loads(merge.REPORT.read_text(encoding="utf-8"))
         self.assertEqual(report["status"], "failed")
         self.assertEqual(report["sources"]["required_failed"], [config.sources[0].url])
+
+    def test_failed_build_report_write_is_logged_not_raised(self):
+        # A source-health failure is decided before the report is written. If
+        # that report cannot be written, the build still fails cleanly.
+        bad_sources = {"root_requested": 1, "root_successful": 0, "results": [],
+                       "failures": [], "source_limit_reached": False, "timed_out": False}
+        messages = []
+        with patch.object(merge, "write_report", side_effect=OSError("simulated disk full")), \
+             patch.object(merge, "log", side_effect=messages.append):
+            self.assertEqual(self._run(source_stats=bad_sources), 1)
+        self.assertTrue(any("Could not write failed build report: simulated disk full" in m for m in messages))
 
 
 class StagedCommitTests(unittest.TestCase):

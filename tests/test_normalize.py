@@ -2,7 +2,7 @@ import sys
 import unittest
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from normalize import normalize_rule, normalize_rule_with_reason, rejection_reason
+from normalize import normalize_rule, normalize_rule_with_reason, rejection_reason, valid_option
 
 class NormalizeTests(unittest.TestCase):
     def test_empty_option_delimiter_is_rejected(self):
@@ -95,15 +95,38 @@ class NormalizeTests(unittest.TestCase):
     def test_cosmetic_domains_are_sorted_and_deduplicated(self):
         self.assertEqual(normalize_rule("B.COM,a.com,b.com##.ad"), "a.com,b.com##.ad")
 
-    def test_inverse_document_and_elemhide_are_valid_abp_options(self):
-        for rule in (
-            "||example.com^$~document",
-            "||example.com^$~elemhide",
-            "@@||example.com^$~document",
-            "@@||example.com^$~elemhide",
+    def test_every_request_type_supports_the_inverse_modifier(self):
+        for option in (
+            "~script", "~image", "~stylesheet", "~object", "~xmlhttprequest",
+            "~subdocument", "~ping", "~websocket", "~webrtc", "~font",
+            "~media", "~popup", "~other", "~webbundle",
         ):
+            for prefix in ("", "@@"):
+                rule = f"{prefix}||example.com^${option}"
+                with self.subTest(option=option, prefix=prefix):
+                    self.assertEqual(normalize_rule(rule), rule)
+
+    def test_exception_only_options_cannot_be_negated(self):
+        # This is invalid independently of the unknown-option policy toggle.
+        # Exception-only options are known, but do not have inverse forms.
+        permissive_policy = {"reject_unknown_options": False}
+        for option in ("~document", "~elemhide", "~generichide", "~genericblock"):
+            with self.subTest(option=option):
+                self.assertFalse(valid_option(option, is_exception=True, rule_policy=permissive_policy))
+                self.assertFalse(valid_option(option, is_exception=False, rule_policy=permissive_policy))
+
+        cases = [
+            f"{prefix}||example.com^${option}"
+            for option in ("~document", "~elemhide", "~generichide", "~genericblock")
+            for prefix in ("", "@@")
+        ]
+        # The special document/addheader combination is the only blocking-rule
+        # exception; negating document must not inherit that exception.
+        cases.append("||example.com^$~document,addheader=response:x-test:value")
+        for rule in cases:
             with self.subTest(rule=rule):
-                self.assertEqual(normalize_rule(rule), rule)
+                self.assertIsNone(normalize_rule(rule))
+                self.assertEqual(rejection_reason(rule), "context-invalid-option")
 
     def test_exception_only_options_remain_rejected_on_blocking_rules(self):
         for option in ("document", "elemhide", "generichide", "genericblock"):
@@ -271,6 +294,24 @@ class SeparatorScopeTests(unittest.TestCase):
     def test_native_has_stays_valid_on_element_hiding(self):
         rule = "example.com##div:has(> .ad)"
         self.assertEqual(normalize_rule(rule), rule)
+
+
+class InteriorByteOrderMarkTests(unittest.TestCase):
+    """A leading BOM is stripped; one left inside a rule is an invisible artifact and is rejected."""
+
+    def test_interior_bom_is_rejected_in_every_rule_shape(self):
+        for rule in (
+            "||exa\ufeffmple.com^",
+            "||example.com^$domain=a.com\ufeff",
+            "example.com##.ad\ufeffslot",
+            "example.com#?#div:-abp-has(\ufeff.ad)",
+            "/foo\ufeffbar/",
+        ):
+            with self.subTest(rule=repr(rule)):
+                self.assertIsNone(normalize_rule(rule))
+
+    def test_leading_bom_is_still_stripped(self):
+        self.assertEqual(normalize_rule("\ufeff||example.com^"), "||example.com^")
 
 
 if __name__ == "__main__":

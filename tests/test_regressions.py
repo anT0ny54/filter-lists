@@ -547,5 +547,30 @@ class UnreadableFileRecordTests(unittest.TestCase):
         self.assertIn("simulated mid-read failure", record["error"])
 
 
+class NonAbpPassThroughRegressionTests(unittest.TestCase):
+    """Disabling the hosts/HTML gates used to publish non-ABP lines verbatim."""
+
+    def test_disabling_hosts_or_html_gate_is_a_configuration_error(self):
+        for switch in ("reject_hosts_format", "reject_html_error_pages"):
+            with self.subTest(switch=switch):
+                setup_config_root(self, config, sources_yaml="sources: []\n",
+                                  policies_yaml=f"rules:\n  {switch}: false\n")
+                with self.assertRaisesRegex(ValueError, f"rules.{switch} cannot be false"):
+                    config.load_config()
+
+    def test_hosts_and_html_lines_are_never_accepted_as_rules(self):
+        policy = config.load_rule_policy()
+        for line, reason_expected in (
+            ("0.0.0.0 ads.example.com", "hosts-format"),
+            ("127.0.0.1 tracker.example", "hosts-format"),
+            ("<html><body>error", "html-or-error-page"),
+            ("<!doctype html><html>", "html-or-error-page"),
+        ):
+            with self.subTest(line=line):
+                rule, reason = normalize.normalize_rule_with_reason(line, rule_policy=policy)
+                self.assertIsNone(rule)
+                self.assertEqual(reason, reason_expected)
+
+
 if __name__ == "__main__":
     unittest.main()
