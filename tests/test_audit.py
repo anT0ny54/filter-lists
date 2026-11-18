@@ -21,6 +21,29 @@ REGEX_WITH_HEADER_REGEX = (
 )
 
 
+class StrictSourceEncodingTests(unittest.TestCase):
+    def test_malformed_utf8_rejects_entire_source_instead_of_replacing_bytes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "source.txt"
+            path.write_bytes(b"||valid.example^\n||bad\xff.example^\n")
+            rules, stats = analyze_files([path])
+
+        self.assertEqual(rules, set())
+        self.assertEqual(stats["input_lines"], 0)
+        self.assertEqual(stats["rejected_lines"], 0)
+        self.assertIn("error", stats["per_file"][0])
+        self.assertIn("codec", stats["per_file"][0]["error"].lower())
+
+    def test_utf8_bom_remains_supported_with_strict_decoding(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "source.txt"
+            path.write_bytes(b"\xef\xbb\xbf||valid.example^\n")
+            rules, stats = analyze_files([path])
+
+        self.assertEqual(rules, {"||valid.example^"})
+        self.assertNotIn("error", stats["per_file"][0])
+
+
 class TrustedFeatureGateTests(unittest.TestCase):
     def test_header_and_addheader_rejected_in_any_option_position_when_untrusted(self):
         for rule in (

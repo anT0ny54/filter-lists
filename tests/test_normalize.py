@@ -40,6 +40,17 @@ class NormalizeTests(unittest.TestCase):
                     self.assertEqual(rejection_reason(rule), "invalid-option-value")
         allowed = "||example.com^$addheader=X-Example:value"
         self.assertEqual(normalize_rule(allowed), allowed)
+    def test_c1_unicode_controls_are_rejected_in_all_rule_shapes(self):
+        for control in ("\x80", "\x81", "\x85", "\x9f"):
+            rules = (
+                f"||exa{control}mple.com^",
+                f"example.com##.ad{control}slot",
+                f"||example.com^$domain=exa{control}mple.com",
+            )
+            for rule in rules:
+                with self.subTest(control=hex(ord(control)), rule=repr(rule)):
+                    self.assertIsNone(normalize_rule(rule))
+
     def test_long_rule_is_rejected(self):
         self.assertIsNone(normalize_rule("||example.com^" + ("x" * 100001)))
 

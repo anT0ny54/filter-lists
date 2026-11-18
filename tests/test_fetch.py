@@ -30,6 +30,44 @@ class FetchSecurityTests(unittest.TestCase):
         self.assertIsNone(address)
         self.assertEqual(reason, "blocked-non-public-address")
 
+    def test_multicast_and_ipv6_translation_literals_are_blocked(self):
+        urls = (
+            "http://224.0.0.1/list.txt",
+            "http://[ff0e::1]/list.txt",
+            "http://[64:ff9b::a9fe:a9fe]/list.txt",
+            "http://[64:ff9b:1::a9fe:a9fe]/list.txt",
+            "http://[2001:20::1]/list.txt",
+            "http://[2001:0:a9fe:a9fe::1]/list.txt",
+            "http://[2002:a9fe:a9fe::1]/list.txt",
+            "http://[::ffff:8.8.8.8]/list.txt",
+        )
+        for url in urls:
+            with self.subTest(url=url):
+                address, reason = fetch._public_address_for_url(url)
+                self.assertIsNone(address)
+                self.assertEqual(reason, "blocked-non-public-address")
+
+    def test_dns_multicast_and_ipv6_translation_answers_are_blocked(self):
+        cases = (
+            ("multicast-v4.test", fetch.socket.AF_INET, ("224.0.0.1", 80)),
+            ("multicast-v6.test", fetch.socket.AF_INET6, ("ff0e::1", 80, 0, 0)),
+            ("nat64.test", fetch.socket.AF_INET6, ("64:ff9b::a9fe:a9fe", 80, 0, 0)),
+            ("orchid-v6.test", fetch.socket.AF_INET6, ("2001:20::1", 80, 0, 0)),
+        )
+        for host, family, sockaddr in cases:
+            cache_key = (host, 80)
+            fetch._ADDRESS_PIN_CACHE.pop(cache_key, None)
+            try:
+                with self.subTest(host=host), patch.object(
+                    fetch.socket, "getaddrinfo",
+                    return_value=[(family, fetch.socket.SOCK_STREAM, 6, "", sockaddr)],
+                ):
+                    address, reason = fetch._public_address_for_url(f"http://{host}/list.txt")
+                self.assertIsNone(address)
+                self.assertEqual(reason, "blocked-non-public-address")
+            finally:
+                fetch._ADDRESS_PIN_CACHE.pop(cache_key, None)
+
     def test_validate_download_reads_only_sample(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "large.txt"
@@ -471,6 +509,35 @@ class FetchTests(unittest.TestCase):
 
     def test_nested_include_is_resolved(self):
         self.assertEqual(include_urls(self.root / "main.txt", self.base + "/main.txt"), [self.base + "/child.txt"])
+
+    def test_include_after_whitespace_and_bom_is_resolved(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "bom-includes.txt"
+            source.write_bytes(
+                b"! header\n"
+                b"  \xef\xbb\xbf!#include child-one.txt\n"
+                b"\xef\xbb\xbf  !#include child-two.txt\n"
+            )
+            self.assertEqual(
+                include_urls(source, "https://example.com/lists/parent.txt"),
+                [
+                    "https://example.com/lists/child-one.txt",
+                    "https://example.com/lists/child-two.txt",
+                ],
+            )
+
+    def test_malformed_utf8_source_does_not_follow_partial_includes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "malformed.txt"
+            source.write_bytes(
+                b"!#include https://example.com/child.txt\n"
+                b"||parent.example^\n"
+                b"\xff\n"
+            )
+            self.assertEqual(
+                include_urls(source, "https://example.com/parent.txt"),
+                [],
+            )
 
     @unittest.skipUnless(curl_stream_limits_available(), "curl >= 8.4.0 required for transfer-limit integration tests")
     def test_root_health_is_separate_from_nested_sources(self):
