@@ -34,7 +34,6 @@ _ADDRESS_PIN_CACHE: dict[tuple[str, int], tuple[str | None, str]] = {}
 # can carry an embedded IPv4 destination and are not ordinary public unicast
 # endpoints for this fetcher's SSRF policy.
 _NON_PUBLIC_IPV6_NETWORKS = (
-    ipaddress.ip_network("::ffff:0:0/96"),  # IPv4-mapped compatibility form
     ipaddress.ip_network("64:ff9b::/96"),  # well-known NAT64 prefix
     ipaddress.ip_network("64:ff9b:1::/48"),  # local-use NAT64 prefix
     ipaddress.ip_network("2001::/32"),  # Teredo

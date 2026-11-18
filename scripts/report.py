@@ -266,7 +266,7 @@ def evaluate_source_quality(results: list[dict], policy: dict | None) -> dict:
     return result
 
 
-def write_report(path: Path, *, source_stats: dict, rule_stats: dict, elapsed_seconds: float, source_urls: list[str], build_id: str, previous_report: dict | None = None, anomaly_policy: dict | None = None, provenance: dict | None = None, source_metadata: dict | None = None, history_dir: Path | None = None, status: str = "success", source_quality_policy: dict | None = None, outcomes_path: Path | None = None) -> None:
+def write_report(path: Path, *, source_stats: dict, rule_stats: dict, elapsed_seconds: float, source_urls: list[str], build_id: str, previous_report: dict | None = None, anomaly_policy: dict | None = None, provenance: dict | None = None, source_metadata: dict | None = None, history_dir: Path | None = None, status: str = "success", source_quality_policy: dict | None = None, outcomes_path: Path | None = None) -> dict:
     clean_sources = {k: v for k, v in source_stats.items() if k != "results"}
     results = []
     for item in source_stats.get("results", []):
@@ -304,3 +304,5 @@ def write_report(path: Path, *, source_stats: dict, rule_stats: dict, elapsed_se
     # ever holds successful anomaly baselines. Recorded after the reputation
     # above was computed so the current run is not counted twice.
     record_outcomes(outcomes_path, history_dir=history_dir, generated_at=generated_at, status=status, build_id=build_id, results=results)
+    # Returned so callers can use the payload without re-reading the file.
+    return payload

@@ -25,7 +25,7 @@ CUSTOM_RULES = ROOT / "custom-rules.txt"
 # validate.py, and fetch.py's outbound User-Agent all import this instead of
 # each keeping an independent copy, which previously let the string drift
 # out of sync between modules on a version bump.
-BUILDER_VERSION = "7.6.0"
+BUILDER_VERSION = "7.6.1"
 
 # Schema revision of policies.yaml itself (its `version:` key).
 POLICY_SCHEMA_VERSION = 3
@@ -333,6 +333,16 @@ def _rule_policy(policy: dict) -> dict[str, bool]:
         )
     elif not merged["allow_abp_inline_styles"] and merged["allow_abp_remove_action"]:
         dependent.append("allow_abp_remove_action")
+    # These two switches used to let non-ABP lines through: with them off,
+    # normalization returned hosts-file entries and HTML error-page lines
+    # verbatim, so they were published as rules. Such lines are never valid ABP
+    # syntax, so the setting is refused instead of emitting invalid output.
+    for name in ("reject_hosts_format", "reject_html_error_pages"):
+        if not merged[name]:
+            raise ValueError(
+                f"policies.yaml: rules.{name} cannot be false; the builder would publish "
+                "non-ABP lines as filter rules"
+            )
     if dependent:
         if not merged["allow_abp_cosmetic"]:
             explanation = "have no effect unless rules.allow_abp_cosmetic is true"

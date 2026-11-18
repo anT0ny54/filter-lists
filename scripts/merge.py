@@ -366,7 +366,12 @@ def main() -> int:
             if source_stats.get("source_limit_reached"):
                 log("[ERROR] Global source traversal limit was reached before all queued sources completed")
             stats = {"input_lines": 0, "accepted_lines": 0, "rejected_lines": 0, "duplicate_lines": 0, "unique_rules": 0, "rejection_reasons": {}}
-            write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=fingerprint, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="failed", source_quality_policy=config.source_quality)
+            try:
+                write_report(REPORT, source_stats=source_stats, rule_stats=stats, elapsed_seconds=time.monotonic()-started, source_urls=source_urls, build_id=fingerprint, previous_report=previous_report, anomaly_policy=config.anomaly_detection, provenance=provenance, source_metadata=source_metadata, history_dir=HISTORY_DIR, status="failed", source_quality_policy=config.source_quality)
+            except Exception as exc:
+                # The health failure is already decided; a report-write error
+                # must be logged, not replace it with an unhandled traceback.
+                log(f"[ERROR] Could not write failed build report: {exc}")
             return 1
         # Reuse the per-source digest fetch.collect_sources already computed
         # instead of hashing every downloaded file a second time in analyze_files.
@@ -392,33 +397,34 @@ def main() -> int:
             # rules from failed files out of its result, but publishing the
             # remaining sources would still silently omit a source that could
             # not be read to completion. Preserve the last good filters.txt.
-            write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats,
-                         elapsed_seconds=time.monotonic()-started, source_urls=source_urls,
-                         build_id=fingerprint, previous_report=previous_report,
-                         anomaly_policy=config.anomaly_detection, provenance=provenance,
-                         source_metadata=source_metadata, history_dir=HISTORY_DIR,
-                         status="failed", source_quality_policy=config.source_quality)
+            try:
+                write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats,
+                             elapsed_seconds=time.monotonic()-started, source_urls=source_urls,
+                             build_id=fingerprint, previous_report=previous_report,
+                             anomaly_policy=config.anomaly_detection, provenance=provenance,
+                             source_metadata=source_metadata, history_dir=HISTORY_DIR,
+                             status="failed", source_quality_policy=config.source_quality)
+            except Exception as exc:
+                # The source-health failure is already decided; a report-write
+                # error must not replace it with an unlogged traceback.
+                log(f"[ERROR] Could not write failed build report: {exc}")
             return 1
         final_rules = sorted(rules, key=rule_sort_key)
         build_id = build_identity(fingerprint, final_rules)
         previous_generated_at = latest_report_generated_at()
         try:
-            write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats,
-                         elapsed_seconds=time.monotonic()-started, source_urls=source_urls,
-                         build_id=build_id, previous_report=previous_report,
-                         anomaly_policy=config.anomaly_detection, provenance=provenance,
-                         source_metadata=source_metadata, history_dir=HISTORY_DIR,
-                         status="success", source_quality_policy=config.source_quality)
+            # write_report returns the exact payload it persisted, so the
+            # decisions below use it directly instead of re-parsing latest.json.
+            data = write_report(REPORT, source_stats=source_stats, rule_stats=rule_stats,
+                                elapsed_seconds=time.monotonic()-started, source_urls=source_urls,
+                                build_id=build_id, previous_report=previous_report,
+                                anomaly_policy=config.anomaly_detection, provenance=provenance,
+                                source_metadata=source_metadata, history_dir=HISTORY_DIR,
+                                status="success", source_quality_policy=config.source_quality)
         except Exception as exc:
             mark_report_failed(build_id, previous_generated_at=previous_generated_at,
                                only_if_new=True)
             log(f"[ERROR] Could not write build report: {exc}")
-            return 1
-        try:
-            data = json.loads(REPORT.read_text(encoding="utf-8"))
-        except (OSError, ValueError) as exc:
-            mark_report_failed(build_id)
-            log(f"[ERROR] Could not read completed build report: {exc}")
             return 1
         quality = data.get("source_quality", {})
         for item in quality.get("items", []):

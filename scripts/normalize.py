@@ -10,8 +10,8 @@ import re
 from config import load_policy_limits, load_rule_policy
 from parser import COSMETIC_MARKERS, COSMETIC_RE, classify, clean_line
 from policy import (
-    INVERSE_OPTIONS, REWRITE_RESOURCES, SIMPLE_OPTIONS, TYPE_OPTIONS,
-    VALUE_OPTIONS,
+    EXCEPTION_ONLY_OPTIONS, INVERSE_OPTIONS, REWRITE_RESOURCES,
+    SIMPLE_OPTIONS, TYPE_OPTIONS, VALUE_OPTIONS,
 )
 
 
@@ -35,10 +35,13 @@ def default_max_rule_length() -> int:
 
 
 # Shared control-character gate (network patterns, options, cosmetic bodies).
-CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
+# U+FEFF (byte-order mark) is rejected anywhere in a rule: a leading BOM is
+# stripped by clean_line(), so one that remains is an invisible copy-paste
+# artifact that would make the rule silently match nothing.
+CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f\ufeff]")
 # Regex filters may contain ordinary whitespace, but raw control characters
 # (including TAB) are never valid in the ABP regex payload.
-REGEX_CONTROL_RE = re.compile(r"[\x00-\x1f\x7f-\x9f]")
+REGEX_CONTROL_RE = re.compile(r"[\x00-\x1f\x7f-\x9f\ufeff]")
 # The TLD may be alphabetic or an IDN A-label (`xn--p1ai`); the latter was
 # previously rejected, silently dropping rules for internationalized TLDs.
 DOMAIN_RE = re.compile(
@@ -57,7 +60,7 @@ UBO_PROCEDURAL_RE = re.compile(
 ALLOWED_COSMETIC_SEPARATORS = frozenset({"##", "#@#", "#?#", "#$#", "#@$#"})
 # Option names that take no `=value`. Precomputed: the option loops run once
 # per option of every network rule, and the union used to be rebuilt each time.
-PLAIN_OPTION_NAMES = frozenset(TYPE_OPTIONS | SIMPLE_OPTIONS)
+PLAIN_OPTION_NAMES = frozenset(TYPE_OPTIONS | EXCEPTION_ONLY_OPTIONS | SIMPLE_OPTIONS)
 # Precompiled: these run once per input line (hundreds of thousands per build).
 WHITESPACE_RE = re.compile(r"\s")
 # ABP extended pseudo-classes that are only evaluated under the `#?#` separator.
@@ -202,7 +205,7 @@ def cosmetic_separator(line: str, classification=None) -> str | None:
     return match.group() if match else None
 
 
-def uses_restricted_abp_feature(line: str, classification=None) -> bool:
+def uses_restricted_abp_feature(line: str, classification=None, parsed=None) -> bool:
     """True if `line` needs a source trusted for ABP security-sensitive features.
 
     The check used to match `$header=` / `$addheader=` anywhere in the raw
@@ -214,7 +217,8 @@ def uses_restricted_abp_feature(line: str, classification=None) -> bool:
     Comments, directives and blank lines never carry a feature, even when the
     text mentions `$header=` or `#$#`; flagging them mislabelled ordinary
     comments as `abp-security-restricted-feature` in untrusted sources.
-    `classification` lets callers reuse a classification they already hold.
+    `classification` lets callers reuse a classification they already hold, and
+    `parsed` (a `split_options` result) avoids re-parsing options.
     """
     kind = (classification or classify(line)).kind
     if kind in {"comment", "directive"}:
@@ -223,7 +227,7 @@ def uses_restricted_abp_feature(line: str, classification=None) -> bool:
         return cosmetic_separator(line, classification) == "#$#"
     if kind != "network" or "$" not in line:
         return False
-    _, options = split_options(line)
+    _, options = parsed if parsed is not None else split_options(line)
     return any(option.split("=", 1)[0].casefold() in RESTRICTED_OPTIONS for option in options)
 
 
@@ -378,9 +382,11 @@ def valid_option(
         return False
     if "=" not in option:
         low = option.lower()
+        if low in EXCEPTION_ONLY_OPTIONS:
+            return is_exception
+        if low.startswith("~") and low[1:] in EXCEPTION_ONLY_OPTIONS:
+            return False
         if low in TYPE_OPTIONS or low in INVERSE_OPTIONS or low in SIMPLE_OPTIONS:
-            if low in {"document", "elemhide", "generichide", "genericblock"} and not is_exception:
-                return False
             return True
         return not policy["reject_unknown_options"]
     name, value = option.split("=", 1)
@@ -434,7 +440,7 @@ def _option_list_reason(options: list[str], is_exception: bool, policy: dict[str
     return None
 
 
-def _normalize_network_with_reason(rule: str, policy: dict[str, bool]) -> tuple[str | None, str | None]:
+def _normalize_network_with_reason(rule: str, policy: dict[str, bool], parsed=None) -> tuple[str | None, str | None]:
     """Normalize `rule`, returning ``(rule, None)`` or ``(None, reason)``.
 
     The reason strings mirror ``_rejection_reason()``'s network branch exactly
@@ -443,7 +449,7 @@ def _normalize_network_with_reason(rule: str, policy: dict[str, bool]) -> tuple[
     re-validates a rejected rule a second time just to explain it.
     """
     is_exception = rule.startswith("@@")
-    pattern, options = split_options(rule)
+    pattern, options = parsed if parsed is not None else split_options(rule)
     pattern_body = pattern[2:] if pattern.startswith("@@") else pattern
     if is_overbroad_pattern(pattern_body, options):
         return None, "overbroad-pattern"
@@ -591,13 +597,11 @@ def _normalize_line(line: str, limit: int, policy: dict[str, bool], trusted_abp_
     if not line or len(line) > limit:
         return None, None, None
     classification = classify(line)
-    if not trusted_abp_features and uses_restricted_abp_feature(line, classification):
+    # Parse the option section once; the trust gate and the network normalizer
+    # both need it, and it is only meaningful for network rules.
+    parsed = split_options(line) if classification.kind == "network" and "$" in line else None
+    if not trusted_abp_features and uses_restricted_abp_feature(line, classification, parsed):
         return None, classification, None
-    if classification.kind == "invalid":
-        if classification.reason == "hosts-format" and not policy["reject_hosts_format"]:
-            return line, classification, None
-        if classification.reason == "html-or-error-page" and not policy["reject_html_error_pages"]:
-            return line, classification, None
     if classification.kind in {"comment", "directive", "invalid"}:
         return None, classification, None
     if classification.kind == "network" and not policy["allow_network_filters"]:
@@ -611,9 +615,9 @@ def _normalize_line(line: str, limit: int, policy: dict[str, bool], trusted_abp_
     # legitimately ends with `$`; the old `/`-prefix exemption admitted
     # rules like `/foo$` as literal patterns containing `$`.
     if _has_unescaped_terminal_dollar(line):
-        _, reason = _normalize_network_with_reason(line, policy)
+        _, reason = _normalize_network_with_reason(line, policy, parsed)
         return None, classification, reason or "invalid-network-rule"
-    normalized, reason = _normalize_network_with_reason(line, policy)
+    normalized, reason = _normalize_network_with_reason(line, policy, parsed)
     return normalized, classification, reason
 
 
@@ -677,10 +681,6 @@ def _rejection_reason(line, limit, policy, trusted_abp_features, c) -> str:
         c = classify(line)
     if not trusted_abp_features and uses_restricted_abp_feature(line, c):
         return "abp-security-restricted-feature"
-    if c.reason == "hosts-format" and not policy["reject_hosts_format"]:
-        return "hosts-format-allowed"
-    if c.reason == "html-or-error-page" and not policy["reject_html_error_pages"]:
-        return "html-or-error-page-allowed"
     if c.reason:
         return c.reason
     if c.kind in {"comment", "directive"}:
