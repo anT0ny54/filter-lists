@@ -1,13 +1,13 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.0-5af9a14df43e
-! Last updated: 2026-11-18 23:17:50 UTC
+! Version: v7.6.1-b06acc391dcf
+! Last updated: 2026-11-18 23:19:44 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: 5af9a14df43e95c01779d7d0fa9de1100f861df2dd933f32f254ea46ab00c8d8
+! Build-ID: b06acc391dcfb4a4180a6939604743e06b2180fb61184fdd4322a816cc545fc1
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
-! Total rules: 172867
+! Total rules: 172881
 !
 ! Format: Strict Adblock Plus-compatible syntax
 ! Profile: Strict Adblock Plus syntax, including current ABP network, content, header, addheader, snippet and snippet-exception, extended-CSS, inline-style, and remove features; uBO/AdGuard-only syntax remains excluded.
@@ -14431,6 +14431,7 @@
 /^https?:\/\/([a-z0-9]{8,10}\.)?[a-z0-9]{5,14}\.(com|bid|online|top|club)\/([a-z0-9]{2}\/){3}[a-f0-9]{32}\.js$/$script,third-party
 /^https?:\/\/(www\.)?([a-z0-9]{3,16}\.)?[a-z0-9]{5,32}\.([a-z]{2,8})\/([a-z0-9]{2,4}\/){3}[a-f0-9]{32}\.js$/$script,xmlhttprequest
 /^https?:\/\/(www\.)?([a-z0-9]{5,32}\.)([a-z]{2,8})\/[0-9a-f]{32}\/invoke\.js$/$script,xmlhttprequest
+/^https?:\/\/.*\.(club|news|live|online|store|tech|guru|cloud|bid|xyz|site|pro|info|online|icu|monster|buzz|fun|website|photos|re|casa|top|today|space|network|live|work|systems|ml|world|life)\/.*/$domain=1vag.com|4tube.com|asianpornmovies.com|getsex.xxx|glam0ur.com|hclips.com|hdzog.com|homemadevids.org|hotmovs.com|justthegays.com|milfzr.com|porn555.com|pornforrelax.com|pornj.com|pornl.com|puporn.com|see.xxx|shemalez.com|sss.xxx|streanplay.cc|thegay.com|thegay.porn|tits-guru.com|tubepornclassic.com|tuberel.com|txxx.com|txxx.tube|upornia.com|vjav.com|voyeurhit.com|xozilla.com,~media
 /^https?:\/\/.*\/.*(sw[0-9a-z._-]|\.notify\.).*/$domain=hammerporno.xxx,script
 /^https?:\/\/.*\/.*sw[0-9._].*/$domain=1vag.com|4tube.com|adult-channels.com|analdin.com|biguz.net|bogrodius.com|chikiporn.com|fantasti.cc|fuqer.com|fux.com|hclips.com|heavy-r.com|hog.tv|megapornx.com|milfzr.com|mypornhere.com|porn555.com|pornchimp.com|pornerbros.com|pornj.com|pornl.com|pornototale.com|porntube.com|sexu.com|sss.xxx|thisav.com|titkino.net|tubepornclassic.com|tuberel.com|tubev.sex|txxx.com|vidmo.org|vpornvideos.com|xozilla.com|youporn.lc|youpornhub.it|yourdailypornstars.com,script,xmlhttprequest
 /^https?:\/\/.*\/.*sw[0-9._].*/$domain=mrpornogratis.it|pornototale.com,script
@@ -14441,8 +14442,11 @@
 /^https?:\/\/.*\/[a-z0-9A-Z_]{2,15}\.(php|jx|jsx|1ph|jsf|jz|jsm|j$)/$domain=maisexo.com|pornoincrivel.com,image,script,subdocument
 /^https?:\/\/[0-9a-z]{8,}.[0-9a-z]{8,}\.com\//$domain=animefenix.com|hispasexy.org|manga-mx.com|serielatinobobesponja.com|series-de.online,script
 /^https?:\/\/[0-9a-z]{8,}\.com\/.*/$domain=allappinc.store|animescx.com.br|animexnovel.com|anitube.biz|bakashi.tv|betteranime.net|doramogo.com|dramafansubs.net|dramaken.com|embedflix.online|embedmax.site|encurtandourl.com|file4go.net|filmeflix.app|filmehdonline.site|futebolplayhd.ws|gemadoff.com.br|hinatasoul.com|megafilmeshd50.com|multicanais.re|netcine.to|pifansubs.org|pobreflix1.com|suatela.net|thepiratefilmeshd.in|torrentdosfilmeshd4.net|tugaflix.best|tyflex.net,third-party,xmlhttprequest
+/^https?:\/\/[0-9a-z]{8,}\.com\/.*/$domain=animeonline.ninja|animeyt.es|compupaste.com|cuevana2.cyou|gnula24.xyz|henaojara2.com|mangamovil.net|megaepubsgratis.com|mejortorrent.cc|mundoepub3.com|pelisplus.top|pelisplushd.nu|pirlotv.fr|pirlotvonline.org|pormega.com|rojadirectaenvivo.club|rojadirectatv.tv|seriesly.top|shadowrangers.live|shadowrangers.net|telenovelas-turcas.com.es|tomatomatela.com|verblackclover.com|verboruto.online|xn--solopeliculasespaol-c4b.com,third-party,~media
 /^https?:\/\/[0-9a-z]{8,}\.com\/.*/$domain=animeunity.so|onepiecepower.com|pepperlive.info,script,third-party,xmlhttprequest
+/^https?:\/\/[0-9a-z]{8,}\.com\/.*/$domain=hentaiyt.net|hispasexy.org|pornotorrent.es|pornstarsyfamosas.es,third-party,~media
 /^https?:\/\/[0-9a-z]{8,}\.xyz\/.*/$domain=animesonline.in|animesup.cx|anitube.vip|appmj.xyz|caroloportunidades.com.br|comandotorrents.to|dattebayo-br.com|digitaltorrentdownload.com.br|fenixproject.xyz|goanimes.vip|gofilmes.me|gustavortech.com|topflix.sh|torrentdosfilmes.to|turquiaflix.com|warezcdn.com,third-party,xmlhttprequest
+/^https?:\/\/[0-9a-z]{8,}\.xyz\/.*/$domain=kinoger.com|megakino.co|topstreamfilm.live,third-party,~media
 /^https?:\/\/[a-z0-9]+\.rumormillnews\.com\/images\/(make_my_day.JPG|banner3kevinremade.jpeg|banner3kevinremade.jpeg|africanfamily3.jpg|acm-homeworkshop.jpg)/$domain=rumormillnews.com
 /^https?:\/\/[a-z]{10,}\.(cfd|click|cyou|online|pro|qpon|rest|shop|site|space|store|top|website|xyz)\/\d{6,}\/\d{6,}\/[a-z]$/$media,third-party
 /^https?:\/\/chyoa\.com\/[a-zA-Z\d]{1,15}\/[a-zA-Z\d]{1,15}\.js$/$domain=chyoa.com
@@ -17546,6 +17550,7 @@
 /tealium-utag-set.js
 /tealiumAnalytics.js
 /tealiumTagsData.js
+/teaser.$domain=~amocrm.ru|~gitlab.io|~gosuslugi.ru|~insomnihack.ch|~kp.ru|~krym.news|~mazda-autohaus-volz-saarbruecken.de|~novostivl.ru|~pik-comfort.ru|~play.date|~ryazan.life|~textbook.ru|~uplabs.com|~v-tatarstane.ru|~yakutsk.ru,~media,~object
 /TeaserBlock.site.js
 /teasers.
 /teasers/*$domain=~ableton.com|~adtran.com|~adventuregamers.com|~agderposten.no|~amway.ru|~amway.ua|~asml.com|~av.by|~babla.ru|~bmw.de|~bmw.ro|~bmw.ru|~business-gazeta.ru|~fujifilm.eu|~gismeteo.by|~gismeteo.kz|~igorlink.com|~kinobulvar.info|~meganomkino.ru|~novsu.ru|~parool.nl|~rce.by|~road.cc|~stackoverflow.com|~teaserstar.ru|~trouw.nl|~volkskrant.nl|~wetteronline.de|~www.kinopoisk.ru|~yandex.by|~yandex.com|~yandex.com.tr|~yandex.fr|~yandex.kz|~yandex.ru
@@ -17846,7 +17851,6 @@
 /webpush-ui.js$domain=aliexpress.com|aliexpress.us
 /webpush.$domain=egoiapp2.com|haberler.com|haberturk.com|soccer.ru|internet-technologies.ru|sondakika.com|brigitte.de
 /webtracker.dll
-/webtracking/*$domain=~wwwapps.ups.com,~document,~subdocument
 /webtrekk_mediaTracking.min.js
 /webtrends.js
 /webtrends.min.js
@@ -17956,6 +17960,7 @@
 /wp-content/plugins/mailoptin/*
 /wp-content/plugins/mm-ad-widget/*
 /wp-content/plugins/mm-kelkoo/*
+/wp-content/plugins/monarch/*$domain=~elegantthemes.com|~philosophia-perennis.com,~font
 /wp-content/plugins/mts-wp-in-post-ads/*
 /wp-content/plugins/nativerent/static/content.js
 /wp-content/plugins/newspack-popups/*
@@ -17998,6 +18003,7 @@
 /wp-content/themes/*/assets/js/fun.js$domain=javdock.com|bestjavporn.com|javhdporn.com|javhdporn.net
 /wp-content/themes/CashLINESystem/js/modal.$script
 /wp-content/themes/iMovies/js/tc_
+/wp-content/themes/Newspaper-child/*$domain=~dyvys.info|~capital.de|~inside-digital.de|~expressvpn.com|~botanichka.ru|~misionesonline.net|~probasket.pl|~serbestiyet.com,~font,~stylesheet
 /wp-content/uploads/*.gif$domain=cdn.diziyou.co|geyvemedya.com
 /wp-content/uploads/*.gif$domain=go-manga.com|doomovie-free.com|manga1688.com|series-888.com
 /wp-content/uploads/*.gif$domain=moviedee24.com|123-hd.com|movie2uhd.com|nung2uhd.com|nung2hdd.com|movieshdfree.com|newseries-hd.com|movie22hd.com|moviehdfree.net|dooseries2uhd.com|newseries24.com|serieshd24.com
@@ -20883,6 +20889,7 @@
 ://plausible.*/js/script.
 ://pop.$script,subdocument,third-party,xmlhttprequest
 ://posthog.$domain=~posthog.com,script
+://promo.$domain=~myshopify.com|~promo.com|~shopifycloud.com|~slidely.com,third-party,~media
 ://pub.*?zoneid=
 ://reclame.
 ://res.ads.
@@ -26466,6 +26473,7 @@
 @@||service.4gtv.tv/4gtv/Data/GetAD.ashx
 @@||service.force.com/embeddedservice/*/esw.min.js$domain=microchip.com|visible.com|playstation.com|cyberpowersystems.com|lego.com|support.sonos.com|chatbot-marie.dhl.de
 @@||service.videoplaza.tv/proxy/pulse-sdk-html5^$domain=rtl.be
+@@||services.bilsyndication.com^$domain=atozmath.com,~media
 @@||services.vlitag.com/adv1/$domain=orbispatches.com,script
 @@||services.vlitag.com^$domain=game24h.vn,script,xmlhttprequest
 @@||servicescape.com/*.asp?content=$document
@@ -100459,6 +100467,7 @@ zzzyk.com###Tinfo
 ||2mdn-cn.net^
 ||2mdn.net^
 ||2mdn.net^$domain=autobild.de|imasdk.googleapis.com
+||2mdn.net^$third-party,~media
 ||2mf9kkbhab31.com^
 ||2mlt7jkbob.com^
 ||2mo3neop.de^
@@ -124116,6 +124125,7 @@ zzzyk.com###Tinfo
 ||flashondemand.top-ix.org/video-omg/channels/vvvvid.mp4
 ||flashscore.*/res/data/$image
 ||flashtalking.com^$domain=g.doubleclick.net
+||flashtalking.com^$domain=toggo.de,~media
 ||flashtalking.com^$domain=~toggo.de,third-party
 ||flashtalking.com^*.mp4$domain=toggo.de,rewrite=abp-resource:blank-mp4
 ||flashy-lawyer.com^
@@ -140437,6 +140447,7 @@ zzzyk.com###Tinfo
 ||mgkjakbwzcrla.online^
 ||mgky6yjwq.com^
 ||mgladthereisso.com^
+||mgln.ai^$third-party,~media
 ||mgnmjkwnaoanu.website^
 ||mgp.jiroxkqcnymkrgm.cfd^
 ||mgpl5pqg29.com^
@@ -156403,6 +156414,7 @@ zzzyk.com###Tinfo
 ||smartbrokerplus.de/_ingenious-script.js
 ||smartclip-services.com^$third-party
 ||smartclip.net/delivery/tag?
+||smartclip.net^$domain=toggo.de,~media
 ||smartclip.net^$domain=~toggo.de,third-party
 ||smartdoing.tech/jet/taste.js
 ||smarthint.co/Scripts/i/SmartHintTrack.Full.min.js
@@ -157330,6 +157342,7 @@ zzzyk.com###Tinfo
 ||sprig.com^$third-party
 ||sprighterogateputted.cfd^
 ||springify.io^$third-party
+||springserve.com^$third-party,~media
 ||sprinkler69.com^
 ||sprinlof.com^
 ||sprintrade.com^$third-party
@@ -161693,6 +161706,7 @@ zzzyk.com###Tinfo
 ||trzmdqpa.com^
 ||trzzolcmtmqkq.space^
 ||ts-tracker.com^
+||ts.kg/olol$~media
 ||ts.kg/olol*.mp4$domain=ts.kg,rewrite=abp-resource:blank-mp4
 ||ts.sopornvideos.com^
 ||ts166.net^
