@@ -2,7 +2,7 @@
 
 **Filter-Lists** is a deterministic, compatibility-first filter-list compiler. It fetches configured upstream lists, resolves bounded `!#include` graphs, normalizes and deduplicates rules, applies a strict Adblock Plus (ABP) compatibility policy, validates the generated output, and publishes build metadata with deterministic hashes and provenance.
 
-**Current builder:** `v7.6.0`
+**Current builder:** `v7.6.1`
 **Output profile:** `strict-abp`
 
 The project is designed around one principle: **prefer a predictable, portable filter list over accepting engine-specific syntax that may behave differently across blockers.**
@@ -23,7 +23,7 @@ The compiler accepts documented ABP syntax and rejects unsupported engine-specif
 ### Supported
 
 - Network blocking and exception filters.
-- ABP request types (including `webbundle`) and supported inverse types.
+- ABP request types (including `webbundle`) and their `~` inverse forms; `elemhide`, `generichide`, and `genericblock` are exception-only. `document` is also exception-only except for ABP's documented `$addheader=...,document` blocking-rule case. None of these exception-only options has a `~` inverse.
 - `domain=`, `sitekey=`, `csp=`, and ABP `rewrite=`.
 - `header=` response-header matching.
 - `addheader=` header injection, including the documented `document` targeting case.
@@ -46,9 +46,9 @@ Input lines are trimmed of surrounding whitespace and a leading byte-order mark 
 - ABP extended pseudo-classes (`:-abp-has()`, `:-abp-contains()`, `:-abp-properties()`, `:has-text()`, `:xpath()`) outside `#?#`. Without the extended-CSS separator they are not evaluated by ABP engines.
 - AdGuard-only cosmetic extensions.
 - Non-ABP network options such as `removeparam`, redirect/scriptlet options, and unknown options.
-- Hosts-file syntax.
+- Hosts-file syntax. This is not configurable: `rules.reject_hosts_format` and `rules.reject_html_error_pages` must stay `true` in `policies.yaml`, because the builder cannot emit those lines as ABP rules and a configuration that turns the gates off is refused at load time.
 - HTML/error pages masquerading as filter lists.
-- Malformed, duplicate, unsafe, or over-limit rules.
+- Malformed, duplicate, unsafe, or over-limit rules, and rules containing a byte-order mark (U+FEFF) after the first character.
 - Option-less patterns with no literal content (`*`, `||`, `^`, `@@*`, ...), which would match every request. Scoped forms such as `*$script,domain=example.com` remain valid.
 
 `!#if` / `!#else` / `!#endif` conditional directives are **not evaluated**: the directive lines (together with `!#safari` and `!#end`) are dropped and the rules inside the blocks are processed like any other rule. `!#include` is resolved (bounded, see below) and its line is dropped from the output as well.
@@ -86,7 +86,7 @@ Run afterwards by the workflow (not called by merge.py):
 The builder currently enforces the following:
 
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`.
-- **Strict configuration validation:** duplicate YAML mapping keys, unknown keys in `policies.yaml` (including every `rules:` switch) and `sources.yaml`, wrong value types, and a mismatched policy `version`/`profile` fail the build immediately with a clean `[ERROR] Configuration` message, before any download starts.
+- **Strict configuration validation:** duplicate YAML mapping keys, unknown keys in `policies.yaml` (including every `rules:` switch) and `sources.yaml`, wrong value types, contradictory rule switches (including turning off the hosts-file or HTML error-page gates), and a mismatched policy `version`/`profile` fail the build immediately with a clean `[ERROR] Configuration` message, before any download starts.
 - **Authoritative source registry:** `sources.yaml` is the only source registry; `sources.txt` is generated as a URL-only compatibility mirror.
 - **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally. Before a request is scheduled, its worst-case byte allocation is reserved against the remaining global budget and the transfer is limited to that allocation. The fetcher requests identity encoding and does not auto-decompress response bodies, so compressed payloads cannot expand past the byte cap; a server that ignores identity encoding is rejected based on its `Content-Encoding` response header. Response headers are parsed once per redirect hop. Only final 2xx responses are accepted: supported redirects are validated hop-by-hop, while unsolicited `206 Partial Content` and other non-success statuses (including non-redirect 3xx) are rejected. Curl 8.4.0 or newer is required for size-limit enforcement on responses with unknown length; older versions are rejected before any network request. Transferred bytes count against the budget for accepted, rejected, partially failed, and retried attempts; each retry is a separate bounded transfer, so an overwritten partial file cannot erase bytes already received. Once no unreserved budget remains, pending sources are queued as budget-exhausted.
 - **Correct source health:** the health ratio is calculated from configured root sources; nested includes cannot inflate it.
@@ -97,7 +97,7 @@ The builder currently enforces the following:
 - **Deterministic rule output and identity:** normalization, sorting, deduplication, and Build-ID generation are deterministic. `filters.txt` also contains a `Last updated` timestamp, while `reports/latest.json` records `generated_at` and `build_seconds`; those operational fields intentionally vary between runs.
 - **Full Build-ID validation:** `validate.py` recomputes the build identity from the active configuration and normalized rules.
 - **Separator-aware feature gating:** `#$#` snippet execution, `header=` and `addheader=` are detected from the parsed rule. `#@$#` snippet exceptions are not trust-gated. Marker text inside a CSS attribute (for example `div[data-x="#$#"]`) is ordinary element hiding and is not treated as a restricted feature.
-- **Strict grammar validation:** malformed options, unsupported procedural syntax, unsafe inline styles, malformed regex envelopes, C0/C1 control characters, and over-limit rules are rejected.
+- **Strict grammar validation:** malformed options, unsupported procedural syntax, unsafe inline styles, malformed regex envelopes, C0/C1 control characters, interior byte-order marks, and over-limit rules are rejected.
 - **Detailed diagnostics:** rejection reasons, per-source statistics, SHA-256 hashes, fetch failures, and anomaly information are retained. Network-rule rejection reasons come from one validator, so the reason recorded in a report is always the same one `rejection_reason()` returns. If a source read or hash operation fails, only lines actually observed are included in aggregate counters; an unreadable empty file still carries a per-file error without a fabricated input/rejection line. A post-download hash read failure is recorded as a failed source instead of aborting the build.
 - **Strict source encoding:** downloaded and custom rule files are decoded as UTF-8 (an optional leading UTF-8 BOM is accepted). Malformed byte sequences are recorded as per-file analysis errors; the source is rejected as a unit and the build fails rather than replacing invalid bytes and potentially publishing altered rules. Include discovery uses the same strict decoding rule and discards every include found in a source if a later byte sequence is malformed, so partially trusted files cannot trigger child fetches.
 - **Strict URL validation:** source and redirect URLs containing raw control characters or whitespace—including leading/trailing whitespace—are rejected before parsing. Canonicalization never trims or silently rewrites an invalid URL, and invalid explicit ports are not silently removed.
@@ -264,6 +264,8 @@ The repository test suite covers:
 - strict source-file UTF-8 decoding, malformed-byte rejection, preservation of a valid leading UTF-8 BOM, and C1 control rejection in non-regex filters
 - explicit rejection of incomplete HTTP 206 responses and non-redirect 3xx responses
 - over-broad pattern rejection
+- hosts-file and HTML error-page lines never accepted as rules, and refusal of configurations that would allow them
+- interior byte-order-mark rejection, and a failed build whose report cannot be written is logged and still fails cleanly
 - rejection-reason agreement between the build pipeline and `rejection_reason()` (fuzzed), header-block parsing, and unreadable-source records
 - regression tests
 - race-safe publishing (`publish.sh`) against a real bare remote: moved branch, generated-file conflicts, pruned history files, stale build inputs, repeated races, non-retryable failures including hook declines
@@ -275,16 +277,16 @@ The repository test suite covers:
 
 Download success does not mean a source contributes rules, so each build also evaluates rule yield per source. The **effective rejection rate** is the share of rule lines (input lines minus comments, blanks, and directives) that the strict-ABP profile rejected. With the shipped policy, sources of at least 100 lines at or above 30% are reported as `warning` and at or above 90% as `critical` in `reports/latest.json` (`source_quality`) and in the build log. They are advisory unless `source_quality.fail_on_critical: true`.
 
-Snapshot from the newest report (`reports/latest.json`, generated 2026-11-18T11:37:30.161081Z): 32/32 root sources OK, 226,685 input lines, 196,227 accepted, 172,655 unique rules, overall rejection rate 13.44%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.40% effective rejection rate).
+Snapshot from the newest checked-in report (`reports/latest.json`, generated 2026-11-18T18:59:15.449772Z by builder v7.6.0; the current code is v7.6.1): 32/32 root sources OK, 226,946 input lines, 196,496 accepted, 172,792 unique rules, overall rejection rate 13.42%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.39% effective rejection rate).
 
 | Source | Input lines | Accepted | Rejection rate* | Main rejection reasons |
 |---|---:|---:|---:|---|
-| AdGuard Ukrainian | 5,555 | 3,633 | 34.60% | `unknown-option` (1,769), `ubo-only-syntax` (122) |
-| AdGuard Social Media | 31,747 | 22,525 | 29.05% | `ubo-only-syntax` (7,494), `unknown-option` (682) |
-| AdGuard Turkish | 6,908 | 5,319 | 23.00% | `ubo-only-syntax` (790), `invalid-cosmetic-rule` (488) |
-| AdGuard Russian | 7,873 | 6,198 | 21.28% | `unknown-option` (862), `ubo-only-syntax` (634) |
-| AdGuard French | 5,137 | 4,149 | 19.23% | `unknown-option` (691), `ubo-only-syntax` (241) |
-*The table shows the five highest plain rejection rates among sources meeting the 100-line quality-gate minimum; this rate is the share of all input lines rejected (comments included). The quality gate uses effective rejection rate, excluding comments, blanks and directives; AdGuard Ukrainian's effective rate is 34.40%.
+| AdGuard Ukrainian | 5,556 | 3,634 | 34.59% | `unknown-option` (1,769), `ubo-only-syntax` (122) |
+| AdGuard Social Media | 31,768 | 22,542 | 29.04% | `ubo-only-syntax` (7,498), `unknown-option` (682) |
+| AdGuard Turkish | 6,909 | 5,320 | 23.00% | `ubo-only-syntax` (790), `invalid-cosmetic-rule` (488) |
+| AdGuard Russian | 7,874 | 6,199 | 21.27% | `unknown-option` (862), `ubo-only-syntax` (634) |
+| AdGuard French | 5,138 | 4,150 | 19.23% | `unknown-option` (691), `ubo-only-syntax` (241) |
+*The table shows the five highest plain rejection rates among sources meeting the 100-line quality-gate minimum; this rate is the share of all input lines rejected (comments included). The quality gate uses effective rejection rate, excluding comments, blanks and directives; AdGuard Ukrainian's effective rate is 34.39%.
 
 Most EasyList-family sources reject under 5% of lines (mostly comments). Rejection of AdGuard/uBO-only syntax is intentional under the strict-ABP policy. Figures change with every upstream update; consult `reports/latest.json`.
 
