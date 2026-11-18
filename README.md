@@ -86,19 +86,21 @@ Run afterwards by the workflow (not called by merge.py):
 The builder currently enforces the following:
 
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`.
-- **Strict configuration validation:** unknown keys in `policies.yaml` (including every `rules:` switch) and `sources.yaml`, wrong value types, and a mismatched policy `version`/`profile` fail the build immediately with a clean `[ERROR] Configuration` message, before any download starts.
+- **Strict configuration validation:** duplicate YAML mapping keys, unknown keys in `policies.yaml` (including every `rules:` switch) and `sources.yaml`, wrong value types, and a mismatched policy `version`/`profile` fail the build immediately with a clean `[ERROR] Configuration` message, before any download starts.
 - **Authoritative source registry:** `sources.yaml` is the only source registry; `sources.txt` is generated as a URL-only compatibility mirror.
 - **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally. Before a request is scheduled, its worst-case byte allocation is reserved against the remaining global budget and the transfer is limited to that allocation. The fetcher requests identity encoding and does not auto-decompress response bodies, so compressed payloads cannot expand past the byte cap; a server that ignores identity encoding is rejected based on its `Content-Encoding` response header. Response headers are parsed once per redirect hop. Only final 2xx responses are accepted: supported redirects are validated hop-by-hop, while unsolicited `206 Partial Content` and other non-success statuses (including non-redirect 3xx) are rejected. Curl 8.4.0 or newer is required for size-limit enforcement on responses with unknown length; older versions are rejected before any network request. Transferred bytes count against the budget for accepted, rejected, partially failed, and retried attempts; each retry is a separate bounded transfer, so an overwritten partial file cannot erase bytes already received. Once no unreserved budget remains, pending sources are queued as budget-exhausted.
 - **Correct source health:** the health ratio is calculated from configured root sources; nested includes cannot inflate it.
 - **Required-source gates:** configured required root sources must succeed.
-- **SSRF protection:** source/include targets are resolved before connection, non-public addresses are blocked, DNS answers are validated and pinned for curl, proxy environment variables are bypassed, and redirects are validated hop-by-hop.
+- **SSRF protection:** source/include targets are resolved before connection, only public unicast addresses are allowed, multicast and reserved/special-purpose IPv6 ranges (including NAT64, Teredo, 6to4, and ORCHIDv2) are blocked, DNS answers are validated and pinned for curl, proxy environment variables are bypassed, and redirects are validated hop-by-hop.
 - **Deadline-aware fetching:** each transfer attempt receives only the remaining build deadline; retryable timeouts, connection refusals, and transient HTTP statuses (408, 429, 500, 502, 503, 504) are retried with bounded backoff. `Retry-After` is honored, permanent 4xx failures are not retried, and bytes received by failed attempts are charged before another request is allowed.
 - **Canonical source identity:** scheme/host/path normalization and fragment removal are used for source identity and include-cycle detection. Already-visited include targets are ignored before the source cap is evaluated, so an include cycle cannot falsely trigger the global source limit; only genuinely new canonical targets count toward that cap.
 - **Deterministic rule output and identity:** normalization, sorting, deduplication, and Build-ID generation are deterministic. `filters.txt` also contains a `Last updated` timestamp, while `reports/latest.json` records `generated_at` and `build_seconds`; those operational fields intentionally vary between runs.
 - **Full Build-ID validation:** `validate.py` recomputes the build identity from the active configuration and normalized rules.
 - **Separator-aware feature gating:** `#$#` snippet execution, `header=` and `addheader=` are detected from the parsed rule. `#@$#` snippet exceptions are not trust-gated. Marker text inside a CSS attribute (for example `div[data-x="#$#"]`) is ordinary element hiding and is not treated as a restricted feature.
-- **Strict grammar validation:** malformed options, unsupported procedural syntax, unsafe inline styles, malformed regex envelopes, control characters, and over-limit rules are rejected.
+- **Strict grammar validation:** malformed options, unsupported procedural syntax, unsafe inline styles, malformed regex envelopes, C0/C1 control characters, and over-limit rules are rejected.
 - **Detailed diagnostics:** rejection reasons, per-source statistics, SHA-256 hashes, fetch failures, and anomaly information are retained. Network-rule rejection reasons come from one validator, so the reason recorded in a report is always the same one `rejection_reason()` returns. If a source read or hash operation fails, only lines actually observed are included in aggregate counters; an unreadable empty file still carries a per-file error without a fabricated input/rejection line. A post-download hash read failure is recorded as a failed source instead of aborting the build.
+- **Strict source encoding:** downloaded and custom rule files are decoded as UTF-8 (an optional leading UTF-8 BOM is accepted). Malformed byte sequences are recorded as per-file analysis errors; the source is rejected as a unit and the build fails rather than replacing invalid bytes and potentially publishing altered rules. Include discovery uses the same strict decoding rule and discards every include found in a source if a later byte sequence is malformed, so partially trusted files cannot trigger child fetches.
+- **Strict URL validation:** source and redirect URLs containing raw control characters or whitespace—including leading/trailing whitespace—are rejected before parsing. Canonicalization never trims or silently rewrites an invalid URL, and invalid explicit ports are not silently removed.
 - **Bounded default concurrency:** the builder uses ten download workers by default — the ceiling implied by the shipped download budget (`max_total_download_bytes // max_download_bytes` = 500 MiB // 50 MiB), since the build is network-bound well before it is CPU-bound (override with the `FILTER_LISTS_WORKERS` environment variable); effective concurrency is additionally capped by the configured global download budget and the reservations required by active transfers.
 - **Historical reports:** only *successful* reports are archived under `reports/history/` as anomaly baselines, kept chronologically up to the configured retention limit. A newer run with the same Build-ID replaces the older archived report, so retention counts distinct builds; retention ordering compares UTC-normalized timestamps rather than raw ISO strings. Failed builds are never archived there, and unreadable, malformed, or non-object JSON entries are skipped during retention. A slim per-source baseline (`reports/baseline.json`, carrying only the fields anomaly detection compares) is written alongside each archive; when selecting a baseline the builder prefers the current report, then the slim baseline, and only then scans the full history files.
 - **Source reputation:** per-URL success rate, consecutive failures, and a `poor`/`watch`/`good`/`excellent` label are computed from `reports/source-outcomes.json`, which records the per-source fetch outcome of **every** run, including failed builds. Consecutive runs on the same UTC day are compacted into a single stored entry (a source's outcome for the day is the AND of that day's runs, so a failure is never hidden by a later same-day success, and the entry keeps the newest run's identity); up to 120 day-entries are retained. One observation is counted per source per UTC day; a day counts as a success only if every run that day succeeded, so rebuilds cannot overweight a day and failures are not hidden. ISO timestamps are normalized to UTC when the instant fits Python’s datetime range; malformed, missing, or out-of-range timestamps stay as separate observations instead of collapsing into one undated bucket. The first run after upgrading seeds the file from retained successful reports. The report lists reputation only for the sources of the current run, so a disabled source disappears from it (its history is kept in case it is re-enabled).
@@ -241,6 +243,7 @@ The repository test suite covers:
 - anomaly detection and historical baselines
 - deterministic Unicode/property fuzzing (**5,000 iterations per fuzz property**)
 - SSRF-protection and redirect handling in `fetch.py`
+- malformed-UTF-8 include traversal, raw URL control characters and surrounding whitespace, and invalid explicit ports
 - staged-output publication and failed-report baseline handling
 - per-source quality gate and failed-run source-outcome history
 - download validation (binary data, HTML/error pages, empty files)
@@ -251,13 +254,14 @@ The repository test suite covers:
 - malformed inline-style rejection (unbalanced braces, trailing text after a style block, and blocks with no declarations)
 - duplicate metadata-header rejection (`Total rules`, `Build-ID`, `Source manifest SHA-256`, `Version`) in the generated-list validator
 - `allow_abp_remove_action` honoured in every declaration position
-- BOM/whitespace cleaning: BOM-prefixed rules, HTML error pages and first-line includes, plus a BOM fuzz idempotency check
+- BOM/whitespace cleaning: BOM-prefixed rules and HTML error pages, includes after leading whitespace or a BOM on later lines, plus a BOM fuzz idempotency check
 - comment/directive lines never labelled as restricted ABP features
 - source reputation limited to the sources of the current run
 - two-phase benchmark covering normalization and a representative merge workload
 - curated real-world syntax corpus
 - strict configuration key/type validation and fail-fast policy loading
 - generated-list validator hardening (encoding, file-read errors, version/Build-ID suffix, sort order)
+- strict source-file UTF-8 decoding, malformed-byte rejection, preservation of a valid leading UTF-8 BOM, and C1 control rejection in non-regex filters
 - explicit rejection of incomplete HTTP 206 responses and non-redirect 3xx responses
 - over-broad pattern rejection
 - rejection-reason agreement between the build pipeline and `rejection_reason()` (fuzzed), header-block parsing, and unreadable-source records
@@ -271,16 +275,16 @@ The repository test suite covers:
 
 Download success does not mean a source contributes rules, so each build also evaluates rule yield per source. The **effective rejection rate** is the share of rule lines (input lines minus comments, blanks, and directives) that the strict-ABP profile rejected. With the shipped policy, sources of at least 100 lines at or above 30% are reported as `warning` and at or above 90% as `critical` in `reports/latest.json` (`source_quality`) and in the build log. They are advisory unless `source_quality.fail_on_critical: true`.
 
-Snapshot from the newest report (`reports/latest.json`, generated 2026-11-11T04:43:00.748304Z): 32/32 root sources OK, 224,696 input lines, 194,333 accepted, 171,170 unique rules, overall rejection rate 13.51%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.41% effective rejection rate).
+Snapshot from the newest report (`reports/latest.json`, generated 2026-11-18T11:37:30.161081Z): 32/32 root sources OK, 226,685 input lines, 196,227 accepted, 172,655 unique rules, overall rejection rate 13.44%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.40% effective rejection rate).
 
 | Source | Input lines | Accepted | Rejection rate* | Main rejection reasons |
 |---|---:|---:|---:|---|
-| AdGuard Ukrainian | 5,553 | 3,631 | 34.61% | `unknown-option` (1,769), `ubo-only-syntax` (122) |
-| AdGuard Social Media | 31,577 | 22,388 | 29.10% | `ubo-only-syntax` (7,465), `unknown-option` (681) |
-| AdGuard Turkish | 6,889 | 5,307 | 22.96% | `ubo-only-syntax` (784), `invalid-cosmetic-rule` (488) |
-| AdGuard Russian | 7,858 | 6,177 | 21.39% | `unknown-option` (866), `ubo-only-syntax` (635) |
-| AdGuard French | 5,010 | 4,043 | 19.30% | `unknown-option` (671), `ubo-only-syntax` (240) |
-*The table shows the five highest plain rejection rates among sources meeting the 100-line quality-gate minimum; this rate is the share of all input lines rejected (comments included). The quality gate uses effective rejection rate, excluding comments, blanks and directives; AdGuard Ukrainian's effective rate is 34.41%.
+| AdGuard Ukrainian | 5,555 | 3,633 | 34.60% | `unknown-option` (1,769), `ubo-only-syntax` (122) |
+| AdGuard Social Media | 31,747 | 22,525 | 29.05% | `ubo-only-syntax` (7,494), `unknown-option` (682) |
+| AdGuard Turkish | 6,908 | 5,319 | 23.00% | `ubo-only-syntax` (790), `invalid-cosmetic-rule` (488) |
+| AdGuard Russian | 7,873 | 6,198 | 21.28% | `unknown-option` (862), `ubo-only-syntax` (634) |
+| AdGuard French | 5,137 | 4,149 | 19.23% | `unknown-option` (691), `ubo-only-syntax` (241) |
+*The table shows the five highest plain rejection rates among sources meeting the 100-line quality-gate minimum; this rate is the share of all input lines rejected (comments included). The quality gate uses effective rejection rate, excluding comments, blanks and directives; AdGuard Ukrainian's effective rate is 34.40%.
 
 Most EasyList-family sources reject under 5% of lines (mostly comments). Rejection of AdGuard/uBO-only syntax is intentional under the strict-ABP policy. Figures change with every upstream update; consult `reports/latest.json`.
 
