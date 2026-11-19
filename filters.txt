@@ -1,10 +1,10 @@
 ! Title: Combined Adblock Plus Filter List
-! Version: v7.6.2-f9e79316e01b
-! Last updated: 2026-11-19 11:18:17 UTC
+! Version: v7.6.2-2d5225e91b2d
+! Last updated: 2026-11-19 11:35:23 UTC
 ! Expires: 1 day
 ! Homepage: https://github.com/anT0ny54/filter-lists
 ! License: https://github.com/anT0ny54/filter-lists/blob/main/LICENSE
-! Build-ID: f9e79316e01bf4590b64775ff22ec6db6840cdf1e78e9b8f30f246df220150c8
+! Build-ID: 2d5225e91b2dd450669aec35bd4d3f0f14a6aa9d76f63e59b163d39271cbb6e1
 ! Source manifest SHA-256: a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781
 ! Root sources: 32
 ! Total rules: 172875
@@ -34198,7 +34198,6 @@ barchart.com##.bc-twittertimeline-wrapper
 barchart.com##.bc-webinar-card
 barchart.com##.modal-share-group
 barchart.com##div[class^="reveal-modal"]
-barco.com##.cmp-social-follow
 barefootcontessa.com##.EntryPost > .container ul:has(> li.inline-block > a.soc-a)
 barefootcontessa.com##.EntryPostTop__soc-header
 bareillytoday.com,bidhannagartimes.com,bnanews24.com,bntlive.com,cgctnews.com,cricnewz.in,dvgsuddi.com,f21news.com,highwaychannel.in,isns.co.in,khabrilal18.com,khelarpata.com,maithilmanch.in,newschutney.com,newsnetworks.co.in,parvatsankalpnews.com,sanskardarshan.in###custom_html-6
@@ -39673,8 +39672,6 @@ chip.de##.RUC-List--Separated > li:has(.RUC-DownloadChartsBlock-AdLabel)
 chip.de##.ShopsContainer
 chip.de##.TestReport__Section--Ads:not([data-scroll-spy-section]):not([id])
 chip.de##.wrapper-safe > div.fb:has( > div.fb-col-12 > div.Article__Ad)
-chip.de##[data-island="AdSlot"]
-chip.de##[data-island="OopAdSlots"]
 chip.de##a:has(> img:only-child:not([class]):not([srcset]):not([loading]))
 chip.de##a[href*="chip.de/downloads/"] img[src*="hash"]:not([class], [data-src], [alt])
 chip.de##a[href*="chip.de/downloads/"]:has(img[src*="hash"]:not([class], [data-src], [alt]))
@@ -39703,7 +39700,6 @@ chip.de##section.TopList--Count
 chip.de##section[class^="WidgetNewsletter"]
 chip.de##section[data-vr-zone="hp-neongelb"] > ul.List > li:last-child
 chip.de##ul > li:has(> div.Ad)
-chip.de#?#.download-item:has-text(Anzeige)
 chip.de,diegrenzgaenger.lu##.ad-listing
 chip.de,focus.de##.Ad-Slot
 chip.de,focus.de##.Google-Preferred-Sources-Button
@@ -54113,7 +54109,6 @@ github.com##a[href^="https://openwrite.cn/"]
 github.com##button[data-testid="copilot-popover-button"]
 github.com##form[action="/settings/dismiss-notice/dashboard_promo_universe24_8"]
 githubnext.com##.text-xs:contains(Share)
-githubstatus.com##nav[aria-label="GitHub's Social Media Links"]
 gitlink.pro##.download-video
 gitpod.io##div[data-analytics*="cookie"]
 giveawayoftheday.com##.ads_wrap
@@ -77614,7 +77609,6 @@ perakendeisdunyasi.com,turkiyesanayigazetesi.com##.advertising728x90_MansetAlti
 perakendeisdunyasi.com,turkiyesanayigazetesi.com##.HeaderAdvertising
 perakendeisdunyasi.com,turkiyesanayigazetesi.com##div[id^="advertising-"]
 peramuzesi.org.tr###paylas
-percentagecalculator.net##.pc-incontent
 perec.info,ua.today##.admix
 pereklad.online.ua##.share-affix
 perelki.net##.widget_fb
@@ -93958,6 +93952,7 @@ venea.net##.ag_line
 venturebeat.com##.briefings-boilerplate
 venturebeat.com##.post-boilerplate:has(.Boilerplate__newsletter-container)
 venturebeat.com##.sidebar-widget-featured-event
+venturebeat.com,victoriabuzz.com##.vb-ad-slot
 veohentai.io###xheti-box-related
 veohentai.io##.ad-center-wrapper
 veohentai.io##div[class*="-adsterra-"]
@@ -132386,6 +132381,7 @@ zzzyk.com###Tinfo
 ||inutomo11.com/nanj$subdocument
 ||inuvo.com^$third-party
 ||inuxu.co.in^$third-party
+||inuzbrezpersb.website^
 ||inv.lapippa.com^
 ||invadedisheartentrail.com^
 ||invadermonks.com^
@@ -145595,6 +145591,7 @@ zzzyk.com###Tinfo
 ||orvgpjjyagvfn.site^
 ||orvietnmqxcgm.online^
 ||orvillehogtie.com^
+||orxctipeikbct.site^
 ||orxo5m9nwcy4xk6w2n5jug8ve.cfd^
 ||oryouri.2chblog.jp/rss-$subdocument
 ||oryrebeat.com^
@@ -150671,6 +150668,7 @@ zzzyk.com###Tinfo
 ||qrjinshubdrmr.online^
 ||qrjtjidfd.com^
 ||qrkdszgrvlmhm.website^
+||qrltespsgkbsl.online^
 ||qrmfmgsagyono.online^
 ||qrnjezhqzokqz.website^
 ||qrpqnjbslsmey.site^
@@ -153078,6 +153076,7 @@ zzzyk.com###Tinfo
 ||ropesscrapeboutique.com^
 ||rophim1.co^*.gif$~third-party
 ||rophimz.ws^*.gif,~third-party
+||ropiesteulerraspish.cfd^
 ||ropkklzxoywtc.space^
 ||roplochscreve.click^
 ||ropsumemu.com^
@@ -163255,6 +163254,7 @@ zzzyk.com###Tinfo
 ||unnaturalcask.com^
 ||unnaturalindulgencerenown.com^
 ||unnaturaljune.com^
+||unncabfncpuvw.space^
 ||unnearyard.com^
 ||unnewthrene.com^
 ||unnicesheeny.cyou^
