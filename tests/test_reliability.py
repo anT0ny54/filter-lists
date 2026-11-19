@@ -1,6 +1,7 @@
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 import sys
 
@@ -111,6 +112,24 @@ class ReliabilityTests(unittest.TestCase):
                 (0, "https://example.test/z"),
                 (1, "https://example.test/b-child"),
             ])
+
+    def test_failed_report_replace_removes_temporary_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root / "latest.json"
+            with patch.object(Path, "replace", side_effect=OSError("simulated rename failure")):
+                with self.assertRaisesRegex(OSError, "simulated rename failure"):
+                    write_report(
+                        path,
+                        source_stats={"root_requested": 0, "root_successful": 0, "results": []},
+                        rule_stats={"unique_rules": 0},
+                        elapsed_seconds=0.1,
+                        source_urls=[],
+                        build_id="c" * 64,
+                        history_dir=root / "history",
+                    )
+            self.assertFalse(path.with_suffix(path.suffix + ".tmp").exists())
+            self.assertFalse(path.exists())
 
     def test_failed_report_is_not_a_future_baseline(self):
         with tempfile.TemporaryDirectory() as tmp:

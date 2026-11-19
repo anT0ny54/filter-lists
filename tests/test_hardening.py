@@ -1,4 +1,4 @@
-"""Regression tests for the maintenance audit (BUILDER_VERSION is 7.6.1).
+"""Regression tests for the maintenance audit (BUILDER_VERSION is 7.6.2).
 
 Each class pins one defect that was reproduced against the previous code.
 """

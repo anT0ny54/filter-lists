@@ -274,6 +274,28 @@ class MergeMainE2ETests(unittest.TestCase):
         self.assertTrue(any(p.name.startswith("build-new-build-") for p in merge.HISTORY_DIR.glob("*.json")))
         self.assertTrue(merge.BASELINE_FILE.is_file())
 
+    def test_baseline_replace_failure_removes_temporary_file(self):
+        merge.REPORT.write_text(json.dumps({
+            "status": "success",
+            "generated_at": "2026-11-03T10:00:00+00:00",
+            "build_id": "new-build",
+            "sources": {"results": []},
+        }), encoding="utf-8")
+        temporary = merge.BASELINE_FILE.with_suffix(merge.BASELINE_FILE.suffix + ".tmp")
+        original_replace = Path.replace
+
+        def failing_replace(path, target):
+            if path == temporary:
+                raise OSError("simulated baseline replace failure")
+            return original_replace(path, target)
+
+        with patch.object(Path, "replace", new=failing_replace):
+            with self.assertRaisesRegex(OSError, "simulated baseline replace failure"):
+                merge.archive_successful_report("new-build", retention=10)
+
+        self.assertFalse(temporary.exists())
+        self.assertFalse(merge.BASELINE_FILE.exists())
+
     def test_report_cleanup_error_does_not_skip_outcome_status_update(self):
         generated_at = "2026-11-03T10:00:00+00:00"
         merge.REPORT.write_text(json.dumps({
@@ -410,6 +432,28 @@ class MergeMainE2ETests(unittest.TestCase):
         self.assertFalse(merge.OUTPUT.exists())
         report = json.loads(merge.REPORT.read_text(encoding="utf-8"))
         self.assertEqual(report["status"], "failed")
+
+    def test_main_global_download_budget_exhaustion_is_unhealthy_with_successful_roots(self):
+        exhausted = {
+            "root_requested": 1,
+            "root_successful": 1,
+            "results": [{
+                "url": self.config.sources[0].url,
+                "status": "ok",
+                "depth": 0,
+                "path": "/fixture.txt",
+                "bytes": 10,
+            }],
+            "failures": [],
+            "source_limit_reached": False,
+            "timed_out": False,
+            "budget_exhausted": True,
+        }
+        self.assertEqual(self._run(source_stats=exhausted), 1)
+        self.assertFalse(merge.OUTPUT.exists())
+        report = json.loads(merge.REPORT.read_text(encoding="utf-8"))
+        self.assertEqual(report["status"], "failed")
+        self.assertTrue(report["sources"]["budget_exhausted"])
 
     def test_main_success_ratio_threshold_uses_unrounded_value(self):
         # 15999/20000 = 0.79995 rounds to 0.8; the health gate must compare

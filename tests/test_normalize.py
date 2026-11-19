@@ -8,6 +8,31 @@ class NormalizeTests(unittest.TestCase):
     def test_empty_option_delimiter_is_rejected(self):
         self.assertIsNone(normalize_rule("||example.com^$"))
 
+    def test_malformed_option_delimiters_are_rejected(self):
+        rules = (
+            "||example.com^$script,",
+            "||example.com^$script,,third-party",
+            "||example.com^$,script",
+            "||example.com^$script$third-party",
+            "||example.com^$script,$third-party",
+            "||example.com^$script,third-party,",
+        )
+        for rule in rules:
+            with self.subTest(rule=rule):
+                self.assertIsNone(normalize_rule(rule))
+                self.assertEqual(
+                    normalize_rule_with_reason(rule),
+                    (None, "invalid-option-or-network-rule"),
+                )
+                self.assertEqual(
+                    rejection_reason(rule), "invalid-option-or-network-rule"
+                )
+
+    def test_escaped_dollars_and_regex_end_anchors_remain_valid(self):
+        for rule in (r"||example.com/path\$literal", r"/foo$/", r"/a$b/$script,third-party"):
+            with self.subTest(rule=rule):
+                self.assertEqual(normalize_rule(rule), rule)
+
     def test_terminal_escaped_dollar_is_literal_pattern_data(self):
         rule = r"foo\$"
         self.assertEqual(normalize_rule(rule), rule)

@@ -198,6 +198,29 @@ class PublishRetryTests(unittest.TestCase):
         self.assertNotIn("moved during the build", proc.stderr)
         self.assertEqual(self._remote_show("filters.txt"), "old\n")
 
+    def test_git_add_failure_is_not_reported_as_noop(self):
+        self._build()
+        lock = self.runner / ".git" / "index.lock"
+        lock.write_text("locked\n", encoding="utf-8")
+
+        proc = self._publish()
+
+        self.assertNotEqual(proc.returncode, 0)
+        self.assertNotIn("No generated changes", proc.stdout)
+        self.assertEqual(self._remote_show("filters.txt"), "old\n")
+
+    def test_pre_staged_unrelated_changes_are_refused(self):
+        self._build()
+        write(self.runner, "README.md", "staged unrelated edit\n")
+        git(self.runner, "add", "README.md")
+
+        proc = self._publish()
+
+        self.assertNotEqual(proc.returncode, 0)
+        self.assertIn("pre-staged index changes", proc.stderr)
+        self.assertEqual(self._remote_show("README.md"), "readme\n")
+        self.assertEqual(self._remote_show("filters.txt"), "old\n")
+
     def test_missing_optional_path_is_skipped(self):
         write(self.runner, "filters.txt", "new\n")
         proc = self._publish(paths=["filters.txt", "reports/does-not-exist.json"])

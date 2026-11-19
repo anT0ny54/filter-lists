@@ -927,6 +927,144 @@ class FetchBudgetWaveTests(unittest.TestCase):
         self.assertFalse(stats["budget_exhausted"])
         self.assertEqual(len(files), 3)
 
+    def test_unused_concurrent_reservations_are_released_before_budget_cutoff(self):
+        """Unspent request caps must remain available to queued sources."""
+        include_body = (
+            b"!#include a\n"
+            b"!#include b\n"
+            b"!#include c\n"
+            b"!#include d\n"
+        )
+        child_body = b"||example.com^\n#####"  # exactly 20 bytes
+        self.assertEqual(len(include_body), 48)
+        self.assertEqual(len(child_body), 20)
+        calls: dict[str, int] = {}
+
+        def fake_download(url, output, timeout, max_download_bytes):
+            calls[url] = max_download_bytes
+            body = include_body if url.endswith("/root") else child_body
+            self.assertLessEqual(len(body), max_download_bytes)
+            output.write_bytes(body)
+            return True, "", len(body)
+
+        with patch.object(fetch, "download", side_effect=fake_download):
+            with tempfile.TemporaryDirectory() as tmp:
+                files, stats = collect_sources(
+                    ["https://example.test/root"],
+                    Path(tmp),
+                    time.monotonic(),
+                    2,
+                    lambda _: None,
+                    total_timeout=30,
+                    max_include_depth=1,
+                    max_download_bytes=60,
+                    max_total_download_bytes=130,
+                    max_total_sources=10,
+                )
+
+        self.assertEqual(len(calls), 5)
+        self.assertEqual(stats["successful"], 5)
+        self.assertEqual(stats["failed"], 0)
+        self.assertEqual(stats["total_download_bytes"], 128)
+        self.assertFalse(stats["budget_exhausted"])
+        self.assertEqual(len(files), 5)
+
+    def test_exact_budget_with_only_a_visited_include_cycle_is_not_exhausted(self):
+        body = b"!#include root\n||example.com^\n"
+
+        def fake_download(url, output, timeout, max_download_bytes):
+            output.write_bytes(body)
+            return True, "", len(body)
+
+        with patch.object(fetch, "download", side_effect=fake_download):
+            with tempfile.TemporaryDirectory() as tmp:
+                files, stats = collect_sources(
+                    ["https://example.test/root"],
+                    Path(tmp),
+                    time.monotonic(),
+                    2,
+                    lambda _: None,
+                    total_timeout=30,
+                    max_include_depth=1,
+                    max_download_bytes=64,
+                    max_total_download_bytes=len(body),
+                    max_total_sources=10,
+                )
+
+        self.assertEqual(len(files), 1)
+        self.assertEqual(stats["successful"], 1)
+        self.assertEqual(stats["failed"], 0)
+        self.assertEqual(stats["total_download_bytes"], len(body))
+        self.assertFalse(stats["budget_exhausted"])
+
+    def test_exact_budget_with_source_limit_pending_is_not_budget_exhaustion(self):
+        root_url = "https://example.test/root"
+        body = (
+            b"!#include root\n"
+            b"!#include child\n"
+            b"||example.com^\n"
+        )
+
+        def fake_download(url, output, timeout, max_download_bytes):
+            output.write_bytes(body)
+            return True, "", len(body)
+
+        with patch.object(fetch, "download", side_effect=fake_download):
+            with tempfile.TemporaryDirectory() as tmp:
+                files, stats = collect_sources(
+                    [root_url],
+                    Path(tmp),
+                    time.monotonic(),
+                    2,
+                    lambda _: None,
+                    total_timeout=30,
+                    max_include_depth=1,
+                    max_download_bytes=128,
+                    max_total_download_bytes=len(body),
+                    max_total_sources=1,
+                )
+
+        self.assertEqual(len(files), 1)
+        self.assertTrue(stats["source_limit_reached"])
+        self.assertFalse(stats["budget_exhausted"])
+        child_result = next(item for item in stats["results"] if item["url"].endswith("/child"))
+        self.assertEqual(child_result["reason"], "source-limit")
+
+    def test_simultaneous_budget_and_source_limit_keep_distinct_failure_reasons(self):
+        root_one = "https://example.test/root-one"
+        root_two = "https://example.test/root-two"
+        first_body = b"!#include child\n" + (b"x" * 34)  # exactly 50 bytes
+        second_body = b"||second.example^\n##"  # exactly 20 bytes
+        self.assertEqual(len(first_body), 50)
+        self.assertEqual(len(second_body), 20)
+
+        def fake_download(url, output, timeout, max_download_bytes):
+            body = first_body if url == root_one else second_body
+            output.write_bytes(body)
+            return True, "", len(body)
+
+        with patch.object(fetch, "download", side_effect=fake_download):
+            with tempfile.TemporaryDirectory() as tmp:
+                files, stats = collect_sources(
+                    [root_one, root_two],
+                    Path(tmp),
+                    time.monotonic(),
+                    2,
+                    lambda _: None,
+                    total_timeout=30,
+                    max_include_depth=1,
+                    max_download_bytes=50,
+                    max_total_download_bytes=50,
+                    max_total_sources=2,
+                )
+
+        results = {item["url"]: item for item in stats["results"]}
+        self.assertEqual(len(files), 1)
+        self.assertTrue(stats["budget_exhausted"])
+        self.assertTrue(stats["source_limit_reached"])
+        self.assertEqual(results[root_two]["reason"], "global-download-budget-exhausted")
+        self.assertEqual(results["https://example.test/child"]["reason"], "source-limit")
+
     def test_failed_download_still_contributes_transferred_bytes(self):
         original_download = fetch.download
         partial_size = 47
