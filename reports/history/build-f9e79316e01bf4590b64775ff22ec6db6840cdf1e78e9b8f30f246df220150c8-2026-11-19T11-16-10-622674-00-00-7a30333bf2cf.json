@@ -1,7 +1,7 @@
 {
   "schema": 5,
   "status": "success",
-  "generated_at": "2026-11-19T11:14:31.965671+00:00",
+  "generated_at": "2026-11-19T11:16:10.622674+00:00",
   "builder": "Filter-Lists v7.6.1",
   "profile": "strict-abp",
   "build_id": "f9e79316e01bf4590b64775ff22ec6db6840cdf1e78e9b8f30f246df220150c8",
@@ -21,7 +21,7 @@
     "failed": 0,
     "root_failed": 0,
     "included_references": 0,
-    "total_download_bytes": 10465800,
+    "total_download_bytes": 10466367,
     "max_total_download_bytes": 524288000,
     "max_total_sources": 500,
     "max_parallel_by_budget": 10,
@@ -674,14 +674,14 @@
         "url": "https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt",
         "depth": 0,
         "status": "ok",
-        "bytes": 2417296,
-        "sha256": "74d1946286b1af298c338ee342941d3967120e626955c2f616a2725015dd2aca",
-        "input_lines": 48496,
-        "accepted_lines": 39962,
+        "bytes": 2417863,
+        "sha256": "9216e51b094406122c09603b1419dd8d0ddde77542b0eeb847abd33d4c8c92aa",
+        "input_lines": 48518,
+        "accepted_lines": 39984,
         "rejected_lines": 8534,
-        "duplicate_lines": 17941,
-        "unique_rules": 39585,
-        "rejection_rate": 0.175973,
+        "duplicate_lines": 17963,
+        "unique_rules": 39607,
+        "rejection_rate": 0.175893,
         "rejection_reasons": {
           "comment": 1392,
           "context-invalid-option": 44,
@@ -1145,12 +1145,12 @@
     "enforced_failure": false
   },
   "rules": {
-    "input_lines": 227038,
-    "accepted_lines": 196577,
+    "input_lines": 227060,
+    "accepted_lines": 196599,
     "rejected_lines": 30461,
-    "duplicate_lines": 23702,
+    "duplicate_lines": 23724,
     "unique_rules": 172875,
-    "rejection_rate": 0.134167,
+    "rejection_rate": 0.134154,
     "rejection_reasons": {
       "abp-security-restricted-feature": 1,
       "comment": 2918,
@@ -1167,7 +1167,7 @@
   },
   "anomalies": {
     "enabled": true,
-    "baseline": "b06acc391dcfb4a4180a6939604743e06b2180fb61184fdd4322a816cc545fc1",
+    "baseline": "f9e79316e01bf4590b64775ff22ec6db6840cdf1e78e9b8f30f246df220150c8",
     "count": 0,
     "critical_count": 0,
     "warning_count": 0,
@@ -1175,5 +1175,5 @@
     "fail_on_warning": false,
     "enforced_failure": false
   },
-  "build_seconds": 6.717
+  "build_seconds": 6.912
 }

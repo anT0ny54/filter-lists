@@ -1,7 +1,7 @@
 {
   "schema": 5,
   "status": "success",
-  "generated_at": "2026-11-19T11:14:31.965671+00:00",
+  "generated_at": "2026-11-19T11:16:10.622674+00:00",
   "build_id": "f9e79316e01bf4590b64775ff22ec6db6840cdf1e78e9b8f30f246df220150c8",
   "sources": {
     "results": [
@@ -242,11 +242,11 @@
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/2_optimized.txt",
         "status": "ok",
-        "bytes": 2417296,
-        "input_lines": 48496,
-        "unique_rules": 39585,
-        "rejection_rate": 0.175973,
-        "sha256": "74d1946286b1af298c338ee342941d3967120e626955c2f616a2725015dd2aca"
+        "bytes": 2417863,
+        "input_lines": 48518,
+        "unique_rules": 39607,
+        "rejection_rate": 0.175893,
+        "sha256": "9216e51b094406122c09603b1419dd8d0ddde77542b0eeb847abd33d4c8c92aa"
       },
       {
         "url": "https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt",
