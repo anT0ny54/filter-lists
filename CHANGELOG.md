@@ -1,28 +1,27 @@
 # Changelog
 
-Only the latest change set is kept here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Only the latest release/modified log is kept here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased] — ABP inverse-option grammar correction (2026-11-19; builder version 7.6.1)
+## [Unreleased] — Round 7 audit and concurrent download-budget scheduling fix (2026-11-19; builder version 7.6.2)
 
 ### Fixed
 
-- `scripts/policy.py` and `scripts/normalize.py`: inverse (`~`) forms now apply to every ABP request type, including `font`, `media`, and `popup`. The exception-only options `document`, `elemhide`, `generichide`, and `genericblock` no longer accept inverse forms. The documented `$addheader=...,document` blocking-rule exception remains supported.
-- Added regression coverage for every inverse request type and for rejecting inverse exception-only options on both blocking and exception filters.
+- `scripts/fetch.py`: do not mark the global download budget exhausted while concurrent requests still hold temporary byte reservations. Wait for the active wave to complete and release reservations, then stop queued sources only when actual transferred bytes have consumed the global ceiling. This avoids falsely failing a completed build when transfers finish below their reserved caps.
+- `tests/test_fetch.py`: add regressions for a four-child include wave that reuses unused reservations and an exact-budget include cycle that must not be mistaken for unattempted work, a source-limit cutoff that must not be mislabeled as byte-budget exhaustion, and distinct failure reasons when both global limits apply in one batch.
 
 ### Changed
 
-- Bumped the centralized builder version to `7.6.1` because the corrected grammar can change the generated rule set.
-- Updated the README and compatibility documentation to distinguish request types from exception-only options and to identify the checked-in v7.6.0 report as a pre-7.6.1 snapshot.
+- README clarifies that the global budget is assessed after active requests finish and unused reservations are released, and documents the new regression coverage.
 
 ### Reviewed
 
-- Read all 60 in-scope files in the combined base archive plus the prior modified-files patch. As requested, `filters.txt` and every `*/reports/history/*` file were excluded.
-- Rechecked production code, tests, workflows, source and policy configuration, checked-in reports, and documentation. The inverse-option mismatch was confirmed against the current Adblock Plus filter syntax reference; no additional reproducible defect or safe production-code removal was established.
+- Reapplied `filter-lists-modified-files-round6.zip` over the original `filter-lists-main.zip` before reviewing the merged project.
+- Read all 60 in-scope files before judgement. Excluded root `filters.txt` and every `*/reports/history/*` file as requested.
+- Rechecked the fetch scheduler and its callers, normalization/merge/report/publishing paths, tests, workflows, configuration, reports, and documentation. No additional safely removable dead code was established; prior parser, publication, report-cleanup, and download-budget CI protections were retained.
 
 ### Verified
 
-- Full unit suite: **312 tests passed**.
-- Python byte-compilation, shell syntax, and YAML parsing: passed.
-- Two-phase benchmark (3 repeats): normalization ~263,436 lines/s; representative merge ~259,337 lines/s.
-- Optional differential engine test: skipped as designed because `FILTER_ENGINE_CMD` is not configured.
-- The checked-in `reports/latest.json` and historical report artifacts were not regenerated; the latest report remains the previous v7.6.0 build snapshot.
+- Full unit suite: **323 tests passed** (including reservation reuse, exact-budget include cycles, and source-limit/budget status separation).
+- Python compilation, shell syntax, YAML/JSON parsing, source registry consistency, and local Markdown link checks: passed.
+- Benchmark completed; measurements are informational and environment-dependent. Optional external-engine differential testing was skipped because `FILTER_ENGINE_CMD` is not configured.
+- Generated filter data and report snapshots were not regenerated.

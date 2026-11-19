@@ -1,4 +1,4 @@
-# Filter-Lists v7.6.1 compatibility policy.
+# Filter-Lists v7.6.2 compatibility policy.
 # Output is strict ABP syntax: consumed natively by Adblock Plus and by
 # uBlock Origin/AdGuard only as an ABP-compatible subset (no uBO/AdGuard-only
 # extensions are emitted); see docs/COMPATIBILITY.md. Unknown top-level keys are rejected at load time.

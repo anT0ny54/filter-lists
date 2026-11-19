@@ -2,7 +2,7 @@
 
 **Filter-Lists** is a deterministic, compatibility-first filter-list compiler. It fetches configured upstream lists, resolves bounded `!#include` graphs, normalizes and deduplicates rules, applies a strict Adblock Plus (ABP) compatibility policy, validates the generated output, and publishes build metadata with deterministic hashes and provenance.
 
-**Current builder:** `v7.6.1`
+**Current builder:** `v7.6.2`
 **Output profile:** `strict-abp`
 
 The project is designed around one principle: **prefer a predictable, portable filter list over accepting engine-specific syntax that may behave differently across blockers.**
@@ -48,7 +48,7 @@ Input lines are trimmed of surrounding whitespace and a leading byte-order mark 
 - Non-ABP network options such as `removeparam`, redirect/scriptlet options, and unknown options.
 - Hosts-file syntax. This is not configurable: `rules.reject_hosts_format` and `rules.reject_html_error_pages` must stay `true` in `policies.yaml`, because the builder cannot emit those lines as ABP rules and a configuration that turns the gates off is refused at load time.
 - HTML/error pages masquerading as filter lists.
-- Malformed, duplicate, unsafe, or over-limit rules, and rules containing a byte-order mark (U+FEFF) after the first character.
+- Malformed, duplicate, unsafe, or over-limit rules, including empty option-list tokens and repeated unescaped `$` delimiters; escaped literal dollars and `$` anchors in complete regex filters remain valid. Rules containing a byte-order mark (U+FEFF) after the first character are also rejected.
 - Option-less patterns with no literal content (`*`, `||`, `^`, `@@*`, ...), which would match every request. Scoped forms such as `*$script,domain=example.com` remain valid.
 
 `!#if` / `!#else` / `!#endif` conditional directives are **not evaluated**: the directive lines (together with `!#safari` and `!#end`) are dropped and the rules inside the blocks are processed like any other rule. `!#include` is resolved (bounded, see below) and its line is dropped from the output as well.
@@ -88,11 +88,11 @@ The builder currently enforces the following:
 - **Single-source configuration:** policy limits are loaded from `policies.yaml`.
 - **Strict configuration validation:** duplicate YAML mapping keys, unknown keys in `policies.yaml` (including every `rules:` switch) and `sources.yaml`, wrong value types, contradictory rule switches (including turning off the hosts-file or HTML error-page gates), and a mismatched policy `version`/`profile` fail the build immediately with a clean `[ERROR] Configuration` message, before any download starts.
 - **Authoritative source registry:** `sources.yaml` is the only source registry; `sources.txt` is generated as a URL-only compatibility mirror.
-- **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally. Before a request is scheduled, its worst-case byte allocation is reserved against the remaining global budget and the transfer is limited to that allocation. The fetcher requests identity encoding and does not auto-decompress response bodies, so compressed payloads cannot expand past the byte cap; a server that ignores identity encoding is rejected based on its `Content-Encoding` response header. Response headers are parsed once per redirect hop. Only final 2xx responses are accepted: supported redirects are validated hop-by-hop, while unsolicited `206 Partial Content` and other non-success statuses (including non-redirect 3xx) are rejected. Curl 8.4.0 or newer is required for size-limit enforcement on responses with unknown length; older versions are rejected before any network request. Transferred bytes count against the budget for accepted, rejected, partially failed, and retried attempts; each retry is a separate bounded transfer, so an overwritten partial file cannot erase bytes already received. Once no unreserved budget remains, pending sources are queued as budget-exhausted.
+- **Bounded includes:** include depth, total source traversal, and download budgets are enforced globally. Before a request is scheduled, its worst-case byte allocation is reserved against the remaining global budget and the transfer is limited to that allocation. The fetcher requests identity encoding and does not auto-decompress response bodies, so compressed payloads cannot expand past the byte cap; a server that ignores identity encoding is rejected based on its `Content-Encoding` response header. Response headers are parsed once per redirect hop. Only final 2xx responses are accepted: supported redirects are validated hop-by-hop, while unsolicited `206 Partial Content` and other non-success statuses (including non-redirect 3xx) are rejected. Curl 8.4.0 or newer is required for size-limit enforcement on responses with unknown length; older versions are rejected before any network request. Transferred bytes count against the budget for accepted, rejected, partially failed, and retried attempts; each retry is a separate bounded transfer, so an overwritten partial file cannot erase bytes already received. After each concurrent wave finishes, unused request reservations are released; the global budget is reported exhausted only when actual transferred bytes have consumed the ceiling and eligible, unattempted work remains (an include blocked by the source-count limit is not a byte-budget failure).
 - **Correct source health:** the health ratio is calculated from configured root sources; nested includes cannot inflate it.
 - **Required-source gates:** configured required root sources must succeed.
 - **SSRF protection:** source/include targets are resolved before connection, only public unicast addresses are allowed, multicast and reserved/special-purpose IPv6 ranges (including NAT64, Teredo, 6to4, and ORCHIDv2) are blocked, DNS answers are validated and pinned for curl, proxy environment variables are bypassed, and redirects are validated hop-by-hop.
-- **Deadline-aware fetching:** each transfer attempt receives only the remaining build deadline; retryable timeouts, connection refusals, and transient HTTP statuses (408, 429, 500, 502, 503, 504) are retried with bounded backoff. `Retry-After` is honored, permanent 4xx failures are not retried, and bytes received by failed attempts are charged before another request is allowed.
+- **Deadline-aware fetching:** each transfer attempt receives only the remaining global fetch deadline; retryable timeouts, connection refusals, and transient HTTP statuses (408, 429, 500, 502, 503, 504) are retried with bounded backoff. `Retry-After` is honored, permanent 4xx failures are not retried, and bytes received by failed attempts are charged before another request is allowed.
 - **Canonical source identity:** scheme/host/path normalization and fragment removal are used for source identity and include-cycle detection. Already-visited include targets are ignored before the source cap is evaluated, so an include cycle cannot falsely trigger the global source limit; only genuinely new canonical targets count toward that cap.
 - **Deterministic rule output and identity:** normalization, sorting, deduplication, and Build-ID generation are deterministic. `filters.txt` also contains a `Last updated` timestamp, while `reports/latest.json` records `generated_at` and `build_seconds`; those operational fields intentionally vary between runs.
 - **Full Build-ID validation:** `validate.py` recomputes the build identity from the active configuration and normalized rules.
@@ -106,7 +106,7 @@ The builder currently enforces the following:
 - **Source reputation:** per-URL success rate, consecutive failures, and a `poor`/`watch`/`good`/`excellent` label are computed from `reports/source-outcomes.json`, which records the per-source fetch outcome of **every** run, including failed builds. Consecutive runs on the same UTC day are compacted into a single stored entry (a source's outcome for the day is the AND of that day's runs, so a failure is never hidden by a later same-day success, and the entry keeps the newest run's identity); up to 120 day-entries are retained. One observation is counted per source per UTC day; a day counts as a success only if every run that day succeeded, so rebuilds cannot overweight a day and failures are not hidden. ISO timestamps are normalized to UTC when the instant fits Python’s datetime range; malformed, missing, or out-of-range timestamps stay as separate observations instead of collapsing into one undated bucket. The first run after upgrading seeds the file from retained successful reports. The report lists reputation only for the sources of the current run, so a disabled source disappears from it (its history is kept in case it is re-enabled).
 - **Source quality gate:** `source_quality` in `policies.yaml` flags sources whose rule lines (comments, blanks and directives excluded) are mostly rejected, recorded in the report and logged as `[WARN]`. Optional `fail_on_critical` makes critical sources fail the build.
 - **Safe anomaly handling:** warning-level anomalies are advisory by default; critical anomalies fail the build. Anomalies compare each source against the previous *successful* report; sources that failed in that report are not used as a baseline.
-- **Safe publication:** `filters.txt` is staged to a temporary file and only replaced after report generation and anomaly/source-quality checks pass. Any source-analysis read or hash error also fails the build before staging. If report persistence or final publication fails, the report and matching run-level outcome are marked failed while the last good list is preserved; an archive-only failure after publication is warning-only. Temporary-file cleanup is best-effort and cannot mask the original build error or skip the status correction.
+- **Safe publication:** `filters.txt` is staged to a temporary file and only replaced after report generation and anomaly/source-quality checks pass. Any source-analysis read or hash error also fails the build before staging. If report persistence or final publication fails, the report and matching run-level outcome are marked failed while the last good list is preserved; an archive-only failure after publication is warning-only. Temporary-file cleanup is best-effort and cannot mask the original build error or skip the status correction. The CI publisher refuses pre-staged index changes and treats `git add` failures as fatal rather than reporting a false no-op.
 
 ## ⚙️ Limits and policy
 
@@ -119,7 +119,7 @@ The shipped `policies.yaml` currently defines:
 | Maximum per-download bytes | 52,428,800 (50 MiB) |
 | Maximum total download bytes | 524,288,000 (500 MiB) |
 | Maximum total sources | 500 |
-| Total build timeout | 1,800 seconds |
+| Global fetch/traversal deadline | 1,800 seconds |
 | Minimum root-source success ratio | 80% |
 | Successful report retention | 10 |
 | Anomaly detection | Enabled |
@@ -210,18 +210,18 @@ The remaining modules in `scripts/` are import-only building blocks; `merge.sh`,
 
 `scripts/publish.sh` is for CI; it commits and pushes, so do not run it in a working copy you care about.
 
-A live build requires network access to the configured upstream lists. The builder fails instead of publishing an incomplete result when the root-source health threshold is missed, a required source fails, the global source limit is reached, or the build deadline is exceeded.
+A live build requires network access to the configured upstream lists. The builder fails instead of publishing an incomplete result when the root-source health threshold is missed, a required source fails, the global source limit is reached, the global download-byte budget is exhausted, or the global fetch/traversal deadline is exceeded.
 
 ## 🤖 Automation
 
-- **`update.yml`** runs daily at 03:17 UTC, on manual dispatch, and on pushes to `main` that touch `sources.yaml`, `custom-rules.txt`, `policies.yaml`, `scripts/**`, `tests/**`, `requirements.txt`, or the workflow itself. It runs the test suite, builds, validates, asserts report invariants (schema, builder version, source health, anomalies), then publishes `filters.txt`, `sources.txt`, `reports/latest.json`, `reports/baseline.json`, `reports/history/`, and `reports/source-outcomes.json` only if they changed. If the build fails, only `reports/source-outcomes.json` is published (nothing else) so failures still count toward source reputation.
+- **`update.yml`** runs daily at 03:17 UTC, on manual dispatch, and on pushes to `main` that touch `sources.yaml`, `custom-rules.txt`, `policies.yaml`, `scripts/**`, `tests/**`, `requirements.txt`, or the workflow itself. It runs the test suite, builds, and strictly validates the generated list. Before publishing, its report gate checks the schema and builder version, a nonzero rule count, root-source success ratio and required-source status, absence of timeout/source-limit/download-budget exhaustion, zero critical anomalies and no enforced anomaly failure, source-manifest hash shape, and total transferred bytes within the configured ceiling. It then publishes `filters.txt`, `sources.txt`, `reports/latest.json`, `reports/baseline.json`, `reports/history/`, and `reports/source-outcomes.json` only if they changed. If the build fails, only `reports/source-outcomes.json` is published (nothing else) so failures still count toward source reputation.
 - **`validate.yml`** runs on pull requests that touch the same paths (plus `.github/workflows/**`) and on manual dispatch: byte-compile, test suite, benchmark, and the optional differential test. It never publishes.
 - **`Keep-Alive.yml`** runs on the 1st and 15th of each month at 03:47 UTC (and manually) and rewrites `.github/keep-alive.txt` with a timestamp so scheduled workflows are not disabled for repository inactivity.
 - **`scripts/publish.sh`** is the only code that pushes from CI (both `update.yml` steps and `Keep-Alive.yml` use it). The workflows check out `main` once and push minutes later, so a human push in between makes a plain `git push` fail as a non-fast-forward. `publish.sh` handles that:
   1. It commits the generated paths and pushes.
   2. If the push is rejected because the branch moved, it fetches the new tip, resets onto it, copies the freshly built files over the top (deletions such as history pruning included) and pushes again, up to 5 attempts (`PUBLISH_MAX_ATTEMPTS`) with a short backoff (`PUBLISH_RETRY_DELAY`). Generated files are overwritten rather than merged, so this cannot hit a merge conflict.
   3. `update.yml` passes its build inputs (`sources.yaml`, `custom-rules.txt`, `policies.yaml`, `scripts/`, `tests/`, `requirements.txt`, the workflow file) as `--guard`s. If any of them changed on the new tip, the output just built is stale, so it is **not** published (the step exits 0 with a warning) and the run that the change triggers, or the next scheduled run, rebuilds.
-  4. Failures that are not a moved branch (permissions, branch protection or hook declines reported as `[remote rejected]`, network) fail immediately instead of being retried. Only git's `[rejected]` non-fast-forward / `fetch first` forms, stale-info and ref-lock errors are retried.
+  4. Failures that are not a moved branch (permissions, branch protection or hook declines reported as `[remote rejected]`, network) fail immediately instead of being retried. Only git's `[rejected]` non-fast-forward / `fetch first` forms, stale-info and ref-lock errors are retried. Pre-staged index changes are refused, and failures while staging the requested paths stop publication.
 
 Human pushes are not part of the `repo-write` concurrency group, which only serializes `update.yml` and `Keep-Alive.yml` with each other; `publish.sh` covers the rest. Note that a human push that touches build inputs and carries `[skip ci]` will not trigger its own rebuild, so the next scheduled run picks it up.
 
@@ -237,7 +237,7 @@ The repository test suite covers:
 - ABP header/addheader/snippet/snippet-exception/inline-style/remove features
 - nested includes, canonical include-cycle detection, and source-limit accounting that distinguishes cycles from unseen children
 - source-health and required-source accounting
-- global source/download limits and deadlines
+- global source/download limits and deadlines, including fail-closed handling when the total download-byte budget is exhausted
 - stable report record ordering and Build-ID generation
 - per-source diagnostics and hashes
 - anomaly detection and historical baselines
@@ -247,7 +247,7 @@ The repository test suite covers:
 - staged-output publication and failed-report baseline handling
 - per-source quality gate and failed-run source-outcome history
 - download validation (binary data, HTML/error pages, empty files)
-- download-byte accounting and per-request reservations across rejected responses and partial transfer failures, including chunked bodies with unknown size
+- download-byte accounting and per-request reservations across rejected responses and partial transfer failures, including chunked bodies with unknown size, plus reuse of unused concurrent reservations before global-budget cutoff
 - compressed response rejection when servers ignore identity encoding
 - valid CSS hex color lengths in inline-style declarations
 - explicit zero-port preservation in DNS resolution and connection pinning
@@ -268,7 +268,7 @@ The repository test suite covers:
 - interior byte-order-mark rejection, and a failed build whose report cannot be written is logged and still fails cleanly
 - rejection-reason agreement between the build pipeline and `rejection_reason()` (fuzzed), header-block parsing, and unreadable-source records
 - regression tests
-- race-safe publishing (`publish.sh`) against a real bare remote: moved branch, generated-file conflicts, pruned history files, stale build inputs, repeated races, non-retryable failures including hook declines
+- race-safe publishing (`publish.sh`) against a real bare remote: moved branch, generated-file conflicts, pruned history files, stale build inputs, repeated races, non-retryable failures including hook declines, failed `git add`, and pre-staged index changes
 - optional external-engine differential testing executed directly as an argument vector, without invoking a shell
 - repeatable parser benchmark
 
@@ -277,12 +277,12 @@ The repository test suite covers:
 
 Download success does not mean a source contributes rules, so each build also evaluates rule yield per source. The **effective rejection rate** is the share of rule lines (input lines minus comments, blanks, and directives) that the strict-ABP profile rejected. With the shipped policy, sources of at least 100 lines at or above 30% are reported as `warning` and at or above 90% as `critical` in `reports/latest.json` (`source_quality`) and in the build log. They are advisory unless `source_quality.fail_on_critical: true`.
 
-Snapshot from the newest checked-in report (`reports/latest.json`, generated 2026-11-18T18:59:15.449772Z by builder v7.6.0; the current code is v7.6.1): 32/32 root sources OK, 226,946 input lines, 196,496 accepted, 172,792 unique rules, overall rejection rate 13.42%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.39% effective rejection rate).
+Snapshot from the newest checked-in report (`reports/latest.json`, generated 2026-11-18T23:19:44.254335Z by builder v7.6.1): 32/32 root sources OK, 227,086 input lines, 196,643 accepted, 172,881 unique rules, overall rejection rate 13.41%. The only source flagged by the quality gate is AdGuard Ukrainian (`warning`, 34.39% effective rejection rate).
 
 | Source | Input lines | Accepted | Rejection rate* | Main rejection reasons |
 |---|---:|---:|---:|---|
-| AdGuard Ukrainian | 5,556 | 3,634 | 34.59% | `unknown-option` (1,769), `ubo-only-syntax` (122) |
-| AdGuard Social Media | 31,768 | 22,542 | 29.04% | `ubo-only-syntax` (7,498), `unknown-option` (682) |
+| AdGuard Ukrainian | 5,556 | 3,634 | 34.59% | `unknown-option` (1,770), `ubo-only-syntax` (122) |
+| AdGuard Social Media | 31,771 | 22,546 | 29.04% | `ubo-only-syntax` (7,498), `unknown-option` (682) |
 | AdGuard Turkish | 6,909 | 5,320 | 23.00% | `ubo-only-syntax` (790), `invalid-cosmetic-rule` (488) |
 | AdGuard Russian | 7,874 | 6,199 | 21.27% | `unknown-option` (862), `ubo-only-syntax` (634) |
 | AdGuard French | 5,138 | 4,150 | 19.23% | `unknown-option` (691), `ubo-only-syntax` (241) |
