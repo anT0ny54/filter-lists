@@ -1,8 +1,8 @@
 {
   "schema": 5,
   "status": "success",
-  "generated_at": "2026-11-19T11:16:10.622674+00:00",
-  "builder": "Filter-Lists v7.6.1",
+  "generated_at": "2026-11-19T11:17:00.220420+00:00",
+  "builder": "Filter-Lists v7.6.2",
   "profile": "strict-abp",
   "build_id": "f9e79316e01bf4590b64775ff22ec6db6840cdf1e78e9b8f30f246df220150c8",
   "source_count": 32,
@@ -10,7 +10,7 @@
     "source_manifest_sha256": "a349409d784894765abddef40952f321f2fdb116f50288691ba14bb08473d781",
     "source_registry": "sources.yaml",
     "source_registry_sha256": "13484ad41ba26493951cd496e6047cd99080a770eda77497243fe6f90043fb9f",
-    "builder": "Filter-Lists v7.6.1",
+    "builder": "Filter-Lists v7.6.2",
     "policy_sha256": "860d78b7dd08bac71a7e37c61e87f706fb39e4571adad278f8e44db861ddb8f4"
   },
   "sources": {
@@ -525,10 +525,10 @@
         "rejection_reasons": {
           "comment": 66,
           "invalid-cosmetic-rule": 488,
-          "invalid-option-or-network-rule": 1,
+          "invalid-option-or-network-rule": 19,
           "invalid-option-value": 22,
           "ubo-only-syntax": 790,
-          "unknown-option": 222
+          "unknown-option": 204
         },
         "name": "AdGuard Turkish",
         "category": "regional-tr",
@@ -1159,10 +1159,10 @@
       "hash-comment": 3,
       "invalid-cosmetic-rule": 1819,
       "invalid-network-rule": 20,
-      "invalid-option-or-network-rule": 82,
+      "invalid-option-or-network-rule": 100,
       "invalid-option-value": 98,
       "ubo-only-syntax": 17022,
-      "unknown-option": 7612
+      "unknown-option": 7594
     }
   },
   "anomalies": {
@@ -1175,5 +1175,5 @@
     "fail_on_warning": false,
     "enforced_failure": false
   },
-  "build_seconds": 6.912
+  "build_seconds": 9.822
 }
