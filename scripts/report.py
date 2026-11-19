@@ -297,8 +297,22 @@ def write_report(path: Path, *, source_stats: dict, rule_stats: dict, elapsed_se
         "provenance": provenance or {}, "sources": clean_sources, "source_reputation": reputation, "source_quality": source_quality,
         "rules": {k: v for k, v in rule_stats.items() if k != "per_file"}, "anomalies": anomalies, "build_seconds": round(elapsed_seconds, 3),
     }
-    path.parent.mkdir(parents=True, exist_ok=True); temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=False) + "\n", encoding="utf-8"); temporary.replace(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    try:
+        temporary.write_text(
+            json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=False) + "\n",
+            encoding="utf-8",
+        )
+        temporary.replace(path)
+    finally:
+        # A failed write or rename must not leave a stale report beside the
+        # last known-good report. Cleanup is best-effort and must not mask the
+        # original persistence error.
+        try:
+            temporary.unlink(missing_ok=True)
+        except OSError:
+            pass
     # Every run (including failed ones) contributes source outcomes to the
     # reputation history. This is separate from reports/history/, which only
     # ever holds successful anomaly baselines. Recorded after the reputation

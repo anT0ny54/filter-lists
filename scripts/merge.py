@@ -176,8 +176,16 @@ def archive_successful_report(build_id: str, *, retention: int = 10) -> None:
         "sources": {"results": slim_results},
     }
     temporary = BASELINE_FILE.with_suffix(BASELINE_FILE.suffix + ".tmp")
-    temporary.write_text(json.dumps(baseline, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    temporary.replace(BASELINE_FILE)
+    try:
+        temporary.write_text(
+            json.dumps(baseline, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        temporary.replace(BASELINE_FILE)
+    finally:
+        # Baseline archival is warning-only after a successful publish, but a
+        # failed write/replace must not leave a stale temporary report behind.
+        remove_temporary(temporary, "baseline report")
 
 
 def sync_legacy_sources(config) -> None:

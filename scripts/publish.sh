@@ -62,6 +62,14 @@ if [[ -z "$branch" ]]; then
   [[ "$branch" != "HEAD" ]] || die_usage "detached HEAD and no PUBLISH_BRANCH / GITHUB_REF_NAME"
 fi
 
+# `git commit` would include any content already staged by a caller, even
+# though stage() only adds the requested generated paths. Fail closed instead
+# of accidentally publishing unrelated changes from the shared index.
+if ! git diff --cached --quiet; then
+  echo "publish.sh: refusing to publish with pre-staged index changes" >&2
+  exit 1
+fi
+
 # `git add` fails on a pathspec that is neither on disk nor tracked (for
 # example reports/source-outcomes.json before its first run); skip those.
 stage() {
@@ -71,7 +79,11 @@ stage() {
       staged+=("$p")
     fi
   done
-  ((${#staged[@]})) && git add -A -- "${staged[@]}"
+  if ((${#staged[@]})); then
+    # Do not turn a failed git-add into a successful no-op. In particular,
+    # an index lock or filesystem error must stop publication immediately.
+    git add -A -- "${staged[@]}" || return "$?"
+  fi
   return 0
 }
 

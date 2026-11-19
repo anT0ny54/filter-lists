@@ -673,7 +673,10 @@ def collect_sources(
                         - reserved_download_bytes
                     )
                     if remaining_budget <= 0:
-                        stats["budget_exhausted"] = True
+                        # Active requests may still release part of their
+                        # reservations when they finish below their caps. Do
+                        # not declare the global budget exhausted until the
+                        # completed wave has been accounted for.
                         break
 
                     # The final request near the boundary receives only what is
@@ -830,19 +833,43 @@ def collect_sources(
             pending.extend(deferred_by_source_limit)
             pending.extend(next_batch)
 
-            if stats["timed_out"]:
-                record_unattempted(pending, "global-timeout")
-                current = []
-                break
-            if stats["budget_exhausted"]:
-                record_unattempted(pending, "global-download-budget-exhausted")
-                current = []
-                break
+            # Includes may refer back to a source already fetched in this
+            # traversal. Such cycles are not pending work and must not turn an
+            # exact-budget but otherwise complete build into a false failure.
             unvisited_next: list[tuple[str, int]] = []
             for url, depth in next_batch:
                 # `discovered` already canonicalizes keys, as does `visited`.
                 if url not in visited and valid_url(url):
                     unvisited_next.append((url, depth))
+
+            # Every future in the batch has now completed, so all temporary
+            # reservations have been released. Only actual transferred bytes
+            # can now establish that eligible, unattempted work cannot fit.
+            # Children already blocked by the source-count ceiling are not a
+            # download-budget failure, even when the byte ceiling is also met.
+            budget_pending = bool(batch[wave_start:]) or (
+                bool(unvisited_next) and len(visited) < max_total_sources
+            )
+            if budget_pending and stats["total_download_bytes"] >= max_total_download_bytes:
+                stats["budget_exhausted"] = True
+
+            if stats["timed_out"]:
+                record_unattempted(pending, "global-timeout")
+                current = []
+                break
+            if stats["budget_exhausted"]:
+                budget_unattempted = list(batch[wave_start:])
+                source_limited = list(deferred_by_source_limit)
+                if len(visited) >= max_total_sources:
+                    source_limited.extend(unvisited_next)
+                else:
+                    budget_unattempted.extend(unvisited_next)
+                record_unattempted(budget_unattempted, "global-download-budget-exhausted")
+                if source_limited:
+                    stats["source_limit_reached"] = True
+                    record_unattempted(source_limited, "source-limit")
+                current = []
+                break
             if deferred_by_source_limit or (len(visited) >= max_total_sources and unvisited_next):
                 stats["source_limit_reached"] = True
                 record_unattempted(pending, "source-limit")

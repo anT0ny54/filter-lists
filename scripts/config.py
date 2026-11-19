@@ -25,7 +25,7 @@ CUSTOM_RULES = ROOT / "custom-rules.txt"
 # validate.py, and fetch.py's outbound User-Agent all import this instead of
 # each keeping an independent copy, which previously let the string drift
 # out of sync between modules on a version bump.
-BUILDER_VERSION = "7.6.1"
+BUILDER_VERSION = "7.6.2"
 
 # Schema revision of policies.yaml itself (its `version:` key).
 POLICY_SCHEMA_VERSION = 3

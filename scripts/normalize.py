@@ -130,6 +130,25 @@ def valid_regex_filter(pattern: str) -> bool:
     return not REGEX_CONTROL_RE.search(payload)
 
 
+def has_unescaped_dollar(value: str) -> bool:
+    """Return whether ``value`` contains a dollar not escaped by a backslash.
+
+    ABP uses an unescaped ``$`` to begin a network-filter option list. Once
+    ``split_options`` has isolated that list, another unescaped dollar in the
+    remaining pattern is malformed unless the whole pattern is a slash-delimited
+    regular expression (where ``$`` is a normal end-of-line anchor).
+    """
+    escaped = False
+    for char in value:
+        if char == "\\" and not escaped:
+            escaped = True
+            continue
+        if char == "$" and not escaped:
+            return True
+        escaped = False
+    return False
+
+
 def valid_network_pattern(pattern: str) -> bool:
     """Conservative ABP network-filter grammar gate."""
     if not pattern or CONTROL_RE.search(pattern):
@@ -444,13 +463,30 @@ def _normalize_network_with_reason(rule: str, policy: dict[str, bool], parsed=No
     """Normalize `rule`, returning ``(rule, None)`` or ``(None, reason)``.
 
     The reason strings mirror ``_rejection_reason()``'s network branch exactly
-    (same check order: overbroad -> option list -> pattern shape), so the
+    (same check order: malformed delimiter -> overbroad -> option list ->
+    pattern shape), so the
     rejection hot path — thousands of rejects per source — no longer
     re-validates a rejected rule a second time just to explain it.
     """
     is_exception = rule.startswith("@@")
     pattern, options = parsed if parsed is not None else split_options(rule)
     pattern_body = pattern[2:] if pattern.startswith("@@") else pattern
+    # An unescaped dollar belongs to the option delimiter, not arbitrary
+    # network-pattern text. split_options() deliberately returns the original
+    # input when it sees an empty/malformed option token; without this check,
+    # that fallback let malformed delimiters pass as literal URL patterns. A
+    # complete regex is the exception because `$` is a valid regex anchor.
+    if (
+        "$" in pattern_body
+        and has_unescaped_dollar(pattern_body)
+        and not valid_regex_filter(pattern_body)
+    ):
+        reason = (
+            "invalid-network-rule"
+            if _has_unescaped_terminal_dollar(pattern_body)
+            else "invalid-option-or-network-rule"
+        )
+        return None, reason
     if is_overbroad_pattern(pattern_body, options):
         return None, "overbroad-pattern"
     if not pattern_body:
