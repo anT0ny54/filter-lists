@@ -86,6 +86,7 @@ jobs:
           assert not data["sources"]["required_failed"]
           assert not data["sources"]["timed_out"]
           assert not data["sources"]["source_limit_reached"]
+          assert not data["sources"]["budget_exhausted"]
           assert data["anomalies"]["critical_count"] == 0
           assert data["anomalies"].get("enforced_failure") is False
           assert len(data["provenance"]["source_manifest_sha256"]) == 64
